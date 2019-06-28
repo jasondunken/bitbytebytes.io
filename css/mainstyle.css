@@ -1,0 +1,30 @@
+body {
+    background-color: #96F3ED;
+}
+
+.logo {
+    font-size: 6em;
+    font-family: 'Alfa Slab One', serif;
+    text-align: center;
+}
+
+.ufo {
+    position: absolute;
+    top: 400px;
+    right: 400px;
+    height: 32px;
+    width: 32px;
+}
+
+#btn {
+    text-align: center;
+}
+
+#game-container {
+    width: 100%;
+    text-align: center;
+}
+
+#game {
+    display: inline-block;
+}
