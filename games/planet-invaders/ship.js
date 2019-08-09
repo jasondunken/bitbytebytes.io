@@ -1,5 +1,5 @@
 function Ship() {
-    this.r = 20;
+    this.r = 8;
     this.posx = width / 2;
     this.posy = height - 30;
     this.shots = [];
@@ -10,7 +10,7 @@ function Ship() {
 Ship.prototype.render = function () {
     noStroke();
     fill("RED");
-    ellipse(this.posx, this.posy, this.r, this.r);
+    ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
     for (let i = 0; i < this.shots.length; i++) {
         if (!this.shots[i].dead) {
             this.shots[i].render();
@@ -19,12 +19,13 @@ Ship.prototype.render = function () {
 };
 
 Ship.prototype.update = function () {
-    for (let shot in this.shots) {
-        if (shot.dead) {
+    for (let i = 0; i < this.shots.length; i++) {
+        if (this.shots[i].dead) {
             this.reload();
-            this.shots.splice(i, 0);
+            this.shots.splice(i - 1, 1);
         }
     }
+    
 
     if (!this.weaponReady) {
         this.cooldown--;
@@ -47,7 +48,7 @@ Ship.prototype.reload = function () {
 };
 
 function Shot(vec2D) {
-    this.r = 10;
+    this.r = 4;
     this.posx = vec2D.x;
     this.posy = vec2D.y;
     this.moveSpeed = 3;
@@ -62,7 +63,7 @@ Shot.prototype.render = function () {
         let a = random(0, 255);
         noStroke();
         fill(r, g, b, a);
-        ellipse(this.posx, this.posy, this.r, this.r);
+        ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
         this.posy -= this.moveSpeed;
     } else {
         this.dead = true;

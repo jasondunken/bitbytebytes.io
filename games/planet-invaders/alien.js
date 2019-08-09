@@ -1,5 +1,5 @@
 function Alien(x, y) {
-    this.r = 15;
+    this.r = 8;
     this.posx = x;
     this.posy = y;
     this.moveSpeed = 1;
@@ -9,7 +9,7 @@ function Alien(x, y) {
 Alien.prototype.render = function() {
     noStroke();
     fill("GREEN");
-    ellipse(this.posx, this.posy, this.r, this.r);
+    ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
 };
 
 Alien.prototype.move = function(multiplier) {

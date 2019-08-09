@@ -8,7 +8,9 @@ function draw() {
     loadPixels();
     for (let i = 0; i < (600 * 400 * 4); i += 4) {
         let flip = Math.random() < 0.5 ? 0 : 255;
+        //     r               g               b
         pixels[i] = pixels[i + 1] = pixels[i + 2] = flip;
+        //         alpha
         pixels[i + 3] = 255;
     }
     updatePixels();

@@ -1,16 +1,17 @@
 let ship;
-let aliens = [];
-let level = [];
-let levelSpeed = 1;
-let levelNum = 0;
+let aliens;
+let level;
+let levelSpeed;
+let levelNum;
 
-let score = 0;
-let gameOver = false;
+let score;
+let gameOver;
 
-let bg_img;
+let bg_img = '#000000';
 
 function  preload() {
-    bg_img = loadImage('invaders/img/bg.png');
+    // getting some CORS bs from this, i'll figure it out later
+    // bg_img = loadImage('./invaders/img/bg.png');
 }
 
 function setup() {
@@ -18,10 +19,20 @@ function setup() {
     canvas.parent('game');
 
     frameRate(60);
+    initGame();
+}
+
+function initGame() {
     ship = new Ship();
+    aliens = [];
+    level = [];
+    levelSpeed = 1
+    levelNum = 0;
     let board = new Board();
     level = board.getLayout();
     loadLevel(level);
+    score = 0;
+    gameOver = false;
 }
 
 function update() {
