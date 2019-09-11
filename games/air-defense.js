@@ -24,6 +24,7 @@ let wave;
 
 let bullets;
 let enemy;
+let visuals;
 
 let enemySpawnRate = 120; // frames between spawns - higher is longer
 let spawnCooldown = enemySpawnRate;
@@ -50,6 +51,7 @@ function initGame() {
 
     bullets = [];
     enemy = [];
+    visuals = [];
 }
 
 function spawnerTick() {
@@ -61,21 +63,30 @@ function spawnerTick() {
             break;
         case 1:
             if (spawnCooldown === (enemySpawnRate / 2) || spawnCooldown === enemySpawnRate) {
-                enemy.push(new Enemy(0, 40, -1));
+                enemy.push(new Enemy(width, 40, -1));
             }
             if (spawnCooldown === enemySpawnRate) {
-                enemy.push(new Enemy(width, 60, 1));
+                enemy.push(new Enemy(0, 60, 1));
             }
             break;
         case 2:
             if (spawnCooldown === (enemySpawnRate / 2) || spawnCooldown === enemySpawnRate) {
-                enemy.push(new Enemy(0, 50, -1));
+                enemy.push(new Enemy(width, 50, -1));
             }
             if (spawnCooldown === enemySpawnRate) {
-                enemy.push(new Enemy(width, 30, 1));
+                enemy.push(new Enemy(0, 30, 1));
             }
             break;
         default:
+            if (spawnCooldown === enemySpawnRate) {
+                enemy.push(new Enemy(0, height / 2 + 10, 1));
+                enemy.push(new Enemy(width, height / 2 - 10, -1));
+                enemy.push(new Enemy(0, height / 2 - 30, 1));
+                enemy.push(new Enemy(width, height / 2 + 30, -1));
+
+                enemy.push(new Enemy(0, (Math.random() * height) / 2, (Math.random() * 4)));
+                enemy.push(new Enemy(width, (Math.random() * height) / 2, (Math.random() * -4)));
+            }
             break;
     }
     spawnCooldown--;
@@ -143,6 +154,10 @@ function update() {
             }
         }
     }
+
+    for (let v of visuals) {
+        v.update();
+    }
 }
 
 function checkForHit(bullet) {
@@ -151,6 +166,7 @@ function checkForHit(bullet) {
             const _enemy = enemy[e];
             if (dist(bullet.pos.x, bullet.pos.y, _enemy._pos.x, _enemy._pos.y) <= _enemy.diameter + bulletDiameter) {
                 _enemy.hit(bullet.damage);
+                explode(new p5.Vector(bullet.pos.x, bullet.pos.y), new p5.Vector(bullet.dir.x, bullet.dir.y));
                 score++;
             }
         }
@@ -170,6 +186,10 @@ function fireTurret() {
         new p5.Vector(endOfBarrel.x - turretCenter.x, endOfBarrel.y - turretCenter.y)
     ));
 
+}
+
+function explode(pos, dir) {
+    visuals.push(new pExplosion(pos, dir, 10));
 }
 
 // p5.draw is called @ 60fps by default
@@ -208,6 +228,11 @@ function draw() {
     setColor('brown');
     rect((width - baseWidth) / 2, height - baseHeight, baseWidth, baseHeight);
 
+    // draw visuals
+    for (let v in visuals) {
+        visuals[v].render();
+    }
+
     // UI --------------------------------------------------------------------
     // draw ammo reserve
     setColor('green');
@@ -216,6 +241,10 @@ function draw() {
     // draw score
     setColor('blue');
     text(score, 20, 20);
+
+    // draw score
+    setColor('green');
+    text('Wave ' + wave, 20, height - 20);
 }
 
 function setColor(newColor) {
@@ -230,5 +259,48 @@ function bullet(position, direction) {
 
     bullet.prototype.update = function () {
         this.pos = new p5.Vector(this.pos.x + (this.dir.x / bulletSpeed), this.pos.y + (this.dir.y / bulletSpeed));
+    }
+}
+
+function pExplosion(pos, dir, amount) {
+    this.particles = [];
+    for (let i = 0; i < amount; i++) {
+        this.particles.push(new Particle(pos, dir));
+    }
+    pExplosion.prototype.update = function () {
+        for (let i = 0; i < this.particles.length; i++) {
+            this.particles[i].update();
+        }
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            if (this.particles[i].dead) {
+                this.particles.splice(i, 1);
+            }
+        }
+    }
+    pExplosion.prototype.render = function () {
+        for (p of this.particles) {
+            p.render();
+        }
+    }
+}
+
+function Particle(pos, dir) {
+    this.life = (Math.random() * 30) + 30;
+    this.dead = false;
+
+    this.pos = new p5.Vector(pos.x + (Math.random() * 10) - 5, pos.y + (Math.random() * 10) - 5);
+    this.dir = new p5.Vector(dir.x + (Math.random() * 10) - 5, dir.y + (Math.random() * 10) - 5);
+
+    Particle.prototype.update = function () {
+        this.life--;
+        if (this.life <= 0) {
+            this.dead = true;
+        }
+        this.pos.x = this.pos.x + (this.dir.x / (bulletSpeed * 2));
+        this.pos.y = this.pos.y + (this.dir.y / (bulletSpeed * 2));
+    }
+    Particle.prototype.render = function () {
+        setColor('red');
+        point(this.pos.x, this.pos.y);
     }
 }
