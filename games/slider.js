@@ -5,7 +5,6 @@ const TILES_PER_SIDE = 4;
 let TILE_SIZE;
 
 let tiles;
-let numTiles = TILES_PER_SIDE * TILES_PER_SIDE - 1;
 
 let mouseLocation = {
   x: 0,
@@ -43,14 +42,17 @@ function initGame() {
 function update() {}
 
 function mouseClicked(event) {
-  if (tiles) {
-    checkTiles(mouseLocation.x, mouseLocation.y);
+  const clickX = Math.floor(mouseX / TILE_SIZE);
+  const clickY = Math.floor(mouseY / TILE_SIZE);
+  if (
+    tiles &&
+    clickX >= 0 &&
+    clickY >= 0 &&
+    clickX < TILES_PER_SIDE &&
+    clickY < TILES_PER_SIDE
+  ) {
+    checkTiles(clickX, clickY);
   }
-}
-
-function mouseMoved(event) {
-  mouseLocation.x = Math.floor(mouseX / TILE_SIZE);
-  mouseLocation.y = Math.floor(mouseY / TILE_SIZE);
 }
 
 function checkTiles(indexX, indexY) {
@@ -130,8 +132,8 @@ function draw() {
   }
   setColor("red", true);
   rect(
-    mouseLocation.x * TILE_SIZE + 1,
-    mouseLocation.y * TILE_SIZE + 1,
+    Math.floor(mouseX / TILE_SIZE) * TILE_SIZE,
+    Math.floor(mouseY / TILE_SIZE) * TILE_SIZE,
     TILE_SIZE - 2,
     TILE_SIZE - 2
   );
