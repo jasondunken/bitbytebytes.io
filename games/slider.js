@@ -1,15 +1,12 @@
 const WIDTH = 600;
 const HEIGHT = 600;
 
-const TILES_PER_SIDE = 4;
+const TILES_PER_SIDE = 3;
 let TILE_SIZE;
 
 let tiles;
 
-let mouseLocation = {
-  x: 0,
-  y: 0,
-};
+let playing = false;
 
 function preload() {
   // preload assets here
@@ -23,6 +20,7 @@ function setup() {
 }
 
 function initGame() {
+  playing = true;
   TILE_SIZE = width / TILES_PER_SIDE;
   tiles = [];
   for (let i = 0; i < TILES_PER_SIDE; i++) {
@@ -35,8 +33,7 @@ function initGame() {
       };
     }
   }
-  setEmptyTile();
-  shuffleTiles();
+  shuffleTiles(1000);
 }
 
 function update() {}
@@ -45,6 +42,7 @@ function mouseClicked(event) {
   const clickX = Math.floor(mouseX / TILE_SIZE);
   const clickY = Math.floor(mouseY / TILE_SIZE);
   if (
+    playing &&
     tiles &&
     clickX >= 0 &&
     clickY >= 0 &&
@@ -52,6 +50,7 @@ function mouseClicked(event) {
     clickY < TILES_PER_SIDE
   ) {
     checkTiles(clickX, clickY);
+    playing = !checkForWin();
   }
 }
 
@@ -75,6 +74,17 @@ function checkTiles(indexX, indexY) {
   }
 }
 
+function checkForWin() {
+  for (let i = 0; i < tiles.length; i++) {
+    for (let j = 0; j < tiles[i].length; j++) {
+      if (tiles[i][j].id !== TILES_PER_SIDE * i + j) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 function swapTiles(x1, y1, x2, y2) {
   let tempTile1 = tiles[x1][y1];
   let tempTile2 = tiles[x2][y2];
@@ -82,19 +92,42 @@ function swapTiles(x1, y1, x2, y2) {
   tiles[x2][y2] = tempTile1;
 }
 
-function setEmptyTile() {
-  const index = getRandomIndex();
+function shuffleTiles(times) {
+  let index = getRandomIndex();
   tiles[index.x][index.y].empty = true;
+  for (let i = 0; i < times; i++) {
+    let neighbors = getNeighbors(index);
+    if (neighbors.length > 0) {
+      let roll = Math.floor(Math.random() * neighbors.length);
+      neighbor = neighbors[roll];
+      swapTiles(index.x, index.y, neighbor.x, neighbor.y);
+      index = neighbor;
+    }
+  }
 }
 
-function shuffleTiles() {
-  for (let i = 0; i < 1000; i++) {
-    const index1 = getRandomIndex();
-    const index2 = getRandomIndex();
-    let temp = tiles[index1.x][index1.y];
-    tiles[index1.x][index1.y] = tiles[index2.x][index2.y];
-    tiles[index2.x][index2.y] = temp;
+function getNeighbors(emptyTileIndex) {
+  let neighbors = [];
+  if (emptyTileIndex.x - 1 >= 0) {
+    let n1 = { x: emptyTileIndex.x - 1, y: emptyTileIndex.y };
+    if (tiles[n1.x][n1.y]) neighbors.push(n1);
   }
+
+  if (emptyTileIndex.x + 1 < TILES_PER_SIDE) {
+    let n2 = { x: emptyTileIndex.x + 1, y: emptyTileIndex.y };
+    if (tiles[n2.x][n2.y]) neighbors.push(n2);
+  }
+
+  if (emptyTileIndex.y - 1 >= 0) {
+    let n3 = { x: emptyTileIndex.x, y: emptyTileIndex.y - 1 };
+    if (tiles[n3.x][n3.y]) neighbors.push(n3);
+  }
+
+  if (emptyTileIndex.y + 1 < TILES_PER_SIDE) {
+    let n4 = { x: emptyTileIndex.x, y: emptyTileIndex.y + 1 };
+    if (tiles[n4.x][n4.y]) neighbors.push(n4);
+  }
+  return neighbors;
 }
 
 function getRandomIndex() {
@@ -121,7 +154,7 @@ function draw() {
           width / TILES_PER_SIDE,
           height / TILES_PER_SIDE
         );
-        setColor("black");
+        setColor("white");
         text(
           tiles[i][j].id,
           (width / TILES_PER_SIDE) * i + 10,
