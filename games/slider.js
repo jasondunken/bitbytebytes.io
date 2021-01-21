@@ -1,12 +1,13 @@
 const WIDTH = 600;
 const HEIGHT = 600;
 
-const TILES_PER_SIDE = 3;
+const TILES_PER_SIDE = 6;
 let TILE_SIZE;
 
 let tiles;
 
 let playing = false;
+let turns = 0;
 
 function preload() {
   // preload assets here
@@ -21,6 +22,7 @@ function setup() {
 
 function initGame() {
   playing = true;
+  turns = 0;
   TILE_SIZE = width / TILES_PER_SIDE;
   tiles = [];
   for (let i = 0; i < TILES_PER_SIDE; i++) {
@@ -49,6 +51,7 @@ function mouseClicked(event) {
     clickX < TILES_PER_SIDE &&
     clickY < TILES_PER_SIDE
   ) {
+    turns++;
     checkTiles(clickX, clickY);
     playing = !checkForWin();
   }
