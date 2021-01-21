@@ -93,7 +93,7 @@ function checkForWin() {
   if (gameOver) {
     playing = false;
     level++;
-    breakTimer = 500;
+    breakTimer = 300;
   }
 }
 
