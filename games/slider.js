@@ -1,13 +1,17 @@
 const WIDTH = 600;
 const HEIGHT = 600;
 
-const TILES_PER_SIDE = 6;
-let TILE_SIZE;
+const STARTING_TILES_PER_SIDE = 2;
+let tilesPerSide;
+let tileSize;
 
 let tiles;
 
 let playing = false;
+let level = 0;
 let turns = 0;
+
+let breakTimer = 0;
 
 function preload() {
   // preload assets here
@@ -23,13 +27,14 @@ function setup() {
 function initGame() {
   playing = true;
   turns = 0;
-  TILE_SIZE = width / TILES_PER_SIDE;
+  tilesPerSide = STARTING_TILES_PER_SIDE + level;
+  tileSize = width / tilesPerSide;
   tiles = [];
-  for (let i = 0; i < TILES_PER_SIDE; i++) {
+  for (let i = 0; i < tilesPerSide; i++) {
     tiles[i] = [];
-    for (let j = 0; j < TILES_PER_SIDE; j++) {
+    for (let j = 0; j < tilesPerSide; j++) {
       tiles[i][j] = {
-        id: TILES_PER_SIDE * i + j,
+        id: tilesPerSide * i + j,
         color: "blue",
         empty: false,
       };
@@ -38,22 +43,27 @@ function initGame() {
   shuffleTiles(1000);
 }
 
-function update() {}
+function update() {
+  breakTimer--;
+  if (breakTimer <= 0 && !playing) {
+    initGame();
+  }
+}
 
 function mouseClicked(event) {
-  const clickX = Math.floor(mouseX / TILE_SIZE);
-  const clickY = Math.floor(mouseY / TILE_SIZE);
+  const clickX = Math.floor(mouseX / tileSize);
+  const clickY = Math.floor(mouseY / tileSize);
   if (
     playing &&
     tiles &&
     clickX >= 0 &&
     clickY >= 0 &&
-    clickX < TILES_PER_SIDE &&
-    clickY < TILES_PER_SIDE
+    clickX < tilesPerSide &&
+    clickY < tilesPerSide
   ) {
     turns++;
     checkTiles(clickX, clickY);
-    playing = !checkForWin();
+    checkForWin();
   }
 }
 
@@ -61,31 +71,30 @@ function checkTiles(indexX, indexY) {
   if (!tiles[indexX][indexY].empty) {
     if (indexX !== 0 && tiles[indexX - 1][indexY].empty) {
       swapTiles(indexX, indexY, indexX - 1, indexY);
-    } else if (
-      indexX !== TILES_PER_SIDE - 1 &&
-      tiles[indexX + 1][indexY].empty
-    ) {
+    } else if (indexX !== tilesPerSide - 1 && tiles[indexX + 1][indexY].empty) {
       swapTiles(indexX, indexY, indexX + 1, indexY);
     } else if (indexY !== 0 && tiles[indexX][indexY - 1].empty) {
       swapTiles(indexX, indexY, indexX, indexY - 1);
-    } else if (
-      indexY !== TILES_PER_SIDE - 1 &&
-      tiles[indexX][indexY + 1].empty
-    ) {
+    } else if (indexY !== tilesPerSide - 1 && tiles[indexX][indexY + 1].empty) {
       swapTiles(indexX, indexY, indexX, indexY + 1);
     }
   }
 }
 
 function checkForWin() {
+  let gameOver = true;
   for (let i = 0; i < tiles.length; i++) {
     for (let j = 0; j < tiles[i].length; j++) {
-      if (tiles[i][j].id !== TILES_PER_SIDE * i + j) {
-        return false;
+      if (tiles[i][j].id !== tilesPerSide * i + j) {
+        gameOver = false;
       }
     }
   }
-  return true;
+  if (gameOver) {
+    playing = false;
+    level++;
+    breakTimer = 500;
+  }
 }
 
 function swapTiles(x1, y1, x2, y2) {
@@ -116,7 +125,7 @@ function getNeighbors(emptyTileIndex) {
     if (tiles[n1.x][n1.y]) neighbors.push(n1);
   }
 
-  if (emptyTileIndex.x + 1 < TILES_PER_SIDE) {
+  if (emptyTileIndex.x + 1 < tilesPerSide) {
     let n2 = { x: emptyTileIndex.x + 1, y: emptyTileIndex.y };
     if (tiles[n2.x][n2.y]) neighbors.push(n2);
   }
@@ -126,7 +135,7 @@ function getNeighbors(emptyTileIndex) {
     if (tiles[n3.x][n3.y]) neighbors.push(n3);
   }
 
-  if (emptyTileIndex.y + 1 < TILES_PER_SIDE) {
+  if (emptyTileIndex.y + 1 < tilesPerSide) {
     let n4 = { x: emptyTileIndex.x, y: emptyTileIndex.y + 1 };
     if (tiles[n4.x][n4.y]) neighbors.push(n4);
   }
@@ -135,8 +144,8 @@ function getNeighbors(emptyTileIndex) {
 
 function getRandomIndex() {
   randomIndex = { x: 0, y: 0 };
-  randomIndex.x = Math.floor(Math.random() * TILES_PER_SIDE);
-  randomIndex.y = Math.floor(Math.random() * TILES_PER_SIDE);
+  randomIndex.x = Math.floor(Math.random() * tilesPerSide);
+  randomIndex.y = Math.floor(Math.random() * tilesPerSide);
   return randomIndex;
 }
 
@@ -150,29 +159,35 @@ function draw() {
     for (let j = 0; j < tiles[i].length; j++) {
       setColor("white");
       if (!tiles[i][j].empty) {
-        fill(tiles[i][j].color);
+        if (playing) {
+          fill(tiles[i][j].color);
+        } else {
+          fill("red");
+        }
         rect(
-          (width / TILES_PER_SIDE) * i,
-          (height / TILES_PER_SIDE) * j,
-          width / TILES_PER_SIDE,
-          height / TILES_PER_SIDE
+          (width / tilesPerSide) * i,
+          (height / tilesPerSide) * j,
+          width / tilesPerSide,
+          height / tilesPerSide
         );
         setColor("white");
         text(
           tiles[i][j].id,
-          (width / TILES_PER_SIDE) * i + 10,
-          (height / TILES_PER_SIDE) * j + 20
+          (width / tilesPerSide) * i + 10,
+          (height / tilesPerSide) * j + 20
         );
       }
     }
   }
-  setColor("red", true);
-  rect(
-    Math.floor(mouseX / TILE_SIZE) * TILE_SIZE,
-    Math.floor(mouseY / TILE_SIZE) * TILE_SIZE,
-    TILE_SIZE - 2,
-    TILE_SIZE - 2
-  );
+  if (playing) {
+    setColor("red", true);
+    rect(
+      Math.floor(mouseX / tileSize) * tileSize,
+      Math.floor(mouseY / tileSize) * tileSize,
+      tileSize - 2,
+      tileSize - 2
+    );
+  }
 }
 
 function setColor(newColor, noFill) {
