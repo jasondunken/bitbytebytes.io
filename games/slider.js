@@ -44,9 +44,11 @@ function initGame() {
 }
 
 function update() {
-  breakTimer--;
-  if (breakTimer <= 0 && !playing) {
-    initGame();
+  if (breakTimer > 0) {
+    breakTimer--;
+    if (breakTimer <= 0 && !playing) {
+      initGame();
+    }
   }
 }
 
