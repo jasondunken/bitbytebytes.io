@@ -42,9 +42,9 @@ for (let game of GAMES) {
             <div class="info">
                 <h1 class="title">${game.title}</h1>
                 <h3>${game.description}</h3>
-                <div class="play">
-                    <a href="${game.file}"><button>Play</button></a>
-                </div>
+            </div>
+            <div class="play">
+                <a href="${game.file}"><button>Play</button></a>
             </div>
         </div>
     </div>`;
@@ -70,7 +70,7 @@ for (let game of GAMES) {
     play.style.transform = "translateZ(150px)";
   });
   container.addEventListener("mouseleave", (e) => {
-    card.style.transition = "all 0.3s ease";
+    card.style.transition = "all 0.7s ease";
     card.style.transform = `rotateY(0deg) rotateX(0deg)`;
     icon.style.transform = "translateZ(0px)";
     title.style.transform = "translateZ(0px)";
