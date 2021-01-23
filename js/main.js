@@ -1,14 +1,18 @@
+let _width;
+let _height = 245;
+
 let map = [];
 let nextMap = [];
-let _width,
-  _height = 0;
+
+let rColor;
 
 function setup() {
   frameRate(15);
   _width = window.innerWidth;
-  _height = 145;
   let canvas = createCanvas(_width, _height);
   canvas.parent("p5-container");
+
+  if (!rColor) setRndColor();
 
   // initialize map arrays to 0 (empty)
   for (let i = 0; i < _width * _height; i++) {
@@ -17,7 +21,7 @@ function setup() {
   }
 
   // randomly set n cells to 1 (occupied)
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < _height * 100; i++) {
     const index = Math.floor(Math.random() * map.length);
     const value = map[index];
     if (value !== 1) {
@@ -45,8 +49,9 @@ function draw() {
         pixels[i * 4] = pixels[i * 4 + 2] = 0;
         pixels[i * 4 + 3] = 255;
       } else if (map[i] < 1024) {
-        pixels[i * 4 + 2] = 255;
-        pixels[i * 4] = pixels[i * 4 + 1] = 0;
+        pixels[i * 4] = rColor.r;
+        pixels[i * 4 + 1] = rColor.g;
+        pixels[i * 4 + 2] = rColor.b;
         pixels[i * 4 + 3] = 255;
       }
     } else {
@@ -87,33 +92,40 @@ function draw() {
 
 function getNumNeighbors(index) {
   let walls = 0;
-  for (let i = -1; i < 2; i++) {
-    let cell = index + i - _width;
-    if (cell < 0) {
-      //do nothing;
-    } else {
-      if (map[cell] >= 1) {
-        walls++;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      let nIndex = index + i + j * _width;
+      if (nIndex !== index && nIndex >= 0 && nIndex < map.length) {
+        if (map[nIndex] >= 1) {
+          walls++;
+        }
       }
     }
   }
-  for (let i = -1; i < 2; i++) {
-    let cell = index + i;
-    if (cell < 0 || cell >= map.length) {
-      //do nothing;
-    } else {
-      if (i != 0 && map[cell] >= 1) walls++;
-    }
-  }
-  for (let i = -1; i < 2; i++) {
-    let cell = index + i + _width;
-    if (cell >= map.length) {
-      //do nothing;
-    } else {
-      if (map[cell] >= 1) walls++;
-    }
-  }
   return walls;
+}
+
+function mouseClicked(e) {
+  if (e.pageY <= _height) {
+    randomSpawn(e.pageX, e.pageY);
+  }
+}
+
+function mouseDragged(e) {
+  randomSpawn(e.pageX, e.pageY);
+}
+
+function randomSpawn(x, y) {
+  const SIZE = 11;
+  let cellIndex = y * _width + x;
+  for (let i = -Math.floor(SIZE / 2); i < SIZE; i++) {
+    for (let j = -Math.floor(SIZE / 2); j < SIZE; j++) {
+      index = cellIndex + i + j * _width;
+      if (index > 0 && index < map.length) {
+        map[index] = Math.random() > 0.5 ? 1 : 0;
+      }
+    }
+  }
 }
 
 function buildName() {
@@ -128,14 +140,17 @@ function buildName() {
 
 function twinkle() {
   let letters = document.getElementsByClassName("ltr");
-  let t_color = () => {
-    let r = Math.floor(Math.random() * 255);
-    let g = Math.floor(Math.random() * 255);
-    let b = Math.floor(Math.random() * 255);
-    return "rgb(" + r + ", " + g + ", " + b + ");";
-  };
   let index = Math.floor(Math.random() * letters.length);
-  letters[index].style = "color: " + t_color();
+  setRndColor();
+  letters[index].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+}
+
+function setRndColor() {
+  rColor = {
+    r: Math.floor(Math.random() * 255),
+    g: Math.floor(Math.random() * 255),
+    b: Math.floor(Math.random() * 255),
+  };
 }
 
 let ufos = [];
@@ -149,7 +164,7 @@ function update() {
       let y_start = Math.random() * MAX_Y;
       let x_dir = Math.random() > 0.5 ? 1 : -1;
       let y_dir = Math.random() > 0.5 ? 1 : -1;
-      let speed = Math.random() * 3 + 2;
+      let speed = Math.random() * 4 + 1;
       ufos[i] = {
         x: x_start,
         y: y_start,
@@ -178,8 +193,8 @@ function move_mob(ufo) {
     move.x = this.innerWidth - 32;
     ufo.xd *= -1;
   }
-  if (move.y < 0) {
-    move.y = 0;
+  if (move.y < 0 + _height) {
+    move.y = _height;
     ufo.yd *= -1;
   }
   if (move.y > MAX_Y - 32) {

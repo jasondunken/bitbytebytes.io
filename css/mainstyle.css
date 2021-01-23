@@ -1,11 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #96f3ed;
+  background-color: powderblue;
 }
 
 .logo {
   font-size: 6em;
   font-family: "Alfa Slab One", serif;
-  text-align: center;
+}
+
+.logo-container {
+  width: 100%;
+  height: 245px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ufo {
@@ -32,6 +45,5 @@ body {
 .game-of-life {
   position: absolute;
   top: 0px;
-  left: 0px;
   z-index: -1;
 }
