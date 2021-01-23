@@ -60,6 +60,8 @@ for (let game of GAMES) {
     let bb = card.getBoundingClientRect();
     let yRotation = (bb.x + bb.width / 2 - e.pageX) / 30;
     let xRotation = (window.pageYOffset + bb.height / 2 - e.pageY) / 30;
+    if (xRotation > 10) xRotation = 10;
+    if (xRotation < -10) xRotation = -10;
     card.style.transform = `rotateY(${-yRotation}deg) rotateX(${-xRotation}deg)`;
   });
   container.addEventListener("mouseenter", () => {

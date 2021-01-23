@@ -21,7 +21,7 @@ function setup() {
   }
 
   // randomly set n cells to 1 (occupied)
-  for (let i = 0; i < _height * 100; i++) {
+  for (let i = 0; i < _height * 75; i++) {
     const index = Math.floor(Math.random() * map.length);
     const value = map[index];
     if (value !== 1) {

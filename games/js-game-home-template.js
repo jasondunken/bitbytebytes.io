@@ -1,15 +1,13 @@
 const message = "Satellite Transmission Error";
 let messageLength = 0;
 
-let x = 0;
-let y = 0;
+const WIDTH = 600;
+const HEIGHT = 400;
 
 function setup() {
   frameRate(15);
-  let canvas = createCanvas(600, 400);
+  let canvas = createCanvas(WIDTH, HEIGHT);
   canvas.parent("game");
-  y = canvas.height / 2;
-  x = canvas.width;
 
   textSize(68);
   messageLength = textWidth(message);
@@ -18,7 +16,7 @@ function setup() {
 
 function draw() {
   loadPixels();
-  for (let i = 0; i < 600 * 400 * 4; i += 4) {
+  for (let i = 0; i < WIDTH * HEIGHT * 4; i += 4) {
     let flip = Math.random() < 0.5 ? 0 : 255;
     //     r               g               b
     pixels[i] = pixels[i + 1] = pixels[i + 2] = flip;
