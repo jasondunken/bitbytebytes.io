@@ -1,27 +1,44 @@
-let _width;
-let _height = 245;
+let cWidth, cHeight, tWidth, tHeight, tLeft, tTop, tVPadding, tHPadding;
+
+const TOOB_PADDING = 180;
 
 let map = [];
 let nextMap = [];
+let cellDensity = 0.075;
+
+let ufos = [];
 
 let rColor;
 
 function setup() {
   frameRate(15);
-  _width = window.innerWidth;
-  let canvas = createCanvas(_width, _height);
+  let header = document
+    .getElementById("logo-container")
+    .getBoundingClientRect();
+  cWidth = header.width;
+  cHeight = header.height;
+
+  let toob = document.getElementById("toobImage").getBoundingClientRect();
+  tWidth = toob.width;
+  tHeight = toob.height;
+  tLeft = toob.left;
+  tTop = toob.top;
+  tVPadding = TOOB_PADDING * (tHeight / tWidth);
+  tHPadding = TOOB_PADDING;
+
+  let canvas = createCanvas(header.width, header.height);
   canvas.parent("p5-container");
 
   if (!rColor) setRndColor();
 
   // initialize map arrays to 0 (empty)
-  for (let i = 0; i < _width * _height; i++) {
+  for (let i = 0; i < header.width * header.height; i++) {
     map[i] = 0;
     nextMap[i] = 0;
   }
 
   // randomly set n cells to 1 (occupied)
-  for (let i = 0; i < _height * 75; i++) {
+  for (let i = 0; i < cWidth * cHeight * cellDensity; i++) {
     const index = Math.floor(Math.random() * map.length);
     const value = map[index];
     if (value !== 1) {
@@ -91,22 +108,22 @@ function draw() {
 }
 
 function getNumNeighbors(index) {
-  let walls = 0;
+  let neighbors = 0;
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
-      let nIndex = index + i + j * _width;
+      let nIndex = index + i + j * cWidth;
       if (nIndex !== index && nIndex >= 0 && nIndex < map.length) {
         if (map[nIndex] >= 1) {
-          walls++;
+          neighbors++;
         }
       }
     }
   }
-  return walls;
+  return neighbors;
 }
 
 function mouseClicked(e) {
-  if (e.pageY <= _height) {
+  if (e.pageY <= cHeight) {
     randomSpawn(e.pageX, e.pageY);
   }
 }
@@ -117,10 +134,10 @@ function mouseDragged(e) {
 
 function randomSpawn(x, y) {
   const SIZE = 11;
-  let cellIndex = y * _width + x;
+  let cellIndex = y * cWidth + x;
   for (let i = -Math.floor(SIZE / 2); i < SIZE; i++) {
     for (let j = -Math.floor(SIZE / 2); j < SIZE; j++) {
-      index = cellIndex + i + j * _width;
+      index = cellIndex + i + j * cWidth;
       if (index > 0 && index < map.length) {
         map[index] = Math.random() > 0.5 ? 1 : 0;
       }
@@ -153,15 +170,12 @@ function setRndColor() {
   };
 }
 
-let ufos = [];
-const MAX_Y = 400;
-
 function update() {
   let ufo = document.getElementsByClassName("ufo");
   for (let i = 0; i < ufo.length; i++) {
     if (!ufos[i]) {
       let x_start = Math.random() * this.innerWidth;
-      let y_start = Math.random() * MAX_Y;
+      let y_start = Math.random() * tHeight;
       let x_dir = Math.random() > 0.5 ? 1 : -1;
       let y_dir = Math.random() > 0.5 ? 1 : -1;
       let speed = Math.random() * 4 + 1;
@@ -185,20 +199,20 @@ function move_mob(ufo) {
   let move = {};
   move.x = ufo.x + ufo.s * ufo.xd;
   move.y = ufo.y + ufo.s * ufo.yd;
-  if (move.x < 0) {
-    move.x = 0;
+  if (move.x < tLeft + tHPadding) {
+    move.x = tLeft + tHPadding;
     ufo.xd *= -1;
   }
-  if (move.x > this.innerWidth - 32) {
-    move.x = this.innerWidth - 32;
+  if (move.x > tWidth + tLeft - 32 - tHPadding) {
+    move.x = tWidth + tLeft - 32 - tHPadding;
     ufo.xd *= -1;
   }
-  if (move.y < 0 + _height) {
-    move.y = _height;
+  if (move.y < tTop + tVPadding) {
+    move.y = tTop + tVPadding;
     ufo.yd *= -1;
   }
-  if (move.y > MAX_Y - 32) {
-    move.y = MAX_Y - 32;
+  if (move.y > tTop + tHeight - tVPadding) {
+    move.y = tTop + tHeight - tVPadding;
     ufo.yd *= -1;
   }
   ufo.x = move.x;

@@ -20,7 +20,7 @@ function preload() {
 function setup() {
   // setup stuff here
   const canvas = createCanvas(WIDTH, HEIGHT);
-  canvas.parent("p5-container");
+  canvas.parent("game");
   initGame();
 }
 
