@@ -42,6 +42,8 @@ function setup() {
             map[index] = 1;
         }
     }
+
+    setInterval(this.update, 32);
 }
 
 // function windowResized() {
@@ -232,5 +234,4 @@ function move_mob(ufo) {
 
 // __main__
 buildName();
-setInterval(update, 32);
 setInterval(twinkle, 100);
