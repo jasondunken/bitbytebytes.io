@@ -9,6 +9,9 @@ let newPixels = [];
 
 let ufos = [];
 
+let tInterval = null;
+let uInterval = null;
+
 function setup() {
     frameRate(15);
     let header = document
@@ -43,13 +46,16 @@ function setup() {
         }
     }
 
-    setInterval(this.update, 32);
+    this.uInterval = setInterval(this.update, 32);
+    this.buildName();
 }
 
-// function windowResized() {
-//     this.setup();
-//     resizeCanvas(windowWidth, windowHeight);
-// }
+function windowResized() {
+    clearInterval(this.tInterval);
+    clearInterval(this.uInterval);
+    resizeCanvas(windowWidth, windowHeight);
+    this.setup();
+}
 
 // game of life header
 function drawd() {
@@ -160,6 +166,7 @@ function buildName() {
         _name += next;
     }
     document.querySelector(".logo").innerHTML = _name;
+    this.tInterval = setInterval(twinkle, 100);
 }
 
 function twinkle() {
@@ -231,7 +238,3 @@ function move_mob(ufo) {
     ufo.y = move.y;
     return move;
 }
-
-// __main__
-buildName();
-setInterval(twinkle, 100);
