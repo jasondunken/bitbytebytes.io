@@ -7,6 +7,10 @@
 body {
     background: rgb(31, 31, 31);
     height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
 }
 
 .logo {
@@ -22,6 +26,15 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.main {
+    background-image: url(../img/2600-grill.png);
+    background-color: blue;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
 }
 
 .ufo {
@@ -50,7 +63,8 @@ body {
 #divider {
     user-select: none;
     width: 100%;
-    vertical-align: top;
+    border-top: 5px solid orange;
+    border-bottom: 5px solid orange;
 }
 
 #toob img {
