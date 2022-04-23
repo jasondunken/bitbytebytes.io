@@ -13,12 +13,6 @@ body {
     grid-template-rows: auto auto 1fr;
 }
 
-.logo {
-    user-select: none;
-    font-size: 6em;
-    font-family: "Alfa Slab One", serif;
-}
-
 .logo-container {
     width: 100%;
     height: 15rem;
@@ -26,6 +20,19 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.logo {
+    user-select: none;
+    font-size: 6em;
+    font-family: "Alfa Slab One", serif;
+}
+
+.game-of-life {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
 }
 
 .main {
@@ -39,8 +46,6 @@ body {
 
 .ufo {
     position: absolute;
-    top: 400px;
-    right: 400px;
     height: 32px;
     width: 32px;
     cursor: pointer;
@@ -48,16 +53,6 @@ body {
 
 .btn {
     text-align: center;
-}
-
-#game {
-    text-align: center;
-}
-
-.game-of-life {
-    position: absolute;
-    top: 0px;
-    z-index: -1;
 }
 
 #divider {
@@ -72,6 +67,7 @@ body {
 }
 
 #toob {
+    padding-top: 5rem;
     display: grid;
     justify-content: center;
     margin: 0px;
