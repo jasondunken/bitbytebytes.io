@@ -1,25 +1,82 @@
-let cWidth, cHeight, tWidth, tHeight, tLeft, tTop, tVPadding, tHPadding;
+let hWidth;
+let hHeight;
+let tWidth;
+let tHeight;
+let tLeft;
+let tTop;
+let tVPadding;
+let tHPadding;
 
 const TOOB_PADDING = 180;
 
-let map = [];
-let nextMap = [];
+const UPDATES_PER_AGE_TICK = 2;
+let frameCount = 1;
 let cellDensity = 0.075;
-let newPixels = [];
+let pixelAge = [];
+let lastPixelAge = [];
 
 let ufos = [];
 
-let tInterval = null;
-let uInterval = null;
-
+// called by p5 when window is ready
 function setup() {
-    frameRate(15);
+    // p5 doesn't call setup until ths page is loaded
+    // so this place works for initializing the other js as well
+    initHeader();
+    buildName();
+    setupToob();
+
+    // p5.draw calls/second
+    frameRate(60);
+}
+
+// called by p5 when window is ready
+function draw() {
+    frameCount = frameCount % UPDATES_PER_AGE_TICK;
+    if (frameCount == 0) {
+        incrementAge(pixels);
+    }
+    frameCount++;
+    // p5.js function
+    // copies the canvas' pixels a global pixels[]
+    //         px0         px1         px2 ...
+    //           |           |           |
+    // pixels = [r, g, b, a, r, g, b, a, r ...]
+    loadPixels();
+
+    setPixelColors(pixels);
+
+    // p5.js function
+    // updates p5 display window
+    updatePixels();
+
+    updateUfos();
+    updateColorChange();
+}
+
+function initHeader() {
     let header = document
         .getElementById("logo-container")
         .getBoundingClientRect();
-    cWidth = header.width;
-    cHeight = header.height;
+    hWidth = header.width;
+    hHeight = header.height;
 
+    // canvas for header
+    let canvas = createCanvas(hWidth, hHeight);
+    canvas.parent("p5-container");
+
+    initializePixelAge(hWidth, hHeight);
+
+    // test canvas for header
+    // hWidth = 200;
+    // hHeight = 100;
+    // let canvas = createCanvas(hWidth, hHeight);
+    // canvas.parent("p5-container");
+
+    // initializePixelAge(hWidth, hHeight);
+}
+
+function setupToob() {
+    // updateUfos needs the toobImage
     let toob = document.getElementById("toobImage").getBoundingClientRect();
     tWidth = toob.width;
     tHeight = toob.height;
@@ -27,95 +84,91 @@ function setup() {
     tTop = toob.top;
     tVPadding = TOOB_PADDING * (tHeight / tWidth);
     tHPadding = TOOB_PADDING;
-
-    let canvas = createCanvas(header.width, header.height);
-    canvas.parent("p5-container");
-
-    // initialize map arrays to age 0 (dead/empty)
-    for (let i = 0; i < header.width * header.height; i++) {
-        map[i] = 0;
-        nextMap[i] = 0;
-    }
-    // randomly set n cells to age 1
-    // the value of map[n] is how many generations it has been alive for
-    for (let i = 0; i < cWidth * cHeight * cellDensity; i++) {
-        const index = Math.floor(Math.random() * map.length);
-        const value = map[index];
-        if (value !== 1) {
-            map[index] = 1;
-        }
-    }
-
-    this.uInterval = setInterval(this.update, 32);
-    this.buildName();
-}
-
-function windowResized() {
-    clearInterval(this.tInterval);
-    clearInterval(this.uInterval);
-    resizeCanvas(windowWidth, windowHeight);
-    this.setup();
 }
 
 // game of life header
-function drawd() {
-    let rColor = this.getRandomColor();
-    loadPixels();
-    for (let i = 0; i < map.length; i++) {
-        //     r               g               b               a
-        if (map[i] >= 1) {
-            // white range
-            if (map[i] > 2048) map[i] = 1;
-            if (map[i] < 256) {
-                pixels[i * 4] = pixels[i * 4 + 1] = pixels[i * 4 + 2] = 256;
-                pixels[i * 4 + 3] = 255;
-            } else if (map[i] < 512) {
-                pixels[i * 4] = 255;
-                pixels[i * 4 + 1] = pixels[i * 4 + 2] = 0;
-                pixels[i * 4 + 3] = 255;
-            } else if (map[i] < 768) {
-                pixels[i * 4 + 1] = 255;
-                pixels[i * 4] = pixels[i * 4 + 2] = 0;
-                pixels[i * 4 + 3] = 255;
-            } else if (map[i] < 1024) {
-                pixels[i * 4] = rColor.r;
-                pixels[i * 4 + 1] = rColor.g;
-                pixels[i * 4 + 2] = rColor.b;
-                pixels[i * 4 + 3] = 255;
-            }
-        } else {
-            pixels[i * 4] = pixels[i * 4 + 1] = pixels[i * 4 + 2] = 0;
-            pixels[i * 4 + 3] = 255;
-        }
+function initializePixelAge(hWidth, hHeight) {
+    pixelAge = new Array(hWidth * hHeight);
+    for (let index = 0; index < hWidth * hHeight; index++) {
+        pixelAge[index] = 0;
     }
-    updatePixels();
+    for (let i = 0; i < hWidth * hHeight * cellDensity; i++) {
+        const index = Math.floor(Math.random() * pixelAge.length);
+        pixelAge[index] = 1;
+    }
+    lastPixelAge = [...pixelAge];
+}
 
-    // create new nextMap from map
-    for (let i = 0; i < map.length; i++) {
-        if (map[i] >= 1) {
-            ////Any live cell...
-            let n = getNumNeighbors(i);
-            if (n < 2) {
-                //with fewer than two live neighbors dies, as if caused by under-population.
-                nextMap[i] = 0;
-            } else if (n == 2 || n == 3) {
-                //live cell with two or three live neighbors lives on to the next generation.
-                nextMap[i] = map[i] + 1; // so increment it's age
-            } else if (n > 3) {
-                //live cell with more than three live neighbors dies, as if by overcrowding.
-                nextMap[i] = 0;
+function incrementAge(pixels) {
+    let age = 0;
+    let n = 0;
+    for (let index = 0; index < pixelAge.length; index++) {
+        // get age from pixelAge array
+        age = pixelAge[index];
+        // determine neighbors from previous screen buffer
+        // testing with a parallel int array for now
+        n = getNumNeighbors(index);
+
+        if (age >= 1) {
+            if (n == 2 || n == 3) {
+                // Any live cell with two or three live neighbors lives on to the next generation..
+                age++;
+            } else {
+                // any live cell with fewer than two live neighbors dies, as if caused by under-population.
+                // or live cell with more than three live neighbors dies, as if by overcrowding.
+                age = 0;
+            }
+        } else if (n == 3) {
+            //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+            age = 1;
+        }
+        // store the updated age
+        pixelAge[index] = age;
+    }
+    lastPixelAge = [...pixelAge];
+    // update screen buffer based on new ages
+    setPixelColors(pixels);
+}
+
+function setPixelColors(pixels) {
+    for (let index = 0; index < pixelAge.length; index++) {
+        let age = pixelAge[index];
+        if (age >= 1) {
+            if (age > 2048) pAge = 1;
+            if (age < 256) {
+                pixels[index * 4] = 255;
+                pixels[index * 4 + 1] = 255;
+                pixels[index * 4 + 2] = 255;
+                pixels[index * 4 + 3] = 255;
+            } else if (age < 512) {
+                pixels[index * 4] = 255;
+                pixels[index * 4 + 1] = 0;
+                pixels[index * 4 + 2] = 0;
+                pixels[index * 4 + 3] = 255;
+            } else if (age < 768) {
+                pixels[index * 4] = 0;
+                pixels[index * 4 + 1] = 255;
+                pixels[index * 4 + 2] = 0;
+                pixels[index * 4 + 3] = 255;
+            } else if (age < 1024) {
+                pixels[index * 4] = 0;
+                pixels[index * 4 + 1] = 0;
+                pixels[index * 4 + 2] = 255;
+                pixels[index * 4 + 3] = 255;
+            } else {
+                let rColor = getRandomOpaqueColor();
+                pixels[index * 4] = rColor.r;
+                pixels[index * 4 + 1] = rColor.g;
+                pixels[index * 4 + 2] = rColor.b;
+                pixels[index * 4 + 3] = 255;
             }
         } else {
-            if (getNumNeighbors(i) == 3) {
-                //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-                nextMap[i] = 1;
-            }
+            pixels[index * 4] =
+                pixels[index * 4 + 1] =
+                pixels[index * 4 + 2] =
+                    0;
+            pixels[index * 4 + 3] = 255;
         }
-    }
-    map = [...nextMap];
-    // clear nextMap
-    for (let i = 0; i < nextMap.length; i++) {
-        nextMap[i] = 0;
     }
 }
 
@@ -123,9 +176,9 @@ function getNumNeighbors(index) {
     let neighbors = 0;
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-            let nIndex = index + i + j * cWidth;
-            if (nIndex !== index && nIndex >= 0 && nIndex < map.length) {
-                if (map[nIndex] >= 1) {
+            let nIndex = index + i + j * hWidth;
+            if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
+                if (lastPixelAge[nIndex] > 0) {
                     neighbors++;
                 }
             }
@@ -135,23 +188,23 @@ function getNumNeighbors(index) {
 }
 
 function mouseClicked(e) {
-    if (e.pageY <= cHeight) {
-        randomSpawn(e.pageX, e.pageY);
+    if (e.pageY <= hHeight) {
+        randomCellSpawn(e.pageX, e.pageY);
     }
 }
 
 function mouseDragged(e) {
-    randomSpawn(e.pageX, e.pageY);
+    randomCellSpawn(e.pageX, e.pageY);
 }
 
-function randomSpawn(x, y) {
+function randomCellSpawn(x, y) {
     const SIZE = 11;
-    let cellIndex = y * cWidth + x;
+    let cellIndex = y * hWidth + x;
     for (let i = -Math.floor(SIZE / 2); i < SIZE; i++) {
         for (let j = -Math.floor(SIZE / 2); j < SIZE; j++) {
-            index = cellIndex + i + j * cWidth;
-            if (index > 0 && index < map.length) {
-                map[index] = Math.random() > 0.5 ? 1 : 0;
+            index = cellIndex + i + j * hWidth;
+            if (index > 0 && index < lastPixelAge.length) {
+                lastPixelAge[index] = Math.random() > 0.5 ? 1 : 0;
             }
         }
     }
@@ -166,34 +219,29 @@ function buildName() {
         _name += next;
     }
     document.querySelector(".logo").innerHTML = _name;
-    this.tInterval = setInterval(twinkle, 100);
 }
 
-function twinkle() {
-    let letters = document.getElementsByClassName("ltr");
-    let index = Math.floor(Math.random() * letters.length);
-    let rColor = this.getRandomColor();
-    letters[index].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
-}
-
-function getRandomColor() {
-    return {
-        r: Math.floor(Math.random() * 255),
-        g: Math.floor(Math.random() * 255),
-        b: Math.floor(Math.random() * 255),
-    };
+function updateColorChange() {
+    if (Math.random() * 100 > 80) {
+        let letters = document.getElementsByClassName("ltr");
+        let index = Math.floor(Math.random() * letters.length);
+        let rColor = getRandomOpaqueColor();
+        letters[
+            index
+        ].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+    }
 }
 
 // game icons
-function update() {
+function updateUfos() {
     let ufo = document.getElementsByClassName("ufo");
     for (let i = 0; i < ufo.length; i++) {
         if (!ufos[i]) {
-            let x_start = Math.random() * this.innerWidth;
+            let x_start = Math.random() * tWidth;
             let y_start = Math.random() * tHeight;
             let x_dir = Math.random() > 0.5 ? 1 : -1;
             let y_dir = Math.random() > 0.5 ? 1 : -1;
-            let speed = Math.random() * 4 + 1;
+            let speed = Math.random() * 2;
             ufos[i] = {
                 x: x_start,
                 y: y_start,
@@ -204,7 +252,7 @@ function update() {
                 state: "none",
             };
         }
-        let move = move_mob(ufos[i]);
+        let move = moveUfo(ufos[i]);
         ufo[i].style =
             "position: absolute; top: " +
             move.y +
@@ -214,7 +262,7 @@ function update() {
     }
 }
 
-function move_mob(ufo) {
+function moveUfo(ufo) {
     let move = {};
     move.x = ufo.x + ufo.s * ufo.xd;
     move.y = ufo.y + ufo.s * ufo.yd;
@@ -237,4 +285,18 @@ function move_mob(ufo) {
     ufo.x = move.x;
     ufo.y = move.y;
     return move;
+}
+
+function getRandomOpaqueColor() {
+    return {
+        r: Math.floor(Math.random() * 255),
+        g: Math.floor(Math.random() * 255),
+        b: Math.floor(Math.random() * 255),
+        a: 255,
+    };
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    setup();
 }
