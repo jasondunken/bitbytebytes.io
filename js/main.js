@@ -9,7 +9,7 @@ let tHPadding;
 
 const TOOB_PADDING = 180;
 
-const UPDATES_PER_AGE_TICK = 2;
+const UPDATES_PER_AGE_TICK = 3;
 let frameCount = 1;
 let cellDensity = 0.075;
 let pixelAge = [];
@@ -65,14 +65,6 @@ function initHeader() {
     canvas.parent("p5-container");
 
     initializePixelAge(hWidth, hHeight);
-
-    // test canvas for header
-    // hWidth = 200;
-    // hHeight = 100;
-    // let canvas = createCanvas(hWidth, hHeight);
-    // canvas.parent("p5-container");
-
-    // initializePixelAge(hWidth, hHeight);
 }
 
 function setupToob() {
@@ -297,6 +289,15 @@ function getRandomOpaqueColor() {
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    setup();
+    let header = document
+        .getElementById("logo-container")
+        .getBoundingClientRect();
+    hWidth = header.width;
+    hHeight = header.height;
+    resizeCanvas(hWidth, hHeight);
+
+    // this resets the pixel buffer
+    background("black");
+
+    initializePixelAge(hWidth, hHeight);
 }
