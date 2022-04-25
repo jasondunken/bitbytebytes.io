@@ -1,41 +1,29 @@
+const DRAW_CALLS_PER_AGE_TICK = 2;
+const INITIAL_CELL_DENSITY = 0.075;
 let hWidth;
 let hHeight;
-let tWidth;
-let tHeight;
-let tLeft;
-let tTop;
-let tVPadding;
-let tHPadding;
+let pixelAge = [];
 
 const TOOB_PADDING = 180;
-
-const UPDATES_PER_AGE_TICK = 3;
-let frameCount = 1;
-let cellDensity = 0.075;
-let pixelAge = [];
-let lastPixelAge = [];
-
+let toob;
 let ufos = [];
 
 // called by p5 when window is ready
 function setup() {
-    // p5 doesn't call setup until ths page is loaded
-    // so this place works for initializing the other js as well
-    initHeader();
-    buildName();
-    setupToob();
-
     // p5.draw calls/second
     frameRate(60);
+    initializeHeaderGOL();
+    initializeHeaderText();
+    initializeToob();
 }
 
 // called by p5 when window is ready
 function draw() {
-    frameCount = frameCount % UPDATES_PER_AGE_TICK;
+    // frameCount is a p5 global
+    frameCount = frameCount % DRAW_CALLS_PER_AGE_TICK;
     if (frameCount == 0) {
         incrementAge(pixels);
     }
-    frameCount++;
     // p5.js function
     // copies the canvas' pixels a global pixels[]
     //         px0         px1         px2 ...
@@ -46,49 +34,54 @@ function draw() {
     setPixelColors(pixels);
 
     // p5.js function
-    // updates p5 display window
     updatePixels();
 
     updateUfos();
-    updateColorChange();
+    updateHeaderText();
 }
 
-function initHeader() {
+function initializeHeaderGOL() {
     let header = document
         .getElementById("logo-container")
         .getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
 
-    // canvas for header
+    // p5 canvas
     let canvas = createCanvas(hWidth, hHeight);
     canvas.parent("p5-container");
 
     initializePixelAge(hWidth, hHeight);
 }
 
-function setupToob() {
-    // updateUfos needs the toobImage
-    let toob = document.getElementById("toobImage").getBoundingClientRect();
-    tWidth = toob.width;
-    tHeight = toob.height;
-    tLeft = toob.left;
-    tTop = toob.top;
-    tVPadding = TOOB_PADDING * (tHeight / tWidth);
-    tHPadding = TOOB_PADDING;
+function initializeHeaderText() {
+    let _name = "";
+    let name_ = "BITbyteBYTES.io";
+    for (let l = 0; l < name_.length; l++) {
+        let next = "<span class='ltr'>" + name_[l] + "</span>";
+        _name += next;
+    }
+    document.querySelector(".logo").innerHTML = _name;
 }
 
-// game of life header
+function initializeToob() {
+    let toobHtmlElement = document.getElementById("toobImage");
+    toob = new Toob(toobHtmlElement, TOOB_PADDING);
+
+    console.log("toob.bounds: ", toob.bounds);
+    initializeUfos();
+}
+
+// game of life ------------------------------->>>
 function initializePixelAge(hWidth, hHeight) {
     pixelAge = new Array(hWidth * hHeight);
     for (let index = 0; index < hWidth * hHeight; index++) {
         pixelAge[index] = 0;
     }
-    for (let i = 0; i < hWidth * hHeight * cellDensity; i++) {
+    for (let i = 0; i < hWidth * hHeight * INITIAL_CELL_DENSITY; i++) {
         const index = Math.floor(Math.random() * pixelAge.length);
         pixelAge[index] = 1;
     }
-    lastPixelAge = [...pixelAge];
 }
 
 function incrementAge(pixels) {
@@ -117,7 +110,6 @@ function incrementAge(pixels) {
         // store the updated age
         pixelAge[index] = age;
     }
-    lastPixelAge = [...pixelAge];
     // update screen buffer based on new ages
     setPixelColors(pixels);
 }
@@ -126,29 +118,40 @@ function setPixelColors(pixels) {
     for (let index = 0; index < pixelAge.length; index++) {
         let age = pixelAge[index];
         if (age >= 1) {
-            if (age > 2048) pAge = 1;
-            if (age < 256) {
+            if (age > 1024) pAge = 1;
+            // a pixel is considered alive if it have > 0 in red channel
+            // dead if 0
+            if (age < 128) {
+                // red
                 pixels[index * 4] = 255;
+                // green
                 pixels[index * 4 + 1] = 255;
+                // blue
                 pixels[index * 4 + 2] = 255;
+                // alpha
                 pixels[index * 4 + 3] = 255;
-            } else if (age < 512) {
+            } else if (age < 256) {
                 pixels[index * 4] = 255;
                 pixels[index * 4 + 1] = 0;
                 pixels[index * 4 + 2] = 0;
                 pixels[index * 4 + 3] = 255;
-            } else if (age < 768) {
-                pixels[index * 4] = 0;
+            } else if (age < 512) {
+                pixels[index * 4] = 1;
                 pixels[index * 4 + 1] = 255;
                 pixels[index * 4 + 2] = 0;
                 pixels[index * 4 + 3] = 255;
-            } else if (age < 1024) {
-                pixels[index * 4] = 0;
+            } else if (age < 768) {
+                pixels[index * 4] = 1;
                 pixels[index * 4 + 1] = 0;
                 pixels[index * 4 + 2] = 255;
                 pixels[index * 4 + 3] = 255;
             } else {
-                let rColor = getRandomOpaqueColor();
+                let rColor = {
+                    r: Math.floor(Math.random() * 254 + 1),
+                    g: Math.floor(Math.random() * 255),
+                    b: Math.floor(Math.random() * 255),
+                    a: 255,
+                };
                 pixels[index * 4] = rColor.r;
                 pixels[index * 4 + 1] = rColor.g;
                 pixels[index * 4 + 2] = rColor.b;
@@ -165,12 +168,13 @@ function setPixelColors(pixels) {
 }
 
 function getNumNeighbors(index) {
+    index = index * 4;
     let neighbors = 0;
-    for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
+    for (let i = -4; i <= 4; i += 4) {
+        for (let j = -4; j <= 4; j += 4) {
             let nIndex = index + i + j * hWidth;
             if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
-                if (lastPixelAge[nIndex] > 0) {
+                if (pixels[nIndex] > 0) {
                     neighbors++;
                 }
             }
@@ -195,97 +199,11 @@ function randomCellSpawn(x, y) {
     for (let i = -Math.floor(SIZE / 2); i < SIZE; i++) {
         for (let j = -Math.floor(SIZE / 2); j < SIZE; j++) {
             index = cellIndex + i + j * hWidth;
-            if (index > 0 && index < lastPixelAge.length) {
-                lastPixelAge[index] = Math.random() > 0.5 ? 1 : 0;
+            if (index > 0 && index < pixelAge.length) {
+                pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
             }
         }
     }
-}
-
-// logo
-function buildName() {
-    let _name = "";
-    let name_ = "BITbyteBYTES.io";
-    for (let l = 0; l < name_.length; l++) {
-        let next = "<span class='ltr'>" + name_[l] + "</span>";
-        _name += next;
-    }
-    document.querySelector(".logo").innerHTML = _name;
-}
-
-function updateColorChange() {
-    if (Math.random() * 100 > 80) {
-        let letters = document.getElementsByClassName("ltr");
-        let index = Math.floor(Math.random() * letters.length);
-        let rColor = getRandomOpaqueColor();
-        letters[
-            index
-        ].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
-    }
-}
-
-// game icons
-function updateUfos() {
-    let ufo = document.getElementsByClassName("ufo");
-    for (let i = 0; i < ufo.length; i++) {
-        if (!ufos[i]) {
-            let x_start = Math.random() * tWidth;
-            let y_start = Math.random() * tHeight;
-            let x_dir = Math.random() > 0.5 ? 1 : -1;
-            let y_dir = Math.random() > 0.5 ? 1 : -1;
-            let speed = Math.random() * 2;
-            ufos[i] = {
-                x: x_start,
-                y: y_start,
-                xd: x_dir,
-                yd: y_dir,
-                s: speed,
-                type: "none",
-                state: "none",
-            };
-        }
-        let move = moveUfo(ufos[i]);
-        ufo[i].style =
-            "position: absolute; top: " +
-            move.y +
-            "px; left: " +
-            move.x +
-            "px;";
-    }
-}
-
-function moveUfo(ufo) {
-    let move = {};
-    move.x = ufo.x + ufo.s * ufo.xd;
-    move.y = ufo.y + ufo.s * ufo.yd;
-    if (move.x < tLeft + tHPadding) {
-        move.x = tLeft + tHPadding;
-        ufo.xd *= -1;
-    }
-    if (move.x > tWidth + tLeft - 32 - tHPadding) {
-        move.x = tWidth + tLeft - 32 - tHPadding;
-        ufo.xd *= -1;
-    }
-    if (move.y < tTop + tVPadding) {
-        move.y = tTop + tVPadding;
-        ufo.yd *= -1;
-    }
-    if (move.y > tTop + tHeight - tVPadding) {
-        move.y = tTop + tHeight - tVPadding;
-        ufo.yd *= -1;
-    }
-    ufo.x = move.x;
-    ufo.y = move.y;
-    return move;
-}
-
-function getRandomOpaqueColor() {
-    return {
-        r: Math.floor(Math.random() * 255),
-        g: Math.floor(Math.random() * 255),
-        b: Math.floor(Math.random() * 255),
-        a: 255,
-    };
 }
 
 function windowResized() {
@@ -300,4 +218,99 @@ function windowResized() {
     background("black");
 
     initializePixelAge(hWidth, hHeight);
+    initializeHeaderText();
+    initializeToob();
+}
+// end of p5/gol stuff--------------------------------------->>>
+
+// Header text
+function updateHeaderText() {
+    if (Math.random() * 100 > 80) {
+        let letters = document.getElementsByClassName("ltr");
+        let index = Math.floor(Math.random() * letters.length);
+        let rColor = {
+            r: Math.floor(Math.random() * 255),
+            g: Math.floor(Math.random() * 255),
+            b: Math.floor(Math.random() * 255),
+            a: 255,
+        };
+        letters[
+            index
+        ].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+    }
+}
+
+// Toob icons
+function initializeUfos() {
+    let ufoElements = document.getElementsByClassName("ufo");
+    for (let i = 0; i < ufoElements.length; i++) {
+        let position = new Vec2D(
+            Math.random() * toob.width - 2 * toob.hPad,
+            Math.random() * toob.height - 2 * toob.vPad
+        );
+        let velocity = new Vec2D(Math.random() * 2, Math.random() * 2);
+        let htmlElement = ufoElements[i];
+        ufos[i] = new Ufo(position, velocity, htmlElement);
+    }
+}
+
+function updateUfos() {
+    for (let i = 0; i < ufos.length; i++) {
+        const ufo = ufos[i];
+        ufo.htmlElement.style = `transform: translate(${ufo.pos.x}px, ${ufo.pos.y}px)`;
+    }
+}
+
+class Ufo {
+    constructor(position, velocity, element) {
+        this.pos = position;
+        this.vel = velocity;
+        this.htmlElement = element;
+    }
+
+    setPosition(position) {
+        this.pos = position;
+    }
+
+    setVelocity(velocity) {
+        this.vel = velocity;
+    }
+}
+
+class Toob {
+    constructor(htmlElement, padding) {
+        this.bounds = htmlElement.getBoundingClientRect();
+        this.width = this.bounds.width;
+        this.height = this.bounds.height;
+        this.center = new Vec2D(
+            this.bounds.x + this.bounds.width / 2,
+            this.bounds.y + this.bounds.height / 2
+        );
+        // in case it needs adjustment
+        this.hPad = padding;
+        this.vPad = padding;
+    }
+}
+
+class Vec2D {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    add(vector2D) {
+        return new vec2D(this.x + vector2D.x, this.y + vector2D.y);
+    }
+
+    sub(vector2D) {
+        return new vec2D(this.x - vector2D.x, this.y - vector2D.y);
+    }
+
+    flipX() {
+        return new vec2D(-this.x, this.y);
+    }
+
+    flipY() {
+        return new vec2D(this.x, -this.y);
+    }
 }
