@@ -1,10 +1,10 @@
 const DRAW_CALLS_PER_AGE_TICK = 2;
 const INITIAL_CELL_DENSITY = 0.075;
+const SPAWN_AREA_SIZE = 11;
 let hWidth;
 let hHeight;
 let pixelAge = [];
 
-const TOOB_PADDING = 180;
 let toob;
 let ufos = [];
 
@@ -24,6 +24,7 @@ function draw() {
     if (frameCount == 0) {
         incrementAge(pixels);
     }
+
     // p5.js function
     // copies the canvas' pixels a global pixels[]
     //         px0         px1         px2 ...
@@ -42,7 +43,7 @@ function draw() {
 
 function initializeHeaderGOL() {
     let header = document
-        .getElementById("logo-container")
+        .getElementById("gol-container")
         .getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
@@ -66,9 +67,8 @@ function initializeHeaderText() {
 
 function initializeToob() {
     let toobHtmlElement = document.getElementById("toobImage");
-    toob = new Toob(toobHtmlElement, TOOB_PADDING);
+    toob = new Toob(toobHtmlElement);
 
-    console.log("toob.bounds: ", toob.bounds);
     initializeUfos();
 }
 
@@ -115,11 +115,12 @@ function incrementAge(pixels) {
 }
 
 function setPixelColors(pixels) {
+    let age = 0;
     for (let index = 0; index < pixelAge.length; index++) {
-        let age = pixelAge[index];
+        age = pixelAge[index];
         if (age >= 1) {
             if (age > 1024) pAge = 1;
-            // a pixel is considered alive if it have > 0 in red channel
+            // a pixel is considered alive if it has > 0 in red channel
             // dead if 0
             if (age < 128) {
                 // red
@@ -170,10 +171,12 @@ function setPixelColors(pixels) {
 function getNumNeighbors(index) {
     index = index * 4;
     let neighbors = 0;
+    let nIndex = 0;
     for (let i = -4; i <= 4; i += 4) {
         for (let j = -4; j <= 4; j += 4) {
-            let nIndex = index + i + j * hWidth;
+            nIndex = index + i + j * hWidth;
             if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
+                // pixel red channel > 0 is alive
                 if (pixels[nIndex] > 0) {
                     neighbors++;
                 }
@@ -194,10 +197,13 @@ function mouseDragged(e) {
 }
 
 function randomCellSpawn(x, y) {
-    const SIZE = 11;
     let cellIndex = y * hWidth + x;
-    for (let i = -Math.floor(SIZE / 2); i < SIZE; i++) {
-        for (let j = -Math.floor(SIZE / 2); j < SIZE; j++) {
+    for (let i = -Math.floor(SPAWN_AREA_SIZE / 2); i < SPAWN_AREA_SIZE; i++) {
+        for (
+            let j = -Math.floor(SPAWN_AREA_SIZE / 2);
+            j < SPAWN_AREA_SIZE;
+            j++
+        ) {
             index = cellIndex + i + j * hWidth;
             if (index > 0 && index < pixelAge.length) {
                 pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
@@ -208,7 +214,7 @@ function randomCellSpawn(x, y) {
 
 function windowResized() {
     let header = document
-        .getElementById("logo-container")
+        .getElementById("gol-container")
         .getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
@@ -245,8 +251,8 @@ function initializeUfos() {
     let ufoElements = document.getElementsByClassName("ufo");
     for (let i = 0; i < ufoElements.length; i++) {
         let position = new Vec2D(
-            Math.random() * toob.width - 2 * toob.hPad,
-            Math.random() * toob.height - 2 * toob.vPad
+            toob.center.x + Math.random() * toob.width - toob.width / 2,
+            toob.center.y + Math.random() * toob.height - toob.height / 2
         );
         let velocity = new Vec2D(Math.random() * 2, Math.random() * 2);
         let htmlElement = ufoElements[i];
@@ -257,11 +263,20 @@ function initializeUfos() {
 function updateUfos() {
     for (let i = 0; i < ufos.length; i++) {
         const ufo = ufos[i];
-        ufo.htmlElement.style = `transform: translate(${ufo.pos.x}px, ${ufo.pos.y}px)`;
+        let nextPos = ufo.pos.add(ufo.vel);
+        if (nextPos.x < toob.left || nextPos.x > toob.right)
+            ufo.vel = ufo.vel.flipX();
+        if (nextPos.y < toob.top || nextPos.y > toob.bottom)
+            ufo.vel = ufo.vel.flipY();
+        ufo.pos = ufo.pos.add(ufo.vel);
+        ufo.htmlElement.style = `transform: translate(${
+            ufo.pos.x - ufo.SIZE / 2
+        }px, ${ufo.pos.y - ufo.SIZE / 2}px)`;
     }
 }
 
 class Ufo {
+    SIZE = 32;
     constructor(position, velocity, element) {
         this.pos = position;
         this.vel = velocity;
@@ -278,17 +293,19 @@ class Ufo {
 }
 
 class Toob {
-    constructor(htmlElement, padding) {
+    TOOB_PADDING = 128;
+    constructor(htmlElement) {
         this.bounds = htmlElement.getBoundingClientRect();
-        this.width = this.bounds.width;
-        this.height = this.bounds.height;
+        this.width = this.bounds.width - this.TOOB_PADDING;
+        this.height = this.bounds.height - this.TOOB_PADDING;
         this.center = new Vec2D(
             this.bounds.x + this.bounds.width / 2,
             this.bounds.y + this.bounds.height / 2
         );
-        // in case it needs adjustment
-        this.hPad = padding;
-        this.vPad = padding;
+        this.top = this.center.y - this.height / 2;
+        this.right = this.center.x + this.width / 2;
+        this.bottom = this.center.y + this.height / 2;
+        this.left = this.center.x - this.width / 2;
     }
 }
 
@@ -299,18 +316,18 @@ class Vec2D {
     }
 
     add(vector2D) {
-        return new vec2D(this.x + vector2D.x, this.y + vector2D.y);
+        return new Vec2D(this.x + vector2D.x, this.y + vector2D.y);
     }
 
     sub(vector2D) {
-        return new vec2D(this.x - vector2D.x, this.y - vector2D.y);
+        return new Vec2D(this.x - vector2D.x, this.y - vector2D.y);
     }
 
     flipX() {
-        return new vec2D(-this.x, this.y);
+        return new Vec2D(-this.x, this.y);
     }
 
     flipY() {
-        return new vec2D(this.x, -this.y);
+        return new Vec2D(this.x, -this.y);
     }
 }
