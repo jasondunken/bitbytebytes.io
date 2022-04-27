@@ -7,16 +7,15 @@ let levelNum;
 let score;
 let gameOver;
 
-let bg_img = '#000000';
+let bg_img = "#000000";
 
-function  preload() {
-    // getting some CORS bs from this, i'll figure it out later
-    // bg_img = loadImage('./invaders/img/bg.png');
+function preload() {
+    bg_img = loadImage("./planet-invaders/img/bg.png");
 }
 
 function setup() {
     let canvas = createCanvas(400, 300);
-    canvas.parent('game');
+    canvas.parent("game");
 
     frameRate(60);
     initGame();
@@ -26,7 +25,7 @@ function initGame() {
     ship = new Ship();
     aliens = [];
     level = [];
-    levelSpeed = 1
+    levelSpeed = 1;
     levelNum = 0;
     let board = new Board();
     level = board.getLayout();
@@ -51,7 +50,12 @@ function update() {
     //check for alien shot collision
     for (let i = ship.shots.length - 1; i >= 0; i--) {
         for (let j = aliens.length - 1; j >= 0; j--) {
-            let d = dist(ship.shots[i].posx, ship.shots[i].posy, aliens[j].posx, aliens[j].posy);
+            let d = dist(
+                ship.shots[i].posx,
+                ship.shots[i].posy,
+                aliens[j].posx,
+                aliens[j].posy
+            );
             if (d <= ship.shots[i].r + aliens[j].r) {
                 ship.shots[i].dead = true;
                 aliens.splice(j, 1);
@@ -92,7 +96,7 @@ function draw() {
     update();
     background(bg_img);
     textSize(24);
-    text('Score: ' + score, 5, 24);
+    text("Score: " + score, 5, 24);
 
     ship.render();
     for (let i = 0; i < aliens.length; i++) {
@@ -114,14 +118,17 @@ let shiftDown = false;
 function moveAliens() {
     for (let i = 0; i < aliens.length; i++) {
         aliens[i].move(levelSpeed / 2);
-        if (aliens[i].posx >= width - aliens[i].r || aliens[i].posx <= aliens[i].r) {
+        if (
+            aliens[i].posx >= width - aliens[i].r ||
+            aliens[i].posx <= aliens[i].r
+        ) {
             shiftDown = true;
         }
     }
     if (shiftDown) {
         for (let i = 0; i < aliens.length; i++) {
             aliens[i].posy += 10;
-            aliens[i].moveSpeed = -(aliens[i].moveSpeed);
+            aliens[i].moveSpeed = -aliens[i].moveSpeed;
         }
         shiftDown = false;
     }
@@ -129,12 +136,14 @@ function moveAliens() {
 
 function loadLevel(level) {
     let margin = 25;
-    let fieldWidth = width - (margin * 2);
+    let fieldWidth = width - margin * 2;
     for (let j = 0; j < level.length; j++) {
         let spacing = fieldWidth / (level[j].length - 1);
         for (let i = 0; i < level[j].length; i++) {
             if (level[j][i] === 1) {
-                aliens.push(new Alien(i * spacing + margin, j * spacing + margin));
+                aliens.push(
+                    new Alien(i * spacing + margin, j * spacing + margin)
+                );
             }
         }
     }
