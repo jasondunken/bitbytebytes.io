@@ -1,71 +1,78 @@
-function Ship() {
-    this.r = 8;
-    this.posx = width / 2;
-    this.posy = height - 30;
-    this.shots = [];
-    this.cooldown = 60;
-    this.weaponReady = true;
-}
+class Ship {
+    BASE_COOLDOWN = 15;
+    cooldown = 0;
+    weaponReady = false;
+    shots = [];
 
-Ship.prototype.render = function () {
-    noStroke();
-    fill("RED");
-    ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
-    for (let i = 0; i < this.shots.length; i++) {
-        if (!this.shots[i].dead) {
-            this.shots[i].render();
+    constructor(size, position, speed) {
+        this.size = size;
+        this.pos = position;
+        this.speed = speed;
+    }
+
+    update() {
+        if (keyIsDown(RIGHT_ARROW)) this.pos.x += this.speed;
+        if (keyIsDown(LEFT_ARROW)) this.pos.x -= this.speed;
+
+        if (keyIsDown(32) && this.weaponReady) {
+            this.fire();
+        }
+
+        for (let i = 0; i < this.shots.length; i++) {
+            if (this.shots[i].dead) {
+                this.shots.splice(i - 1, 1);
+            }
+        }
+
+        if (!this.weaponReady) {
+            this.cooldown--;
+            if (this.cooldown <= 0) {
+                this.cooldown = this.BASE_COOLDOWN;
+                this.weaponReady = true;
+            }
         }
     }
-};
 
-Ship.prototype.update = function () {
-    for (let i = 0; i < this.shots.length; i++) {
-        if (this.shots[i].dead) {
-            this.reload();
-            this.shots.splice(i - 1, 1);
-        }
-    }
-    
-
-    if (!this.weaponReady) {
-        this.cooldown--;
-        if (this.cooldown <= 0) {
-            this.reload();
-        }
-    }
-};
-
-Ship.prototype.fire = function () {
-    if (this.weaponReady) {
-        this.shots.push(new Shot(new p5.Vector(this.posx, this.posy)));
-        this.weaponReady = false;
-    }
-};
-
-Ship.prototype.reload = function () {
-    this.cooldown = 60;
-    this.weaponReady = true;
-};
-
-function Shot(vec2D) {
-    this.r = 4;
-    this.posx = vec2D.x;
-    this.posy = vec2D.y;
-    this.moveSpeed = 3;
-    this.dead = false;
-}
-
-Shot.prototype.render = function () {
-    if (this.posy >= 0) {
-        let r = random(0, 255);
-        let g = random(0, 255);
-        let b = random(0, 255);
-        let a = random(0, 255);
+    render() {
         noStroke();
-        fill(r, g, b, a);
-        ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
-        this.posy -= this.moveSpeed;
-    } else {
-        this.dead = true;
+        fill("WHITE");
+        ellipse(this.pos.x, this.pos.y, this.size, this.size);
+        for (let i = 0; i < this.shots.length; i++) {
+            if (!this.shots[i].dead) {
+                this.shots[i].render();
+            }
+        }
     }
-};
+
+    fire() {
+        if (this.weaponReady) {
+            this.shots.push(new Shot(new p5.Vector(this.pos.x, this.pos.y)));
+            this.weaponReady = false;
+        }
+    }
+}
+
+class Shot {
+    BASE_SIZE = 4;
+    constructor(position) {
+        this.size = this.BASE_SIZE;
+        this.pos = position;
+        this.moveSpeed = 3;
+        this.dead = false;
+    }
+
+    render() {
+        if (this.pos.y >= 0) {
+            let r = random(0, 255);
+            let g = random(0, 255);
+            let b = random(0, 255);
+            let a = random(0, 255);
+            noStroke();
+            fill(r, g, b, a);
+            ellipse(this.pos.x, this.pos.y, this.size * 2, this.size * 2);
+            this.pos.y -= this.moveSpeed;
+        } else {
+            this.dead = true;
+        }
+    }
+}

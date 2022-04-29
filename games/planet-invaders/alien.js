@@ -1,17 +1,22 @@
-function Alien(x, y) {
-    this.r = 8;
-    this.posx = x;
-    this.posy = y;
-    this.moveSpeed = 1;
-    this.dead = false;
+class Alien {
+    delta = 0;
+    constructor(size, position, speed) {
+        this.size = size;
+        this.pos = position;
+        this.speed = speed;
+        this.dead = false;
+    }
+
+    update() {
+        this.pos.y = this.pos.y + Math.sin(this.delta);
+        this.delta += 0.25;
+        // if (this.delta >= 360) this.delta = 0;
+        this.pos.x = this.pos.x + this.speed;
+    }
+
+    render() {
+        noStroke();
+        fill("WHITE");
+        ellipse(this.pos.x, this.pos.y, this.size, this.size);
+    }
 }
-
-Alien.prototype.render = function() {
-    noStroke();
-    fill("GREEN");
-    ellipse(this.posx, this.posy, this.r * 2, this.r * 2);
-};
-
-Alien.prototype.move = function(multiplier) {
-    this.posx += this.moveSpeed * multiplier;
-};

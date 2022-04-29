@@ -1,17 +1,4 @@
-let ship;
-let aliens;
-let level;
-let levelSpeed;
-let levelNum;
-
-let score;
-let gameOver;
-
-let bg_img = "#000000";
-
-function preload() {
-    bg_img = loadImage("./planet-invaders/img/bg.png");
-}
+let game = null;
 
 function setup() {
     let canvas = createCanvas(400, 300);
@@ -22,131 +9,139 @@ function setup() {
 }
 
 function initGame() {
-    ship = new Ship();
-    aliens = [];
-    level = [];
-    levelSpeed = 1;
-    levelNum = 0;
-    let board = new Board();
-    level = board.getLayout();
-    loadLevel(level);
-    score = 0;
-    gameOver = false;
-}
-
-function update() {
-    if (keyIsDown(RIGHT_ARROW)) {
-        moveShip(2);
-    }
-    if (keyIsDown(LEFT_ARROW)) {
-        moveShip(-2);
-    }
-    if (keyIsDown(32)) {
-        ship.fire();
-    }
-    ship.update();
-    moveAliens();
-
-    //check for alien shot collision
-    for (let i = ship.shots.length - 1; i >= 0; i--) {
-        for (let j = aliens.length - 1; j >= 0; j--) {
-            let d = dist(
-                ship.shots[i].posx,
-                ship.shots[i].posy,
-                aliens[j].posx,
-                aliens[j].posy
-            );
-            if (d <= ship.shots[i].r + aliens[j].r) {
-                ship.shots[i].dead = true;
-                aliens.splice(j, 1);
-
-                score += 10;
-                levelSpeed += 0.02;
-                break;
-            }
-        }
-    }
-
-    //check for alien ship collision
-    for (let i = 0; i < aliens.length; i++) {
-        let d = dist(ship.posx, ship.posy, aliens[i].posx, aliens[i].posy);
-        if (d < ship.r + aliens[i].r) {
-            gameOver = true;
-        }
-    }
-
-    //Check if aliens have reached bottom
-    for (let i = 0; i < aliens.length; i++) {
-        if (aliens[i].posy >= height) {
-            gameOver = true;
-        }
-    }
-    //check if all the aliens are dead
-    if (aliens.length < 1) {
-        loadLevel(level);
-    }
-
-    //exit render loop if game over
-    if (gameOver) {
-        noLoop();
-    }
+    game = new PlanetInvaders();
+    game.initializeGame();
 }
 
 function draw() {
-    update();
-    background(bg_img);
-    textSize(24);
-    text("Score: " + score, 5, 24);
-
-    ship.render();
-    for (let i = 0; i < aliens.length; i++) {
-        aliens[i].render();
-    }
+    game.update();
+    game.render();
 }
 
-function moveShip(val) {
-    ship.posx += val;
-    if (ship.posx < ship.r) {
-        ship.posx = ship.r;
-    }
-    if (ship.posx > width - ship.r) {
-        ship.posx = width - ship.r;
-    }
-}
+// PlanetInvaders
+const STARTING_LIVES = 3;
+const SCOREBOARD_HEIGHT = 48;
 
-let shiftDown = false;
-function moveAliens() {
-    for (let i = 0; i < aliens.length; i++) {
-        aliens[i].move(levelSpeed / 2);
-        if (
-            aliens[i].posx >= width - aliens[i].r ||
-            aliens[i].posx <= aliens[i].r
-        ) {
-            shiftDown = true;
+class PlanetInvaders {
+    currentLives = 0;
+    score = 0;
+    gameOver = false;
+
+    level = null;
+    player = null;
+    aliens = [];
+
+    startDelay = 60;
+
+    constructor() {}
+
+    initializeGame() {
+        this.currentLives = STARTING_LIVES;
+        this.loadLevel(new Level(width, height, SCOREBOARD_HEIGHT));
+    }
+
+    update() {
+        this.startDelay--;
+        if (this.startDelay > 0) return;
+
+        this.player.update();
+
+        // check player bounds
+        if (this.player.pos.x < 0 + this.player.size / 2) this.player.pos.x = this.player.size / 2;
+        if (this.player.pos.x > width - this.player.size / 2) this.player.pos.x = width - this.player.size / 2;
+
+        for (let row of this.aliens) {
+            for (let alien of row) {
+                alien.update();
+            }
+        }
+
+        // check for alien/bounds and alien/alien collision
+        for (let row of this.aliens) {
+            let changeRowDirection = false;
+            for (let alien of row) {
+                if (alien.pos.x <= 0 + alien.size / 2 || alien.pos.x > width - alien.size / 2) {
+                    changeRowDirection = true;
+                    break;
+                }
+            }
+            if (changeRowDirection) {
+                for (let alien of row) {
+                    alien.speed = -alien.speed;
+                }
+            }
+        }
+
+        // //check for alien/shot collision
+        // for (let i = this.player.shots.length - 1; i >= 0; i--) {
+        //     for (let j = this.aliens.length - 1; j >= 0; j--) {
+        //         let d = dist(
+        //             this.player.shots[i].pos.x,
+        //             this.player.shots[i].pos.y,
+        //             this.aliens[j].pos.x,
+        //             this.aliens[j].pos.y
+        //         );
+        //         if (d <= this.player.shots[i].size / 2 + this.aliens[j].size / 2) {
+        //             this.player.shots[i].dead = true;
+        //             this.aliens.splice(j, 1);
+
+        //             this.score += 10;
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // //check for alien/player collision
+        // for (let i = 0; i < this.aliens.length; i++) {
+        //     let d = dist(this.player.pos.x, this.player.pos.y, this.aliens[i].pos.x, this.aliens[i].pos.y);
+        //     if (d < this.player.size / 2 + this.aliens[i].size / 2) {
+        //         this.gameOver = true;
+        //     }
+        // }
+
+        // //Check if aliens have reached bottom
+        // for (let i = 0; i < this.aliens.length; i++) {
+        //     if (this.aliens[i].pos.y >= height) {
+        //         this.gameOver = true;
+        //     }
+        // }
+        // //check if all the aliens are dead
+        // if (this.aliens.length < 1) {
+        //     // loadLevel(level);
+        // }
+
+        //exit render loop if game over
+        if (this.gameOver) {
+            noLoop();
         }
     }
-    if (shiftDown) {
-        for (let i = 0; i < aliens.length; i++) {
-            aliens[i].posy += 10;
-            aliens[i].moveSpeed = -aliens[i].moveSpeed;
-        }
-        shiftDown = false;
-    }
-}
 
-function loadLevel(level) {
-    let margin = 25;
-    let fieldWidth = width - margin * 2;
-    for (let j = 0; j < level.length; j++) {
-        let spacing = fieldWidth / (level[j].length - 1);
-        for (let i = 0; i < level[j].length; i++) {
-            if (level[j][i] === 1) {
-                aliens.push(
-                    new Alien(i * spacing + margin, j * spacing + margin)
-                );
+    render() {
+        background(this.level.backgroundImage);
+        this.renderUI();
+        this.player.render();
+        for (let row of this.aliens) {
+            for (let alien of row) {
+                alien.render();
             }
         }
     }
-    levelNum++;
-    levelSpeed = levelNum;
+
+    renderUI() {
+        fill("blue");
+        textSize(18);
+        text(`SCORE ${this.score}`, 24, 22);
+
+        noStroke();
+        fill("green");
+        for (let i = 0; i < this.currentLives; i++) {
+            ellipse(width - 32 - i * 32, 16, 16, 16);
+        }
+    }
+
+    loadLevel(level) {
+        this.level = level;
+        this.player = level.getPlayer();
+        this.aliens = level.getAliens();
+    }
 }
