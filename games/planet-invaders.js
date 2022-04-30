@@ -4,6 +4,8 @@ function setup() {
     let canvas = createCanvas(400, 300);
     canvas.parent("game");
 
+    let loader = new SpriteLoader();
+
     frameRate(60);
     initGame();
 }
@@ -72,24 +74,21 @@ class PlanetInvaders {
             }
         }
 
-        // //check for alien/shot collision
-        // for (let i = this.player.shots.length - 1; i >= 0; i--) {
-        //     for (let j = this.aliens.length - 1; j >= 0; j--) {
-        //         let d = dist(
-        //             this.player.shots[i].pos.x,
-        //             this.player.shots[i].pos.y,
-        //             this.aliens[j].pos.x,
-        //             this.aliens[j].pos.y
-        //         );
-        //         if (d <= this.player.shots[i].size / 2 + this.aliens[j].size / 2) {
-        //             this.player.shots[i].dead = true;
-        //             this.aliens.splice(j, 1);
+        //check for alien/shot collision
+        for (let i = this.player.shots.length - 1; i >= 0; i--) {
+            for (let row of this.aliens) {
+                for (let j = row.length - 1; j >= 0; j--) {
+                    let d = dist(this.player.shots[i].pos.x, this.player.shots[i].pos.y, row[j].pos.x, row[j].pos.y);
+                    if (d <= this.player.shots[i].size / 2 + row[j].size / 2) {
+                        this.player.shots[i].dead = true;
+                        row.splice(j, 1);
 
-        //             this.score += 10;
-        //             break;
-        //         }
-        //     }
-        // }
+                        this.score += 10;
+                        break;
+                    }
+                }
+            }
+        }
 
         // //check for alien/player collision
         // for (let i = 0; i < this.aliens.length; i++) {

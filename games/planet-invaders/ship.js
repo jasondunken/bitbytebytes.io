@@ -67,9 +67,12 @@ class Shot {
             let g = random(0, 255);
             let b = random(0, 255);
             let a = random(0, 255);
-            noStroke();
-            fill(r, g, b, a);
-            ellipse(this.pos.x, this.pos.y, this.size * 2, this.size * 2);
+            stroke(r, g, b, a);
+            strokeWeight(this.size);
+            line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 16);
+            // noStroke();
+            // fill(r, g, b, a);
+            // ellipse(this.pos.x, this.pos.y, this.size * 2, this.size * 2);
             this.pos.y -= this.moveSpeed;
         } else {
             this.dead = true;
