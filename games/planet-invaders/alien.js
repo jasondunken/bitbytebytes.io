@@ -16,7 +16,11 @@ class Alien {
 
     render() {
         noStroke();
-        fill("WHITE");
-        ellipse(this.pos.x, this.pos.y, this.size, this.size);
+        // fill("WHITE");
+        // ellipse(this.pos.x, this.pos.y, this.size, this.size);
+        let alienSprite = loader.getSprite("alien");
+        if (alienSprite) {
+            image(alienSprite, this.pos.x, this.pos.y);
+        }
     }
 }

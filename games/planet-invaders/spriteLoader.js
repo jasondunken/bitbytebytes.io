@@ -9,31 +9,33 @@ class SpriteLoader {
 
     loadSpriteSheet(names, path) {
         loadImage(path, (spriteSheet) => {
-            image(spriteSheet, 0, 0);
             console.log("spriteSheet: ", spriteSheet);
             let spriteCount = spriteSheet.width / this.SPRITE_SIZE;
-            console.log("spriteCount: ", spriteCount);
             // let spriteNumFrames = spriteSheet.height / this.SPRITE_SIZE;
             spriteSheet.loadPixels();
             for (let s = 0; s < spriteCount; s++) {
-                let pixelBuffer = [];
+                const sprite = createImage(this.SPRITE_SIZE, this.SPRITE_SIZE);
+                sprite.loadPixels();
                 for (let i = 0; i < this.SPRITE_SIZE; i++) {
                     for (let j = 0; j < this.SPRITE_SIZE; j++) {
-                        pixelBuffer[i + j * this.SPRITE_SIZE] = spriteSheet.pixels[i + j * spriteSheet.width];
+                        sprite.set(i, j, [
+                            0,
+                            255,
+                            0,
+                            spriteSheet.pixels[i * 4 + this.SPRITE_SIZE * s * 4 + j * 4 * spriteSheet.width + 3],
+                        ]);
                     }
                 }
-                this.createSprite(names[s], pixelBuffer);
+                sprite.updatePixels();
+                this.addSprite(names[s], sprite);
             }
 
             console.log("this.sprites: ", this.sprites);
+            image(this.sprites["ship"], 0, 0, 400, 300);
         });
     }
 
-    createSprite(name, pixelBuffer) {
-        const sprite = createImage(this.SPRITE_SIZE, this.SPRITE_SIZE);
-        sprite.loadPixels();
-        sprite.pixels = pixelBuffer;
-        sprite.updatePixels();
+    addSprite(name, sprite) {
         this.sprites[name] = sprite;
     }
 

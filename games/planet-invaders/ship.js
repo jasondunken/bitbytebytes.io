@@ -35,8 +35,12 @@ class Ship {
 
     render() {
         noStroke();
-        fill("WHITE");
-        ellipse(this.pos.x, this.pos.y, this.size, this.size);
+        // fill("WHITE");
+        // ellipse(this.pos.x, this.pos.y, this.size, this.size);
+        let shipSprite = loader.getSprite("ship");
+        if (shipSprite) {
+            image(shipSprite, this.pos.x, this.pos.y);
+        }
         for (let i = 0; i < this.shots.length; i++) {
             if (!this.shots[i].dead) {
                 this.shots[i].render();

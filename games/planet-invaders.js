@@ -1,10 +1,11 @@
 let game = null;
+let loader = null;
 
 function setup() {
     let canvas = createCanvas(400, 300);
     canvas.parent("game");
 
-    let loader = new SpriteLoader();
+    loader = new SpriteLoader();
 
     frameRate(60);
     initGame();
