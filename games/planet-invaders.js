@@ -118,6 +118,7 @@ class PlanetInvaders {
 
     render() {
         background(this.level.backgroundImage);
+        noSmooth();
         this.renderUI();
         this.player.render();
         for (let row of this.aliens) {

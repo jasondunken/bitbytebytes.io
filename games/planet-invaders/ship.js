@@ -39,7 +39,7 @@ class Ship {
         // ellipse(this.pos.x, this.pos.y, this.size, this.size);
         let shipSprite = loader.getSprite("ship");
         if (shipSprite) {
-            image(shipSprite, this.pos.x, this.pos.y);
+            image(shipSprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
         }
         for (let i = 0; i < this.shots.length; i++) {
             if (!this.shots[i].dead) {

@@ -20,7 +20,7 @@ class Alien {
         // ellipse(this.pos.x, this.pos.y, this.size, this.size);
         let alienSprite = loader.getSprite("alien");
         if (alienSprite) {
-            image(alienSprite, this.pos.x, this.pos.y);
+            image(alienSprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
         }
     }
 }
