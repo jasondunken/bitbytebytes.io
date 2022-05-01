@@ -31,8 +31,11 @@ class PlanetInvaders {
 
     levels = ["level_1", "level_2", "level_3"];
     level = null;
+    levelTime = 0;
 
-    startDelay = 60;
+    bonus = null;
+
+    START_DELAY = 60;
 
     constructor() {}
 
@@ -42,9 +45,14 @@ class PlanetInvaders {
     }
 
     update() {
+        //exit render loop if game over
+        if (this.gameOver) {
+            noLoop();
+        }
+
         if (this.level) {
-            this.startDelay--;
-            if (this.startDelay > 0) return;
+            this.levelTime++;
+            if (this.levelTime < this.START_DELAY) return;
 
             this.level.player.update();
 
@@ -53,6 +61,15 @@ class PlanetInvaders {
                 this.level.player.pos.x = this.level.player.size / 2;
             if (this.level.player.pos.x > width - this.level.player.size / 2)
                 this.level.player.pos.x = width - this.level.player.size / 2;
+
+            if (this.bonus) {
+                this.bonus.update();
+                if (this.bonus.pos.x > width + this.bonus.size && this.bonus.speed > 0) {
+                    this.bonus = null;
+                } else if (this.bonus.pos.x < -this.bonus.size && this.bonus.speed < 0) {
+                    this.bonus = null;
+                }
+            }
 
             for (let row of this.level.aliens) {
                 for (let alien of row) {
@@ -117,9 +134,8 @@ class PlanetInvaders {
                 this.loadLevel(this.levels[Math.floor(Math.random() * this.levels.length)]);
             }
 
-            //exit render loop if game over
-            if (this.gameOver) {
-                noLoop();
+            if (this.levelTime % this.levelManager.BONUS_INTERVAL == 0) {
+                this.bonus = this.levelManager.getBonus();
             }
         }
     }
@@ -128,6 +144,11 @@ class PlanetInvaders {
         if (this.level) {
             background(this.level.backgroundImage);
             this.level.player.render();
+
+            if (this.bonus) {
+                this.bonus.render();
+            }
+
             for (let row of this.level.aliens) {
                 for (let alien of row) {
                     alien.render();
@@ -152,5 +173,6 @@ class PlanetInvaders {
     async loadLevel(level) {
         const display = { width, height, SCOREBOARD_HEIGHT };
         this.level = await this.levelManager.initializeLevel(display, level);
+        this.levelTime = 0;
     }
 }

@@ -35,9 +35,7 @@ class Ship {
     }
 
     render() {
-        if (this.sprite) {
-            image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
-        }
+        image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
         for (let i = 0; i < this.shots.length; i++) {
             if (!this.shots[i].dead) {
                 this.shots[i].render();

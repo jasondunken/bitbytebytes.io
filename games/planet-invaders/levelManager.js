@@ -54,10 +54,17 @@ class LevelManager {
 
     GUTTER_WIDTH = 32;
 
+    BONUS_SIZE = 16;
+    BONUS_INTERVAL = 1000;
+    bonusSprite;
+    bonusSpriteReversed;
+
     async initializeLevel(display, levelName) {
         const level = this.levels[levelName];
         const backgroundImage = await loadImage(level.backgroundImage);
         const levelSprites = await SpriteLoader.loadSprites(level.spriteSheetData);
+        this.bonusSprite = levelSprites["bonus"];
+        this.bonusSpriteReversed = levelSprites["bonus_reversed"];
 
         const playerStartingPosition = {
             x: display.width / 2,
@@ -97,6 +104,17 @@ class LevelManager {
             player,
             aliens,
             totalAliens,
+            bonus: null,
         };
+    }
+
+    getBonus() {
+        const speed = Math.random() > 0.5 ? 1 : -1;
+        const pos = {
+            x: speed > 0 ? -this.BONUS_SIZE : width + this.BONUS_SIZE,
+            y: this.BONUS_SIZE,
+        };
+        const sprite = speed > 0 ? this.bonusSprite : this.bonusSpriteReversed;
+        return new Bonus(this.BONUS_SIZE, pos, speed, sprite);
     }
 }
