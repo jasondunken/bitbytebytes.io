@@ -22,6 +22,11 @@ class LevelManager {
                 [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
                 [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
             ],
+            spriteSheetData: {
+                names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
+                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+            },
+            backgroundImage: "./planet-invaders/img/bg.png",
         },
 
         level_3: {
@@ -33,6 +38,11 @@ class LevelManager {
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
             ],
+            spriteSheetData: {
+                names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
+                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+            },
+            backgroundImage: "./planet-invaders/img/bg.png",
         },
     };
 
@@ -57,6 +67,10 @@ class LevelManager {
 
         let spawnAreaWidth = display.width - this.GUTTER_WIDTH * 2;
         let aliens = [];
+        const alienNames = Object.keys(levelSprites).filter((spriteName) => {
+            return spriteName.startsWith("alien_");
+        });
+        let totalAliens = 0;
         for (let j = 0; j < level.map.length; j++) {
             let spacing = spawnAreaWidth / (level.map[j].length - 1);
             let row = [];
@@ -70,9 +84,10 @@ class LevelManager {
                                 y: j * spacing + display.SCOREBOARD_HEIGHT,
                             },
                             j % 2 == 0 ? this.ALIEN_SPEED : -this.ALIEN_SPEED,
-                            levelSprites["alien_2"]
+                            levelSprites[alienNames[Math.floor(Math.random() * alienNames.length)]]
                         )
                     );
+                    totalAliens++;
                 }
             }
             aliens.push(row);
@@ -81,6 +96,7 @@ class LevelManager {
             backgroundImage,
             player,
             aliens,
+            totalAliens,
         };
     }
 }

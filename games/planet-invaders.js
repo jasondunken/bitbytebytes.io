@@ -29,6 +29,7 @@ class PlanetInvaders {
     score = 0;
     gameOver = false;
 
+    levels = ["level_1", "level_2", "level_3"];
     level = null;
 
     startDelay = 60;
@@ -88,7 +89,7 @@ class PlanetInvaders {
                         if (d <= this.level.player.shots[i].size / 2 + row[j].size / 2) {
                             this.level.player.shots[i].dead = true;
                             row.splice(j, 1);
-
+                            this.level.totalAliens -= 1;
                             this.score += 10;
                             break;
                         }
@@ -110,10 +111,11 @@ class PlanetInvaders {
             //         this.gameOver = true;
             //     }
             // }
-            // //check if all the aliens are dead
-            // if (this.aliens.length < 1) {
-            //     // loadLevel(level);
-            // }
+
+            //check if all the aliens are dead
+            if (this.level.totalAliens < 1) {
+                this.loadLevel(this.levels[Math.floor(Math.random() * this.levels.length)]);
+            }
 
             //exit render loop if game over
             if (this.gameOver) {
@@ -150,6 +152,5 @@ class PlanetInvaders {
     async loadLevel(level) {
         const display = { width, height, SCOREBOARD_HEIGHT };
         this.level = await this.levelManager.initializeLevel(display, level);
-        console.log("this.level: ", this.level);
     }
 }
