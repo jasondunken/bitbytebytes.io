@@ -19,9 +19,9 @@ class Ship {
             this.fire();
         }
 
-        for (let i = 0; i < this.shots.length; i++) {
+        for (let i = this.shots.length - 1; i >= 0; i--) {
             if (this.shots[i].dead) {
-                this.shots.splice(i - 1, 1);
+                this.shots.splice(i, 1);
             }
         }
 
