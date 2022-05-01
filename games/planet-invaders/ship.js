@@ -4,10 +4,11 @@ class Ship {
     weaponReady = false;
     shots = [];
 
-    constructor(size, position, speed) {
+    constructor(size, position, speed, sprite) {
         this.size = size;
         this.pos = position;
         this.speed = speed;
+        this.sprite = sprite;
     }
 
     update() {
@@ -34,12 +35,8 @@ class Ship {
     }
 
     render() {
-        noStroke();
-        // fill("WHITE");
-        // ellipse(this.pos.x, this.pos.y, this.size, this.size);
-        let shipSprite = loader.getSprite("ship");
-        if (shipSprite) {
-            image(shipSprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
+        if (this.sprite) {
+            image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
         }
         for (let i = 0; i < this.shots.length; i++) {
             if (!this.shots[i].dead) {
@@ -73,7 +70,7 @@ class Shot {
             let a = random(0, 255);
             stroke(r, g, b, a);
             strokeWeight(this.size);
-            line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 16);
+            line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 8);
             // noStroke();
             // fill(r, g, b, a);
             // ellipse(this.pos.x, this.pos.y, this.size * 2, this.size * 2);
