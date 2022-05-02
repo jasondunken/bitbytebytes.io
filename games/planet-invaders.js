@@ -77,7 +77,7 @@ class PlanetInvaders {
                 }
             }
 
-            // check for alien/bounds and alien/alien collision
+            // check for alien/bounds collision
             for (let row of this.level.aliens) {
                 let changeRowDirection = false;
                 for (let alien of row) {
@@ -93,18 +93,21 @@ class PlanetInvaders {
                 }
             }
 
-            //check for alien/shot collision
+            //check for alien/bonus/shot collision
             for (let i = this.level.player.shots.length - 1; i >= 0; i--) {
+                const shot = this.level.player.shots[i];
+                if (this.bonus) {
+                    let d = dist(shot.pos.x, shot.pos.y, this.bonus.pos.x, this.bonus.pos.y);
+                    if (d <= shot.size + this.bonus.size) {
+                        this.bonus = null;
+                        this.score += 250;
+                    }
+                }
                 for (let row of this.level.aliens) {
                     for (let j = row.length - 1; j >= 0; j--) {
-                        let d = dist(
-                            this.level.player.shots[i].pos.x,
-                            this.level.player.shots[i].pos.y,
-                            row[j].pos.x,
-                            row[j].pos.y
-                        );
-                        if (d <= this.level.player.shots[i].size / 2 + row[j].size / 2) {
-                            this.level.player.shots[i].dead = true;
+                        let d = dist(shot.pos.x, shot.pos.y, row[j].pos.x, row[j].pos.y);
+                        if (d <= shot.size / 2 + row[j].size / 2) {
+                            shot.dead = true;
                             row.splice(j, 1);
                             this.level.totalAliens -= 1;
                             this.score += 10;
@@ -153,6 +156,10 @@ class PlanetInvaders {
                 for (let alien of row) {
                     alien.render();
                 }
+            }
+
+            for (let barrier of this.level.barriers) {
+                barrier.render();
             }
 
             // RENDER UI

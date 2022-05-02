@@ -12,7 +12,7 @@ class Alien {
     }
 
     update() {
-        this.delta += 0.25;
+        this.delta += 0.08;
         if (this.delta >= 2 * PI) this.delta = 0;
         this.pos.x = this.pos.x + this.speed;
     }
