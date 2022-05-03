@@ -181,5 +181,6 @@ class PlanetInvaders {
         const display = { width, height, SCOREBOARD_HEIGHT };
         this.level = await this.levelManager.initializeLevel(display, level);
         this.levelTime = 0;
+        this.bonus = null;
     }
 }
