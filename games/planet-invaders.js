@@ -172,7 +172,7 @@ class PlanetInvaders {
             noStroke();
             fill("green");
             for (let i = 0; i < this.currentLives; i++) {
-                ellipse(width - 32 - i * 32, 16, 16, 16);
+                image(this.level.player.sprite, width - 48 - i * 32, 0, 32, 32);
             }
         }
     }

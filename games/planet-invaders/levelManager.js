@@ -20,6 +20,7 @@ class LevelManager {
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
                 spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                color: "0x00ff00ff",
             },
             backgroundImage: "./planet-invaders/img/bg.png",
         },
@@ -44,6 +45,7 @@ class LevelManager {
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
                 spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                color: "0x00ffffff",
             },
             backgroundImage: "./planet-invaders/img/bg.png",
         },
@@ -68,6 +70,7 @@ class LevelManager {
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
                 spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                color: "0xffff00ff",
             },
             backgroundImage: "./planet-invaders/img/bg.png",
         },
