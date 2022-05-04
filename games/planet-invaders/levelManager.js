@@ -145,6 +145,7 @@ class LevelManager {
             aliens.push(row);
         }
         return {
+            name: levelName,
             backgroundImage,
             player,
             aliens,

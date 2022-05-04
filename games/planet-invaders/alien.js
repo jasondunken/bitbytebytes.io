@@ -17,6 +17,10 @@ class Alien {
         this.pos.x = this.pos.x + this.speed;
     }
 
+    moveDown() {
+        this.pos.y += this.size / 2;
+    }
+
     render() {
         image(
             this.sprite,
