@@ -2,12 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Slider</title>
+        <title>%GAME_NAME%</title>
         <meta name="air defense" content="The official site of %GAME_NAME%." />
-        <link
-            href="https://fonts.googleapis.com/css?family=Alfa Slab One"
-            rel="stylesheet"
-        />
+        <link href="https://fonts.googleapis.com/css?family=Alfa Slab One" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="../css/gamestyle.css" />
         <link rel="stylesheet" type="text/css" href="./%GAME_NAME%/main.css" />
 
@@ -25,15 +22,19 @@
             <div id="game"></div>
         </div>
 
-        <div class="btn">
-            <a href="%GAME_NAME%.html">
-                <h3>Restart Game</h3>
-            </a>
-        </div>
-        <div class="btn">
-            <a href="../index.html">
-                <h3>Back</h3>
-            </a>
+        <div class="buttons">
+            <div class="button">
+                <a href="%GAME_NAME%.html" class="button-link">
+                    <img src="../img/%BUTTON%.png" class="button-image" />
+                </a>
+                <div class="button-label">START 1P</div>
+            </div>
+            <div class="button">
+                <a href="../index.html" class="button-link">
+                    <img src="../img/%BUTTON%.png" class="button-image" />
+                </a>
+                <div class="button-label">HOME</div>
+            </div>
         </div>
     </body>
 </html>
