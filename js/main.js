@@ -15,6 +15,28 @@ function setup() {
     initializeHeaderGOL();
     initializeHeaderText();
     initializeToob();
+    document.getElementById("toggle-1").addEventListener("click", ($event) => {
+        this.toggleSwitch("toggle-1", $event.target);
+    });
+    document.getElementById("toggle-2").addEventListener("click", ($event) => {
+        this.toggleSwitch("toggle-2", $event.target);
+    });
+    document.getElementById("toggle-3").addEventListener("click", ($event) => {
+        this.toggleSwitch("toggle-3", $event.target);
+    });
+    document.getElementById("toggle-4").addEventListener("click", ($event) => {
+        this.toggleSwitch("toggle-4", $event.target);
+    });
+}
+
+function toggleSwitch(switchNum, switchElement) {
+    if (switchElement.classList.contains("switch-off")) {
+        switchElement.classList.remove("switch-off");
+        switchElement.classList.add("switch-on");
+    } else {
+        switchElement.classList.remove("switch-on");
+        switchElement.classList.add("switch-off");
+    }
 }
 
 // called by p5 when window is ready
@@ -42,9 +64,7 @@ function draw() {
 }
 
 function initializeHeaderGOL() {
-    let header = document
-        .getElementById("gol-container")
-        .getBoundingClientRect();
+    let header = document.getElementById("gol-container").getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
 
@@ -159,10 +179,7 @@ function setPixelColors(pixels) {
                 pixels[index * 4 + 3] = 255;
             }
         } else {
-            pixels[index * 4] =
-                pixels[index * 4 + 1] =
-                pixels[index * 4 + 2] =
-                    0;
+            pixels[index * 4] = pixels[index * 4 + 1] = pixels[index * 4 + 2] = 0;
             pixels[index * 4 + 3] = 255;
         }
     }
@@ -199,11 +216,7 @@ function mouseDragged(e) {
 function randomCellSpawn(x, y) {
     let cellIndex = y * hWidth + x;
     for (let i = -Math.floor(SPAWN_AREA_SIZE / 2); i < SPAWN_AREA_SIZE; i++) {
-        for (
-            let j = -Math.floor(SPAWN_AREA_SIZE / 2);
-            j < SPAWN_AREA_SIZE;
-            j++
-        ) {
+        for (let j = -Math.floor(SPAWN_AREA_SIZE / 2); j < SPAWN_AREA_SIZE; j++) {
             index = cellIndex + i + j * hWidth;
             if (index > 0 && index < pixelAge.length) {
                 pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
@@ -213,9 +226,7 @@ function randomCellSpawn(x, y) {
 }
 
 function windowResized() {
-    let header = document
-        .getElementById("gol-container")
-        .getBoundingClientRect();
+    let header = document.getElementById("gol-container").getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
     resizeCanvas(hWidth, hHeight);
@@ -240,9 +251,7 @@ function updateHeaderText() {
             b: Math.floor(Math.random() * 255),
             a: 255,
         };
-        letters[
-            index
-        ].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+        letters[index].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
     }
 }
 
@@ -264,14 +273,10 @@ function updateUfos() {
     for (let i = 0; i < ufos.length; i++) {
         const ufo = ufos[i];
         let nextPos = ufo.pos.add(ufo.vel);
-        if (nextPos.x < toob.left || nextPos.x > toob.right)
-            ufo.vel = ufo.vel.flipX();
-        if (nextPos.y < toob.top || nextPos.y > toob.bottom)
-            ufo.vel = ufo.vel.flipY();
+        if (nextPos.x < toob.left || nextPos.x > toob.right) ufo.vel = ufo.vel.flipX();
+        if (nextPos.y < toob.top || nextPos.y > toob.bottom) ufo.vel = ufo.vel.flipY();
         ufo.pos = ufo.pos.add(ufo.vel);
-        ufo.htmlElement.style = `transform: translate(${
-            ufo.pos.x - ufo.SIZE / 2
-        }px, ${ufo.pos.y - ufo.SIZE / 2}px)`;
+        ufo.htmlElement.style = `transform: translate(${ufo.pos.x - ufo.SIZE / 2}px, ${ufo.pos.y - ufo.SIZE / 2}px)`;
     }
 }
 
@@ -298,10 +303,7 @@ class Toob {
         this.bounds = htmlElement.getBoundingClientRect();
         this.width = this.bounds.width - this.TOOB_PADDING;
         this.height = this.bounds.height - this.TOOB_PADDING;
-        this.center = new Vec2D(
-            this.bounds.x + this.bounds.width / 2,
-            this.bounds.y + this.bounds.height / 2
-        );
+        this.center = new Vec2D(this.bounds.x + this.bounds.width / 2, this.bounds.y + this.bounds.height / 2);
         this.top = this.center.y - this.height / 2;
         this.right = this.center.x + this.width / 2;
         this.bottom = this.center.y + this.height / 2;

@@ -24,6 +24,10 @@ const STARTING_LIVES = 3;
 const SCOREBOARD_HEIGHT = 48;
 
 class PlanetInvaders {
+    PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
+        this.start1Player();
+    });
+
     levelManager = new LevelManager();
     currentLives = 0;
     score = 0;
@@ -43,6 +47,8 @@ class PlanetInvaders {
         this.currentLives = STARTING_LIVES;
         this.loadLevel("level_1");
     }
+
+    start1Player() {}
 
     update() {
         if (this.level) {
