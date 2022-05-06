@@ -37,15 +37,18 @@ body {
     column-gap: 1rem;
     margin-right: auto;
     margin-left: auto;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .button {
     display: grid;
     place-items: center;
+    user-select: none;
 }
 
 .button-link {
     text-decoration: none;
+    cursor: pointer;
 }
 
 .button-image {
