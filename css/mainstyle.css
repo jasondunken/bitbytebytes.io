@@ -15,8 +15,8 @@ body {
 
 .gol-container {
     width: 100%;
-    height: 15rem;
-    display: flex;
+    height: 10rem;
+    display: grid;
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -56,6 +56,7 @@ body {
 
 .navigation {
     width: 100%;
+    height: 116px;
     user-select: none;
     border-top: 8px solid black;
     border-bottom: 8px solid black;
@@ -64,32 +65,48 @@ body {
 
 .switches-background {
     width: 100%;
-    height: 80px;
+    height: 100%;
 }
 
 .switches {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    position: absolute;
+    top: 2px;
+    width: 100%;
 }
 
 #switch-1 {
-    left: calc(10% - 16px);
 }
 
 #switch-2 {
-    left: calc(30% - 16px);
 }
 
 #switch-3 {
-    left: calc(70% - 16px);
 }
 
 #switch-4 {
-    left: calc(90% - 16px);
+}
+
+.switch-container {
+    display: grid;
+    grid-template-rows: 28px 1fr 12px;
+    place-items: center;
+    position: relative;
+}
+
+.switch-label {
+    color: orange;
+    font-weight: 900;
+    text-align: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 4px;
 }
 
 .switch {
-    position: absolute;
-    top: 12px;
     height: 64px;
+    position: relative;
+    display: inline-block;
 }
 
 .switch-on {
@@ -116,8 +133,8 @@ body {
 #divider {
     user-select: none;
     width: 100%;
-    border-top: 5px solid orange;
-    border-bottom: 5px solid orange;
+    border-top: 8px solid orange;
+    border-bottom: 8px solid orange;
 }
 
 #toob img {
