@@ -17,7 +17,10 @@ function setup() {
     initializeToob();
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
-        restartGOL();
+        noLoop();
+        setTimeout(() => {
+            restartGOL();
+        }, 250);
     });
     document.getElementById("toggle-2").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -84,7 +87,14 @@ function initializeHeaderGOL() {
 }
 
 function restartGOL() {
+    let header = document.getElementById("gol-container").getBoundingClientRect();
+    hWidth = header.width;
+    hHeight = header.height;
+    resizeCanvas(hWidth, hHeight);
+    // this resets the pixel buffer
+    background("black");
     initializePixelAge(hWidth, hHeight);
+    loop();
 }
 
 function initializeHeaderText() {
@@ -238,14 +248,7 @@ function randomCellSpawn(x, y) {
 }
 
 function windowResized() {
-    let header = document.getElementById("gol-container").getBoundingClientRect();
-    hWidth = header.width;
-    hHeight = header.height;
-    resizeCanvas(hWidth, hHeight);
-
-    // this resets the pixel buffer
-    background("black");
-    initializePixelAge(hWidth, hHeight);
+    restartGOL();
     initializeHeaderText();
     initializeToob();
 }

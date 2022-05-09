@@ -122,6 +122,12 @@ body {
     height: 64px;
 }
 
+.switch-options-label {
+    position: absolute;
+    top: 0;
+    left: 32px;
+}
+
 .switch-toggle {
     position: absolute;
     left: 0;
@@ -132,7 +138,8 @@ body {
 
 .momentary-animation {
     animation-name: momentary;
-    animation-duration: 1s;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in;
 }
 
 @keyframes momentary {
