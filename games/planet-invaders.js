@@ -29,6 +29,8 @@ class PlanetInvaders {
     });
 
     levelManager = new LevelManager();
+    demo = false;
+
     currentLives = 0;
     score = 0;
     gameOver = false;
@@ -44,11 +46,19 @@ class PlanetInvaders {
     constructor() {}
 
     initializeGame() {
-        this.currentLives = STARTING_LIVES;
         this.loadLevel("level_1");
     }
 
-    start1Player() {}
+    startDemo() {
+        this.demo = true;
+        this.player = new DemoPlayer();
+    }
+
+    start1Player() {
+        this.demo = false;
+        this.currentLives = STARTING_LIVES;
+        this.player = new Player();
+    }
 
     update() {
         if (this.level) {

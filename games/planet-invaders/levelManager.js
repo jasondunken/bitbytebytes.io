@@ -102,7 +102,7 @@ class LevelManager {
             x: display.width / 2,
             y: display.height - this.PLAYER_SIZE * 2,
         };
-        const player = new Ship(this.PLAYER_SIZE, playerStartingPosition, this.PLAYER_SPEED, levelSprites["ship"]);
+        const player = new Player(this.PLAYER_SIZE, playerStartingPosition, this.PLAYER_SPEED, levelSprites["ship"]);
 
         let spawnAreaWidth = display.width - this.GUTTER_WIDTH * 2;
         let barriers = [];

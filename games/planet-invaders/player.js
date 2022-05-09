@@ -1,4 +1,4 @@
-class Ship {
+class Player {
     BASE_COOLDOWN = 15;
     cooldown = 0;
     weaponReady = false;
@@ -47,6 +47,30 @@ class Ship {
         if (this.weaponReady) {
             this.shots.push(new Shot(new p5.Vector(this.pos.x, this.pos.y)));
             this.weaponReady = false;
+        }
+    }
+}
+
+class DemoPlayer extends Player {
+    constructor(size, position, speed, sprite) {
+        super(size, position, speed, sprite);
+    }
+
+    update() {
+        this.pos.x += this.speed;
+
+        for (let i = this.shots.length - 1; i >= 0; i--) {
+            if (this.shots[i].dead) {
+                this.shots.splice(i, 1);
+            }
+        }
+
+        if (!this.weaponReady) {
+            this.cooldown--;
+            if (this.cooldown <= 0) {
+                this.cooldown = this.BASE_COOLDOWN;
+                this.weaponReady = true;
+            }
         }
     }
 }
