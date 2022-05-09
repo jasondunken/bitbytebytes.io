@@ -130,6 +130,20 @@ body {
     cursor: pointer;
 }
 
+.momentary-animation {
+    animation-name: momentary;
+    animation-duration: 1s;
+}
+
+@keyframes momentary {
+    0% {
+        top: 0px;
+    }
+    50% {
+        top: 32px;
+    }
+}
+
 #divider {
     user-select: none;
     width: 100%;

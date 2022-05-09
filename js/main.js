@@ -16,20 +16,28 @@ function setup() {
     initializeHeaderText();
     initializeToob();
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
-        this.toggleSwitch("toggle-1", $event.target);
+        this.momentarySwitch($event.target);
+        restartGOL();
     });
     document.getElementById("toggle-2").addEventListener("click", ($event) => {
-        this.toggleSwitch("toggle-2", $event.target);
+        this.toggleSwitch($event.target);
     });
     document.getElementById("toggle-3").addEventListener("click", ($event) => {
-        this.toggleSwitch("toggle-3", $event.target);
+        this.toggleSwitch($event.target);
     });
     document.getElementById("toggle-4").addEventListener("click", ($event) => {
-        this.toggleSwitch("toggle-4", $event.target);
+        this.toggleSwitch($event.target);
     });
 }
 
-function toggleSwitch(switchNum, switchElement) {
+function momentarySwitch(switchElement) {
+    switchElement.classList.remove("switch-off");
+    switchElement.classList.remove("momentary-animation");
+    switchElement.offsetWidth; // hack to get animation to restart on subsequent clicks
+    switchElement.classList.add("momentary-animation");
+}
+
+function toggleSwitch(switchElement) {
     if (switchElement.classList.contains("switch-off")) {
         switchElement.classList.remove("switch-off");
         switchElement.classList.add("switch-on");
@@ -72,6 +80,10 @@ function initializeHeaderGOL() {
     let canvas = createCanvas(hWidth, hHeight);
     canvas.parent("p5-container");
 
+    initializePixelAge(hWidth, hHeight);
+}
+
+function restartGOL() {
     initializePixelAge(hWidth, hHeight);
 }
 
@@ -233,7 +245,6 @@ function windowResized() {
 
     // this resets the pixel buffer
     background("black");
-
     initializePixelAge(hWidth, hHeight);
     initializeHeaderText();
     initializeToob();
