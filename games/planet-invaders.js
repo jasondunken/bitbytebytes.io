@@ -11,7 +11,7 @@ function setup() {
 
 function initGame() {
     game = new PlanetInvaders();
-    game.initializeGame();
+    game.startDemo();
 }
 
 function draw() {
@@ -29,7 +29,7 @@ class PlanetInvaders {
     });
 
     levelManager = new LevelManager();
-    demo = false;
+    isDemo = false;
 
     currentLives = 0;
     score = 0;
@@ -45,19 +45,15 @@ class PlanetInvaders {
 
     constructor() {}
 
-    initializeGame() {
-        this.loadLevel("level_1");
-    }
-
     startDemo() {
-        this.demo = true;
-        this.player = new DemoPlayer();
+        this.isDemo = true;
+        this.loadLevel("level_1", true);
     }
 
     start1Player() {
-        this.demo = false;
+        this.isDemo = false;
         this.currentLives = STARTING_LIVES;
-        this.player = new Player();
+        this.loadLevel("level_1", false);
     }
 
     update() {
@@ -163,14 +159,14 @@ class PlanetInvaders {
                     if (this.currentLives < 1) {
                         this.gameOver = true;
                     } else {
-                        this.loadLevel(this.level.name);
+                        this.loadLevel(this.level.name, this.isDemo);
                         return;
                     }
                 }
 
                 //check if all the aliens are dead
                 if (this.level.totalAliens < 1) {
-                    this.loadLevel(this.levels[Math.floor(Math.random() * this.levels.length)]);
+                    this.loadLevel(this.levels[Math.floor(Math.random() * this.levels.length)], this.isDemo);
                     return;
                 }
 
@@ -226,9 +222,9 @@ class PlanetInvaders {
         }
     }
 
-    async loadLevel(level) {
+    async loadLevel(level, isDemo) {
         const display = { width, height, SCOREBOARD_HEIGHT };
-        this.level = await this.levelManager.initializeLevel(display, level);
+        this.level = await this.levelManager.initializeLevel(display, level, isDemo);
         this.levelTime = 0;
         this.bonus = null;
     }

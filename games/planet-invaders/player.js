@@ -52,12 +52,26 @@ class Player {
 }
 
 class DemoPlayer extends Player {
-    constructor(size, position, speed, sprite) {
+    moving = false;
+
+    constructor(size, position, speed, sprite, bounds) {
         super(size, position, speed, sprite);
+        this.bounds = bounds;
     }
 
     update() {
+        if (frameCount % 30 === 0) {
+            this.fire();
+        }
         this.pos.x += this.speed;
+        if (this.pos.x < this.size) {
+            this.pos.x = this.size;
+            this.speed = -this.speed;
+        }
+        if (this.pos.x > this.bounds.width - this.size) {
+            this.pos.x = this.bounds.width - this.size;
+            this.speed = -this.speed;
+        }
 
         for (let i = this.shots.length - 1; i >= 0; i--) {
             if (this.shots[i].dead) {

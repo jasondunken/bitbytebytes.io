@@ -91,7 +91,7 @@ class LevelManager {
     bonusSprite;
     bonusSpriteReversed;
 
-    async initializeLevel(display, levelName) {
+    async initializeLevel(display, levelName, isDemo) {
         const level = this.levels[levelName];
         const backgroundImage = await loadImage(level.backgroundImage);
         const levelSprites = await SpriteLoader.loadSprites(level.spriteSheetData);
@@ -102,7 +102,18 @@ class LevelManager {
             x: display.width / 2,
             y: display.height - this.PLAYER_SIZE * 2,
         };
-        const player = new Player(this.PLAYER_SIZE, playerStartingPosition, this.PLAYER_SPEED, levelSprites["ship"]);
+        let player = null;
+        if (isDemo) {
+            player = new DemoPlayer(
+                this.PLAYER_SIZE,
+                playerStartingPosition,
+                this.PLAYER_SPEED,
+                levelSprites["ship"],
+                display
+            );
+        } else {
+            player = new Player(this.PLAYER_SIZE, playerStartingPosition, this.PLAYER_SPEED, levelSprites["ship"]);
+        }
 
         let spawnAreaWidth = display.width - this.GUTTER_WIDTH * 2;
         let barriers = [];
