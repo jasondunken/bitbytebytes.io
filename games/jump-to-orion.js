@@ -8,11 +8,7 @@ let img_background2;
 let img_foreground1;
 let scenery = [];
 
-let img_player;
-let pos = { x: 100, y: HEIGHT / 2 };
-let fireReady = 0;
-let cooldown = 30;
-let rockets = [];
+let player;
 
 function setup() {
     frameRate(60);
@@ -21,9 +17,9 @@ function setup() {
 
     img_player = new Image();
     img_player.src = "./jump-to-orion/img/sprite1.png";
-
     img_rocket = new Image();
     img_rocket.src = "./jump-to-orion/img/rocket.png";
+    player = new Player(img_player, { x: 100, y: HEIGHT / 2 }, img_rocket);
 
     img_background1 = new Image();
     img_background1.src = "./jump-to-orion/img/space.png";
@@ -49,19 +45,7 @@ function update() {
             layer.xScroll = 0;
         }
     }
-    if (keyIsDown(87)) pos.y -= 1;
-    if (keyIsDown(83)) pos.y += 1;
-    if (keyIsDown(32) && fireReady === 0) {
-        fireReady = cooldown;
-        rockets.push({ x: pos.x, y: pos.y, s: 5 });
-    } else {
-        fireReady -= 1;
-        if (fireReady < 0) fireReady = 0;
-    }
-
-    for (let rocket of rockets) {
-        rocket.x += rocket.s;
-    }
+    player.update();
 }
 
 function draw() {
@@ -95,10 +79,7 @@ function draw() {
             HEIGHT
         );
     }
-    drawingContext.drawImage(img_player, pos.x, pos.y);
-    for (let rocket of rockets) {
-        drawingContext.drawImage(img_rocket, rocket.x, rocket.y);
-    }
+    player.draw();
     drawingContext.drawImage(scenery[2], scenery[2].xScroll, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT);
     if (scenery[2].xScroll > scenery[2].width - WIDTH) {
         drawingContext.drawImage(
