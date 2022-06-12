@@ -35,3 +35,13 @@ class Player {
         }
     }
 }
+
+class DemoPlayer extends Player {
+    constructor(img_player, pos, img_rocket) {
+        super(img_player, pos, img_rocket);
+    }
+
+    update() {
+        // move demo player
+    }
+}
