@@ -13,6 +13,7 @@ let images = {};
 let player;
 
 let items = [];
+let aliens = [];
 
 function preload() {
     images["player"] = loadImage("./jump-to-orion/img/sprite1.png");
@@ -62,11 +63,15 @@ function update() {
         const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
         const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
         // const itemType = Object.keys(items);
-        console.log(`${frameCount}, ${items.length} : ${item}`);
         items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, 10, images[item], 32, -2));
+        aliens.push(new Alien({ x: width + 32, y: Math.floor(Math.random() * height) }, images["alien"], 32, -3));
     }
     for (let item of items) {
         item.update();
+    }
+    console.log(`aliens: ${aliens}`);
+    for (let alien of aliens) {
+        alien.update();
     }
 }
 
@@ -104,6 +109,9 @@ function draw() {
     player.draw();
     for (let item of items) {
         item.draw();
+    }
+    for (let alien of aliens) {
+        alien.draw();
     }
     drawingContext.drawImage(scenery[2], scenery[2].xScroll, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT);
     if (scenery[2].xScroll > scenery[2].width - WIDTH) {
