@@ -32,7 +32,7 @@ function setup() {
     canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent("game");
 
-    player = new Player(images["player"], { x: 100, y: HEIGHT / 2 }, images["rocket"]);
+    player = new Player({ x: 100, y: HEIGHT / 2 }, 2, 32, images["player"], images["rocket"]);
 
     img_background1 = new Image();
     img_background1.src = "./jump-to-orion/img/space.png";
@@ -59,6 +59,7 @@ function update() {
         }
     }
     player.update();
+    console.log("player: ", player);
     if (frameCount % 60 === 0) {
         const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
         const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];

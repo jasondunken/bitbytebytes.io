@@ -1,23 +1,47 @@
-class Player {
-    img_player;
-    pos;
-    img_rocket;
+class Player extends GameObject {
+    imagePlayer;
+    imageRocket;
+
     fireReady = 0;
     cooldown = 30;
     rockets = [];
 
-    constructor(img_player, pos, img_rocket) {
-        this.img_player = img_player;
-        this.pos = pos;
-        this.img_rocket = img_rocket;
+    constructor(initialPos, speed, size, imagePlayer, imageRocket) {
+        super(initialPos, speed, size);
+        this.imagePlayer = imagePlayer;
+        this.imageRocket = imageRocket;
     }
 
     update() {
-        if (keyIsDown(87)) this.pos.y -= 1;
-        if (keyIsDown(83)) this.pos.y += 1;
+        if (keyIsDown(87)) this.pathPos.y -= this.speed;
+        if (keyIsDown(83)) this.pathPos.y += this.speed;
+        this.delta += this.speed / 60.0;
+        this.currentPos = {
+            x: this.pathPos.x,
+            y: this.pathPos.y + Math.cos(this.delta % 360) * this.size,
+        };
+        this.corners = {
+            a: {
+                x: this.currentPos.x - this.halfSize,
+                y: this.currentPos.y - this.halfSize,
+            },
+            b: {
+                x: this.currentPos.x + this.halfSize,
+                y: this.currentPos.y - this.halfSize,
+            },
+            c: {
+                x: this.currentPos.x + this.halfSize,
+                y: this.currentPos.y + this.halfSize,
+            },
+            d: {
+                x: this.currentPos.x - this.halfSize,
+                y: this.currentPos.y + this.halfSize,
+            },
+        };
+
         if (keyIsDown(32) && this.fireReady === 0) {
             this.fireReady = this.cooldown;
-            this.rockets.push({ x: this.pos.x, y: this.pos.y, s: 5 });
+            this.rockets.push({ x: this.currentPos.x, y: this.currentPos.y, s: 5 });
         } else {
             this.fireReady -= 1;
             if (this.fireReady < 0) this.fireReady = 0;
@@ -29,16 +53,16 @@ class Player {
     }
 
     draw() {
-        image(this.img_player, this.pos.x, this.pos.y);
+        image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         for (let rocket of this.rockets) {
-            image(this.img_rocket, rocket.x, rocket.y);
+            image(this.imageRocket, rocket.x, rocket.y);
         }
     }
 }
 
 class DemoPlayer extends Player {
-    constructor(img_player, pos, img_rocket) {
-        super(img_player, pos, img_rocket);
+    constructor(initialPos, speed, size, imagePlayer, imageRocket) {
+        super(initialPos, speed, size, imagePlayer, imageRocket);
     }
 
     update() {
