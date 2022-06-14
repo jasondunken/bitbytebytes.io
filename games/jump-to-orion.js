@@ -8,18 +8,30 @@ let img_background2;
 let img_foreground1;
 let scenery = [];
 
+let images = {};
+
 let player;
+
+let items = [];
+
+function preload() {
+    images["player"] = loadImage("./jump-to-orion/img/sprite1.png");
+    images["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
+    images["alien"] = loadImage("./jump-to-orion/img/alien.png");
+    images["alienRocket"] = loadImage("./jump-to-orion/img/rocket-alien.png");
+    images["healthSML"] = loadImage("./jump-to-orion/img/healthSMLImage.png");
+    images["healthMED"] = loadImage("./jump-to-orion/img/healthMEDImage.png");
+    images["healthLRG"] = loadImage("./jump-to-orion/img/healthLRGImage.png");
+    images["ammo"] = loadImage("./jump-to-orion/img/ammoImage.png");
+    images["shield"] = loadImage("./jump-to-orion/img/shieldImage.png");
+}
 
 function setup() {
     frameRate(60);
     canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent("game");
 
-    img_player = new Image();
-    img_player.src = "./jump-to-orion/img/sprite1.png";
-    img_rocket = new Image();
-    img_rocket.src = "./jump-to-orion/img/rocket.png";
-    player = new Player(img_player, { x: 100, y: HEIGHT / 2 }, img_rocket);
+    player = new Player(images["player"], { x: 100, y: HEIGHT / 2 }, images["rocket"]);
 
     img_background1 = new Image();
     img_background1.src = "./jump-to-orion/img/space.png";
@@ -46,6 +58,13 @@ function update() {
         }
     }
     player.update();
+    if (frameCount % 60 === 0) {
+        items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, 10, images["healthSML"], 32, -2));
+    }
+    console.log(`${frameCount}, ${items.length}`);
+    for (let item of items) {
+        item.update();
+    }
 }
 
 function draw() {
@@ -80,6 +99,9 @@ function draw() {
         );
     }
     player.draw();
+    for (let item of items) {
+        item.draw();
+    }
     drawingContext.drawImage(scenery[2], scenery[2].xScroll, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT);
     if (scenery[2].xScroll > scenery[2].width - WIDTH) {
         drawingContext.drawImage(
@@ -94,9 +116,4 @@ function draw() {
             HEIGHT
         );
     }
-}
-
-function setColor(newColor) {
-    stroke(newColor);
-    fill(newColor);
 }

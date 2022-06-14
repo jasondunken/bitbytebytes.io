@@ -29,9 +29,9 @@ class Player {
     }
 
     draw() {
-        drawingContext.drawImage(this.img_player, this.pos.x, this.pos.y);
+        image(this.img_player, this.pos.x, this.pos.y);
         for (let rocket of this.rockets) {
-            drawingContext.drawImage(img_rocket, rocket.x, rocket.y);
+            image(this.img_rocket, rocket.x, rocket.y);
         }
     }
 }
