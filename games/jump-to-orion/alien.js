@@ -13,13 +13,15 @@ class Alien {
         this.speed = speed;
         this.size = size;
         this.halfSize = size / 2;
+        this.delta = 0;
     }
 
     update() {
         this.pathPos.x = this.pathPos.x + this.speed;
+        this.delta += this.speed / 60.0;
         this.currentPos = {
             x: this.pathPos.x,
-            y: this.pathPos.y,
+            y: this.pathPos.y + Math.cos(this.delta % 360) * this.size,
         };
         this.corners = {
             a: {

@@ -70,8 +70,6 @@ function update() {
         items[i].update();
         if (items[i].pos.x < -items[i].size) items.splice(i, 1);
     }
-    console.log(`aliens: `, aliens);
-    console.log(`items: `, items);
     for (let i = aliens.length - 1; i >= 0; i--) {
         aliens[i].update();
         if (aliens[i].currentPos.x < -aliens[i].size) aliens.splice(i, 1);
