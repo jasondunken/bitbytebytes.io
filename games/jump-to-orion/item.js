@@ -6,8 +6,9 @@ class Item {
     size;
     speed;
 
-    constructor(pos, value, image, size, speed) {
+    constructor(pos, type, value, image, size, speed) {
         this.pos = pos;
+        this.type = type;
         this.value = value;
         this.image = image;
         this.size = size;

@@ -39,8 +39,8 @@ class Alien {
                 y: this.currentPos.y + this.halfSize,
             },
         };
-        console.log("pathPos: ", this.pathPos);
-        console.log("currentPos: ", this.currentPos);
+        // console.log("pathPos: ", this.pathPos);
+        // console.log("currentPos: ", this.currentPos);
     }
 
     draw() {
