@@ -59,9 +59,12 @@ function update() {
     }
     player.update();
     if (frameCount % 60 === 0) {
-        items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, 10, images["healthSML"], 32, -2));
+        const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
+        const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+        // const itemType = Object.keys(items);
+        console.log(`${frameCount}, ${items.length} : ${item}`);
+        items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, 10, images[item], 32, -2));
     }
-    console.log(`${frameCount}, ${items.length}`);
     for (let item of items) {
         item.update();
     }
