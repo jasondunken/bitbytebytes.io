@@ -59,7 +59,7 @@ function update() {
         }
     }
     player.update();
-    console.log("player: ", player);
+    // console.log("player: ", player);
     if (frameCount % 60 === 0) {
         const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
         const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];

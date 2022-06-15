@@ -41,21 +41,25 @@ class Player extends GameObject {
 
         if (keyIsDown(32) && this.fireReady === 0) {
             this.fireReady = this.cooldown;
-            this.rockets.push({ x: this.currentPos.x, y: this.currentPos.y, s: 5 });
+            this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
         } else {
             this.fireReady -= 1;
             if (this.fireReady < 0) this.fireReady = 0;
         }
 
         for (let rocket of this.rockets) {
-            rocket.x += rocket.s;
+            rocket.update();
         }
     }
 
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        noStroke();
+        fill("red");
+        ellipse(this.currentPos.x, this.currentPos.y, 5, 5);
+        console.log("rockets: ", this.rockets);
         for (let rocket of this.rockets) {
-            image(this.imageRocket, rocket.x, rocket.y);
+            rocket.draw();
         }
     }
 }
