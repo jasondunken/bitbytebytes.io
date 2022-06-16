@@ -17,4 +17,25 @@ class GameObject {
 
     update() {}
     draw() {}
+
+    setCorners() {
+        this.corners = {
+            a: {
+                x: this.currentPos.x - this.halfSize,
+                y: this.currentPos.y - this.halfSize,
+            },
+            b: {
+                x: this.currentPos.x + this.halfSize,
+                y: this.currentPos.y - this.halfSize,
+            },
+            c: {
+                x: this.currentPos.x + this.halfSize,
+                y: this.currentPos.y + this.halfSize,
+            },
+            d: {
+                x: this.currentPos.x - this.halfSize,
+                y: this.currentPos.y + this.halfSize,
+            },
+        };
+    }
 }

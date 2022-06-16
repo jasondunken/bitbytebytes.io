@@ -6,6 +6,8 @@ class Player extends GameObject {
     cooldown = 30;
     rockets = [];
 
+    health = 100;
+
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size);
         this.imagePlayer = imagePlayer;
@@ -18,26 +20,10 @@ class Player extends GameObject {
         this.delta += this.speed / 60.0;
         this.currentPos = {
             x: this.pathPos.x,
-            y: this.pathPos.y + Math.cos(this.delta % 360) * this.size,
+            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.cos(this.delta % 360) * this.size,
         };
-        this.corners = {
-            a: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            b: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            c: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-            d: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-        };
+
+        this.setCorners();
 
         if (keyIsDown(32) && this.fireReady === 0) {
             this.fireReady = this.cooldown;
@@ -54,9 +40,6 @@ class Player extends GameObject {
 
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
-        noStroke();
-        fill("red");
-        ellipse(this.currentPos.x, this.currentPos.y, 5, 5);
         console.log("rockets: ", this.rockets);
         for (let rocket of this.rockets) {
             rocket.draw();
