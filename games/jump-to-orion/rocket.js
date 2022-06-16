@@ -11,24 +11,7 @@ class Rocket extends GameObject {
             x: this.pathPos.x,
             y: this.pathPos.y,
         };
-        this.corners = {
-            a: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            b: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            c: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-            d: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-        };
+        this.setCorners();
     }
 
     draw() {
