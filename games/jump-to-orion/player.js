@@ -40,7 +40,6 @@ class Player extends GameObject {
 
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
-        console.log("rockets: ", this.rockets);
         for (let rocket of this.rockets) {
             rocket.draw();
         }

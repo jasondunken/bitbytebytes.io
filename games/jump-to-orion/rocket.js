@@ -16,6 +16,5 @@ class Rocket extends GameObject {
 
     draw() {
         image(this.imageRocket, this.corners.a.x, this.corners.a.y, this.size, this.size);
-        ellipse(this.corners.a.x, this.corners.a.y, 5, 5);
     }
 }
