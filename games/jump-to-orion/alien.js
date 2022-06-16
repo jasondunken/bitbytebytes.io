@@ -1,19 +1,9 @@
-class Alien {
-    img;
-    currentPos; // the current position of the sprite, including any offset
-    pathPos; // the path position, currentPos is pathPos plus an offset
-    speed;
-    size;
-    corners; // a collision box?
+class Alien extends GameObject {
+    imageAlien;
 
-    constructor(initialPos, img, size, speed) {
-        this.img = img;
-        this.currentPos = initialPos;
-        this.pathPos = initialPos;
-        this.speed = speed;
-        this.size = size;
-        this.halfSize = size / 2;
-        this.delta = 0;
+    constructor(initialPos, speed, size, imageAlien) {
+        super(initialPos, speed, size);
+        this.imageAlien = imageAlien;
     }
 
     update() {
@@ -23,29 +13,10 @@ class Alien {
             x: this.pathPos.x,
             y: this.pathPos.y + Math.cos(this.delta % 360) * this.size,
         };
-        this.corners = {
-            a: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            b: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            c: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-            d: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-        };
-        // console.log("pathPos: ", this.pathPos);
-        // console.log("currentPos: ", this.currentPos);
+        this.setCorners();
     }
 
     draw() {
-        image(this.img, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        image(this.imageAlien, this.corners.a.x, this.corners.a.y, this.size, this.size);
     }
 }

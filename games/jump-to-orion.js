@@ -64,8 +64,8 @@ function update() {
         const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
         const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
         // const itemType = Object.keys(items);
-        items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, item, 10, images[item], 32, -2));
-        aliens.push(new Alien({ x: width + 32, y: Math.floor(Math.random() * height) }, images["alien"], 32, -3));
+        items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, 32, -2, item, 10, images[item]));
+        aliens.push(new Alien({ x: width + 32, y: Math.floor(Math.random() * height) }, 32, -3, images["alien"]));
     }
     for (let i = items.length - 1; i >= 0; i--) {
         items[i].update();
