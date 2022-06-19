@@ -6,7 +6,12 @@ class Player extends GameObject {
     cooldown = 30;
     rockets = [];
 
-    health = 100;
+    STARTING_HEALTH = 100;
+    health = this.STARTING_HEALTH;
+
+    STARTING_SHIELD = 100;
+    shield = this.STARTING_SHIELD;
+    MIN_SHIELD_DISTANCE = 20;
 
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size);
@@ -26,11 +31,16 @@ class Player extends GameObject {
         this.setCorners();
 
         if (keyIsDown(32) && this.fireReady === 0) {
-            this.fireReady = this.cooldown;
-            this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
+            this.fire();
         } else {
             this.fireReady -= 1;
             if (this.fireReady < 0) this.fireReady = 0;
+        }
+
+        if (keyIsDown(67)) {
+            this.raiseShield();
+        } else {
+            this.shieldsRaised = false;
         }
 
         for (let rocket of this.rockets) {
@@ -40,8 +50,33 @@ class Player extends GameObject {
 
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        if (this.shieldsRaised) {
+            stroke("red");
+            noFill();
+            ellipse(
+                this.currentPos.x,
+                this.currentPos.y,
+                this.shield + this.MIN_SHIELD_DISTANCE,
+                this.shield + this.MIN_SHIELD_DISTANCE
+            );
+        }
         for (let rocket of this.rockets) {
             rocket.draw();
+        }
+    }
+
+    fire() {
+        this.fireReady = this.cooldown;
+        this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
+    }
+
+    raiseShield() {
+        this.shield--;
+        if (this.shield > 0) {
+            this.shieldsRaised = true;
+            console.log("shields up: ", this.shield);
+        } else {
+            this.shieldsRaised = false;
         }
     }
 }
