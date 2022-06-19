@@ -25,6 +25,9 @@ function preload() {
     images["healthLRG"] = loadImage("./jump-to-orion/img/healthLRGImage.png");
     images["ammo"] = loadImage("./jump-to-orion/img/ammoImage.png");
     images["shield"] = loadImage("./jump-to-orion/img/shieldImage.png");
+    images["health_ui"] = loadImage("./jump-to-orion/img/healthImage_ui.png");
+    images["ammo_ui"] = loadImage("./jump-to-orion/img/ammoImage_ui.png");
+    images["shield_ui"] = loadImage("./jump-to-orion/img/shieldImage_ui.png");
 }
 
 function setup() {
@@ -129,4 +132,14 @@ function draw() {
             HEIGHT
         );
     }
+
+    // UI elements
+    fill("red");
+    textSize(28);
+    image(images["health_ui"], 10, HEIGHT - 42, 32, 32);
+    text(player.getHealth(), 42, HEIGHT - 15);
+    image(images["ammo_ui"], 110, HEIGHT - 42, 32, 32);
+    text(player.getAmmo(), 142, HEIGHT - 15);
+    image(images["shield_ui"], 210, HEIGHT - 42, 32, 32);
+    text(player.getShield(), 242, HEIGHT - 15);
 }
