@@ -11,7 +11,10 @@ class Player extends GameObject {
 
     STARTING_SHIELD = 100;
     shield = this.STARTING_SHIELD;
-    MIN_SHIELD_DISTANCE = 20;
+    MIN_SHIELD_DISTANCE = 50;
+
+    STARTING_AMMO = 20;
+    ammo = this.STARTING_AMMO;
 
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size);
@@ -51,14 +54,11 @@ class Player extends GameObject {
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         if (this.shieldsRaised) {
+            let shieldDistance = this.shield;
+            if (shieldDistance < this.MIN_SHIELD_DISTANCE) shieldDistance = this.MIN_SHIELD_DISTANCE;
             stroke("red");
             noFill();
-            ellipse(
-                this.currentPos.x,
-                this.currentPos.y,
-                this.shield + this.MIN_SHIELD_DISTANCE,
-                this.shield + this.MIN_SHIELD_DISTANCE
-            );
+            ellipse(this.currentPos.x, this.currentPos.y, shieldDistance, shieldDistance);
         }
         for (let rocket of this.rockets) {
             rocket.draw();
@@ -66,18 +66,32 @@ class Player extends GameObject {
     }
 
     fire() {
-        this.fireReady = this.cooldown;
-        this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
+        if (this.ammo > 0) {
+            this.ammo--;
+            this.fireReady = this.cooldown;
+            this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
+        }
     }
 
     raiseShield() {
-        this.shield--;
         if (this.shield > 0) {
+            this.shield--;
             this.shieldsRaised = true;
-            console.log("shields up: ", this.shield);
         } else {
             this.shieldsRaised = false;
         }
+    }
+
+    getHealth() {
+        return this.health;
+    }
+
+    getAmmo() {
+        return this.ammo;
+    }
+
+    getShield() {
+        return this.shield;
     }
 }
 
