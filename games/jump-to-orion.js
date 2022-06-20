@@ -11,6 +11,7 @@ let scenery = [];
 let images = {};
 
 let player;
+let score = 0;
 
 let items = [];
 let aliens = [];
@@ -142,4 +143,5 @@ function draw() {
     text(player.getAmmo(), 142, HEIGHT - 15);
     image(images["shield_ui"], 210, HEIGHT - 42, 32, 32);
     text(player.getShield(), 242, HEIGHT - 15);
+    text(`Score ${score}`, WIDTH - 180, HEIGHT - 15);
 }
