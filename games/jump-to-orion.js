@@ -17,6 +17,22 @@ let items = [];
 let aliens = [];
 
 function preload() {
+    img_background1 = new Image();
+    img_background1.src = "./jump-to-orion/img/space.png";
+    img_background1.xScroll = 0;
+    img_background1.xScrollSpeed = 1;
+    scenery.push(img_background1);
+    img_background2 = new Image();
+    img_background2.src = "./jump-to-orion/img/planets.png";
+    img_background2.xScroll = 0;
+    img_background2.xScrollSpeed = 2;
+    scenery.push(img_background2);
+    img_foreground1 = new Image();
+    img_foreground1.src = "./jump-to-orion/img/debris.png";
+    img_foreground1.xScroll = 0;
+    img_foreground1.xScrollSpeed = 5;
+    scenery.push(img_foreground1);
+
     images["player"] = loadImage("./jump-to-orion/img/sprite1.png");
     images["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
     images["alien"] = loadImage("./jump-to-orion/img/alien.png");
@@ -37,22 +53,26 @@ function setup() {
     canvas.parent("game");
 
     player = new Player({ x: 100, y: HEIGHT / 2 }, 2, 32, images["player"], images["rocket"]);
+}
 
-    img_background1 = new Image();
-    img_background1.src = "./jump-to-orion/img/space.png";
-    img_background1.xScroll = 0;
-    img_background1.xScrollSpeed = 1;
-    scenery.push(img_background1);
-    img_background2 = new Image();
-    img_background2.src = "./jump-to-orion/img/planets.png";
-    img_background2.xScroll = 0;
-    img_background2.xScrollSpeed = 2;
-    scenery.push(img_background2);
-    img_foreground1 = new Image();
-    img_foreground1.src = "./jump-to-orion/img/debris.png";
-    img_foreground1.xScroll = 0;
-    img_foreground1.xScrollSpeed = 5;
-    scenery.push(img_foreground1);
+function mousePressed() {
+    console.log("mouse: ", mouseX, "|", mouseY);
+    for (let item of items) {
+        if (dist(mouseX, mouseY, item.currentPos.x, item.currentPos.y) < item.size) {
+            switch (item.type) {
+                case "healthSML":
+                case "healthMED":
+                case "healthLRG":
+                    player.addHealth(item.value);
+                    break;
+                case "ammo":
+                    player.addAmmo(item.value);
+                    break;
+                case "shield":
+                    player.addShield(item.value);
+            }
+        }
+    }
 }
 
 function update() {
@@ -63,11 +83,9 @@ function update() {
         }
     }
     player.update();
-    // console.log("player: ", player);
     if (frameCount % 60 === 0) {
         const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
         const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
-        // const itemType = Object.keys(items);
         items.push(new Item({ x: width + 32, y: Math.floor(Math.random() * height) }, -2, 32, images[item], item));
         aliens.push(new Alien({ x: width + 32, y: Math.floor(Math.random() * height) }, -3, 32, images["alien"]));
     }

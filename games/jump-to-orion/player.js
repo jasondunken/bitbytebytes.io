@@ -82,12 +82,27 @@ class Player extends GameObject {
         }
     }
 
+    addHealth(health) {
+        this.health += health;
+        if (this.health > this.STARTING_HEALTH) this.health = this.STARTING_HEALTH;
+    }
+
     getHealth() {
         return this.health;
     }
 
+    addAmmo(ammo) {
+        this.ammo += ammo;
+        if (this.ammo > this.STARTING_AMMO) this.ammo = this.STARTING_AMMO;
+    }
+
     getAmmo() {
         return this.ammo;
+    }
+
+    addShield(shield) {
+        this.shield += shield;
+        if (this.shield > this.STARTING_SHIELD) this.shield = this.STARTING_SHIELD;
     }
 
     getShield() {
