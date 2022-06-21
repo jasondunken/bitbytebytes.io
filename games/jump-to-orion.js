@@ -35,6 +35,11 @@ function preload() {
     images["health_ui"] = loadImage("./jump-to-orion/img/healthImage_ui.png");
     images["ammo_ui"] = loadImage("./jump-to-orion/img/ammoImage_ui.png");
     images["shield_ui"] = loadImage("./jump-to-orion/img/shieldImage_ui.png");
+    images["explosion_0"] = loadImage("./jump-to-orion/img/explosion_0.png");
+    images["explosion_1"] = loadImage("./jump-to-orion/img/explosion_1.png");
+    images["explosion_2"] = loadImage("./jump-to-orion/img/explosion_2.png");
+    images["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
+    images["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
 
     game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, images);
 }
@@ -79,11 +84,14 @@ class JumpToOrion {
     items = [];
     aliens = [];
 
+    explosionManager = null;
+
     constructor(width, height, scenery, images) {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
         this.images = images;
+        this.explosionManager = new ExplosionManager();
     }
 
     mousePressed(pos) {
@@ -127,6 +135,7 @@ class JumpToOrion {
         this.score = 0;
         this.items = [];
         this.aliens = [];
+        this.explosions = [];
         this.resetScenery();
     }
 
@@ -152,14 +161,61 @@ class JumpToOrion {
             const item = this.items[i];
             item.update();
             const playerCollision = this.checkForPlayerCollision(item);
-            if (item.currentPos.x < -item.size || playerCollision) this.items.splice(i, 1);
+            if (playerCollision) {
+                this.explosionManager.add(
+                    new Explosion(
+                        { x: item.currentPos.x, y: item.currentPos.y },
+                        -1,
+                        32,
+                        new Animation(
+                            [
+                                this.images["explosion_0"],
+                                this.images["explosion_1"],
+                                this.images["explosion_2"],
+                                this.images["explosion_3"],
+                                this.images["explosion_4"],
+                            ],
+                            10,
+                            false
+                        )
+                    )
+                );
+                this.items.splice(i, 1);
+            }
+            if (item.currentPos.x < -item.size) {
+                this.items.splice(i, 1);
+            }
         }
         for (let i = this.aliens.length - 1; i >= 0; i--) {
             const alien = this.aliens[i];
             alien.update();
             const playerCollision = this.checkForPlayerCollision(alien);
-            if (alien.currentPos.x < -alien.size || playerCollision) this.aliens.splice(i, 1);
+            if (playerCollision) {
+                this.explosionManager.add(
+                    new Explosion(
+                        { x: alien.currentPos.x, y: alien.currentPos.y },
+                        -1,
+                        32,
+                        new Animation(
+                            [
+                                this.images["explosion_0"],
+                                this.images["explosion_1"],
+                                this.images["explosion_2"],
+                                this.images["explosion_3"],
+                                this.images["explosion_4"],
+                            ],
+                            10,
+                            false
+                        )
+                    )
+                );
+                this.aliens.splice(i, 1);
+            }
+            if (alien.currentPos.x < -alien.size) {
+                this.aliens.splice(i, 1);
+            }
         }
+        this.explosionManager.update();
     }
 
     render() {
@@ -173,6 +229,7 @@ class JumpToOrion {
         for (let alien of this.aliens) {
             alien.draw();
         }
+        this.explosionManager.draw();
         this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
 
         // UI elements

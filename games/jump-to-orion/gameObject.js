@@ -13,6 +13,7 @@ class GameObject {
         this.size = size;
         this.halfSize = size / 2;
         this.delta = 0;
+        this.setCorners();
     }
 
     update() {}
@@ -37,5 +38,13 @@ class GameObject {
                 y: this.currentPos.y + this.halfSize,
             },
         };
+    }
+}
+
+class Animation {
+    constructor(frames, duration, loop) {
+        this.frames = frames;
+        this.duration = duration;
+        this.loop = loop;
     }
 }
