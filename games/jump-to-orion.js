@@ -3,6 +3,7 @@ const GAME_HEIGHT = 400;
 
 let game = null;
 
+// p5.js functions ------------------------>
 function preload() {
     let scenery = [];
     let images = {};
@@ -59,8 +60,8 @@ function draw() {
 function mousePressed() {
     game.mousePressed({ x: mouseX, y: mouseY });
 }
+// p5.js functions end -------------------->
 
-// Jump to Orion -------------------------->
 class JumpToOrion {
     PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
         this.start1Player();
@@ -126,6 +127,7 @@ class JumpToOrion {
         this.score = 0;
         this.items = [];
         this.aliens = [];
+        this.resetScenery();
     }
 
     update() {
@@ -189,6 +191,12 @@ class JumpToOrion {
         drawingContext.drawImage(layer, layer.xScroll, 0, width, height, 0, 0, width, height);
         if (layer.xScroll > layer.width - width) {
             drawingContext.drawImage(layer, layer.xScroll - layer.width, 0, width, height, 0, 0, width, height);
+        }
+    }
+
+    resetScenery() {
+        for (let layer of this.scenery) {
+            layer.xScroll = 0;
         }
     }
 
