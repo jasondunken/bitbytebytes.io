@@ -1,12 +1,11 @@
-let game = null;
-
 const GAME_WIDTH = 600;
 const GAME_HEIGHT = 400;
 
-let scenery = [];
-let images = {};
+let game = null;
 
 function preload() {
+    let scenery = [];
+    let images = {};
     img_background1 = new Image();
     img_background1.src = "./jump-to-orion/img/space.png";
     img_background1.xScroll = 0;
