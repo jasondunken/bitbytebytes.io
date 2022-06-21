@@ -56,7 +56,6 @@ function setup() {
 }
 
 function mousePressed() {
-    console.log("mouse: ", mouseX, "|", mouseY);
     for (let item of items) {
         if (dist(mouseX, mouseY, item.currentPos.x, item.currentPos.y) < item.size) {
             switch (item.type) {
@@ -71,6 +70,8 @@ function mousePressed() {
                 case "shield":
                     player.addShield(item.value);
             }
+            items.splice(items.indexOf(item), 1);
+            return;
         }
     }
 }
