@@ -122,5 +122,12 @@ class DemoPlayer extends Player {
 
     update() {
         // move demo player
+        this.delta += this.speed / 60.0;
+        this.currentPos = {
+            x: this.pathPos.x,
+            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.cos(this.delta % 360) * this.size,
+        };
+
+        this.setCorners();
     }
 }

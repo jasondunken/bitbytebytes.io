@@ -108,7 +108,25 @@ class JumpToOrion {
     }
 
     startDemo() {
+        this.player = new DemoPlayer(
+            { x: 100, y: this.HEIGHT / 2 },
+            2,
+            32,
+            this.images["player"],
+            this.images["rocket"]
+        );
+        this.startGame();
+    }
+
+    start1Player() {
         this.player = new Player({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.images["player"], this.images["rocket"]);
+        this.startGame();
+    }
+
+    startGame() {
+        this.score = 0;
+        this.items = [];
+        this.aliens = [];
     }
 
     update() {
@@ -147,44 +165,6 @@ class JumpToOrion {
         background("black");
         this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
         this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
-        // drawingContext.drawImage(
-        //     this.scenery[0],
-        //     this.scenery[0].xScroll,
-        //     0,
-        //     this.WIDTH,
-        //     this.HEIGHT,
-        //     0,
-        //     0,
-        //     this.WIDTH,
-        //     this.HEIGHT
-        // );
-        // if (this.scenery[0].xScroll > this.scenery[0].width - this.WIDTH) {
-        //     drawingContext.drawImage(
-        //         this.scenery[0],
-        //         scenery[0].xScroll - scenery[0].width,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT,
-        //         0,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT
-        //     );
-        // }
-        // drawingContext.drawImage(scenery[1], scenery[1].xScroll, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT);
-        // if (scenery[1].xScroll > scenery[1].width - WIDTH) {
-        //     drawingContext.drawImage(
-        //         scenery[1],
-        //         scenery[1].xScroll - scenery[1].width,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT,
-        //         0,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT
-        //     );
-        // }
         this.player.draw();
         for (let item of this.items) {
             item.draw();
@@ -193,21 +173,6 @@ class JumpToOrion {
             alien.draw();
         }
         this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
-
-        // drawingContext.drawImage(scenery[2], scenery[2].xScroll, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT);
-        // if (scenery[2].xScroll > scenery[2].width - WIDTH) {
-        //     drawingContext.drawImage(
-        //         scenery[2],
-        //         scenery[2].xScroll - scenery[2].width,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT,
-        //         0,
-        //         0,
-        //         WIDTH,
-        //         HEIGHT
-        //     );
-        // }
 
         // UI elements
         fill("red");
