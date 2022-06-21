@@ -12,6 +12,8 @@ class Player extends GameObject {
     STARTING_SHIELD = 100;
     shield = this.STARTING_SHIELD;
     MIN_SHIELD_DISTANCE = 50;
+    shieldDistance = this.MIN_SHIELD_DISTANCE;
+    shieldsRaised = false;
 
     STARTING_AMMO = 20;
     ammo = this.STARTING_AMMO;
@@ -46,6 +48,11 @@ class Player extends GameObject {
             this.shieldsRaised = false;
         }
 
+        if (this.shieldsRaised) {
+            this.shieldDistance = this.shield;
+            if (this.shieldDistance < this.MIN_SHIELD_DISTANCE) this.shieldDistance = this.MIN_SHIELD_DISTANCE;
+        }
+
         for (let rocket of this.rockets) {
             rocket.update();
         }
@@ -54,11 +61,9 @@ class Player extends GameObject {
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         if (this.shieldsRaised) {
-            let shieldDistance = this.shield;
-            if (shieldDistance < this.MIN_SHIELD_DISTANCE) shieldDistance = this.MIN_SHIELD_DISTANCE;
             stroke("red");
             noFill();
-            ellipse(this.currentPos.x, this.currentPos.y, shieldDistance, shieldDistance);
+            ellipse(this.currentPos.x, this.currentPos.y, this.shieldDistance, this.shieldDistance);
         }
         for (let rocket of this.rockets) {
             rocket.draw();
