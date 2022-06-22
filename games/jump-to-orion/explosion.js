@@ -21,9 +21,15 @@ class Explosion extends GameObject {
 }
 
 class ExplosionManager {
+    animations = {};
     explosions = [];
 
-    add(explosion) {
+    addAnimation(name, animation) {
+        this.animations[name] = animation;
+    }
+
+    addExplosion(position, speed, size, animationName) {
+        const explosion = new Explosion(position, speed, size, this.animations[animationName]);
         this.explosions.push(explosion);
     }
 
@@ -40,5 +46,9 @@ class ExplosionManager {
 
     draw() {
         for (let explosion of this.explosions) explosion.draw();
+    }
+
+    reset() {
+        this.explosions = [];
     }
 }
