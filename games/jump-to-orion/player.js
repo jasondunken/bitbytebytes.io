@@ -9,10 +9,11 @@ class Player extends GameObject {
     STARTING_HEALTH = 100;
     health = this.STARTING_HEALTH;
 
-    STARTING_SHIELD = 100;
+    MIN_SHIELD_RADIUS = 50;
+    MAX_SHIELD_RADIUS = 100;
+    STARTING_SHIELD = 2000;
     shield = this.STARTING_SHIELD;
-    MIN_SHIELD_DISTANCE = 50;
-    shieldDistance = this.MIN_SHIELD_DISTANCE;
+    shieldRadius = this.MAX_SHIELD_RADIUS;
     shieldsRaised = false;
 
     STARTING_AMMO = 20;
@@ -49,8 +50,9 @@ class Player extends GameObject {
         }
 
         if (this.shieldsRaised) {
-            this.shieldDistance = this.shield;
-            if (this.shieldDistance < this.MIN_SHIELD_DISTANCE) this.shieldDistance = this.MIN_SHIELD_DISTANCE;
+            this.shieldRadius = this.shield;
+            if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
+            if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
         }
 
         for (let rocket of this.rockets) {
@@ -63,7 +65,7 @@ class Player extends GameObject {
         if (this.shieldsRaised) {
             stroke("red");
             noFill();
-            ellipse(this.currentPos.x, this.currentPos.y, this.shieldDistance, this.shieldDistance);
+            ellipse(this.currentPos.x, this.currentPos.y, this.shieldRadius, this.shieldRadius);
         }
         for (let rocket of this.rockets) {
             rocket.draw();
@@ -112,6 +114,18 @@ class Player extends GameObject {
 
     getShield() {
         return this.shield;
+    }
+
+    checkForCollision(entity) {
+        let size = this.size;
+        if (this.shieldsRaised) {
+            size = this.shieldRadius;
+        }
+        let isCollision =
+            dist(entity.currentPos.x, entity.currentPos.y, this.currentPos.x, this.currentPos.y) <
+            (size + entity.size) / 2;
+        if (isCollision && !this.shieldsRaised) this.health -= 10;
+        return isCollision;
     }
 }
 
