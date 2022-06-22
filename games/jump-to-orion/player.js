@@ -125,6 +125,7 @@ class Player extends GameObject {
             dist(entity.currentPos.x, entity.currentPos.y, this.currentPos.x, this.currentPos.y) <
             (size + entity.size) / 2;
         if (isCollision && !this.shieldsRaised) this.health -= 10;
+        if (this.health < 0) this.health = 0;
         return isCollision;
     }
 }

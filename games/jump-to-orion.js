@@ -223,14 +223,41 @@ class JumpToOrion {
         this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
 
         // UI elements
+        const statBar = {
+            height: 18,
+            width: 96,
+        };
+        stroke("blue");
+        const health = this.player.getHealth();
+        const healthWidth = (health / this.player.STARTING_HEALTH) * statBar.width;
         fill("red");
-        textSize(28);
+        rect(42, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
+        fill("green");
+        rect(42, this.HEIGHT - 13 - statBar.height, healthWidth, statBar.height);
         image(this.images["health_ui"], 10, this.HEIGHT - 42, 32, 32);
-        text(this.player.getHealth(), 42, this.HEIGHT - 15);
-        image(this.images["ammo_ui"], 110, this.HEIGHT - 42, 32, 32);
-        text(this.player.getAmmo(), 142, this.HEIGHT - 15);
-        image(this.images["shield_ui"], 190, this.HEIGHT - 42, 32, 32);
-        text(this.player.getShield(), 222, this.HEIGHT - 15);
+
+        const shield = this.player.getShield();
+        const shieldWidth = (shield / this.player.STARTING_SHIELD) * statBar.width;
+        fill("red");
+        rect(170, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
+        fill("lightblue");
+        rect(170, this.HEIGHT - 13 - statBar.height, shieldWidth, statBar.height);
+        image(this.images["shield_ui"], 138, this.HEIGHT - 42, 32, 32);
+
+        image(this.images["ammo_ui"], 270, this.HEIGHT - 42, 32, 32);
+        const ammo = this.player.getAmmo();
+        const topRowCount = this.countBelow(ammo, this.player.STARTING_AMMO / 2);
+        const bottomRowCount = this.countAbove(ammo, this.player.STARTING_AMMO / 2);
+        for (let i = 0; i < topRowCount; i++) {
+            image(this.images["rocket"], 302 + i * 8, this.HEIGHT - 40, 16, 16);
+        }
+        for (let i = 0; i < bottomRowCount; i++) {
+            image(this.images["rocket"], 302 + i * 8, this.HEIGHT - 25, 16, 16);
+        }
+
+        fill("red");
+        noStroke();
+        textSize(28);
         text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
 
         let debug = true;
@@ -254,5 +281,15 @@ class JumpToOrion {
         for (let layer of this.scenery) {
             layer.xScroll = 0;
         }
+    }
+
+    countBelow(number, split) {
+        if (number <= split) return number;
+        if (number > split) return split;
+    }
+
+    countAbove(number, split) {
+        if (number < split) return 0;
+        if (number > split) return number - split;
     }
 }
