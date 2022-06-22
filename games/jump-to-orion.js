@@ -92,6 +92,20 @@ class JumpToOrion {
         this.scenery = scenery;
         this.images = images;
         this.explosionManager = new ExplosionManager();
+        this.explosionManager.addAnimation(
+            "explosion_1",
+            new Animation(
+                [
+                    this.images["explosion_0"],
+                    this.images["explosion_1"],
+                    this.images["explosion_2"],
+                    this.images["explosion_3"],
+                    this.images["explosion_4"],
+                ],
+                15,
+                false
+            )
+        );
     }
 
     mousePressed(pos) {
@@ -135,8 +149,8 @@ class JumpToOrion {
         this.score = 0;
         this.items = [];
         this.aliens = [];
-        this.explosions = [];
         this.resetScenery();
+        this.explosionManager.reset();
     }
 
     update() {
@@ -160,25 +174,13 @@ class JumpToOrion {
         for (let i = this.items.length - 1; i >= 0; i--) {
             const item = this.items[i];
             item.update();
-            const playerCollision = this.checkForPlayerCollision(item);
+            const playerCollision = this.player.checkForCollision(item);
             if (playerCollision) {
-                this.explosionManager.add(
-                    new Explosion(
-                        { x: item.currentPos.x, y: item.currentPos.y },
-                        -1,
-                        32,
-                        new Animation(
-                            [
-                                this.images["explosion_0"],
-                                this.images["explosion_1"],
-                                this.images["explosion_2"],
-                                this.images["explosion_3"],
-                                this.images["explosion_4"],
-                            ],
-                            10,
-                            false
-                        )
-                    )
+                this.explosionManager.addExplosion(
+                    { x: item.currentPos.x, y: item.currentPos.y },
+                    -1,
+                    32,
+                    "explosion_1"
                 );
                 this.items.splice(i, 1);
             }
@@ -189,25 +191,13 @@ class JumpToOrion {
         for (let i = this.aliens.length - 1; i >= 0; i--) {
             const alien = this.aliens[i];
             alien.update();
-            const playerCollision = this.checkForPlayerCollision(alien);
+            const playerCollision = this.player.checkForCollision(alien);
             if (playerCollision) {
-                this.explosionManager.add(
-                    new Explosion(
-                        { x: alien.currentPos.x, y: alien.currentPos.y },
-                        -1,
-                        32,
-                        new Animation(
-                            [
-                                this.images["explosion_0"],
-                                this.images["explosion_1"],
-                                this.images["explosion_2"],
-                                this.images["explosion_3"],
-                                this.images["explosion_4"],
-                            ],
-                            10,
-                            false
-                        )
-                    )
+                this.explosionManager.addExplosion(
+                    { x: alien.currentPos.x, y: alien.currentPos.y },
+                    -1,
+                    32,
+                    "explosion_1"
                 );
                 this.aliens.splice(i, 1);
             }
@@ -242,6 +232,15 @@ class JumpToOrion {
         image(this.images["shield_ui"], 190, this.HEIGHT - 42, 32, 32);
         text(this.player.getShield(), 222, this.HEIGHT - 15);
         text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
+
+        let debug = true;
+        if (debug) {
+            textSize(16);
+            text(`i: ${this.items.length}`, 10, 20);
+            text(`a: ${this.aliens.length}`, 50, 20);
+            text(`m: ${this.player.rockets.length}`, 90, 20);
+            text(`e: ${this.explosionManager.explosions.length}`, 130, 20);
+        }
     }
 
     renderSceneryLayer(layer, width, height) {
@@ -255,13 +254,5 @@ class JumpToOrion {
         for (let layer of this.scenery) {
             layer.xScroll = 0;
         }
-    }
-
-    checkForPlayerCollision(entity) {
-        let size = this.player.size;
-        if (this.player.shieldsRaised) size = this.player.shieldDistance;
-        return (
-            dist(entity.currentPos.x, entity.currentPos.y, this.player.currentPos.x, this.player.currentPos.y) < size
-        );
     }
 }
