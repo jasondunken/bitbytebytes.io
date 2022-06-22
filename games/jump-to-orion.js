@@ -6,7 +6,7 @@ let game = null;
 // p5.js functions ------------------------>
 function preload() {
     let scenery = [];
-    let images = {};
+    let sprites = {};
     img_background1 = new Image();
     img_background1.src = "./jump-to-orion/img/space.png";
     img_background1.xScroll = 0;
@@ -23,25 +23,25 @@ function preload() {
     img_foreground1.xScrollSpeed = 5;
     scenery.push(img_foreground1);
 
-    images["player"] = loadImage("./jump-to-orion/img/sprite1.png");
-    images["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
-    images["alien"] = loadImage("./jump-to-orion/img/alien.png");
-    images["alienRocket"] = loadImage("./jump-to-orion/img/rocket-alien.png");
-    images["healthSML"] = loadImage("./jump-to-orion/img/healthSMLImage.png");
-    images["healthMED"] = loadImage("./jump-to-orion/img/healthMEDImage.png");
-    images["healthLRG"] = loadImage("./jump-to-orion/img/healthLRGImage.png");
-    images["ammo"] = loadImage("./jump-to-orion/img/ammoImage.png");
-    images["shield"] = loadImage("./jump-to-orion/img/shieldImage.png");
-    images["health_ui"] = loadImage("./jump-to-orion/img/healthImage_ui.png");
-    images["ammo_ui"] = loadImage("./jump-to-orion/img/ammoImage_ui.png");
-    images["shield_ui"] = loadImage("./jump-to-orion/img/shieldImage_ui.png");
-    images["explosion_0"] = loadImage("./jump-to-orion/img/explosion_0.png");
-    images["explosion_1"] = loadImage("./jump-to-orion/img/explosion_1.png");
-    images["explosion_2"] = loadImage("./jump-to-orion/img/explosion_2.png");
-    images["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
-    images["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
+    sprites["player"] = loadImage("./jump-to-orion/img/sprite1.png");
+    sprites["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
+    sprites["alien"] = loadImage("./jump-to-orion/img/alien.png");
+    sprites["alienRocket"] = loadImage("./jump-to-orion/img/rocket-alien.png");
+    sprites["healthSML"] = loadImage("./jump-to-orion/img/healthSMLImage.png");
+    sprites["healthMED"] = loadImage("./jump-to-orion/img/healthMEDImage.png");
+    sprites["healthLRG"] = loadImage("./jump-to-orion/img/healthLRGImage.png");
+    sprites["ammo"] = loadImage("./jump-to-orion/img/ammoImage.png");
+    sprites["shield"] = loadImage("./jump-to-orion/img/shieldImage.png");
+    sprites["health_ui"] = loadImage("./jump-to-orion/img/healthImage_ui.png");
+    sprites["ammo_ui"] = loadImage("./jump-to-orion/img/ammoImage_ui.png");
+    sprites["shield_ui"] = loadImage("./jump-to-orion/img/shieldImage_ui.png");
+    sprites["explosion_0"] = loadImage("./jump-to-orion/img/explosion_0.png");
+    sprites["explosion_1"] = loadImage("./jump-to-orion/img/explosion_1.png");
+    sprites["explosion_2"] = loadImage("./jump-to-orion/img/explosion_2.png");
+    sprites["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
+    sprites["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
 
-    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, images);
+    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites);
 }
 
 function setup() {
@@ -76,14 +76,10 @@ class JumpToOrion {
     WIDTH;
 
     scenery = [];
-    images = {};
+    sprites = {};
 
     player;
     score = 0;
-
-    items = [];
-    aliens = [];
-    rockets = [];
 
     gameObjects = [];
 
@@ -93,17 +89,17 @@ class JumpToOrion {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
-        this.images = images;
+        this.sprites = images;
         this.explosionManager = new ExplosionManager();
         this.explosionManager.addAnimation(
             "explosion_1",
             new Animation(
                 [
-                    this.images["explosion_0"],
-                    this.images["explosion_1"],
-                    this.images["explosion_2"],
-                    this.images["explosion_3"],
-                    this.images["explosion_4"],
+                    this.sprites["explosion_0"],
+                    this.sprites["explosion_1"],
+                    this.sprites["explosion_2"],
+                    this.sprites["explosion_3"],
+                    this.sprites["explosion_4"],
                 ],
                 15,
                 false
@@ -139,14 +135,14 @@ class JumpToOrion {
             { x: 100, y: this.HEIGHT / 2 },
             2,
             32,
-            this.images["player"],
-            this.images["rocket"]
+            this.sprites["player"],
+            this.sprites["rocket"]
         );
         this.startGame();
     }
 
     start1Player() {
-        this.player = new Player({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.images["player"], this.images["rocket"]);
+        this.player = new Player({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
         this.startGame();
     }
 
@@ -168,15 +164,26 @@ class JumpToOrion {
         }
 
         this.player.update();
+        if (keyIsDown(32)) {
+            if (this.player.fire()) {
+                this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+            }
+        }
 
         if (frameCount % 60 === 0) {
             const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
             const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
             this.gameObjects.push(
-                new Item({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -2, 32, this.images[item], item)
+                new Item(
+                    { x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) },
+                    -2,
+                    32,
+                    this.sprites[item],
+                    item
+                )
             );
             this.gameObjects.push(
-                new Alien({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -3, 32, this.images["alien"])
+                new Alien({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -3, 32, this.sprites["alien"])
             );
         }
 
@@ -223,7 +230,7 @@ class JumpToOrion {
         rect(42, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
         fill("green");
         rect(42, this.HEIGHT - 13 - statBar.height, healthWidth, statBar.height);
-        image(this.images["health_ui"], 10, this.HEIGHT - 42, 32, 32);
+        image(this.sprites["health_ui"], 10, this.HEIGHT - 42, 32, 32);
 
         const shield = this.player.getShield();
         const shieldWidth = (shield / this.player.STARTING_SHIELD) * statBar.width;
@@ -231,29 +238,39 @@ class JumpToOrion {
         rect(170, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
         fill("lightblue");
         rect(170, this.HEIGHT - 13 - statBar.height, shieldWidth, statBar.height);
-        image(this.images["shield_ui"], 138, this.HEIGHT - 42, 32, 32);
+        image(this.sprites["shield_ui"], 138, this.HEIGHT - 42, 32, 32);
 
-        image(this.images["ammo_ui"], 270, this.HEIGHT - 42, 32, 32);
+        image(this.sprites["ammo_ui"], 270, this.HEIGHT - 42, 32, 32);
         const ammo = this.player.getAmmo();
         const topRowCount = this.countBelow(ammo, this.player.STARTING_AMMO / 2);
         const bottomRowCount = this.countAbove(ammo, this.player.STARTING_AMMO / 2);
         for (let i = 0; i < topRowCount; i++) {
-            image(this.images["rocket"], 302 + i * 8, this.HEIGHT - 40, 16, 16);
+            image(this.sprites["rocket"], 302 + i * 8, this.HEIGHT - 40, 16, 16);
         }
         for (let i = 0; i < bottomRowCount; i++) {
-            image(this.images["rocket"], 302 + i * 8, this.HEIGHT - 25, 16, 16);
+            image(this.sprites["rocket"], 302 + i * 8, this.HEIGHT - 25, 16, 16);
         }
 
         fill("red");
         textSize(28);
         text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
 
+        console.log("gameObjs: ", this.gameObjects);
         let debug = true;
         if (debug) {
+            const debugVals = {
+                item: 0,
+                alien: 0,
+                rocket: 0,
+                explosion: 0,
+            };
+            for (let gameObj of this.gameObjects) {
+                debugVals[gameObj.type]++;
+            }
             textSize(16);
-            text(`i: ${this.items.length}`, 10, 20);
-            text(`a: ${this.aliens.length}`, 50, 20);
-            text(`m: ${this.player.rockets.length}`, 90, 20);
+            text(`i: ${debugVals["item"]}`, 10, 20);
+            text(`a: ${debugVals["alien"]}`, 50, 20);
+            text(`r: ${debugVals["rocket"]}`, 90, 20);
             text(`e: ${this.explosionManager.explosions.length}`, 130, 20);
         }
     }
