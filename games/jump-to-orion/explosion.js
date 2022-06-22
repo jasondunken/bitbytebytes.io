@@ -2,7 +2,7 @@ class Explosion extends GameObject {
     animation;
     life = 0;
     constructor(initialPos, speed, size, animation) {
-        super(initialPos, speed, size);
+        super("explosion", initialPos, speed, size);
         this.animation = animation;
     }
 

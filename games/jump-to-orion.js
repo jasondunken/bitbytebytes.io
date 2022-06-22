@@ -83,6 +83,9 @@ class JumpToOrion {
 
     items = [];
     aliens = [];
+    rockets = [];
+
+    gameObjects = [];
 
     explosionManager = null;
 
@@ -109,22 +112,24 @@ class JumpToOrion {
     }
 
     mousePressed(pos) {
-        for (let item of this.items) {
-            if (dist(pos.x, pos.y, item.currentPos.x, item.currentPos.y) < item.size) {
-                switch (item.type) {
-                    case "healthSML":
-                    case "healthMED":
-                    case "healthLRG":
-                        this.player.addHealth(item.value);
-                        break;
-                    case "ammo":
-                        this.player.addAmmo(item.value);
-                        break;
-                    case "shield":
-                        this.player.addShield(item.value);
+        for (let gameObj of this.gameObjects) {
+            if (gameObj.type === "item") {
+                if (dist(pos.x, pos.y, gameObj.currentPos.x, gameObj.currentPos.y) < gameObj.size) {
+                    switch (gameObj.id) {
+                        case "healthSML":
+                        case "healthMED":
+                        case "healthLRG":
+                            this.player.addHealth(gameObj.value);
+                            break;
+                        case "ammo":
+                            this.player.addAmmo(gameObj.value);
+                            break;
+                        case "shield":
+                            this.player.addShield(gameObj.value);
+                    }
+                    this.gameObjects.splice(this.gameObjects.indexOf(gameObj), 1);
+                    return;
                 }
-                this.items.splice(this.items.indexOf(item), 1);
-                return;
             }
         }
     }
@@ -149,6 +154,7 @@ class JumpToOrion {
         this.score = 0;
         this.items = [];
         this.aliens = [];
+        this.rockets = [];
         this.resetScenery();
         this.explosionManager.reset();
     }
@@ -160,49 +166,35 @@ class JumpToOrion {
                 layer.xScroll = 0;
             }
         }
+
         this.player.update();
+
         if (frameCount % 60 === 0) {
             const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
             const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
-            this.items.push(
+            this.gameObjects.push(
                 new Item({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -2, 32, this.images[item], item)
             );
-            this.aliens.push(
+            this.gameObjects.push(
                 new Alien({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -3, 32, this.images["alien"])
             );
         }
-        for (let i = this.items.length - 1; i >= 0; i--) {
-            const item = this.items[i];
-            item.update();
-            const playerCollision = this.player.checkForCollision(item);
+
+        for (let i = this.gameObjects.length - 1; i >= 0; i--) {
+            const gameObj = this.gameObjects[i];
+            gameObj.update();
+            const playerCollision = this.player.checkForCollision(gameObj);
             if (playerCollision) {
                 this.explosionManager.addExplosion(
-                    { x: item.currentPos.x, y: item.currentPos.y },
+                    { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
                     -1,
                     32,
                     "explosion_1"
                 );
-                this.items.splice(i, 1);
+                this.gameObjects.splice(i, 1);
             }
-            if (item.currentPos.x < -item.size) {
-                this.items.splice(i, 1);
-            }
-        }
-        for (let i = this.aliens.length - 1; i >= 0; i--) {
-            const alien = this.aliens[i];
-            alien.update();
-            const playerCollision = this.player.checkForCollision(alien);
-            if (playerCollision) {
-                this.explosionManager.addExplosion(
-                    { x: alien.currentPos.x, y: alien.currentPos.y },
-                    -1,
-                    32,
-                    "explosion_1"
-                );
-                this.aliens.splice(i, 1);
-            }
-            if (alien.currentPos.x < -alien.size) {
-                this.aliens.splice(i, 1);
+            if (gameObj.currentPos.x < -gameObj.size) {
+                this.gameObjects.splice(i, 1);
             }
         }
         this.explosionManager.update();
@@ -213,11 +205,8 @@ class JumpToOrion {
         this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
         this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
         this.player.draw();
-        for (let item of this.items) {
-            item.draw();
-        }
-        for (let alien of this.aliens) {
-            alien.draw();
+        for (let gameObj of this.gameObjects) {
+            gameObj.draw();
         }
         this.explosionManager.draw();
         this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
@@ -227,7 +216,7 @@ class JumpToOrion {
             height: 18,
             width: 96,
         };
-        stroke("blue");
+        noStroke();
         const health = this.player.getHealth();
         const healthWidth = (health / this.player.STARTING_HEALTH) * statBar.width;
         fill("red");
@@ -256,7 +245,6 @@ class JumpToOrion {
         }
 
         fill("red");
-        noStroke();
         textSize(28);
         text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
 

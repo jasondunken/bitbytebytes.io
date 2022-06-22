@@ -1,4 +1,5 @@
 class GameObject {
+    type;
     currentPos; // the current position of the sprite, including any offset
     pathPos; // the path position, currentPos is pathPos plus an offset
     corners; // a collision box?
@@ -6,7 +7,8 @@ class GameObject {
     speed; // pixels / tick
     delta; // lifetime
 
-    constructor(initialPos, speed, size) {
+    constructor(type, initialPos, speed, size) {
+        this.type = type;
         this.currentPos = initialPos;
         this.pathPos = initialPos;
         this.speed = speed;
@@ -39,6 +41,14 @@ class GameObject {
             },
         };
     }
+}
+
+class Collider {
+    constructor(bounds) {
+        this.bounds = bounds;
+    }
+
+    contains(entity) {}
 }
 
 class Animation {

@@ -1,21 +1,21 @@
 class Item extends GameObject {
-    type;
     value;
     image;
+    id;
 
     values = {
-        healthSML: 2,
-        healthMED: 4,
-        healthLRG: 10,
+        healthSML: 10,
+        healthMED: 25,
+        healthLRG: 50,
         ammo: 10,
         shield: 25,
     };
 
-    constructor(initialPos, speed, size, itemImage, type) {
-        super(initialPos, speed, size);
+    constructor(initialPos, speed, size, itemImage, id) {
+        super("item", initialPos, speed, size);
         this.itemImage = itemImage;
-        this.type = type;
-        this.value = this.values[type];
+        this.id = id;
+        this.value = this.values[id];
     }
 
     update() {

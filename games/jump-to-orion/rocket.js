@@ -1,6 +1,6 @@
 class Rocket extends GameObject {
     constructor(initialPos, speed, size, imageRocket) {
-        super(initialPos, speed, size);
+        super("rocket", initialPos, speed, size);
         this.imageRocket = imageRocket;
     }
 

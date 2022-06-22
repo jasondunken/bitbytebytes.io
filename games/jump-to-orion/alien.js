@@ -2,7 +2,7 @@ class Alien extends GameObject {
     imageAlien;
 
     constructor(initialPos, speed, size, imageAlien) {
-        super(initialPos, speed, size);
+        super("alien", initialPos, speed, size);
         this.imageAlien = imageAlien;
     }
 

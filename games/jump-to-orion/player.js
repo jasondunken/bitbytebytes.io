@@ -3,7 +3,7 @@ class Player extends GameObject {
     imageRocket;
 
     fireReady = 0;
-    cooldown = 30;
+    loadSpeed = 30;
     rockets = [];
 
     STARTING_HEALTH = 100;
@@ -11,7 +11,7 @@ class Player extends GameObject {
 
     MIN_SHIELD_RADIUS = 50;
     MAX_SHIELD_RADIUS = 100;
-    STARTING_SHIELD = 2000;
+    STARTING_SHIELD = 200;
     shield = this.STARTING_SHIELD;
     shieldRadius = this.MAX_SHIELD_RADIUS;
     shieldsRaised = false;
@@ -20,7 +20,7 @@ class Player extends GameObject {
     ammo = this.STARTING_AMMO;
 
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
-        super(initialPos, speed, size);
+        super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
         this.imageRocket = imageRocket;
     }
@@ -75,7 +75,7 @@ class Player extends GameObject {
     fire() {
         if (this.ammo > 0) {
             this.ammo--;
-            this.fireReady = this.cooldown;
+            this.fireReady = this.loadSpeed;
             this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
         }
     }
