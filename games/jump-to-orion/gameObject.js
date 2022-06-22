@@ -6,6 +6,7 @@ class GameObject {
     size; // in pixels
     speed; // pixels / tick
     delta; // lifetime
+    remove; // should be removed from gameObjects[]
 
     constructor(type, initialPos, speed, size) {
         this.type = type;
@@ -15,6 +16,7 @@ class GameObject {
         this.size = size;
         this.halfSize = size / 2;
         this.delta = 0;
+        this.remove = false;
         this.setCorners();
     }
 

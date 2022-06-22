@@ -105,7 +105,7 @@ class Player extends GameObject {
     }
 
     checkForCollision(entity) {
-        if (entity.type === "rocket") return;
+        if (entity.type === "rocket" || entity.type === "explosion") return false;
 
         let size = this.size;
         if (this.shieldsRaised) {

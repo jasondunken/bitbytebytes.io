@@ -83,76 +83,54 @@ class JumpToOrion {
 
     gameObjects = [];
 
-    explosionManager = null;
-
     constructor(width, height, scenery, images) {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
         this.sprites = images;
-        this.explosionManager = new ExplosionManager();
-        this.explosionManager.addAnimation(
-            "explosion_1",
-            new Animation(
-                [
-                    this.sprites["explosion_0"],
-                    this.sprites["explosion_1"],
-                    this.sprites["explosion_2"],
-                    this.sprites["explosion_3"],
-                    this.sprites["explosion_4"],
-                ],
-                15,
-                false
-            )
-        );
     }
 
     mousePressed(pos) {
-        for (let gameObj of this.gameObjects) {
-            if (gameObj.type === "item") {
-                if (dist(pos.x, pos.y, gameObj.currentPos.x, gameObj.currentPos.y) < gameObj.size) {
-                    switch (gameObj.id) {
-                        case "healthSML":
-                        case "healthMED":
-                        case "healthLRG":
-                            this.player.addHealth(gameObj.value);
-                            break;
-                        case "ammo":
-                            this.player.addAmmo(gameObj.value);
-                            break;
-                        case "shield":
-                            this.player.addShield(gameObj.value);
+        if (!this.demo) {
+            for (let gameObj of this.gameObjects) {
+                if (gameObj.type === "item") {
+                    if (dist(pos.x, pos.y, gameObj.currentPos.x, gameObj.currentPos.y) < gameObj.size) {
+                        switch (gameObj.id) {
+                            case "healthSML":
+                            case "healthMED":
+                            case "healthLRG":
+                                this.player.addHealth(gameObj.value);
+                                break;
+                            case "ammo":
+                                this.player.addAmmo(gameObj.value);
+                                break;
+                            case "shield":
+                                this.player.addShield(gameObj.value);
+                        }
+                        this.gameObjects.splice(this.gameObjects.indexOf(gameObj), 1);
+                        return;
                     }
-                    this.gameObjects.splice(this.gameObjects.indexOf(gameObj), 1);
-                    return;
                 }
             }
         }
     }
 
     startDemo() {
-        this.player = new DemoPlayer(
-            { x: 100, y: this.HEIGHT / 2 },
-            2,
-            32,
-            this.sprites["player"],
-            this.sprites["rocket"]
-        );
+        this.demo = true;
+        this.player = new DemoPlayer({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
         this.startGame();
     }
 
     start1Player() {
+        this.demo = false;
         this.player = new Player({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
         this.startGame();
     }
 
     startGame() {
         this.score = 0;
-        this.items = [];
-        this.aliens = [];
-        this.rockets = [];
+        this.gameObjects = [];
         this.resetScenery();
-        this.explosionManager.reset();
     }
 
     update() {
@@ -164,9 +142,11 @@ class JumpToOrion {
         }
 
         this.player.update();
-        if (keyIsDown(32)) {
-            if (this.player.fire()) {
-                this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+        if (!this.demo) {
+            if (keyIsDown(32)) {
+                if (this.player.fire()) {
+                    this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                }
             }
         }
 
@@ -190,13 +170,29 @@ class JumpToOrion {
         for (let i = this.gameObjects.length - 1; i >= 0; i--) {
             const gameObj = this.gameObjects[i];
             gameObj.update();
+            if (gameObj.remove) {
+                this.gameObjects.splice(i, 1);
+                continue;
+            }
             const playerCollision = this.player.checkForCollision(gameObj);
             if (playerCollision) {
-                this.explosionManager.addExplosion(
-                    { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
-                    -1,
-                    32,
-                    "explosion_1"
+                this.gameObjects.push(
+                    new Explosion(
+                        { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
+                        -1,
+                        32,
+                        new Animation(
+                            [
+                                this.sprites["explosion_0"],
+                                this.sprites["explosion_1"],
+                                this.sprites["explosion_2"],
+                                this.sprites["explosion_3"],
+                                this.sprites["explosion_4"],
+                            ],
+                            15,
+                            false
+                        )
+                    )
                 );
                 this.gameObjects.splice(i, 1);
             }
@@ -204,7 +200,6 @@ class JumpToOrion {
                 this.gameObjects.splice(i, 1);
             }
         }
-        this.explosionManager.update();
     }
 
     render() {
@@ -215,7 +210,6 @@ class JumpToOrion {
         for (let gameObj of this.gameObjects) {
             gameObj.draw();
         }
-        this.explosionManager.draw();
         this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
 
         // UI elements
@@ -255,7 +249,6 @@ class JumpToOrion {
         textSize(28);
         text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
 
-        console.log("gameObjs: ", this.gameObjects);
         let debug = true;
         if (debug) {
             const debugVals = {
@@ -271,7 +264,7 @@ class JumpToOrion {
             text(`i: ${debugVals["item"]}`, 10, 20);
             text(`a: ${debugVals["alien"]}`, 50, 20);
             text(`r: ${debugVals["rocket"]}`, 90, 20);
-            text(`e: ${this.explosionManager.explosions.length}`, 130, 20);
+            text(`e: ${debugVals["explosion"]}`, 130, 20);
         }
     }
 
