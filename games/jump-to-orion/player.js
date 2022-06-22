@@ -4,7 +4,6 @@ class Player extends GameObject {
 
     fireReady = 0;
     loadSpeed = 30;
-    rockets = [];
 
     STARTING_HEALTH = 100;
     health = this.STARTING_HEALTH;
@@ -36,12 +35,8 @@ class Player extends GameObject {
 
         this.setCorners();
 
-        if (keyIsDown(32) && this.fireReady === 0) {
-            this.fire();
-        } else {
-            this.fireReady -= 1;
-            if (this.fireReady < 0) this.fireReady = 0;
-        }
+        if (this.fireReady > 0) this.fireReady--;
+        if (this.fireReady < 0) this.fireReady = 0;
 
         if (keyIsDown(67)) {
             this.raiseShield();
@@ -54,10 +49,6 @@ class Player extends GameObject {
             if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
             if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
         }
-
-        for (let rocket of this.rockets) {
-            rocket.update();
-        }
     }
 
     draw() {
@@ -67,16 +58,13 @@ class Player extends GameObject {
             noFill();
             ellipse(this.currentPos.x, this.currentPos.y, this.shieldRadius, this.shieldRadius);
         }
-        for (let rocket of this.rockets) {
-            rocket.draw();
-        }
     }
 
     fire() {
-        if (this.ammo > 0) {
+        if (this.ammo > 0 && this.fireReady === 0) {
             this.ammo--;
             this.fireReady = this.loadSpeed;
-            this.rockets.push(new Rocket({ x: this.currentPos.x, y: this.currentPos.y }, 5, 32, this.imageRocket));
+            return true;
         }
     }
 
@@ -117,6 +105,8 @@ class Player extends GameObject {
     }
 
     checkForCollision(entity) {
+        if (entity.type === "rocket") return;
+
         let size = this.size;
         if (this.shieldsRaised) {
             size = this.shieldRadius;
