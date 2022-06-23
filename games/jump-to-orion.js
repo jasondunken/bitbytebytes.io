@@ -41,7 +41,9 @@ function preload() {
     sprites["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
     sprites["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
 
-    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites);
+    let font = loadFont("./jump-to-orion/font/PressStart2P.ttf");
+
+    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, font);
 }
 
 function setup() {
@@ -77,17 +79,19 @@ class JumpToOrion {
 
     scenery = [];
     sprites = {};
+    font;
 
     player;
     score = 0;
 
     gameObjects = [];
 
-    constructor(width, height, scenery, images) {
+    constructor(width, height, scenery, sprites, font) {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
-        this.sprites = images;
+        this.sprites = sprites;
+        this.font = font;
     }
 
     mousePressed(pos) {
@@ -134,12 +138,7 @@ class JumpToOrion {
     }
 
     update() {
-        for (let layer of this.scenery) {
-            layer.xScroll += layer.xScrollSpeed;
-            if (layer.xScroll >= layer.width) {
-                layer.xScroll = 0;
-            }
-        }
+        this.updateScenery();
 
         this.player.update();
         if (!this.demo) {
@@ -147,6 +146,45 @@ class JumpToOrion {
                 if (this.player.fire()) {
                     this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
                 }
+            }
+        }
+
+        for (let gameObj of this.gameObjects) {
+            gameObj.update();
+            if (gameObj.currentPos.x < -gameObj.size) {
+                gameObj.remove = true;
+                continue;
+            }
+            if (gameObj.type === "rocket" && gameObj.currentPos.x > this.WIDTH + gameObj.size) gameObj.remove = true;
+            const playerCollision = this.player.checkForCollision(gameObj);
+            const rocketCollision = this.checkForRocketCollision(gameObj);
+            if (rocketCollision) this.score++;
+            if (playerCollision || rocketCollision) {
+                gameObj.remove = true;
+                this.gameObjects.push(
+                    new Explosion(
+                        { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
+                        -1,
+                        32,
+                        new Animation(
+                            [
+                                this.sprites["explosion_0"],
+                                this.sprites["explosion_1"],
+                                this.sprites["explosion_2"],
+                                this.sprites["explosion_3"],
+                                this.sprites["explosion_4"],
+                            ],
+                            15,
+                            false
+                        )
+                    )
+                );
+            }
+        }
+
+        for (let i = this.gameObjects.length - 1; i >= 0; i--) {
+            if (this.gameObjects[i].remove) {
+                this.gameObjects.splice(i, 1);
             }
         }
 
@@ -166,38 +204,33 @@ class JumpToOrion {
                 new Alien({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -3, 32, this.sprites["alien"])
             );
         }
+    }
 
-        for (let i = this.gameObjects.length - 1; i >= 0; i--) {
-            const gameObj = this.gameObjects[i];
-            gameObj.update();
-            if (gameObj.remove) {
-                this.gameObjects.splice(i, 1);
-                continue;
+    checkForRocketCollision(entity) {
+        const rockets = this.gameObjects.filter((gameObj) => {
+            return gameObj.type === "rocket";
+        });
+        if (rockets) {
+            for (let rocket of rockets) {
+                if (rocket !== entity && !rocket.remove) {
+                    if (
+                        dist(entity.currentPos.x, entity.currentPos.y, rocket.currentPos.x, rocket.currentPos.y) <
+                        (entity.size + rocket.size) / 2
+                    ) {
+                        rocket.remove = true;
+                        return true;
+                    }
+                }
             }
-            const playerCollision = this.player.checkForCollision(gameObj);
-            if (playerCollision) {
-                this.gameObjects.push(
-                    new Explosion(
-                        { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
-                        -1,
-                        32,
-                        new Animation(
-                            [
-                                this.sprites["explosion_0"],
-                                this.sprites["explosion_1"],
-                                this.sprites["explosion_2"],
-                                this.sprites["explosion_3"],
-                                this.sprites["explosion_4"],
-                            ],
-                            15,
-                            false
-                        )
-                    )
-                );
-                this.gameObjects.splice(i, 1);
-            }
-            if (gameObj.currentPos.x < -gameObj.size) {
-                this.gameObjects.splice(i, 1);
+        }
+        return false;
+    }
+
+    updateScenery() {
+        for (let layer of this.scenery) {
+            layer.xScroll += layer.xScrollSpeed;
+            if (layer.xScroll >= layer.width) {
+                layer.xScroll = 0;
             }
         }
     }
@@ -246,10 +279,27 @@ class JumpToOrion {
         }
 
         fill("red");
-        textSize(28);
-        text(`Score ${this.score}`, this.WIDTH - 180, this.HEIGHT - 15);
+        textFont(this.font);
+        textSize(18);
+        // text(`Score 0000`, this.WIDTH - 190, this.HEIGHT - 10);
+        text(`Score ${this.score}`, this.WIDTH - 190, this.HEIGHT - 10);
 
-        let debug = true;
+        if (this.demo) {
+            fill("blue");
+            textSize(36);
+            const title = "Jump To Orion";
+            const tWidth = textWidth(title);
+            text(title, this.WIDTH / 2 - tWidth / 2, this.HEIGHT / 3);
+            if (frameCount % 60 > 30) {
+                fill("red");
+                textSize(16);
+                const play = "Press Start to Play";
+                const pWidth = textWidth(play);
+                text(play, this.WIDTH / 2 - pWidth / 2, this.HEIGHT / 2);
+            }
+        }
+
+        let debug = false;
         if (debug) {
             const debugVals = {
                 item: 0,
@@ -260,11 +310,11 @@ class JumpToOrion {
             for (let gameObj of this.gameObjects) {
                 debugVals[gameObj.type]++;
             }
-            textSize(16);
-            text(`i: ${debugVals["item"]}`, 10, 20);
-            text(`a: ${debugVals["alien"]}`, 50, 20);
-            text(`r: ${debugVals["rocket"]}`, 90, 20);
-            text(`e: ${debugVals["explosion"]}`, 130, 20);
+            textSize(12);
+            text(`i:${debugVals["item"]}`, 10, 20);
+            text(`a:${debugVals["alien"]}`, 90, 20);
+            text(`r:${debugVals["rocket"]}`, 170, 20);
+            text(`e:${debugVals["explosion"]}`, 250, 20);
         }
     }
 
