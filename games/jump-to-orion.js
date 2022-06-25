@@ -5,24 +5,34 @@ let game = null;
 
 // p5.js functions ------------------------>
 function preload() {
-    let scenery = [];
-    let sprites = {};
-    img_background1 = new Image();
-    img_background1.src = "./jump-to-orion/img/space.png";
-    img_background1.xScroll = 0;
-    img_background1.xScrollSpeed = 1;
-    scenery.push(img_background1);
-    img_background2 = new Image();
-    img_background2.src = "./jump-to-orion/img/planets.png";
-    img_background2.xScroll = 0;
-    img_background2.xScrollSpeed = 2;
-    scenery.push(img_background2);
-    img_foreground1 = new Image();
-    img_foreground1.src = "./jump-to-orion/img/debris.png";
-    img_foreground1.xScroll = 0;
-    img_foreground1.xScrollSpeed = 5;
-    scenery.push(img_foreground1);
+    let scenery = [
+        {
+            name: "background_1",
+            img: loadImage("./jump-to-orion/img/space.png"),
+            xScroll: 0,
+            xScrollSpeed: -1,
+            show: true,
+            startDelay: 0,
+        },
+        {
+            name: "background_2",
+            img: loadImage("./jump-to-orion/img/planets.png"),
+            xScroll: GAME_WIDTH,
+            xScrollSpeed: -2,
+            show: false,
+            startDelay: GAME_WIDTH,
+        },
+        {
+            name: "foreground_1",
+            img: loadImage("./jump-to-orion/img/debris.png"),
+            xScroll: GAME_WIDTH,
+            xScrollSpeed: -5,
+            show: false,
+            startDelay: GAME_WIDTH * 2,
+        },
+    ];
 
+    let sprites = {};
     sprites["player"] = loadImage("./jump-to-orion/img/sprite1.png");
     sprites["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
     sprites["alien"] = loadImage("./jump-to-orion/img/alien.png");
@@ -120,6 +130,7 @@ class JumpToOrion {
     }
 
     startDemo() {
+        console.log("sprite: ", this.sprites["player"]);
         this.demo = true;
         this.player = new DemoPlayer({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
         this.startGame();
@@ -227,23 +238,37 @@ class JumpToOrion {
     }
 
     updateScenery() {
+        if (this.score > 20 && this.scenery[1].show === false) {
+            this.scenery[1].show = true;
+        }
+        if (this.score > 50 && this.scenery[2].show === false) {
+            this.scenery[2].show = true;
+        }
         for (let layer of this.scenery) {
-            layer.xScroll += layer.xScrollSpeed;
-            if (layer.xScroll >= layer.width) {
-                layer.xScroll = 0;
+            if (layer.show) {
+                if (layer.startDelay > 0) {
+                    layer.startDelay--;
+                    continue;
+                }
+                layer.xScroll += layer.xScrollSpeed;
+                if (layer.xScroll <= -layer.img.width) {
+                    layer.xScroll = 0;
+                }
             }
         }
     }
 
     render() {
         background("black");
-        this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
-        this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
+        if (this.scenery[0].show) this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
+        if (this.scenery[1].show) this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
+
         this.player.draw();
         for (let gameObj of this.gameObjects) {
             gameObj.draw();
         }
-        this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
+
+        if (this.scenery[2].show) this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
 
         // UI elements
         const statBar = {
@@ -319,16 +344,16 @@ class JumpToOrion {
     }
 
     renderSceneryLayer(layer, width, height) {
-        drawingContext.drawImage(layer, layer.xScroll, 0, width, height, 0, 0, width, height);
-        if (layer.xScroll > layer.width - width) {
-            drawingContext.drawImage(layer, layer.xScroll - layer.width, 0, width, height, 0, 0, width, height);
+        image(layer.img, layer.xScroll, 0, layer.img.width, height);
+        if (layer.xScroll < -layer.img.width + width) {
+            image(layer.img, layer.xScroll + layer.img.width, 0, layer.img.width, height);
         }
     }
 
     resetScenery() {
-        for (let layer of this.scenery) {
-            layer.xScroll = 0;
-        }
+        this.scenery[0].xScroll = 0;
+        this.scenery[1].xScroll = width * 2;
+        this.scenery[2].xScroll = width * 2;
     }
 
     countBelow(number, split) {
