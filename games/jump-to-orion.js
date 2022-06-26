@@ -93,6 +93,7 @@ class JumpToOrion {
 
     player;
     score = 0;
+    gameOver = false;
 
     gameObjects = [];
 
@@ -143,6 +144,7 @@ class JumpToOrion {
     }
 
     startGame() {
+        this.gameOver = false;
         this.score = 0;
         this.gameObjects = [];
         this.resetScenery();
@@ -151,8 +153,20 @@ class JumpToOrion {
     update() {
         this.updateScenery();
 
-        this.player.update();
-        if (!this.demo) {
+        if (!this.gameOver) {
+            this.player.update();
+        }
+        if (this.player.health <= 0 && !this.gameOver) {
+            this.gameOver = true;
+            for (let i = 0; i < 6; i++) {
+                this.addExplosion({
+                    x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
+                    y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
+                });
+            }
+            // remove the player
+        }
+        if (!this.demo && !this.gameOver) {
             if (keyIsDown(32)) {
                 if (this.player.fire()) {
                     this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
@@ -172,24 +186,7 @@ class JumpToOrion {
             if (rocketCollision) this.score++;
             if (playerCollision || rocketCollision) {
                 gameObj.remove = true;
-                this.gameObjects.push(
-                    new Explosion(
-                        { x: gameObj.currentPos.x, y: gameObj.currentPos.y },
-                        -1,
-                        32,
-                        new Animation(
-                            [
-                                this.sprites["explosion_0"],
-                                this.sprites["explosion_1"],
-                                this.sprites["explosion_2"],
-                                this.sprites["explosion_3"],
-                                this.sprites["explosion_4"],
-                            ],
-                            15,
-                            false
-                        )
-                    )
-                );
+                this.addExplosion({ x: gameObj.currentPos.x, y: gameObj.currentPos.y });
             }
         }
 
@@ -226,6 +223,27 @@ class JumpToOrion {
                 )
             );
         }
+    }
+
+    addExplosion(pos) {
+        this.gameObjects.push(
+            new Explosion(
+                pos,
+                -1,
+                32,
+                new Animation(
+                    [
+                        this.sprites["explosion_0"],
+                        this.sprites["explosion_1"],
+                        this.sprites["explosion_2"],
+                        this.sprites["explosion_3"],
+                        this.sprites["explosion_4"],
+                    ],
+                    15,
+                    false
+                )
+            )
+        );
     }
 
     checkForRocketCollision(entity) {
@@ -273,8 +291,9 @@ class JumpToOrion {
         background("black");
         if (this.scenery[0].show) this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
         if (this.scenery[1].show) this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
-
-        this.player.draw();
+        if (!this.gameOver) {
+            this.player.draw();
+        }
         for (let gameObj of this.gameObjects) {
             gameObj.draw();
         }
@@ -319,6 +338,21 @@ class JumpToOrion {
         textSize(18);
         // text(`Score 0000`, this.WIDTH - 190, this.HEIGHT - 10);
         text(`Score ${this.score}`, this.WIDTH - 190, this.HEIGHT - 10);
+
+        if (this.gameOver && !this.demo) {
+            fill("blue");
+            textSize(36);
+            const title = "Game Over";
+            const tWidth = textWidth(title);
+            text(title, this.WIDTH / 2 - tWidth / 2, this.HEIGHT / 3);
+            if (frameCount % 60 > 30) {
+                fill("red");
+                textSize(16);
+                const play = "Press Start to Play";
+                const pWidth = textWidth(play);
+                text(play, this.WIDTH / 2 - pWidth / 2, this.HEIGHT / 2);
+            }
+        }
 
         if (this.demo) {
             fill("blue");
