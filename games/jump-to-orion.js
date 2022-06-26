@@ -199,7 +199,21 @@ class JumpToOrion {
             }
         }
 
+        // spawn stuff
+        let waveFactor = 1 + Math.floor(this.score / 15);
         if (frameCount % 60 === 0) {
+            for (let alien = 0; alien < 1 * waveFactor; alien++) {
+                this.gameObjects.push(
+                    new Alien(
+                        { x: width + 32 + Math.random() * 100, y: Math.floor(Math.random() * this.HEIGHT) },
+                        -3,
+                        32,
+                        this.sprites["alien"]
+                    )
+                );
+            }
+        }
+        if (frameCount % 120 === 0) {
             const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
             const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
             this.gameObjects.push(
@@ -210,9 +224,6 @@ class JumpToOrion {
                     this.sprites[item],
                     item
                 )
-            );
-            this.gameObjects.push(
-                new Alien({ x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) }, -3, 32, this.sprites["alien"])
             );
         }
     }
