@@ -38,7 +38,7 @@ class Player extends GameObject {
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
 
-        if (keyIsDown(67)) {
+        if (keyIsDown(81)) {
             this.raiseShield();
         } else {
             this.shieldsRaised = false;
