@@ -131,7 +131,6 @@ class JumpToOrion {
     }
 
     startDemo() {
-        console.log("sprite: ", this.sprites["player"]);
         this.demo = true;
         this.player = new DemoPlayer({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
         this.startGame();
@@ -199,15 +198,29 @@ class JumpToOrion {
         // spawn stuff
         let waveFactor = 1 + Math.floor(this.score / 15);
         if (frameCount % 60 === 0) {
+            let lastAlien = null;
             for (let alien = 0; alien < 1 * waveFactor; alien++) {
-                this.gameObjects.push(
-                    new Alien(
-                        { x: width + 32 + Math.random() * 100, y: Math.floor(Math.random() * this.HEIGHT) },
+                if (!lastAlien) {
+                    lastAlien = new Alien(
+                        {
+                            x: width + 32 + alien * 32 + Math.random() * 100,
+                            y: Math.floor(Math.random() * this.HEIGHT),
+                        },
                         -3,
                         32,
                         this.sprites["alien"]
-                    )
+                    );
+                    this.gameObjects.push(lastAlien);
+                    continue;
+                }
+                let newAlien = new Alien(
+                    { x: lastAlien.currentPos.x + 32 + Math.random() * 64, y: Math.floor(Math.random() * this.HEIGHT) },
+                    -3,
+                    32,
+                    this.sprites["alien"]
                 );
+                this.gameObjects.push(newAlien);
+                lastAlien = newAlien;
             }
         }
         if (frameCount % 120 === 0) {
