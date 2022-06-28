@@ -22,6 +22,7 @@ class Player extends GameObject {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
         this.imageRocket = imageRocket;
+        this.smokeEmitter = new SmokeEmitter();
     }
 
     update() {
@@ -34,6 +35,13 @@ class Player extends GameObject {
         };
 
         this.setCorners();
+
+        if (this.health <= 30) {
+            this.smokeEmitter.smoke();
+        } else {
+            this.smokeEmitter.stopSmoking();
+        }
+        this.smokeEmitter.update(this.currentPos);
 
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
@@ -53,6 +61,7 @@ class Player extends GameObject {
 
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        this.smokeEmitter.drawSmoke();
         if (this.shieldsRaised) {
             stroke("red");
             noFill();
@@ -120,6 +129,55 @@ class Player extends GameObject {
     }
 }
 
+class SmokeEmitter {
+    MAX_PARTICLES = 100;
+    smokeParticles = [];
+    particlesPerUpdate = 10;
+
+    smoke() {
+        this.smoking = true;
+    }
+
+    stopSmoking() {
+        this.smoking = false;
+    }
+
+    update(playerPosition) {
+        if (frameCount % 15 === 0 && this.smoking) {
+            for (let i = 0; i < this.particlesPerUpdate; i++) {
+                if (this.smokeParticles.length < this.MAX_PARTICLES) {
+                    this.smokeParticles.push({
+                        pos: { x: playerPosition.x - 16, y: playerPosition.y },
+                        dir: { x: Math.random() * -1 + -0.5, y: Math.random() * 0.5 - 0.25 },
+                        life: 60,
+                        color: Math.floor(Math.random() * 100 + 100),
+                    });
+                }
+            }
+        }
+
+        for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
+            let particle = this.smokeParticles[i];
+            particle.life--;
+            if (particle.life <= 0) {
+                this.smokeParticles.splice(i, 1);
+                continue;
+            }
+            particle.pos.x += particle.dir.x;
+            particle.pos.y += particle.dir.y;
+        }
+    }
+
+    drawSmoke() {
+        for (let particle of this.smokeParticles) {
+            noStroke();
+            fill(color(`rgba(${particle.color}, ${particle.color}, ${particle.color}, ${particle.life})`));
+            const particleDiameter = Math.floor(Math.random() * 6 + 1);
+            ellipse(particle.pos.x, particle.pos.y, particleDiameter, particleDiameter);
+        }
+    }
+}
+
 class DemoPlayer extends Player {
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size, imagePlayer, imageRocket);
@@ -134,5 +192,12 @@ class DemoPlayer extends Player {
         };
 
         this.setCorners();
+
+        if (this.health <= 30) {
+            this.smokeEmitter.smoke();
+        } else {
+            this.smokeEmitter.stopSmoking();
+        }
+        this.smokeEmitter.update(this.currentPos);
     }
 }
