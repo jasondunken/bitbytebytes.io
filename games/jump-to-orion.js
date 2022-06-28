@@ -94,6 +94,7 @@ class JumpToOrion {
     player;
     score = 0;
     gameOver = false;
+    gameOverTime = 0;
 
     gameObjects = [];
 
@@ -152,11 +153,17 @@ class JumpToOrion {
     update() {
         this.updateScenery();
 
+        if (this.gameOver) {
+            if (frameCount - this.gameOverTime >= 1800) {
+                this.startDemo();
+            }
+        }
+
         if (!this.gameOver) {
             this.player.update();
         }
         if (this.player.health <= 0 && !this.gameOver) {
-            this.gameOver = true;
+            this.endGame();
             for (let i = 0; i < 6; i++) {
                 this.addExplosion({
                     x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
@@ -238,6 +245,11 @@ class JumpToOrion {
                 )
             );
         }
+    }
+
+    endGame() {
+        this.gameOver = true;
+        this.gameOverTime = frameCount;
     }
 
     addExplosion(pos) {
