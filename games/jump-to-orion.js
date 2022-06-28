@@ -96,6 +96,9 @@ class JumpToOrion {
     gameOver = false;
     gameOverTime = 0;
 
+    SCORE_PER_WAVE = 15;
+    DEMO_RESTART_DELAY = 1800;
+
     gameObjects = [];
 
     constructor(width, height, scenery, sprites, font) {
@@ -154,31 +157,33 @@ class JumpToOrion {
         this.updateScenery();
 
         if (this.gameOver) {
-            if (frameCount - this.gameOverTime >= 1800) {
+            if (frameCount - this.gameOverTime >= this.DEMO_RESTART_DELAY) {
                 this.startDemo();
             }
         }
 
         if (!this.gameOver) {
             this.player.update();
+
             if (this.player.pathPos.y < 0 + this.player.size / 2) this.player.pathPos.y = 0 + this.player.size / 2;
             if (this.player.pathPos.y > this.HEIGHT - this.player.size / 2)
                 this.player.pathPos.y = this.HEIGHT - this.player.size / 2;
-        }
-        if (this.player.health <= 0 && !this.gameOver) {
-            this.endGame();
-            for (let i = 0; i < 6; i++) {
-                this.addExplosion({
-                    x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
-                    y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
-                });
+
+            if (this.player.health <= 0) {
+                for (let i = 0; i < 6; i++) {
+                    this.addExplosion({
+                        x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
+                        y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
+                    });
+                }
+                this.endGame();
             }
-            // remove the player
-        }
-        if (!this.demo && !this.gameOver) {
-            if (keyIsDown(32)) {
-                if (this.player.fire()) {
-                    this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+
+            if (!this.demo) {
+                if (keyIsDown(32)) {
+                    if (this.player.fire()) {
+                        this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                    }
                 }
             }
         }
@@ -208,14 +213,14 @@ class JumpToOrion {
         }
 
         // spawn stuff
-        let waveFactor = 1 + Math.floor(this.score / 15);
+        let waveFactor = 1 + Math.floor(this.score / this.SCORE_PER_WAVE);
         if (frameCount % 60 === 0) {
             let lastAlien = null;
             for (let alien = 0; alien < 1 * waveFactor; alien++) {
                 if (!lastAlien) {
                     lastAlien = new Alien(
                         {
-                            x: width + 32 + alien * 32 + Math.random() * 100,
+                            x: width + 32 + Math.random() * 100,
                             y: Math.floor(Math.random() * this.HEIGHT),
                         },
                         -3,
@@ -321,6 +326,7 @@ class JumpToOrion {
         background("black");
         if (this.scenery[0].show) this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
         if (this.scenery[1].show) this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
+
         if (!this.gameOver) {
             this.player.draw();
         }
