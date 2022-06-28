@@ -22,7 +22,7 @@ class Player extends GameObject {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
         this.imageRocket = imageRocket;
-        this.smokeEmitter = new SmokeEmitter();
+        this.smokeEmitter = new SmokeEmitter(this.STARTING_HEALTH / 2);
     }
 
     update() {
@@ -36,12 +36,7 @@ class Player extends GameObject {
 
         this.setCorners();
 
-        if (this.health <= 30) {
-            this.smokeEmitter.smoke();
-        } else {
-            this.smokeEmitter.stopSmoking();
-        }
-        this.smokeEmitter.update(this.currentPos);
+        this.updateDamage();
 
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
@@ -57,6 +52,15 @@ class Player extends GameObject {
             if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
             if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
         }
+    }
+
+    updateDamage() {
+        if (this.health <= this.STARTING_HEALTH / 2) {
+            this.smokeEmitter.smoke(this.health);
+        } else {
+            this.smokeEmitter.stopSmoking();
+        }
+        this.smokeEmitter.update(this.currentPos);
     }
 
     draw() {
@@ -132,9 +136,17 @@ class Player extends GameObject {
 class SmokeEmitter {
     MAX_PARTICLES = 100;
     smokeParticles = [];
-    particlesPerUpdate = 10;
+    MAX_PARTICLES_PER_UPDATE = 10;
+    particlesPerUpdate;
 
-    smoke() {
+    halfHealth; // half the player's starting health
+
+    constructor(halfHealth) {
+        this.halfHealth = halfHealth;
+    }
+
+    smoke(playerHealth) {
+        this.particlesPerUpdate = Math.floor(this.MAX_PARTICLES_PER_UPDATE * (1 - playerHealth / this.halfHealth)) + 1;
         this.smoking = true;
     }
 
@@ -193,11 +205,6 @@ class DemoPlayer extends Player {
 
         this.setCorners();
 
-        if (this.health <= 30) {
-            this.smokeEmitter.smoke();
-        } else {
-            this.smokeEmitter.stopSmoking();
-        }
-        this.smokeEmitter.update(this.currentPos);
+        this.updateDamage();
     }
 }
