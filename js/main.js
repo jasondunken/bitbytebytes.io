@@ -133,7 +133,6 @@ function incrementAge(pixels) {
         // get age from pixelAge array
         age = pixelAge[index];
         // determine neighbors from previous screen buffer
-        // testing with a parallel int array for now
         n = getNumNeighbors(index);
 
         if (age >= 1) {
