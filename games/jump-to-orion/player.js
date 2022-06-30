@@ -18,6 +18,8 @@ class Player extends GameObject {
     STARTING_AMMO = 20;
     ammo = this.STARTING_AMMO;
 
+    updateDelta = false;
+
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
@@ -26,17 +28,18 @@ class Player extends GameObject {
     }
 
     update() {
+        this.updateDamage();
         if (keyIsDown(87)) this.pathPos.y -= this.speed;
         if (keyIsDown(83)) this.pathPos.y += this.speed;
-        this.delta += this.speed / 60.0;
         this.currentPos = {
             x: this.pathPos.x,
-            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.cos(this.delta % 360) * this.size,
+            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
         };
+        if (this.updateDelta) {
+            this.delta += this.speed / 60.0;
+        }
 
         this.setCorners();
-
-        this.updateDamage();
 
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
@@ -55,12 +58,21 @@ class Player extends GameObject {
     }
 
     updateDamage() {
+        let damageDir = this.health - this.lastHealth > 0 ? "up" : this.health - this.lastHealth < 0 ? "down" : "none";
+        if (this.health <= 30 && damageDir === "down" && this.lastHealth > 30) {
+            this.updateDelta = true;
+            this.delta = 0;
+        }
+        if (this.health > 30 / 2 && damageDir === "up" && this.lastHealth < 30) {
+            this.updateDelta = false;
+        }
         if (this.health <= this.STARTING_HEALTH / 2) {
             this.smokeEmitter.smoke(this.health);
         } else {
             this.smokeEmitter.stopSmoking();
         }
         this.smokeEmitter.update(this.currentPos);
+        this.lastHealth = this.health;
     }
 
     draw() {
