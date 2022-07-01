@@ -5,6 +5,9 @@ let hWidth;
 let hHeight;
 let pixelAge = [];
 
+const RESTART_DELAY = 10;
+let restartTimer = 0;
+
 let toob;
 let ufos = [];
 
@@ -17,10 +20,7 @@ function setup() {
     initializeToob();
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
-        noLoop();
-        setTimeout(() => {
-            restartGOL();
-        }, 250);
+        restartGOL();
     });
     document.getElementById("toggle-2").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -52,10 +52,14 @@ function toggleSwitch(switchElement) {
 
 // called by p5 when window is ready
 function draw() {
-    // frameCount is a p5 global
-    frameCount = frameCount % DRAW_CALLS_PER_AGE_TICK;
-    if (frameCount == 0) {
-        incrementAge(pixels);
+    if (restartTimer > 0) {
+        restartTimer--;
+    } else {
+        // frameCount is a p5 global
+        frameCount = frameCount % DRAW_CALLS_PER_AGE_TICK;
+        if (frameCount == 0) {
+            incrementAge(pixels);
+        }
     }
 
     // p5.js function
@@ -87,14 +91,12 @@ function initializeHeaderGOL() {
 }
 
 function restartGOL() {
+    restartTimer = RESTART_DELAY;
     let header = document.getElementById("gol-container").getBoundingClientRect();
     hWidth = header.width;
     hHeight = header.height;
     resizeCanvas(hWidth, hHeight);
-    // this resets the pixel buffer
-    background("black");
     initializePixelAge(hWidth, hHeight);
-    loop();
 }
 
 function initializeHeaderText() {

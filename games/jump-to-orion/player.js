@@ -80,7 +80,7 @@ class Player extends GameObject {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         this.smokeEmitter.drawSmoke();
         if (this.shieldsRaised) {
-            this.shieldOrbitDelta += 2;
+            this.shieldOrbitDelta += 0.33;
             let shieldDensity = 20;
             for (let i = 0; i < shieldDensity; i++) {
                 if (i % 2 == 0) {
@@ -92,19 +92,25 @@ class Player extends GameObject {
                     let ya =
                         this.currentPos.y +
                         (Math.cos(((i + this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
-                    stroke(color(`hsla(${Math.floor(Math.cos(i / shieldDensity) * 360)}, 50%, 50%, 1)`));
+                    stroke(
+                        color(
+                            `hsla(${Math.floor(
+                                Math.cos(i / shieldDensity + this.shieldOrbitDelta) * 360
+                            )}, 50%, 50%, 1)`
+                        )
+                    );
                     noFill();
                     ellipse(xa, ya, xr, yr);
                 } else {
-                    let xr = Math.floor(Math.random() * 20) + 1;
-                    let yr = Math.floor(Math.random() * 20) + 1;
+                    let xr = Math.floor(Math.random() * 10) + 11;
+                    let yr = Math.floor(Math.random() * 10) + 11;
                     let xa =
                         this.currentPos.x +
                         (Math.sin(((i + -this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
                     let ya =
                         this.currentPos.y +
                         (Math.cos(((i + -this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
-                    stroke(color(`hsla(${Math.floor(Math.cos(i / shieldDensity) * 360)}, 50%, 50%, 1)`));
+                    stroke(color(`hsla(${Math.floor(Math.cos(i / shieldDensity) * 180)}, 50%, 50%, 1)`));
                     noFill();
                     ellipse(xa, ya, xr, yr);
                 }
