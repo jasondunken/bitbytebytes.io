@@ -10,7 +10,7 @@ class Player extends GameObject {
 
     MIN_SHIELD_RADIUS = 50;
     MAX_SHIELD_RADIUS = 100;
-    STARTING_SHIELD = 200;
+    STARTING_SHIELD = 2000;
     shield = this.STARTING_SHIELD;
     shieldRadius = this.MAX_SHIELD_RADIUS;
     shieldsRaised = false;
@@ -75,13 +75,40 @@ class Player extends GameObject {
         this.lastHealth = this.health;
     }
 
+    shieldOrbitDelta = 0;
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         this.smokeEmitter.drawSmoke();
         if (this.shieldsRaised) {
-            stroke("red");
-            noFill();
-            ellipse(this.currentPos.x, this.currentPos.y, this.shieldRadius, this.shieldRadius);
+            this.shieldOrbitDelta += 2;
+            let shieldDensity = 20;
+            for (let i = 0; i < shieldDensity; i++) {
+                if (i % 2 == 0) {
+                    let xr = Math.floor(Math.random() * 20) + 1;
+                    let yr = Math.floor(Math.random() * 20) + 1;
+                    let xa =
+                        this.currentPos.x +
+                        (Math.sin(((i + this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
+                    let ya =
+                        this.currentPos.y +
+                        (Math.cos(((i + this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
+                    stroke(color(`hsla(${Math.floor(Math.cos(i / shieldDensity) * 360)}, 50%, 50%, 1)`));
+                    noFill();
+                    ellipse(xa, ya, xr, yr);
+                } else {
+                    let xr = Math.floor(Math.random() * 20) + 1;
+                    let yr = Math.floor(Math.random() * 20) + 1;
+                    let xa =
+                        this.currentPos.x +
+                        (Math.sin(((i + -this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
+                    let ya =
+                        this.currentPos.y +
+                        (Math.cos(((i + -this.shieldOrbitDelta) / shieldDensity) * 2 * PI) * this.shieldRadius) / 2;
+                    stroke(color(`hsla(${Math.floor(Math.cos(i / shieldDensity) * 360)}, 50%, 50%, 1)`));
+                    noFill();
+                    ellipse(xa, ya, xr, yr);
+                }
+            }
         }
     }
 
