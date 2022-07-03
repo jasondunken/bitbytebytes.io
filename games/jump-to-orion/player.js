@@ -264,11 +264,11 @@ class DemoPlayer extends Player {
                 this.currentMove = +this.speed;
             }
             if (this.currentPos.y < this.centerY - this.centerY / 2) {
-                this.moveTimer = 90;
+                this.moveTimer = 60;
                 this.currentMove = this.speed;
             }
             if (this.currentPos.y > this.centerY + this.centerY / 2) {
-                this.moveTimer = 90;
+                this.moveTimer = 60;
                 this.currentMove = -this.speed;
             }
         } else {
