@@ -275,14 +275,22 @@ class DemoPlayer extends Player {
             this.moveTimer--;
         }
         this.pathPos.y += this.currentMove;
-        this.delta += this.speed / 60.0;
+        if (this.updateDelta) {
+            this.delta += this.speed / 60.0;
+        }
         this.currentPos = {
             x: this.pathPos.x,
-            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.cos(this.delta % 360) * this.size,
+            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
         };
 
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
+
+        if (this.shieldsRaised) {
+            this.shieldRadius = this.shield;
+            if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
+            if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
+        }
 
         this.setCorners();
 
