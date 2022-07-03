@@ -236,17 +236,53 @@ class SmokeEmitter {
 }
 
 class DemoPlayer extends Player {
+    moveTimer = 0;
+    moves = ["none", "up", "down"];
+    currentMove = null;
+    centerX = null;
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size, imagePlayer, imageRocket);
+        this.centerX = initialPos.x;
+    }
+
+    lowerShield() {
+        this.shieldsRaised = false;
     }
 
     update() {
         // move demo player
+        if (this.moveTimer === 0) {
+            const moveRoll = Math.floor(Math.random() * 100);
+            if (moveRoll < 30) {
+                this.moveTimer = 15;
+                this.currentMove = -this.speed;
+            } else if (moveRoll < 70) {
+                this.moveTimer = 60;
+                this.currentMove = 0;
+            } else {
+                this.moveTimer = 15;
+                this.currentMove = +this.speed;
+            }
+            if (this.pathPos.x < this.centerX - this.centerX / 2) {
+                this.moveTimer = 90;
+                this.currentMove = this.speed;
+            }
+            if (this.pathPos.x > this.centerX + this.centerX / 2) {
+                this.moveTimer = 90;
+                this.currentMove = -this.speed;
+            }
+        } else {
+            this.moveTimer--;
+        }
+        this.pathPos.y += this.currentMove;
         this.delta += this.speed / 60.0;
         this.currentPos = {
             x: this.pathPos.x,
             y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.cos(this.delta % 360) * this.size,
         };
+
+        if (this.fireReady > 0) this.fireReady--;
+        if (this.fireReady < 0) this.fireReady = 0;
 
         this.setCorners();
 

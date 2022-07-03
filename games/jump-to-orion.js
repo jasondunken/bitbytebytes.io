@@ -189,6 +189,31 @@ class JumpToOrion {
         }
 
         for (let gameObj of this.gameObjects) {
+            if (this.demo) {
+                if (
+                    gameObj.type === "item" ||
+                    (gameObj.type === "alien" &&
+                        this.player.currentPos.y > gameObj.currentPos.y - 10 &&
+                        this.player.currentPos.y < gameObj.currentPos.y + 10)
+                ) {
+                    if (this.player.fire()) {
+                        this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                    }
+                }
+                if (
+                    gameObj.type != "rocket" &&
+                    dist(
+                        this.player.currentPos.x,
+                        this.player.currentPos.y,
+                        gameObj.currentPos.x,
+                        gameObj.currentPos.y
+                    ) < 80
+                ) {
+                    this.player.raiseShield();
+                } else {
+                    this.player.lowerShield();
+                }
+            }
             gameObj.update();
             if (gameObj.currentPos.x < -gameObj.size) {
                 gameObj.remove = true;
