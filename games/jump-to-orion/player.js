@@ -239,10 +239,10 @@ class DemoPlayer extends Player {
     moveTimer = 0;
     moves = ["none", "up", "down"];
     currentMove = null;
-    centerX = null;
+    centerY = null;
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size, imagePlayer, imageRocket);
-        this.centerX = initialPos.x;
+        this.centerY = initialPos.y;
     }
 
     lowerShield() {
@@ -263,11 +263,11 @@ class DemoPlayer extends Player {
                 this.moveTimer = 15;
                 this.currentMove = +this.speed;
             }
-            if (this.pathPos.x < this.centerX - this.centerX / 2) {
+            if (this.currentPos.y < this.centerY - this.centerY / 2) {
                 this.moveTimer = 90;
                 this.currentMove = this.speed;
             }
-            if (this.pathPos.x > this.centerX + this.centerX / 2) {
+            if (this.currentPos.y > this.centerY + this.centerY / 2) {
                 this.moveTimer = 90;
                 this.currentMove = -this.speed;
             }
