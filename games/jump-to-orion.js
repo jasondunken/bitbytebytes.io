@@ -190,17 +190,23 @@ class JumpToOrion {
 
         for (let gameObj of this.gameObjects) {
             if (this.demo) {
-                if (gameObj.type === "item" || gameObj.type === "alien") {
-                    if (
-                        this.player.currentPos.y > gameObj.currentPos.y - this.player.size &&
-                        this.player.currentPos.y < gameObj.currentPos.y + this.player.size &&
-                        this.player.currentPos.x < gameObj.currentPos.x
-                    ) {
+                if (
+                    this.player.currentPos.y > gameObj.currentPos.y - this.player.size / 2 &&
+                    this.player.currentPos.y < gameObj.currentPos.y + this.player.size / 2 &&
+                    this.player.currentPos.x < gameObj.currentPos.x
+                ) {
+                    if (gameObj.type === "alien") {
+                        if (this.player.fire()) {
+                            this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                        }
+                    }
+                    if (gameObj.type === "item" && gameObj.currentPos.x - this.player.currentPos.x < 32) {
                         if (this.player.fire()) {
                             this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
                         }
                     }
                 }
+                this.player.lowerShield();
                 if (
                     gameObj.type != "rocket" &&
                     dist(
@@ -211,8 +217,6 @@ class JumpToOrion {
                     ) < 80
                 ) {
                     this.player.raiseShield();
-                } else {
-                    this.player.lowerShield();
                 }
             }
             gameObj.update();
