@@ -183,7 +183,7 @@ class DemoPlayer extends Player {
     centerY = null;
     targetLocked = null;
     cursorPos = null; // a vector away from the player's position
-    cursorMoveSpeed = 4;
+    cursorMoveSpeed = 3;
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size, imagePlayer, imageRocket);
         this.centerY = initialPos.y;
@@ -252,12 +252,19 @@ class DemoPlayer extends Player {
                 y: targetPos.y - this.cursorPos.y,
             };
             const targetDist = Math.sqrt(targetVector.x * targetVector.x + targetVector.y * targetVector.y);
-            const targetVectorNormal = {
-                x: targetVector.x / targetDist,
-                y: targetVector.y / targetDist,
-            };
-            this.cursorPos.x += targetVectorNormal.x * this.cursorMoveSpeed;
-            this.cursorPos.y += targetVectorNormal.y * this.cursorMoveSpeed;
+            if (targetDist < this.targetLocked.size / 2) {
+                this.targetLocked.remove = true;
+                if (this.targetLocked.id === "ammo") this.addAmmo(this.targetLocked.value);
+                if (this.targetLocked.id === "shield") this.addShield(this.targetLocked.value);
+                if (this.targetLocked.id === "health") this.addHealth(this.targetLocked.value);
+            } else {
+                const targetVectorNormal = {
+                    x: targetVector.x / targetDist,
+                    y: targetVector.y / targetDist,
+                };
+                this.cursorPos.x += targetVectorNormal.x * this.cursorMoveSpeed;
+                this.cursorPos.y += targetVectorNormal.y * this.cursorMoveSpeed;
+            }
         }
 
         this.setCorners();
