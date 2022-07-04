@@ -1,6 +1,5 @@
 class Player extends GameObject {
     imagePlayer;
-    imageRocket;
 
     fireReady = 0;
     loadSpeed = 30;
@@ -19,27 +18,28 @@ class Player extends GameObject {
     ammo = this.STARTING_AMMO;
 
     updateDelta = false;
+    shieldOrbitDelta = 0;
 
-    constructor(initialPos, speed, size, imagePlayer, imageRocket) {
+    constructor(initialPos, speed, size, imagePlayer) {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
-        this.imageRocket = imageRocket;
         this.smokeEmitter = new SmokeEmitter(this.STARTING_HEALTH / 2);
     }
 
     update() {
-        this.updateDamage();
         if (keyIsDown(87)) this.pathPos.y -= this.speed;
         if (keyIsDown(83)) this.pathPos.y += this.speed;
         this.currentPos = {
             x: this.pathPos.x,
             y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
         };
+
+        this.setCorners();
+        this.updateDamage();
+
         if (this.updateDelta) {
             this.delta += this.speed / 60.0;
         }
-
-        this.setCorners();
 
         if (this.fireReady > 0) this.fireReady--;
         if (this.fireReady < 0) this.fireReady = 0;
@@ -75,7 +75,6 @@ class Player extends GameObject {
         this.lastHealth = this.health;
     }
 
-    shieldOrbitDelta = 0;
     draw() {
         image(this.imagePlayer, this.corners.a.x, this.corners.a.y, this.size, this.size);
         this.smokeEmitter.drawSmoke();
@@ -178,6 +177,68 @@ class Player extends GameObject {
     }
 }
 
+class DemoPlayer extends Player {
+    moveTimer = 0;
+    currentMove = null;
+    centerY = null;
+    constructor(initialPos, speed, size, imagePlayer, imageRocket) {
+        super(initialPos, speed, size, imagePlayer, imageRocket);
+        this.centerY = initialPos.y;
+    }
+
+    lowerShield() {
+        this.shieldsRaised = false;
+    }
+
+    update() {
+        // move demo player
+        if (this.moveTimer === 0) {
+            const moveRoll = Math.floor(Math.random() * 100);
+            if (moveRoll < 30) {
+                this.moveTimer = 15;
+                this.currentMove = -this.speed;
+            } else if (moveRoll < 70) {
+                this.moveTimer = 60;
+                this.currentMove = 0;
+            } else {
+                this.moveTimer = 15;
+                this.currentMove = +this.speed;
+            }
+            if (this.currentPos.y < this.centerY - this.centerY / 2) {
+                this.moveTimer = 60;
+                this.currentMove = this.speed;
+            }
+            if (this.currentPos.y > this.centerY + this.centerY / 2) {
+                this.moveTimer = 60;
+                this.currentMove = -this.speed;
+            }
+        } else {
+            this.moveTimer--;
+        }
+        this.pathPos.y += this.currentMove;
+        this.currentPos = {
+            x: this.pathPos.x,
+            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
+        };
+
+        this.setCorners();
+        this.updateDamage();
+
+        if (this.updateDelta) {
+            this.delta += this.speed / 60.0;
+        }
+
+        if (this.fireReady > 0) this.fireReady--;
+        if (this.fireReady < 0) this.fireReady = 0;
+
+        if (this.shieldsRaised) {
+            this.shieldRadius = this.shield;
+            if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
+            if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
+        }
+    }
+}
+
 class SmokeEmitter {
     MAX_PARTICLES = 100;
     smokeParticles = [];
@@ -232,68 +293,5 @@ class SmokeEmitter {
             const particleDiameter = Math.floor(Math.random() * 6 + 1);
             ellipse(particle.pos.x, particle.pos.y, particleDiameter, particleDiameter);
         }
-    }
-}
-
-class DemoPlayer extends Player {
-    moveTimer = 0;
-    moves = ["none", "up", "down"];
-    currentMove = null;
-    centerY = null;
-    constructor(initialPos, speed, size, imagePlayer, imageRocket) {
-        super(initialPos, speed, size, imagePlayer, imageRocket);
-        this.centerY = initialPos.y;
-    }
-
-    lowerShield() {
-        this.shieldsRaised = false;
-    }
-
-    update() {
-        // move demo player
-        if (this.moveTimer === 0) {
-            const moveRoll = Math.floor(Math.random() * 100);
-            if (moveRoll < 30) {
-                this.moveTimer = 15;
-                this.currentMove = -this.speed;
-            } else if (moveRoll < 70) {
-                this.moveTimer = 60;
-                this.currentMove = 0;
-            } else {
-                this.moveTimer = 15;
-                this.currentMove = +this.speed;
-            }
-            if (this.currentPos.y < this.centerY - this.centerY / 2) {
-                this.moveTimer = 60;
-                this.currentMove = this.speed;
-            }
-            if (this.currentPos.y > this.centerY + this.centerY / 2) {
-                this.moveTimer = 60;
-                this.currentMove = -this.speed;
-            }
-        } else {
-            this.moveTimer--;
-        }
-        this.pathPos.y += this.currentMove;
-        if (this.updateDelta) {
-            this.delta += this.speed / 60.0;
-        }
-        this.currentPos = {
-            x: this.pathPos.x,
-            y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
-        };
-
-        if (this.fireReady > 0) this.fireReady--;
-        if (this.fireReady < 0) this.fireReady = 0;
-
-        if (this.shieldsRaised) {
-            this.shieldRadius = this.shield;
-            if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
-            if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
-        }
-
-        this.setCorners();
-
-        this.updateDamage();
     }
 }
