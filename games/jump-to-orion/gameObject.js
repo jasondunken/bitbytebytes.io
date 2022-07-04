@@ -45,14 +45,6 @@ class GameObject {
     }
 }
 
-class Collider {
-    constructor(bounds) {
-        this.bounds = bounds;
-    }
-
-    contains(entity) {}
-}
-
 class Animation {
     constructor(frames, duration, loop) {
         this.frames = frames;

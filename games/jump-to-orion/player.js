@@ -181,9 +181,33 @@ class DemoPlayer extends Player {
     moveTimer = 0;
     currentMove = null;
     centerY = null;
+    targetLocked = null;
+    cursorPos = null; // a vector away from the player's position
+    cursorMoveSpeed = 4;
     constructor(initialPos, speed, size, imagePlayer, imageRocket) {
         super(initialPos, speed, size, imagePlayer, imageRocket);
         this.centerY = initialPos.y;
+    }
+
+    target(items) {
+        if (this.targetLocked && this.targetLocked.remove) {
+            this.targetLocked = null;
+        }
+        if (!this.targetLocked) {
+            let targetItem = null;
+            let closestTarget = Number.MAX_VALUE;
+            for (let i = 0; i < items.length; i++) {
+                let dist = Math.abs(this.currentPos.x - items[i].currentPos.x);
+                if (dist < closestTarget) {
+                    closestTarget = dist;
+                    targetItem = items[i];
+                }
+            }
+            this.targetLocked = targetItem;
+            if (this.cursorPos === null) {
+                this.cursorPos = this.currentPos;
+            }
+        }
     }
 
     lowerShield() {
@@ -221,6 +245,21 @@ class DemoPlayer extends Player {
             y: this.health > 30 ? this.pathPos.y : this.pathPos.y + Math.sin(this.delta) * this.size,
         };
 
+        if (this.targetLocked) {
+            const targetPos = this.targetLocked.currentPos;
+            const targetVector = {
+                x: targetPos.x - this.cursorPos.x,
+                y: targetPos.y - this.cursorPos.y,
+            };
+            const targetDist = Math.sqrt(targetVector.x * targetVector.x + targetVector.y * targetVector.y);
+            const targetVectorNormal = {
+                x: targetVector.x / targetDist,
+                y: targetVector.y / targetDist,
+            };
+            this.cursorPos.x += targetVectorNormal.x * this.cursorMoveSpeed;
+            this.cursorPos.y += targetVectorNormal.y * this.cursorMoveSpeed;
+        }
+
         this.setCorners();
         this.updateDamage();
 
@@ -235,6 +274,14 @@ class DemoPlayer extends Player {
             this.shieldRadius = this.shield;
             if (this.shieldRadius > this.MAX_SHIELD_RADIUS) this.shieldRadius = this.MAX_SHIELD_RADIUS;
             if (this.shieldRadius < this.MIN_SHIELD_RADIUS) this.shieldRadius = this.MIN_SHIELD_RADIUS;
+        }
+    }
+
+    drawCursor() {
+        if (this.cursorPos) {
+            stroke("red");
+            noFill();
+            ellipse(this.cursorPos.x, this.cursorPos.y, 30, 30);
         }
     }
 }

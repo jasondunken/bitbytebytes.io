@@ -165,7 +165,7 @@ class JumpToOrion {
         if (!this.gameOver) {
             this.player.update();
 
-            if (this.player.pathPos.y < 0 + this.player.size / 2) this.player.pathPos.y = 0 + this.player.size / 2;
+            if (this.player.pathPos.y < this.player.size / 2) this.player.pathPos.y = this.player.size / 2;
             if (this.player.pathPos.y > this.HEIGHT - this.player.size / 2)
                 this.player.pathPos.y = this.HEIGHT - this.player.size / 2;
 
@@ -184,6 +184,15 @@ class JumpToOrion {
                     if (this.player.fire()) {
                         this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
                     }
+                }
+            }
+
+            if (this.demo) {
+                const items = this.gameObjects.filter((obj) => {
+                    return obj.type === "item";
+                });
+                if (items) {
+                    this.player.target(items);
                 }
             }
         }
@@ -359,6 +368,9 @@ class JumpToOrion {
 
         if (!this.gameOver) {
             this.player.draw();
+            if (this.demo) {
+                this.player.drawCursor();
+            }
         }
         for (let gameObj of this.gameObjects) {
             gameObj.draw();
