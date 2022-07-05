@@ -13,10 +13,16 @@ let turns = 0;
 
 let breakTimer = 0;
 
+images = [];
 let emptyTile = null;
 
 function preload() {
-    image_1 = loadImage("./slider/img/image_1.png");
+    images.push(loadImage("./slider/img/image_1.png"));
+    images.push(loadImage("./slider/img/image_2.png"));
+    images.push(loadImage("./slider/img/image_3.png"));
+    images.push(loadImage("./slider/img/image_4.png"));
+    images.push(loadImage("./slider/img/image_5.png"));
+    images.push(loadImage("./slider/img/image_6.png"));
 }
 
 function setup() {
@@ -33,12 +39,13 @@ function initGame() {
     tilesPerSide = STARTING_TILES_PER_SIDE + level;
     tileSize = width / tilesPerSide;
     tiles = [];
+    const currentImage = images[Math.floor(Math.random() * images.length)];
     for (let i = 0; i < tilesPerSide; i++) {
         tiles[i] = [];
         for (let j = 0; j < tilesPerSide; j++) {
             let tileImage = createImage(tileSize, tileSize);
             tileImage.copy(
-                image_1,
+                currentImage,
                 (width / tilesPerSide) * i,
                 (height / tilesPerSide) * j,
                 tileSize,
