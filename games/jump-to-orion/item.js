@@ -8,7 +8,7 @@ class Item extends GameObject {
         healthMED: 25,
         healthLRG: 50,
         ammo: 10,
-        shield: 25,
+        shield: 250,
     };
 
     constructor(initialPos, speed, size, itemImage, id) {
