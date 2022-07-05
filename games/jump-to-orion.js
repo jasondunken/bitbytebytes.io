@@ -476,7 +476,9 @@ class JumpToOrion {
     resetScenery() {
         this.scenery[0].xScroll = 0;
         this.scenery[1].xScroll = width * 2;
+        this.scenery[1].show = false;
         this.scenery[2].xScroll = width * 2;
+        this.scenery[2].show = false;
     }
 
     countBelow(number, split) {
