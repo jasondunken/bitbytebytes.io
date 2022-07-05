@@ -165,9 +165,9 @@ class JumpToOrion {
         if (!this.gameOver) {
             this.player.update();
 
-            if (this.player.pathPos.y < this.player.size / 2) this.player.pathPos.y = this.player.size / 2;
-            if (this.player.pathPos.y > this.HEIGHT - this.player.size / 2)
-                this.player.pathPos.y = this.HEIGHT - this.player.size / 2;
+            if (this.player.pathPos.y < this.player.size) this.player.pathPos.y = this.player.size;
+            if (this.player.pathPos.y > this.HEIGHT - this.player.size)
+                this.player.pathPos.y = this.HEIGHT - this.player.size;
 
             if (this.player.health <= 0) {
                 for (let i = 0; i < 6; i++) {
