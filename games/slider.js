@@ -174,7 +174,15 @@ function draw() {
     // update game logic
     update();
 
-    background("black");
+    background("gray");
+    setColor("white");
+    for (let i = 0; i < width / 32; i++) {
+        for (let j = 0; j < height / 32; j++) {
+            if ((j + i) % 2 === 0) {
+                rect(i * 32, j * 32, 32, 32);
+            }
+        }
+    }
     for (let i = 0; i < tiles.length; i++) {
         for (let j = 0; j < tiles[i].length; j++) {
             setColor("white");
