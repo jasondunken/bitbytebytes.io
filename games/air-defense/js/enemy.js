@@ -1,54 +1,34 @@
-function Enemy(x, y, z) {
-    this._maxHealth = 10;
-    this._moveSpeed = 5;
+class EnemyAircraft extends GameObject {
+    MAX_HEALTH = 10;
+    MOVE_SPEED = 5;
 
-    this.diameter = 5;
+    health;
 
-    this._health;
-    this._pos = new p5.Vector();
-
-    this.falling = true;
-    this.dead = false;
-    // since this is a 2d game, x & y will be screen pos, z will be used to indicate direction;
-    // z === -1: left | z === 0: not moving | z === 1: right
-    this._pos = new p5.Vector(x, y, z);
-    this.health = maxHealth;
-}
-
-Enemy.prototype.jump = function () {
-    this._pos.z = 1;
-}
-
-Enemy.prototype.update = function (tick) {
-    if (isNaN(this._health)) {
-        this._health = this._maxHealth;
+    constructor(position, spriteL, spriteR) {
+        super("enemy", position);
+        this.spriteL = spriteL;
+        this.spriteR = spriteR;
+        this.health = this.MAX_HEALTH;
     }
-    let _x = this._pos.x;
-    let _y = this._pos.y;
-    let _z = this._pos.z;
-    _x += _z;
-    this._pos = new p5.Vector(_x, _y, _z);
-    if (_x < 0 || _x > width || this.health <= 0) {
-        this.dead = true;
+
+    update() {
+        this.position.x += this.position.z;
     }
-}
 
-Enemy.prototype.render = function () {
-    setColor('white');
-    ellipse(this._pos.x, this._pos.y, this.diameter, this.diameter);
-}
-
-Enemy.prototype.getHealth = function () {
-    return this._health;
-}
-
-Enemy.prototype.hit = function (dmg) {
-    this._health -= dmg;
-    if (this._health <= 0) {
-        this.kill();
+    render() {
+        // since this is a 2d game, x & y will be screen pos, z will be used to indicate direction;
+        // z === -1: left | z === 0: not moving | z === 1: right
+        if (this.position.z < 0) {
+            image(this.spriteL, this.position.x, this.position.y, 32, 16);
+        } else {
+            image(this.spriteR, this.position.x, this.position.y, 32, 16);
+        }
     }
-}
 
-Enemy.prototype.kill = function () {
-    this.dead = true;
+    hit(dmg) {
+        this.health -= dmg;
+        if (this.health <= 0) {
+            this.dead = true;
+        }
+    }
 }
