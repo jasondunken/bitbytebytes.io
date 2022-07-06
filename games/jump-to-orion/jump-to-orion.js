@@ -51,9 +51,15 @@ function preload() {
     sprites["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
     sprites["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
 
+    let sounds = {};
+    // sounds["fire_1"] = loadSound("./jump-to-orion/snd/fire_1.mp3");
+    // sounds["fire_1"].playMode("restart");
+    // sounds["explosion_1"] = loadSound("./jump-to-orion/snd/explosion_1.mp3");
+    // sounds["explosion_1"].playMode("restart");
+
     let font = loadFont("./jump-to-orion/font/PressStart2P.ttf");
 
-    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, font);
+    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, sounds, font);
 }
 
 function setup() {
@@ -89,6 +95,7 @@ class JumpToOrion {
 
     scenery = [];
     sprites = {};
+    sounds = {};
     font;
 
     player;
@@ -101,11 +108,12 @@ class JumpToOrion {
 
     gameObjects = [];
 
-    constructor(width, height, scenery, sprites, font) {
+    constructor(width, height, scenery, sprites, sounds, font) {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
         this.sprites = sprites;
+        this.sounds = sounds;
         this.font = font;
     }
 
@@ -183,6 +191,7 @@ class JumpToOrion {
                 if (keyIsDown(32)) {
                     if (this.player.fire()) {
                         this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                        // this.sounds["fire_1"].play(0);
                     }
                 }
             }
@@ -240,6 +249,7 @@ class JumpToOrion {
                 if (rocketCollision) this.score++;
                 if (playerCollision || rocketCollision) {
                     gameObj.remove = true;
+                    // this.sounds["explosion_1"].play(0);
                     this.addExplosion({ x: gameObj.currentPos.x, y: gameObj.currentPos.y });
                 }
             }
@@ -259,7 +269,7 @@ class JumpToOrion {
                 if (!lastAlien) {
                     lastAlien = new Alien(
                         {
-                            x: width + 32 + Math.random() * 100,
+                            x: this.WIDTH + 32 + Math.random() * 100,
                             y: Math.floor(Math.random() * this.HEIGHT),
                         },
                         -3,
@@ -284,7 +294,7 @@ class JumpToOrion {
             const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
             this.gameObjects.push(
                 new Item(
-                    { x: width + 32, y: Math.floor(Math.random() * this.HEIGHT) },
+                    { x: this.WIDTH + 32, y: Math.floor(Math.random() * this.HEIGHT) },
                     -2,
                     32,
                     this.sprites[item],
@@ -475,9 +485,9 @@ class JumpToOrion {
 
     resetScenery() {
         this.scenery[0].xScroll = 0;
-        this.scenery[1].xScroll = width * 2;
+        this.scenery[1].xScroll = this.WIDTH * 2;
         this.scenery[1].show = false;
-        this.scenery[2].xScroll = width * 2;
+        this.scenery[2].xScroll = this.WIDTH * 2;
         this.scenery[2].show = false;
     }
 

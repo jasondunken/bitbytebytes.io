@@ -288,7 +288,7 @@ class DemoPlayer extends Player {
         if (this.cursorPos) {
             stroke("red");
             noFill();
-            ellipse(this.cursorPos.x, this.cursorPos.y, 30, 30);
+            ellipse(this.cursorPos.x, this.cursorPos.y, 5, 5);
         }
     }
 }

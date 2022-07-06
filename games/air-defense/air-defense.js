@@ -22,7 +22,7 @@ function preload() {
 function setup() {
     const canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent("game");
-    game.startDemo();
+    game.start1Player();
 }
 
 function draw() {
@@ -56,7 +56,7 @@ class AirDefense {
         this.startGame();
     }
 
-    startDemo() {
+    start1Player() {
         this.inDemo = false;
         this.turret = new Turret(this, { x: this.width / 2, y: this.height - this.GROUND_HEIGHT });
         this.gameState = GameState.PLAY;
@@ -73,6 +73,32 @@ class AirDefense {
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
+            if (gameObj.type === "enemy") {
+                if (
+                    (gameObj.position.x <= -32 && gameObj.position.z === -1) ||
+                    (gameObj.position.x >= this.width + 32 && gameObj.position.z === 1)
+                ) {
+                    gameObj.dead = true;
+                }
+                if (
+                    !gameObj.dead &&
+                    gameObj.position.x < this.turret.position.x + this.turret.BASE_WIDTH &&
+                    gameObj.position.x > this.turret.position.x - this.turret.BASE_WIDTH
+                ) {
+                    if (gameObj.dropBomb()) {
+                        this.gameObjects.push(
+                            new Bomb({ x: gameObj.position.x, y: gameObj.position.y }, { x: gameObj.position.z, y: 0 })
+                        );
+                    }
+                }
+            }
+            if (gameObj.type === "bomb" && gameObj.position.y > this.height) gameObj.dead = true;
+        }
+
+        for (let i = this.gameObjects.length - 1; i >= 0; i--) {
+            if (this.gameObjects[i].dead) {
+                this.gameObjects.splice(i, 1);
+            }
         }
 
         if (frameCount % 60 === 0) {
@@ -96,17 +122,13 @@ class AirDefense {
         rect(0, this.height - this.GROUND_HEIGHT, this.width, this.GROUND_HEIGHT);
 
         // UI --------------------------------------------------------------------
-        // // draw ammo reserve
-        // setColor("green");
-        // text(ammo, WIDTH - 55, 20);
+        setColor("green");
+        textSize(16);
+        text(this.turret.ammo, WIDTH - 55, 20);
 
-        // // draw score
-        // setColor("blue");
-        // text(score, 20, 20);
-
-        // // draw score
-        // setColor("green");
-        // text("Wave " + wave, 20, HEIGHT - 20);
+        setColor("blue");
+        textSize(16);
+        text(this.score, 10, 20);
     }
 
     checkForHit(bullet) {
