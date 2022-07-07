@@ -80,53 +80,83 @@ class BugDug {
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
+            if (gameObj.type === "block" && gameObj.solid) {
+                const collision = this.resolveCollision(gameObj, this.player);
+                if (collision) {
+                    console.log("collision: ", collision);
+                }
+                // if (collision) {
+                //     this.gameObjects.push(new CollisionEffect(gameObj.type, collision));
+                // }
+            }
         }
+    }
+
+    resolveCollision(obj1, obj2) {
+        let collision = false;
+        const collider1 = obj1.collider;
+        const collider2 = obj2.collider;
+        if (
+            // collider1.a is inside collider2
+            (collider1.a.x < collider2.b.x &&
+                collider1.a.x > collider2.a.x &&
+                collider1.a.y < collider2.d.y &&
+                collider1.a.y > collider2.a.y) ||
+            // collider1.b is inside collider2
+            (collider1.b.x < collider2.b.x &&
+                collider1.b.x > collider2.a.x &&
+                collider1.b.y < collider2.d.y &&
+                collider1.b.y > collider2.a.y) ||
+            // collider1.c is inside collider2
+            (collider1.c.x < collider2.b.x &&
+                collider1.c.x > collider2.a.x &&
+                collider1.c.y < collider2.d.y &&
+                collider1.c.y > collider2.a.y) ||
+            // collider1.d is inside collider2
+            (collider1.d.x < collider2.b.x &&
+                collider1.d.x > collider2.a.x &&
+                collider1.d.y < collider2.d.y &&
+                collider1.d.y > collider2.a.y)
+        ) {
+            collision = true;
+        }
+        if (
+            // collider2.a is inside collider1
+            (collider2.a.x < collider1.b.x &&
+                collider2.a.x > collider1.a.x &&
+                collider2.a.y < collider1.d.y &&
+                collider2.a.y > collider1.a.y) ||
+            // collider2.b is inside collider1
+            (collider2.b.x < collider1.b.x &&
+                collider2.b.x > collider1.a.x &&
+                collider2.b.y < collider1.d.y &&
+                collider2.b.y > collider1.a.y) ||
+            // collider2.c is inside collider1
+            (collider2.c.x < collider1.b.x &&
+                collider2.c.x > collider1.a.x &&
+                collider2.c.y < collider1.d.y &&
+                collider2.c.y > collider1.a.y) ||
+            // collider2.d is inside collider1
+            (collider2.d.x < collider1.b.x &&
+                collider2.d.x > collider1.a.x &&
+                collider2.d.y < collider1.d.y &&
+                collider2.d.y > collider1.a.y)
+        ) {
+            collision = true;
+        }
+
+        return collision;
     }
 
     render() {
         background(color("#9EF6FF"));
-
         noStroke();
-        for (let i = 0; i < this.terrain.blocks.length; i++) {
-            let column = this.terrain.blocks[i];
-            for (let j = 0; j < column.length; j++) {
-                switch (column[j]) {
-                    case "grass":
-                        fill("green");
-                        break;
-                    case "dirt":
-                        fill("brown");
-                        break;
-                    case "clay":
-                        fill("orange");
-                        break;
-                    case "sand":
-                        fill("beige");
-                        break;
-                    case "water":
-                        fill("blue");
-                        break;
-                    case "stone":
-                        fill("gray");
-                        break;
-                    default:
-                        console.log("unknown block type");
-                        fill("magenta");
-                }
-                rect(
-                    i * this.terrain.blockSize,
-                    j * this.terrain.blockSize + this.terrain.surfaceHeight,
-                    this.terrain.blockSize,
-                    this.terrain.blockSize
-                );
-            }
-        }
-
-        this.player.render();
 
         for (let gameObj of this.gameObjects) {
             gameObj.render();
         }
+
+        this.player.render();
 
         // draw foreground
         for (let i = 0; i < this.foregroundLayer.length; i++) {
@@ -144,6 +174,12 @@ class BugDug {
 
     loadLevel() {
         this.terrain = new Terrain(this.width, this.height, levels[this.currentLevel]);
+        this.terrain.blocks.forEach((column) => {
+            column.forEach((block) => {
+                this.gameObjects.push(block);
+            });
+        });
+
         this.player.setPosition(this.terrain.playerSpawn);
 
         this.foregroundLayer = [];

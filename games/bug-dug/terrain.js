@@ -14,21 +14,59 @@ class Terrain {
         for (let i = 0; i < this.BLOCKS_PER_ROW; i++) {
             this.blocks[i] = [];
             for (let j = 0; j < this.blockPerColumn; j++) {
+                let blockPosition = { x: i * this.blockSize, y: j * this.blockSize + levelConfig.surfaceHeight };
                 if (j === 0) {
-                    this.blocks[i][j] = levelConfig.SURFACE_BLOCK;
+                    this.blocks[i][j] = new Block(
+                        blockPosition,
+                        this.blockSize,
+                        this.blockSize,
+                        levelConfig.SURFACE_BLOCK
+                    );
                     continue;
                 }
                 if (j === this.blockPerColumn - 1) {
-                    this.blocks[i][j] = levelConfig.BEDROCK_BLOCK;
+                    this.blocks[i][j] = new Block(
+                        blockPosition,
+                        this.blockSize,
+                        this.blockSize,
+                        levelConfig.BEDROCK_BLOCK
+                    );
                     continue;
                 }
 
-                this.blocks[i][j] = levelConfig.BLOCK_TYPES[Math.floor(Math.random() * levelConfig.BLOCK_TYPES.length)];
+                this.blocks[i][j] = new Block(
+                    blockPosition,
+                    this.blockSize,
+                    this.blockSize,
+                    levelConfig.BLOCK_TYPES[Math.floor(Math.random() * levelConfig.BLOCK_TYPES.length)]
+                );
             }
         }
 
         this.surfaceHeight = levelConfig.surfaceHeight;
         this.playerSpawn = levelConfig.playerSpawn;
+
+        console.log("this.blocks: ", this.blocks);
+    }
+
+    static getColor(blockType) {
+        switch (blockType) {
+            case "grass":
+                return "green";
+            case "dirt":
+                return "brown";
+            case "clay":
+                return "orange";
+            case "sand":
+                return "beige";
+            case "water":
+                return "blue";
+            case "stone":
+                return "gray";
+            default:
+                console.log("unknown block type: ", blockType);
+                return "magenta";
+        }
     }
 
     static loadSprites() {
