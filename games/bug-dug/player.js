@@ -16,13 +16,16 @@ class Player extends GameObject {
         this.sprite = sprite;
     }
 
-    update() {
+    update(terrain) {
+        if (!this.grounded) {
+            this.position.y += terrain.gravity;
+        }
         if (keyIsDown(65)) this.position.x -= this.speed;
         if (keyIsDown(68)) this.position.x += this.speed;
 
         // if (keyIsDown(87)) this.climb();
-        if (keyIsDown(87)) this.position.y -= 1;
-        if (keyIsDown(83)) this.position.y += 1;
+        if (keyIsDown(87)) this.position.y -= 2;
+        if (keyIsDown(83)) this.position.y += 2;
 
         if (keyIsDown(32)) this.jump();
 
@@ -30,6 +33,14 @@ class Player extends GameObject {
         if (keyIsDown(39)) this.digRight();
         if (keyIsDown(40)) this.digDown();
         if (keyIsDown(37)) this.digLeft();
+
+        // constrain x
+        if (this.position.x < this.width / 2) this.setPosition({ x: this.width / 2, y: this.position.y });
+        if (this.position.x > terrain.width - this.width / 2)
+            this.setPosition({ x: terrain.width - this.width / 2, y: this.position.y });
+        // constrain y
+        if (this.position.y < this.height) this.setPosition({ x: this.position.x, y: this.height });
+        if (this.position.y > terrain.height) this.setPosition({ x: this.position.x, y: terrain.height });
 
         this.updateCollider();
     }

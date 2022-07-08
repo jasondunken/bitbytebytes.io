@@ -72,80 +72,11 @@ class BugDug {
     }
 
     update() {
-        this.player.update();
-        if (this.player.position.x < this.player.width / 2)
-            this.player.setPosition({ x: this.player.width / 2, y: this.player.position.y });
-        if (this.player.position.x > this.width - this.player.width / 2)
-            this.player.setPosition({ x: this.width - this.player.width / 2, y: this.player.position.y });
+        this.player.update(this.terrain);
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
-            if (gameObj.type === "block" && gameObj.solid) {
-                const collision = this.resolveCollision(gameObj, this.player);
-                if (collision) {
-                    console.log("collision: ", collision);
-                }
-                // if (collision) {
-                //     this.gameObjects.push(new CollisionEffect(gameObj.type, collision));
-                // }
-            }
         }
-    }
-
-    resolveCollision(obj1, obj2) {
-        let collision = false;
-        const collider1 = obj1.collider;
-        const collider2 = obj2.collider;
-        if (
-            // collider1.a is inside collider2
-            (collider1.a.x < collider2.b.x &&
-                collider1.a.x > collider2.a.x &&
-                collider1.a.y < collider2.d.y &&
-                collider1.a.y > collider2.a.y) ||
-            // collider1.b is inside collider2
-            (collider1.b.x < collider2.b.x &&
-                collider1.b.x > collider2.a.x &&
-                collider1.b.y < collider2.d.y &&
-                collider1.b.y > collider2.a.y) ||
-            // collider1.c is inside collider2
-            (collider1.c.x < collider2.b.x &&
-                collider1.c.x > collider2.a.x &&
-                collider1.c.y < collider2.d.y &&
-                collider1.c.y > collider2.a.y) ||
-            // collider1.d is inside collider2
-            (collider1.d.x < collider2.b.x &&
-                collider1.d.x > collider2.a.x &&
-                collider1.d.y < collider2.d.y &&
-                collider1.d.y > collider2.a.y)
-        ) {
-            collision = true;
-        }
-        if (
-            // collider2.a is inside collider1
-            (collider2.a.x < collider1.b.x &&
-                collider2.a.x > collider1.a.x &&
-                collider2.a.y < collider1.d.y &&
-                collider2.a.y > collider1.a.y) ||
-            // collider2.b is inside collider1
-            (collider2.b.x < collider1.b.x &&
-                collider2.b.x > collider1.a.x &&
-                collider2.b.y < collider1.d.y &&
-                collider2.b.y > collider1.a.y) ||
-            // collider2.c is inside collider1
-            (collider2.c.x < collider1.b.x &&
-                collider2.c.x > collider1.a.x &&
-                collider2.c.y < collider1.d.y &&
-                collider2.c.y > collider1.a.y) ||
-            // collider2.d is inside collider1
-            (collider2.d.x < collider1.b.x &&
-                collider2.d.x > collider1.a.x &&
-                collider2.d.y < collider1.d.y &&
-                collider2.d.y > collider1.a.y)
-        ) {
-            collision = true;
-        }
-
-        return collision;
     }
 
     render() {
@@ -159,17 +90,17 @@ class BugDug {
         this.player.render();
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                image(
-                    this.foregroundLayer[i][j],
-                    i * this.terrain.blockSize,
-                    j * this.terrain.blockSize + this.terrain.surfaceHeight,
-                    this.terrain.blockSize,
-                    this.terrain.blockSize
-                );
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         image(
+        //             this.foregroundLayer[i][j],
+        //             i * this.terrain.blockSize,
+        //             j * this.terrain.blockSize + this.terrain.surfaceHeight,
+        //             this.terrain.blockSize,
+        //             this.terrain.blockSize
+        //         );
+        //     }
+        // }
     }
 
     loadLevel() {

@@ -7,9 +7,14 @@ class Terrain {
     playerSpawn;
     surfaceHeight;
 
+    gravity;
+
     constructor(screenWidth, screenHeight, levelConfig) {
+        this.width = screenWidth;
+        this.height = screenHeight;
         this.blockSize = screenWidth / this.BLOCKS_PER_ROW;
         this.blockPerColumn = screenHeight / this.blockSize - levelConfig.surfaceHeight / this.blockSize;
+        this.gravity = levelConfig.gravity;
 
         for (let i = 0; i < this.BLOCKS_PER_ROW; i++) {
             this.blocks[i] = [];
