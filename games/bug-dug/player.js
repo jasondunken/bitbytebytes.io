@@ -20,18 +20,8 @@ class Player extends GameObject {
         if (!this.grounded) {
             this.position.y += terrain.gravity;
         }
-        if (keyIsDown(65)) this.position.x -= this.speed;
-        if (keyIsDown(68)) this.position.x += this.speed;
 
-        if (keyIsDown(87)) this.climbUp();
-        if (keyIsDown(83)) this.climbDown();
-
-        if (keyIsDown(32)) this.jump();
-
-        if (keyIsDown(38)) this.digUp(this.getBlockAbove(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(40)) this.digDown(this.getBlockBelow(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(37)) this.digLeft(this.getBlockLeft(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(39)) this.digRight(this.getBlockRight(terrain.blocks, terrain.BLOCK_SIZE));
+        this.getInput(terrain);
 
         // constrain x
         if (this.position.x < this.width / 2) this.setPosition({ x: this.width / 2, y: this.position.y });
@@ -78,6 +68,21 @@ class Player extends GameObject {
         }
 
         this.updateCollider();
+    }
+
+    getInput(terrain) {
+        if (keyIsDown(65)) this.position.x -= this.speed;
+        if (keyIsDown(68)) this.position.x += this.speed;
+
+        if (keyIsDown(87)) this.climbUp();
+        if (keyIsDown(83)) this.climbDown();
+
+        if (keyIsDown(32)) this.jump();
+
+        if (keyIsDown(38)) this.digUp(this.getBlockAbove(terrain.blocks, terrain.BLOCK_SIZE));
+        if (keyIsDown(40)) this.digDown(this.getBlockBelow(terrain.blocks, terrain.BLOCK_SIZE));
+        if (keyIsDown(37)) this.digLeft(this.getBlockLeft(terrain.blocks, terrain.BLOCK_SIZE));
+        if (keyIsDown(39)) this.digRight(this.getBlockRight(terrain.blocks, terrain.BLOCK_SIZE));
     }
 
     getBlockBelow(blocks, blockSize) {
@@ -133,11 +138,8 @@ class Player extends GameObject {
     }
     jump() {
         if (this.grounded) {
-            console.log("jump");
             this.position.y -= 30;
             this.grounded = false;
-        } else {
-            console.log("can't jump!");
         }
     }
     digUp(block) {
@@ -171,4 +173,6 @@ class DemoPlayer extends Player {
     constructor(sprite) {
         super(sprite);
     }
+
+    getInput() {}
 }
