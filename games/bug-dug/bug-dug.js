@@ -36,6 +36,7 @@ class BugDug {
     });
 
     terrain = null;
+    backgroundLayer = null;
     foregroundLayer = null;
 
     player = null;
@@ -80,8 +81,22 @@ class BugDug {
     }
 
     render() {
-        background(color("#9EF6FF"));
+        background(color(this.terrain.skyColor));
         noStroke();
+        // draw background
+        for (let i = 0; i < this.backgroundLayer.length; i++) {
+            for (let j = 0; j < this.backgroundLayer[i].length; j++) {
+                if (this.backgroundLayer[i][j] !== "none") {
+                    image(
+                        this.backgroundLayer[i][j],
+                        i * this.terrain.BLOCK_SIZE,
+                        j * this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE
+                    );
+                }
+            }
+        }
 
         for (let gameObj of this.gameObjects) {
             gameObj.render();
@@ -92,45 +107,30 @@ class BugDug {
         // draw foreground
         for (let i = 0; i < this.foregroundLayer.length; i++) {
             for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                image(
-                    this.foregroundLayer[i][j],
-                    i * this.terrain.BLOCK_SIZE,
-                    j * this.terrain.BLOCK_SIZE + this.terrain.surfaceHeight,
-                    this.terrain.BLOCK_SIZE,
-                    this.terrain.BLOCK_SIZE
-                );
+                if (this.foregroundLayer[i][j] !== "none") {
+                    image(
+                        this.foregroundLayer[i][j],
+                        i * this.terrain.BLOCK_SIZE,
+                        j * this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE
+                    );
+                }
             }
         }
     }
 
     loadLevel() {
-        this.terrain = new Terrain(this.width, this.height, levels[this.currentLevel]);
+        this.terrain = new Terrain(this.width, this.height, levels[this.currentLevel], this.sprites);
         this.terrain.blocks.forEach((column) => {
             column.forEach((block) => {
                 this.gameObjects.push(block);
             });
         });
 
-        this.player.setPosition(this.terrain.playerSpawn);
+        this.backgroundLayer = this.terrain.backgroundLayer;
+        this.foregroundLayer = this.terrain.foregroundLayer;
 
-        this.foregroundLayer = [];
-        for (let i = 0; i < this.terrain.blocks.length; i++) {
-            this.foregroundLayer[i] = [];
-            let column = this.terrain.blocks[i];
-            for (let j = 0; j < column.length; j++) {
-                let sprite = null;
-                if (j === 0) {
-                    sprite = this.sprites["grass_3"];
-                } else {
-                    sprite = this.sprites["dirt_3_0"];
-                }
-                this.foregroundLayer[i][j] = sprite;
-            }
-        }
-        for (let rndDirt = 0; rndDirt < 16; rndDirt++) {
-            let i = Math.floor(Math.random() * this.terrain.blocks.length);
-            let j = Math.floor(Math.random() * (this.terrain.blocks[0].length - 1)) + 1;
-            this.foregroundLayer[i][j] = Math.random() < 0.5 ? this.sprites["dirt_3_1"] : this.sprites["dirt_3_2"];
-        }
+        this.player.setPosition(this.terrain.playerSpawn);
     }
 }

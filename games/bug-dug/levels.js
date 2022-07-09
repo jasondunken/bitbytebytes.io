@@ -6,6 +6,7 @@ const levels = [
         gravity: 3,
         numItems: 6,
         numTraps: 3,
+        SKY_COLOR: "#9EF6FF",
         SURFACE_BLOCK: "grass",
         BEDROCK_BLOCK: "stone",
         AIR_BLOCK: "air",
