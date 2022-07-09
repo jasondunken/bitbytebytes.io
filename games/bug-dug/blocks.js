@@ -8,6 +8,9 @@ class Block extends GameObject {
         this.height = height;
         this.blockType = blockType;
         this.updateCollider();
+        if (blockType === "air" || blockType === "water") {
+            this.solid = false;
+        }
     }
 
     update() {

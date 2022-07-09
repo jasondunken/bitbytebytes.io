@@ -1,5 +1,5 @@
-const GAME_WIDTH = 400;
-const GAME_HEIGHT = 600;
+const GAME_WIDTH = 512;
+const GAME_HEIGHT = 768;
 
 let game = null;
 
@@ -90,17 +90,17 @@ class BugDug {
         this.player.render();
 
         // draw foreground
-        // for (let i = 0; i < this.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-        //         image(
-        //             this.foregroundLayer[i][j],
-        //             i * this.terrain.blockSize,
-        //             j * this.terrain.blockSize + this.terrain.surfaceHeight,
-        //             this.terrain.blockSize,
-        //             this.terrain.blockSize
-        //         );
-        //     }
-        // }
+        for (let i = 0; i < this.foregroundLayer.length; i++) {
+            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+                image(
+                    this.foregroundLayer[i][j],
+                    i * this.terrain.BLOCK_SIZE,
+                    j * this.terrain.BLOCK_SIZE + this.terrain.surfaceHeight,
+                    this.terrain.BLOCK_SIZE,
+                    this.terrain.BLOCK_SIZE
+                );
+            }
+        }
     }
 
     loadLevel() {
