@@ -39,18 +39,33 @@ class Player extends GameObject {
         if (this.position.x > terrain.width - this.width / 2)
             this.setPosition({ x: terrain.width - this.width / 2, y: this.position.y });
         // constrain y
-        if (this.position.y < this.height) this.setPosition({ x: this.position.x, y: this.height });
-        if (this.position.y > terrain.height) this.setPosition({ x: this.position.x, y: terrain.height });
+        if (this.position.y < this.height / 2) this.setPosition({ x: this.position.x, y: this.height / 2 });
+        if (this.position.y > terrain.height - this.height / 2)
+            this.setPosition({ x: this.position.x, y: terrain.height - this.height / 2 });
+
+        // look for blocks around player, check if solid
+        let block = this.getBlockBelow(terrain.blocks, terrain.BLOCK_SIZE);
+        if (block && block.solid) {
+            if (this.position.y + this.height / 2 >= block.collider.a.y) {
+                this.position.y = block.collider.a.y - this.height / 2;
+                this.grounded = true;
+            }
+        }
 
         this.updateCollider();
     }
 
+    getBlockBelow(blocks, blockSize) {
+        const index = getGridIndex(this.position, blockSize);
+        return blocks[index.x][index.y + 1];
+    }
+
     updateCollider() {
         this.collider = {
-            a: { x: this.position.x - this.width / 2, y: this.position.y - this.height },
-            b: { x: this.position.x + this.width / 2, y: this.position.y - this.height },
-            c: { x: this.position.x + this.width / 2, y: this.position.y },
-            d: { x: this.position.x - this.width / 2, y: this.position.y },
+            a: { x: this.position.x - this.width / 2, y: this.position.y - this.height / 2 },
+            b: { x: this.position.x + this.width / 2, y: this.position.y - this.height / 2 },
+            c: { x: this.position.x + this.width / 2, y: this.position.y + this.height / 2 },
+            d: { x: this.position.x - this.width / 2, y: this.position.y + this.height / 2 },
         };
     }
 
@@ -58,7 +73,13 @@ class Player extends GameObject {
         console.log("climb");
     }
     jump() {
-        console.log("jump");
+        if (this.grounded) {
+            console.log("jump");
+            this.position.y -= 30;
+            this.grounded = false;
+        } else {
+            console.log("can't jump!");
+        }
     }
     digUp() {
         console.log("digUp");
@@ -74,8 +95,12 @@ class Player extends GameObject {
     }
 
     render() {
-        fill("blue");
-        rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
+        if (this.sprite) {
+            image(this.sprite, this.position.x - this.width / 2, this.position.y - this.height / 2);
+        } else {
+            fill("blue");
+            rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
+        }
     }
 }
 
