@@ -1,3 +1,7 @@
+function getGridIndex(position, blockSize) {
+    return { x: Math.floor(position.x / blockSize), y: Math.floor(position.y / blockSize) };
+}
+
 function calculateAABBCollision(obj1, obj2) {
     const collider1 = obj1.collider;
     const collider2 = obj2.collider;
