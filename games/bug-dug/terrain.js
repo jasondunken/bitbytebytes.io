@@ -27,7 +27,6 @@ class Terrain {
         this.surfaceHeight = levelConfig.surfaceHeight;
         this.playerSpawn = levelConfig.playerSpawn;
 
-        console.log("sprites: ", sprites);
         for (let i = 0; i < this.blocksPerRow; i++) {
             this.blocks[i] = [];
             this.backgroundLayer[i] = [];
@@ -90,10 +89,6 @@ class Terrain {
             1;
             this.foregroundLayer[i][j] = Math.random() < 0.5 ? sprites["dirt_3_1"] : sprites["dirt_3_2"];
         }
-
-        console.log("this.blocks: ", this.blocks);
-        console.log("this.background: ", this.backgroundLayer);
-        console.log("this.foreground: ", this.foregroundLayer);
     }
 
     static getColor(blockType) {

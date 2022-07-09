@@ -25,5 +25,6 @@ class GameObject {
 
     setPosition(position) {
         this.position = position;
+        this.updateCollider();
     }
 }

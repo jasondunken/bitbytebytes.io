@@ -69,6 +69,7 @@ class BugDug {
         this.currentLevel = 0;
         this.gameOver = false;
         this.score = 0;
+
         this.loadLevel();
     }
 
@@ -131,6 +132,6 @@ class BugDug {
         this.backgroundLayer = this.terrain.backgroundLayer;
         this.foregroundLayer = this.terrain.foregroundLayer;
 
-        this.player.setPosition(this.terrain.playerSpawn);
+        this.player.setPosition({ x: this.terrain.playerSpawn.x, y: this.terrain.playerSpawn.y });
     }
 }
