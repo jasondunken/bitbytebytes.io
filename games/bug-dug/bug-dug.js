@@ -106,19 +106,19 @@ class BugDug {
         this.player.render();
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.terrain.BLOCK_SIZE,
-                        j * this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         if (this.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.foregroundLayer[i][j],
+        //                 i * this.terrain.BLOCK_SIZE,
+        //                 j * this.terrain.BLOCK_SIZE,
+        //                 this.terrain.BLOCK_SIZE,
+        //                 this.terrain.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
     }
 
     loadLevel() {

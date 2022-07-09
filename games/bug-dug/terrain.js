@@ -47,7 +47,8 @@ class Terrain {
                         blockPosition,
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
-                        levelConfig.SURFACE_BLOCK
+                        levelConfig.SURFACE_BLOCK,
+                        sprites["grass_3"]
                     );
                     this.backgroundLayer[i][j] = sprites["dirt_3_0"];
                     this.foregroundLayer[i][j] = sprites["grass_3"];
@@ -56,16 +57,20 @@ class Terrain {
                         blockPosition,
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
-                        levelConfig.BEDROCK_BLOCK
+                        levelConfig.BEDROCK_BLOCK,
+                        sprites["bedrock"]
                     );
                     this.backgroundLayer[i][j] = sprites["dirt_3_0"];
                     this.foregroundLayer[i][j] = sprites["dirt_3_0"];
                 } else {
+                    const blockType =
+                        levelConfig.BLOCK_TYPES[Math.floor(Math.random() * levelConfig.BLOCK_TYPES.length)];
                     this.blocks[i][j] = new Block(
                         blockPosition,
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
-                        levelConfig.BLOCK_TYPES[Math.floor(Math.random() * levelConfig.BLOCK_TYPES.length)]
+                        blockType,
+                        sprites[blockType]
                     );
                     this.backgroundLayer[i][j] = sprites["dirt_3_0"];
                     this.foregroundLayer[i][j] = sprites["dirt_3_0"];
@@ -105,6 +110,8 @@ class Terrain {
                 return "blue";
             case "stone":
                 return "gray";
+            case "bedrock":
+                return "black";
             case "air":
                 return color("#9EF6FF");
             default:
@@ -126,6 +133,12 @@ class Terrain {
         sprites["dirt_3_0"] = loadImage("./bug-dug/img/block_dirt_3_0.png");
         sprites["dirt_3_1"] = loadImage("./bug-dug/img/block_dirt_3_1.png");
         sprites["dirt_3_2"] = loadImage("./bug-dug/img/block_dirt_3_2.png");
+        sprites["dirt"] = loadImage("./bug-dug/img/block_dirt.png");
+        sprites["clay"] = loadImage("./bug-dug/img/block_clay.png");
+        sprites["sand"] = loadImage("./bug-dug/img/block_sand.png");
+        sprites["water"] = loadImage("./bug-dug/img/block_water.png");
+        sprites["stone"] = loadImage("./bug-dug/img/block_stone.png");
+        sprites["bedrock"] = loadImage("./bug-dug/img/block_bedrock.png");
         sprites["nether"] = loadImage("./bug-dug/img/block_nether.png");
         return sprites;
     }

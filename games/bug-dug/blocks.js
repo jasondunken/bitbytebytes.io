@@ -2,11 +2,12 @@ class Block extends GameObject {
     solid = true;
     sprite;
     animation;
-    constructor(position, width, height, blockType) {
+    constructor(position, width, height, blockType, sprite) {
         super("block", position);
         this.width = width;
         this.height = height;
         this.blockType = blockType;
+        this.sprite = sprite;
         this.updateCollider();
         if (blockType === "air" || blockType === "water") {
             this.solid = false;

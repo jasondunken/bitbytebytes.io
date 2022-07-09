@@ -8,7 +8,7 @@ const levels = [
         numTraps: 3,
         SKY_COLOR: "#9EF6FF",
         SURFACE_BLOCK: "grass",
-        BEDROCK_BLOCK: "stone",
+        BEDROCK_BLOCK: "bedrock",
         AIR_BLOCK: "air",
         BLOCK_TYPES: ["dirt", "clay", "sand", "water", "stone"],
         ITEM_TYPES: ["treasure", "trap"],
