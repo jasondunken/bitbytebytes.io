@@ -78,6 +78,9 @@ class BugDug {
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
+            if (gameObj.destroyed) {
+                clearForegroundAround(getGridIndex(gameObj.position, this.terrain.BLOCK_SIZE), this.foregroundLayer);
+            }
         }
     }
 
@@ -106,22 +109,23 @@ class BugDug {
         this.player.render();
 
         // draw foreground
-        // for (let i = 0; i < this.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-        //         if (this.foregroundLayer[i][j] !== "none") {
-        //             image(
-        //                 this.foregroundLayer[i][j],
-        //                 i * this.terrain.BLOCK_SIZE,
-        //                 j * this.terrain.BLOCK_SIZE,
-        //                 this.terrain.BLOCK_SIZE,
-        //                 this.terrain.BLOCK_SIZE
-        //             );
-        //         }
-        //     }
-        // }
+        for (let i = 0; i < this.foregroundLayer.length; i++) {
+            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+                if (this.foregroundLayer[i][j] !== "none") {
+                    image(
+                        this.foregroundLayer[i][j],
+                        i * this.terrain.BLOCK_SIZE,
+                        j * this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE,
+                        this.terrain.BLOCK_SIZE
+                    );
+                }
+            }
+        }
     }
 
     loadLevel() {
+        this.gameObjects = [];
         this.terrain = new Terrain(this.width, this.height, levels[this.currentLevel], this.sprites);
         this.terrain.blocks.forEach((column) => {
             column.forEach((block) => {
