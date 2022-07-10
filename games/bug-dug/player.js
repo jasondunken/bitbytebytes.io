@@ -3,6 +3,11 @@ class Player extends GameObject {
     height = 24;
     grounded = false;
     speed = 2;
+    blocks = [];
+
+    MINING_TIME = 60;
+    mining = 0;
+    pickaxeStrength = 33;
 
     collider = {
         a: { x: 0, y: 0 },
@@ -17,11 +22,13 @@ class Player extends GameObject {
     }
 
     update(terrain) {
+        if (this.mining) {
+            this.mining--;
+        }
         if (!this.grounded) {
             this.position.y += terrain.gravity;
         }
-
-        this.getInput(terrain);
+        this.getInput();
 
         // constrain x
         if (this.position.x < this.width / 2) this.setPosition({ x: this.width / 2, y: this.position.y });
@@ -32,8 +39,15 @@ class Player extends GameObject {
         if (this.position.y > terrain.height - this.height / 2)
             this.setPosition({ x: this.position.x, y: terrain.height - this.height / 2 });
 
-        // look for blocks around player, check if solid
-        let block = this.getBlockBelow(terrain.blocks, terrain.BLOCK_SIZE);
+        // check blocks around player
+        this.blocks = getAdjacentBlocks(this.position, terrain.blocks, terrain.BLOCK_SIZE);
+        let block = this.blocks.above;
+        if (block && block.solid) {
+            if (this.position.y - this.height / 2 <= block.collider.d.y) {
+                this.position.y = block.collider.d.y + this.height / 2;
+            }
+        }
+        block = this.blocks.below;
         if (block && block.solid) {
             if (this.position.y + this.height / 2 >= block.collider.a.y) {
                 this.position.y = block.collider.a.y - this.height / 2;
@@ -48,19 +62,13 @@ class Player extends GameObject {
         ) {
             this.grounded = false;
         }
-        block = this.getBlockAbove(terrain.blocks, terrain.BLOCK_SIZE);
-        if (block && block.solid) {
-            if (this.position.y - this.height / 2 <= block.collider.d.y) {
-                this.position.y = block.collider.d.y + this.height / 2;
-            }
-        }
-        block = this.getBlockLeft(terrain.blocks, terrain.BLOCK_SIZE);
+        block = this.blocks.left;
         if (block && block.solid) {
             if (this.position.x - this.width / 2 <= block.collider.b.x) {
                 this.position.x = block.collider.b.x + this.width / 2;
             }
         }
-        block = this.getBlockRight(terrain.blocks, terrain.BLOCK_SIZE);
+        block = this.blocks.right;
         if (block && block.solid) {
             if (this.position.x + this.width / 2 >= block.collider.a.x) {
                 this.position.x = block.collider.a.x - this.width / 2;
@@ -70,51 +78,18 @@ class Player extends GameObject {
         this.updateCollider();
     }
 
-    getInput(terrain) {
-        if (keyIsDown(65)) this.position.x -= this.speed;
-        if (keyIsDown(68)) this.position.x += this.speed;
-
+    getInput() {
         if (keyIsDown(87)) this.climbUp();
         if (keyIsDown(83)) this.climbDown();
+        if (keyIsDown(65)) this.moveLeft();
+        if (keyIsDown(68)) this.moveRight();
 
         if (keyIsDown(32)) this.jump();
 
-        if (keyIsDown(38)) this.digUp(this.getBlockAbove(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(40)) this.digDown(this.getBlockBelow(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(37)) this.digLeft(this.getBlockLeft(terrain.blocks, terrain.BLOCK_SIZE));
-        if (keyIsDown(39)) this.digRight(this.getBlockRight(terrain.blocks, terrain.BLOCK_SIZE));
-    }
-
-    getBlockBelow(blocks, blockSize) {
-        const index = getGridIndex(this.position, blockSize);
-        if (index + 1 > blocks[index.x].length - 1) {
-            return null;
-        }
-        return blocks[index.x][index.y + 1];
-    }
-
-    getBlockAbove(blocks, blockSize) {
-        const index = getGridIndex(this.position, blockSize);
-        if (index.y < 1) {
-            return null;
-        }
-        return blocks[index.x][index.y - 1];
-    }
-
-    getBlockLeft(blocks, blockSize) {
-        const index = getGridIndex(this.position, blockSize);
-        if (index.x < 1) {
-            return null;
-        }
-        return blocks[index.x - 1][index.y];
-    }
-
-    getBlockRight(blocks, blockSize) {
-        const index = getGridIndex(this.position, blockSize);
-        if (index.x + 1 > blocks.length - 1) {
-            return null;
-        }
-        return blocks[index.x + 1][index.y];
+        if (keyIsDown(38)) this.dig("up");
+        if (keyIsDown(40)) this.dig("down");
+        if (keyIsDown(37)) this.dig("left");
+        if (keyIsDown(39)) this.dig("right");
     }
 
     updateCollider() {
@@ -136,27 +111,36 @@ class Player extends GameObject {
         this.position.y += 2;
         this.grounded = false;
     }
+    moveLeft() {
+        this.position.x -= this.speed;
+    }
+    moveRight() {
+        this.position.x += this.speed;
+    }
     jump() {
         if (this.grounded) {
             this.position.y -= 30;
             this.grounded = false;
         }
     }
-    digUp(block) {
-        console.log("digUp");
-        block.solid = false;
-    }
-    digDown(block) {
-        console.log("digDown");
-        block.solid = false;
-    }
-    digLeft(block) {
-        console.log("digLeft");
-        block.solid = false;
-    }
-    digRight(block) {
-        console.log("digRight");
-        block.solid = false;
+    dig(direction) {
+        if (!this.mining) {
+            this.mining = this.MINING_TIME;
+            switch (direction) {
+                case "up":
+                    this.blocks.above.takeDamage(this.pickaxeStrength);
+                    break;
+                case "down":
+                    this.blocks.below.takeDamage(this.pickaxeStrength);
+                    break;
+                case "left":
+                    this.blocks.left.takeDamage(this.pickaxeStrength);
+                    break;
+                case "right":
+                    this.blocks.right.takeDamage(this.pickaxeStrength);
+                    break;
+            }
+        }
     }
 
     render() {
@@ -173,6 +157,4 @@ class DemoPlayer extends Player {
     constructor(sprite) {
         super(sprite);
     }
-
-    getInput() {}
 }
