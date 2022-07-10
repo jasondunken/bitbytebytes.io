@@ -10,7 +10,7 @@ const levels = [
         SURFACE_BLOCK: "grass",
         BEDROCK_BLOCK: "bedrock",
         AIR_BLOCK: "air",
-        BLOCK_TYPES: ["dirt", "clay", "sand", "water", "stone"],
+        BLOCK_TYPES: ["dirt", "clay", "sand", "stone"],
         ITEM_TYPES: ["treasure", "trap"],
     },
 ];
