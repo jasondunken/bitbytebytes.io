@@ -2,6 +2,58 @@ function getGridIndex(position, blockSize) {
     return { x: Math.floor(position.x / blockSize), y: Math.floor(position.y / blockSize) };
 }
 
+function getAdjacentBlocks(position, blocks, blockSize) {
+    const index = getGridIndex(position, blockSize);
+    return {
+        below: getBlockBelow(index, blocks),
+        above: getBlockAbove(index, blocks),
+        left: getBlockLeft(index, blocks),
+        right: getBlockRight(index, blocks),
+    };
+}
+
+function getBlockBelow(index, blocks) {
+    if (index + 1 > blocks[index.x].length - 1) {
+        return null;
+    }
+    return blocks[index.x][index.y + 1];
+}
+
+function getBlockAbove(index, blocks) {
+    if (index.y < 1) {
+        return null;
+    }
+    return blocks[index.x][index.y - 1];
+}
+
+function getBlockLeft(index, blocks) {
+    if (index.x < 1) {
+        return null;
+    }
+    return blocks[index.x - 1][index.y];
+}
+
+function getBlockRight(index, blocks) {
+    if (index.x + 1 > blocks.length - 1) {
+        return null;
+    }
+    return blocks[index.x + 1][index.y];
+}
+
+function clearForegroundAround(index, foreground) {
+    const rad = 2.5;
+    foreground.forEach((column, i) => {
+        column.forEach((tile, j) => {
+            let a = (i - index.x) ** 2;
+            let b = (j - index.y) ** 2;
+            let ab = a + b;
+            if (ab < rad ** 2) {
+                foreground[i][j] = "none";
+            }
+        });
+    });
+}
+
 function calculateAABBCollision(obj1, obj2) {
     const collider1 = obj1.collider;
     const collider2 = obj2.collider;
