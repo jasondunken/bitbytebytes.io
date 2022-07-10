@@ -1,13 +1,19 @@
 class Block extends GameObject {
     solid = true;
+    fixed = true;
     sprite;
     animation;
+
+    MAX_HEALTH = 99;
+    health;
+    destroyed = false;
     constructor(position, width, height, blockType, sprite) {
         super("block", position);
         this.width = width;
         this.height = height;
         this.blockType = blockType;
         this.sprite = sprite;
+        this.health = this.MAX_HEALTH;
         this.updateCollider();
         if (blockType === "air" || blockType === "water") {
             this.solid = false;
@@ -30,12 +36,22 @@ class Block extends GameObject {
         };
     }
 
+    takeDamage(dmg) {
+        this.health -= dmg;
+        if (this.health <= 0) {
+            this.destroyed = true;
+            this.solid = false;
+        }
+    }
+
     render() {
-        if (this.sprite) {
-            image(this.sprite, this.position.x, this.position.y, this.width, this.height);
-        } else {
-            fill(Terrain.getColor(this.blockType));
-            rect(this.position.x, this.position.y, this.width, this.height);
+        if (!this.destroyed) {
+            if (this.sprite) {
+                image(this.sprite, this.position.x, this.position.y, this.width, this.height);
+            } else {
+                fill(Terrain.getColor(this.blockType));
+                rect(this.position.x, this.position.y, this.width, this.height);
+            }
         }
     }
 }
