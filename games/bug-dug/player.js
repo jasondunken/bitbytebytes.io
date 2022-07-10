@@ -5,7 +5,7 @@ class Player extends GameObject {
     speed = 2;
     blocks = [];
 
-    MINING_TIME = 60;
+    MINING_TIME = 30;
     mining = 0;
     pickaxeStrength = 33;
 

@@ -1,6 +1,5 @@
 class Block extends GameObject {
     solid = true;
-    fixed = true;
     sprite;
     animation;
 
@@ -37,10 +36,12 @@ class Block extends GameObject {
     }
 
     takeDamage(dmg) {
-        this.health -= dmg;
-        if (this.health <= 0) {
-            this.destroyed = true;
-            this.solid = false;
+        if (this.blockType !== "bedrock") {
+            this.health -= dmg;
+            if (this.health <= 0) {
+                this.destroyed = true;
+                this.solid = false;
+            }
         }
     }
 
