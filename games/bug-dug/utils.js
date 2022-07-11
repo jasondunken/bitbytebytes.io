@@ -40,14 +40,13 @@ function getBlockRight(index, blocks) {
     return blocks[index.x + 1][index.y];
 }
 
-function clearForegroundAround(index, foreground) {
-    const rad = 2.5;
+function clearForegroundAround(index, foreground, radius = 2.5) {
     foreground.forEach((column, i) => {
         column.forEach((tile, j) => {
             let a = (i - index.x) ** 2;
             let b = (j - index.y) ** 2;
             let ab = a + b;
-            if (ab < rad ** 2) {
+            if (ab < radius ** 2) {
                 foreground[i][j] = "none";
             }
         });
