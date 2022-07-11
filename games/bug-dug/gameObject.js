@@ -28,3 +28,23 @@ class GameObject {
         this.updateCollider();
     }
 }
+
+class Item extends GameObject {
+    collected = false;
+    constructor(position, sprite) {
+        super("item", position);
+        this.sprite = sprite;
+    }
+
+    render() {
+        if (this.sprite) {
+            image(
+                this.sprite,
+                this.position.x + this.sprite.width / 2,
+                this.position.y + this.sprite.height,
+                this.sprite.width,
+                this.sprite.height
+            );
+        }
+    }
+}

@@ -13,6 +13,8 @@ class Terrain {
     backgroundLayer = [];
     foregroundLayer = [];
 
+    items = [];
+
     constructor(screenWidth, screenHeight, levelConfig, sprites) {
         this.width = screenWidth;
         this.height = screenHeight;
@@ -22,6 +24,7 @@ class Terrain {
         this.skyColor = levelConfig.SKY_COLOR;
         this.backgroundLayer = [];
         this.foregroundLayer = [];
+        this.items = [];
 
         this.gravity = levelConfig.gravity;
         this.surfaceHeight = levelConfig.surfaceHeight;
@@ -94,6 +97,48 @@ class Terrain {
             1;
             this.foregroundLayer[i][j] = Math.random() < 0.5 ? sprites["dirt_3_1"] : sprites["dirt_3_2"];
         }
+        this.addStuff(levelConfig, sprites);
+    }
+
+    addStuff(levelConfig, sprites) {
+        let firstPlatform = 12;
+        let platformSpacing = 5;
+
+        for (let i = 0; i < levelConfig.numEnemies; i++) {
+            let platformWidth = Math.floor(Math.random() * 4) + 3;
+
+            let xIndex = Math.floor(Math.random() * this.blocksPerRow);
+            console.log("rnd: ", xIndex);
+            if (xIndex + platformWidth > this.blocksPerRow - 1) {
+                xIndex = xIndex - platformWidth;
+            }
+            let chestIndex = Math.floor(Math.random() * platformWidth);
+
+            for (let j = 0; j < platformWidth; j++) {
+                let blockAbove = this.blocks[xIndex + j][firstPlatform + i * platformSpacing - 1];
+                blockAbove.solid = false;
+                blockAbove.sprite = null;
+                blockAbove.blockType = "none";
+
+                if (j === chestIndex) {
+                    this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
+                }
+
+                let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
+                block.blockType = "bedrock";
+                block.solid = true;
+
+                if (j === 0) {
+                    block.sprite = sprites["cave_floor_1"];
+                    continue;
+                }
+                if (j === platformWidth - 1) {
+                    block.sprite = sprites["cave_floor_6"];
+                    continue;
+                }
+                block.sprite = sprites["cave_floor_2"];
+            }
+        }
     }
 
     static getColor(blockType) {
@@ -106,14 +151,14 @@ class Terrain {
                 return "orange";
             case "sand":
                 return "beige";
-            case "water":
-                return "blue";
             case "stone":
                 return "gray";
             case "bedrock":
                 return "black";
             case "air":
                 return color("#9EF6FF");
+            case "none":
+                return color("#00000000");
             default:
                 console.log("unknown block type: ", blockType);
                 return "magenta";
@@ -122,13 +167,6 @@ class Terrain {
 
     static loadSprites() {
         let sprites = {};
-        sprites["grass_1"] = loadImage("./bug-dug/img/block_grass_1.png");
-        sprites["dirt_1_1"] = loadImage("./bug-dug/img/block_dirt_1_1.png");
-        sprites["dirt_1_2"] = loadImage("./bug-dug/img/block_dirt_1_2.png");
-        sprites["grass_2"] = loadImage("./bug-dug/img/block_grass_2.png");
-        sprites["dirt_2_0"] = loadImage("./bug-dug/img/block_dirt_2_0.png");
-        sprites["dirt_2_1"] = loadImage("./bug-dug/img/block_dirt_2_1.png");
-        sprites["dirt_2_2"] = loadImage("./bug-dug/img/block_dirt_2_2.png");
         sprites["grass_3"] = loadImage("./bug-dug/img/block_grass_3.png");
         sprites["dirt_3_0"] = loadImage("./bug-dug/img/block_dirt_3_0.png");
         sprites["dirt_3_1"] = loadImage("./bug-dug/img/block_dirt_3_1.png");
@@ -136,10 +174,26 @@ class Terrain {
         sprites["dirt"] = loadImage("./bug-dug/img/block_dirt.png");
         sprites["clay"] = loadImage("./bug-dug/img/block_clay.png");
         sprites["sand"] = loadImage("./bug-dug/img/block_sand.png");
-        sprites["water"] = loadImage("./bug-dug/img/block_water.png");
         sprites["stone"] = loadImage("./bug-dug/img/block_stone.png");
         sprites["bedrock"] = loadImage("./bug-dug/img/block_bedrock.png");
         sprites["nether"] = loadImage("./bug-dug/img/block_nether.png");
+        sprites["cave_floor_1"] = loadImage("./bug-dug/img/cave_floor_1.png");
+        sprites["cave_floor_2"] = loadImage("./bug-dug/img/cave_floor_2.png");
+        sprites["cave_floor_3"] = loadImage("./bug-dug/img/cave_floor_3.png");
+        sprites["cave_floor_4"] = loadImage("./bug-dug/img/cave_floor_4.png");
+        sprites["cave_floor_5"] = loadImage("./bug-dug/img/cave_floor_5.png");
+        sprites["cave_floor_6"] = loadImage("./bug-dug/img/cave_floor_6.png");
+        sprites["cave_wall"] = loadImage("./bug-dug/img/cave_wall.png");
+        sprites["cave_wall_L"] = loadImage("./bug-dug/img/cave_wall_L.png");
+        sprites["cave_wall_R"] = loadImage("./bug-dug/img/cave_wall_R.png");
+        sprites["cave_wall_top_1"] = loadImage("./bug-dug/img/cave_wall_top_1.png");
+        sprites["cave_wall_top_2"] = loadImage("./bug-dug/img/cave_wall_top_2.png");
+        sprites["cave_wall_top_3"] = loadImage("./bug-dug/img/cave_wall_top_3.png");
+        sprites["cave_wall_top_4"] = loadImage("./bug-dug/img/cave_wall_top_4.png");
+        sprites["cave_wall_top_5"] = loadImage("./bug-dug/img/cave_wall_top_5.png");
+        sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
+        sprites["chest"] = loadImage("./bug-dug/img/chest.png");
+        sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
         return sprites;
     }
 }

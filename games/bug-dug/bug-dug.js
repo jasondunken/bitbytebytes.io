@@ -107,6 +107,14 @@ class BugDug {
         }
 
         this.player.render();
+        clearForegroundAround(
+            getGridIndex(this.player.position, this.terrain.BLOCK_SIZE),
+            this.terrain.foregroundLayer,
+            1.75
+        );
+        for (let item of this.terrain.items) {
+            item.render();
+        }
 
         // draw foreground
         for (let i = 0; i < this.foregroundLayer.length; i++) {
