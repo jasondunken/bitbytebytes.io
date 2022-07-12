@@ -1,6 +1,6 @@
 class Player extends GameObject {
-    width = 24;
-    height = 24;
+    width = 32;
+    height = 32;
     grounded = false;
     speed = 2;
     blocks = [];
@@ -33,7 +33,7 @@ class Player extends GameObject {
         super("player");
         this.state = Player.STATE.IDLE;
         this.animations = {
-            idle: new Animation(spriteSheets["idle"], 60, true),
+            idle: new Animation(spriteSheets["idle"], 240, true),
             walk: new Animation(spriteSheets["walk"], 60, true),
         };
     }
@@ -133,11 +133,11 @@ class Player extends GameObject {
     }
     moveLeft() {
         this.position.x -= this.speed;
-        this.walking = true;
+        this.state = Player.STATE.WALKING;
     }
     moveRight() {
         this.position.x += this.speed;
-        this.walking = true;
+        this.state = Player.STATE.WALKING;
     }
     jump() {
         if (this.grounded) {
@@ -167,7 +167,14 @@ class Player extends GameObject {
 
     render() {
         if (this.currentAnimation) {
-            image(this.currentAnimation.currentFrame, this.position.x - 21, this.position.y - 20, 32, 32);
+            const sprite = this.currentAnimation.currentFrame;
+            image(
+                sprite,
+                this.position.x - sprite.width / 2,
+                this.position.y - sprite.height / 2,
+                sprite.width,
+                sprite.height
+            );
         } else {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
@@ -176,8 +183,8 @@ class Player extends GameObject {
 
     static loadSpriteSheets() {
         let spriteSheets = {};
-        spriteSheets["idle"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
-        spriteSheets["walk"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
+        spriteSheets["idle"] = loadImage("./bug-dug/img/animations/big_mushroom_idle.png");
+        spriteSheets["walk"] = loadImage("./bug-dug/img/animations/big_mushroom_walk.png");
         return spriteSheets;
     }
 }
