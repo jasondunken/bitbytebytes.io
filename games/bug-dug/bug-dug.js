@@ -5,11 +5,13 @@ let game = null;
 
 // p5.js functions ------------------------>
 function preload() {
-    let sprites = Terrain.loadSprites();
+    let blockSprites = LevelArchitect.loadSprites();
+    let playerSprites = Player.loadSpriteSheets();
+    let enemySprites = Enemy.loadSpriteSheets();
 
     let font = loadFont("./bug-dug/font/PressStart2P.ttf");
 
-    game = new BugDug(GAME_WIDTH, GAME_HEIGHT, sprites, font);
+    game = new BugDug(GAME_WIDTH, GAME_HEIGHT, blockSprites, playerSprites, enemySprites, font);
 }
 
 function setup() {
@@ -42,11 +44,15 @@ class BugDug {
     player = null;
     currentLevel = 0;
 
-    constructor(width, height, sprites, font) {
+    constructor(width, height, blockSprites, playerSprites, enemySprites, font) {
         this.width = width;
         this.height = height;
-        this.sprites = sprites;
+        this.blockSprites = blockSprites;
+        this.playerSprites = playerSprites;
+        this.enemySprites = enemySprites;
         this.font = font;
+        this.playerSprites = playerSprites;
+
         this.demo = true;
         this.gameOver = true;
         this.score = 0;
@@ -55,13 +61,13 @@ class BugDug {
 
     startDemo() {
         this.demo = true;
-        this.player = new DemoPlayer(this.sprites["player"]);
+        this.player = new DemoPlayer(this.playerSprites);
         this.startGame();
     }
 
     start1Player() {
         this.demo = false;
-        this.player = new Player(this.sprites["player"]);
+        this.player = new Player(this.playerSprites);
         this.startGame();
     }
 
@@ -117,24 +123,24 @@ class BugDug {
         }
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.terrain.BLOCK_SIZE,
-                        j * this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         if (this.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.foregroundLayer[i][j],
+        //                 i * this.terrain.BLOCK_SIZE,
+        //                 j * this.terrain.BLOCK_SIZE,
+        //                 this.terrain.BLOCK_SIZE,
+        //                 this.terrain.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
     }
 
     loadLevel() {
         this.gameObjects = [];
-        this.terrain = new Terrain(this.width, this.height, levels[this.currentLevel], this.sprites);
+        this.terrain = new LevelArchitect(this.width, this.height, levels[this.currentLevel], this.blockSprites);
         this.terrain.blocks.forEach((column) => {
             column.forEach((block) => {
                 this.gameObjects.push(block);

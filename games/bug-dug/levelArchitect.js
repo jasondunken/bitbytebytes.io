@@ -1,4 +1,4 @@
-class Terrain {
+class LevelArchitect {
     BLOCK_SIZE = 32;
     blocks = [];
 
@@ -108,7 +108,6 @@ class Terrain {
             let platformWidth = Math.floor(Math.random() * 4) + 3;
 
             let xIndex = Math.floor(Math.random() * this.blocksPerRow);
-            console.log("rnd: ", xIndex);
             if (xIndex + platformWidth > this.blocksPerRow - 1) {
                 xIndex = xIndex - platformWidth;
             }
@@ -121,7 +120,8 @@ class Terrain {
                 blockAbove.blockType = "none";
 
                 if (j === chestIndex) {
-                    this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
+                    // this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
+                    this.items.push(new Item(blockAbove.position, sprites["white-key"]));
                 }
 
                 let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
@@ -194,6 +194,8 @@ class Terrain {
         sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
         sprites["chest"] = loadImage("./bug-dug/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
+        sprites["sprite-sheet-mushroom"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
+        sprites["white-key"] = loadImage("./bug-dug/img/animations/White_Key.png");
         return sprites;
     }
 }

@@ -9,6 +9,19 @@ class Player extends GameObject {
     mining = 0;
     pickaxeStrength = 33;
 
+    animations;
+    currentAnimation = null;
+
+    static STATE = {
+        IDLE: "idle",
+        WALKING: "walk",
+        JUMPING: "jump",
+        CLIMBING: "climb",
+        ATTACKING: "attack",
+        HURT: "hurt",
+        DEAD: "dead",
+    };
+
     collider = {
         a: { x: 0, y: 0 },
         b: { x: 0, y: 0 },
@@ -16,12 +29,19 @@ class Player extends GameObject {
         d: { x: 0, y: 0 },
     };
 
-    constructor(sprite) {
+    constructor(spriteSheets) {
         super("player");
-        this.sprite = sprite;
+        this.state = Player.STATE.IDLE;
+        this.animations = {
+            idle: new Animation(spriteSheets["idle"], 60, true),
+            walk: new Animation(spriteSheets["walk"], 60, true),
+        };
     }
 
     update(terrain) {
+        // console.log("animation: ", this.currentAnimation);
+        this.currentAnimation = this.animations[this.state];
+        this.currentAnimation.update();
         if (this.mining) {
             this.mining--;
         }
@@ -113,9 +133,11 @@ class Player extends GameObject {
     }
     moveLeft() {
         this.position.x -= this.speed;
+        this.walking = true;
     }
     moveRight() {
         this.position.x += this.speed;
+        this.walking = true;
     }
     jump() {
         if (this.grounded) {
@@ -144,17 +166,24 @@ class Player extends GameObject {
     }
 
     render() {
-        if (this.sprite) {
-            image(this.sprite, this.position.x - this.width / 2, this.position.y - this.height / 2);
+        if (this.currentAnimation) {
+            image(this.currentAnimation.currentFrame, this.position.x - 21, this.position.y - 20, 32, 32);
         } else {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
         }
     }
+
+    static loadSpriteSheets() {
+        let spriteSheets = {};
+        spriteSheets["idle"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
+        spriteSheets["walk"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
+        return spriteSheets;
+    }
 }
 
 class DemoPlayer extends Player {
-    constructor(sprite) {
-        super(sprite);
+    constructor(spriteSheets) {
+        super(spriteSheets);
     }
 }

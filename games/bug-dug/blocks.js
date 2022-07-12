@@ -50,7 +50,7 @@ class Block extends GameObject {
             if (this.sprite) {
                 image(this.sprite, this.position.x, this.position.y, this.width, this.height);
             } else {
-                fill(Terrain.getColor(this.blockType));
+                fill(LevelArchitect.getColor(this.blockType));
                 rect(this.position.x, this.position.y, this.width, this.height);
             }
         }

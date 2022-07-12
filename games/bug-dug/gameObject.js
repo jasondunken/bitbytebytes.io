@@ -31,20 +31,15 @@ class GameObject {
 
 class Item extends GameObject {
     collected = false;
-    constructor(position, sprite) {
+    constructor(position, spriteSheet) {
         super("item", position);
-        this.sprite = sprite;
+        this.animation = new Animation(spriteSheet, 90, true);
     }
 
     render() {
-        if (this.sprite) {
-            image(
-                this.sprite,
-                this.position.x + this.sprite.width / 2,
-                this.position.y + this.sprite.height,
-                this.sprite.width,
-                this.sprite.height
-            );
+        if (this.animation) {
+            this.animation.update();
+            image(this.animation.currentFrame, this.position.x + 8, this.position.y + 16, 16, 16);
         }
     }
 }
