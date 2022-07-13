@@ -62,7 +62,7 @@ class LevelArchitect {
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
                         levelConfig.BEDROCK_BLOCK,
-                        blockSprites["bedrock"]
+                        blockSprites["cave_wall"]
                     );
                     this.backgroundLayer[i][j] = blockSprites["dirt_3_0"];
                     this.foregroundLayer[i][j] = blockSprites["dirt_3_0"];
@@ -81,7 +81,7 @@ class LevelArchitect {
                 }
             }
         }
-        for (let rndDirt = 0; rndDirt < 16; rndDirt++) {
+        for (let rndDirt = 0; rndDirt < 32; rndDirt++) {
             let i = Math.floor(Math.random() * this.blocks.length);
             let j =
                 Math.floor(Math.random() * (this.blocks[0].length - (this.surfaceHeight / this.BLOCK_SIZE + 1))) +
@@ -121,13 +121,14 @@ class LevelArchitect {
                 blockAbove.sprite = null;
                 blockAbove.blockType = "none";
 
-                if (j === chestIndex) {
-                    // this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
-                    this.items.push(new Item(blockAbove.position, blockSprites["white-key"]));
-                }
                 if (j === enemyIndex) {
-                    // this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
-                    this.enemies.push(new Enemy(blockAbove.position, enemySprites));
+                    this.enemies.push(new Enemy({ ...blockAbove.position }, enemySprites));
+                }
+                if (j === chestIndex) {
+                    this.items.push(new Item({ ...blockAbove.position }, blockSprites["white-key"]));
+                }
+                if (j !== chestIndex) {
+                    this.items.push(new Item({ ...blockAbove.position }, blockSprites["coin-gold"]));
                 }
 
                 let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
@@ -202,6 +203,7 @@ class LevelArchitect {
         sprites["chest"] = loadImage("./bug-dug/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
         sprites["white-key"] = loadImage("./bug-dug/img/animations/White_Key.png");
+        sprites["coin-gold"] = loadImage("./bug-dug/img/animations/coin_gold.png");
         sprites["block-damage"] = loadImage("./bug-dug/img/animations/block_damage.png");
         return sprites;
     }

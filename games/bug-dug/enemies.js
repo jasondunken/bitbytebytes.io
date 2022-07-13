@@ -20,6 +20,8 @@ class Enemy extends Entity {
             "walk-left": new Animation(spriteSheets["walk-left"], 60, true),
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
         };
+        this.currentAnimation = this.animations["idle"];
+        this.currentAnimation.time = Math.random() * this.currentAnimation.duration;
     }
 
     getInput() {

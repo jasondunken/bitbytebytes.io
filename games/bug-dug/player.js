@@ -68,11 +68,8 @@ class Player extends Entity {
         }
     }
     dig(direction) {
-        console.log("blocks: ", this.blocks);
         if (!this.mining) {
             this.mining = this.MINING_TIME;
-            console.log("blocks: ", this.blocks);
-            console.log("direction: ", direction);
             switch (direction) {
                 case "up":
                     this.blocks.above.takeDamage(this.pickaxeStrength);

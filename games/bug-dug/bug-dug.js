@@ -177,7 +177,7 @@ class BugDug {
         this.backgroundLayer = this.terrain.backgroundLayer;
         this.foregroundLayer = this.terrain.foregroundLayer;
 
-        this.player.setPosition({ x: this.terrain.playerSpawn.x, y: this.terrain.playerSpawn.y });
+        this.player.setPosition({ ...this.terrain.playerSpawn });
 
         this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
     }
