@@ -14,8 +14,9 @@ class LevelArchitect {
     foregroundLayer = [];
 
     items = [];
+    enemies = [];
 
-    constructor(screenWidth, screenHeight, levelConfig, sprites) {
+    constructor(screenWidth, screenHeight, levelConfig, blockSprites, enemySprites) {
         this.width = screenWidth;
         this.height = screenHeight;
         this.blocksPerColumn = screenHeight / this.BLOCK_SIZE;
@@ -51,20 +52,20 @@ class LevelArchitect {
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
                         levelConfig.SURFACE_BLOCK,
-                        sprites["grass_3"]
+                        blockSprites["grass_3"]
                     );
-                    this.backgroundLayer[i][j] = sprites["dirt_3_0"];
-                    this.foregroundLayer[i][j] = sprites["grass_3"];
+                    this.backgroundLayer[i][j] = blockSprites["dirt_3_0"];
+                    this.foregroundLayer[i][j] = blockSprites["grass_3"];
                 } else if (j === this.blocksPerColumn - 1) {
                     this.blocks[i][j] = new Block(
                         blockPosition,
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
                         levelConfig.BEDROCK_BLOCK,
-                        sprites["bedrock"]
+                        blockSprites["bedrock"]
                     );
-                    this.backgroundLayer[i][j] = sprites["dirt_3_0"];
-                    this.foregroundLayer[i][j] = sprites["dirt_3_0"];
+                    this.backgroundLayer[i][j] = blockSprites["dirt_3_0"];
+                    this.foregroundLayer[i][j] = blockSprites["dirt_3_0"];
                 } else {
                     const blockType =
                         levelConfig.BLOCK_TYPES[Math.floor(Math.random() * levelConfig.BLOCK_TYPES.length)];
@@ -73,10 +74,10 @@ class LevelArchitect {
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
                         blockType,
-                        sprites[blockType]
+                        blockSprites[blockType]
                     );
-                    this.backgroundLayer[i][j] = sprites["dirt_3_0"];
-                    this.foregroundLayer[i][j] = sprites["dirt_3_0"];
+                    this.backgroundLayer[i][j] = blockSprites["dirt_3_0"];
+                    this.foregroundLayer[i][j] = blockSprites["dirt_3_0"];
                 }
             }
         }
@@ -86,7 +87,7 @@ class LevelArchitect {
                 Math.floor(Math.random() * (this.blocks[0].length - (this.surfaceHeight / this.BLOCK_SIZE + 1))) +
                 this.surfaceHeight / this.BLOCK_SIZE +
                 1;
-            this.backgroundLayer[i][j] = Math.random() < 0.5 ? sprites["dirt_3_1"] : sprites["dirt_3_2"];
+            this.backgroundLayer[i][j] = Math.random() < 0.5 ? blockSprites["dirt_3_1"] : blockSprites["dirt_3_2"];
         }
         for (let rndDirt = 0; rndDirt < 16; rndDirt++) {
             let i = Math.floor(Math.random() * this.blocks.length);
@@ -95,12 +96,12 @@ class LevelArchitect {
                 this.surfaceHeight / this.BLOCK_SIZE +
                 1;
             1;
-            this.foregroundLayer[i][j] = Math.random() < 0.5 ? sprites["dirt_3_1"] : sprites["dirt_3_2"];
+            this.foregroundLayer[i][j] = Math.random() < 0.5 ? blockSprites["dirt_3_1"] : blockSprites["dirt_3_2"];
         }
-        this.addStuff(levelConfig, sprites);
+        this.addStuff(levelConfig, blockSprites, enemySprites);
     }
 
-    addStuff(levelConfig, sprites) {
+    addStuff(levelConfig, blockSprites, enemySprites) {
         let firstPlatform = 12;
         let platformSpacing = 5;
 
@@ -112,6 +113,7 @@ class LevelArchitect {
                 xIndex = xIndex - platformWidth;
             }
             let chestIndex = Math.floor(Math.random() * platformWidth);
+            let enemyIndex = Math.floor(Math.random() * platformWidth);
 
             for (let j = 0; j < platformWidth; j++) {
                 let blockAbove = this.blocks[xIndex + j][firstPlatform + i * platformSpacing - 1];
@@ -121,7 +123,11 @@ class LevelArchitect {
 
                 if (j === chestIndex) {
                     // this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
-                    this.items.push(new Item(blockAbove.position, sprites["white-key"]));
+                    this.items.push(new Item(blockAbove.position, blockSprites["white-key"]));
+                }
+                if (j === enemyIndex) {
+                    // this.items.push(new Item(blockAbove.position, sprites["chest_sm"]));
+                    this.enemies.push(new Enemy(blockAbove.position, enemySprites));
                 }
 
                 let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
@@ -129,14 +135,15 @@ class LevelArchitect {
                 block.solid = true;
 
                 if (j === 0) {
-                    block.sprite = sprites["cave_floor_1"];
+                    block.sprite = blockSprites["cave_wall_top_1"];
                     continue;
                 }
                 if (j === platformWidth - 1) {
-                    block.sprite = sprites["cave_floor_6"];
+                    block.sprite = blockSprites["cave_wall_top_6"];
                     continue;
                 }
-                block.sprite = sprites["cave_floor_2"];
+                const rndFloorSprite = Math.floor(Math.random() * 4) + 2;
+                block.sprite = blockSprites[`cave_wall_top_${rndFloorSprite}`];
             }
         }
     }
@@ -194,8 +201,8 @@ class LevelArchitect {
         sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
         sprites["chest"] = loadImage("./bug-dug/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
-        sprites["sprite-sheet-mushroom"] = loadImage("./bug-dug/img/animations/Big_Mushroom_walk.png");
         sprites["white-key"] = loadImage("./bug-dug/img/animations/White_Key.png");
+        sprites["block-damage"] = loadImage("./bug-dug/img/animations/block_damage.png");
         return sprites;
     }
 }
