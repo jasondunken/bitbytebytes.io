@@ -3,7 +3,7 @@ class Block extends GameObject {
     sprite;
     animation;
 
-    MAX_HEALTH = 99;
+    MAX_HEALTH = 120;
     health;
     destroyed = false;
     constructor(position, width, height, blockType, sprite) {
@@ -12,11 +12,14 @@ class Block extends GameObject {
         this.height = height;
         this.blockType = blockType;
         this.sprite = sprite;
-        this.health = this.MAX_HEALTH;
         this.updateCollider();
         if (blockType === "air" || blockType === "water") {
             this.solid = false;
         }
+        if (blockType === "sand" || blockType === "grass") this.MAX_HEALTH = 50;
+        if (blockType === "dirt" || blockType === "clay") this.MAX_HEALTH = 75;
+        if (blockType === "stone") this.MAX_HEALTH = 120;
+        this.health = this.MAX_HEALTH;
     }
 
     update() {
