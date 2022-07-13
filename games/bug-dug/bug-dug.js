@@ -40,6 +40,7 @@ class BugDug {
     terrain = null;
     backgroundLayer = null;
     foregroundLayer = null;
+    damageAnimation = null;
 
     player = null;
     currentLevel = 0;
@@ -81,6 +82,9 @@ class BugDug {
 
     update() {
         this.player.update(this.terrain);
+        for (let enemy of this.terrain.enemies) {
+            enemy.update(this.terrain);
+        }
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
@@ -110,6 +114,20 @@ class BugDug {
 
         for (let gameObj of this.gameObjects) {
             gameObj.render();
+            if (gameObj.type === "block") {
+                if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
+                    let damageSpriteIndex = Math.floor(
+                        map(gameObj.health, 0, gameObj.MAX_HEALTH, this.damageAnimation.keyFrames.length - 1, 0)
+                    );
+                    image(
+                        this.damageAnimation.keyFrames[damageSpriteIndex],
+                        gameObj.position.x,
+                        gameObj.position.y,
+                        gameObj.width,
+                        gameObj.height
+                    );
+                }
+            }
         }
 
         this.player.render();
@@ -118,6 +136,9 @@ class BugDug {
             this.terrain.foregroundLayer,
             1.75
         );
+        for (let enemy of this.terrain.enemies) {
+            enemy.render();
+        }
         for (let item of this.terrain.items) {
             item.render();
         }
@@ -140,7 +161,13 @@ class BugDug {
 
     loadLevel() {
         this.gameObjects = [];
-        this.terrain = new LevelArchitect(this.width, this.height, levels[this.currentLevel], this.blockSprites);
+        this.terrain = new LevelArchitect(
+            this.width,
+            this.height,
+            levels[this.currentLevel],
+            this.blockSprites,
+            this.enemySprites
+        );
         this.terrain.blocks.forEach((column) => {
             column.forEach((block) => {
                 this.gameObjects.push(block);
@@ -151,5 +178,7 @@ class BugDug {
         this.foregroundLayer = this.terrain.foregroundLayer;
 
         this.player.setPosition({ x: this.terrain.playerSpawn.x, y: this.terrain.playerSpawn.y });
+
+        this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
     }
 }
