@@ -39,7 +39,7 @@ class Block extends GameObject {
     }
 
     takeDamage(dmg) {
-        if (this.blockType !== "bedrock") {
+        if (this.blockType !== "bedrock" && this.blockType !== "air" && this.blockType !== "none") {
             this.health -= dmg;
             if (this.health <= 0) {
                 this.destroyed = true;
