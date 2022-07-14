@@ -142,6 +142,13 @@ class BugDug {
         for (let item of this.terrain.items) {
             item.render();
         }
+        image(
+            this.terrain.exit.sprite,
+            this.terrain.exit.position.x,
+            this.terrain.exit.position.y,
+            this.terrain.exit.width,
+            this.terrain.exit.height
+        );
 
         // draw foreground
         // for (let i = 0; i < this.foregroundLayer.length; i++) {

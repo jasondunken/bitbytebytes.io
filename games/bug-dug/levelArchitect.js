@@ -62,7 +62,7 @@ class LevelArchitect {
                         this.BLOCK_SIZE,
                         this.BLOCK_SIZE,
                         levelConfig.BEDROCK_BLOCK,
-                        blockSprites["cave_wall"]
+                        blockSprites["bedrock"]
                     );
                     this.backgroundLayer[i][j] = blockSprites["dirt_3_0"];
                     this.foregroundLayer[i][j] = blockSprites["dirt_3_0"];
@@ -102,11 +102,14 @@ class LevelArchitect {
     }
 
     addStuff(levelConfig, blockSprites, enemySprites) {
-        let firstPlatform = 12;
-        let platformSpacing = 5;
+        let firstPlatform = 10;
+        let platformSpacing = 4;
+        let PLATFORM_MAX_WIDTH = 9;
+        let PLATFORM_MIN_WIDTH = 4;
 
         for (let i = 0; i < levelConfig.numEnemies; i++) {
-            let platformWidth = Math.floor(Math.random() * 4) + 3;
+            let platformWidth =
+                Math.floor(Math.random() * (PLATFORM_MAX_WIDTH - PLATFORM_MIN_WIDTH) + 1) + PLATFORM_MIN_WIDTH - 1;
 
             let xIndex = Math.floor(Math.random() * this.blocksPerRow);
             if (xIndex + platformWidth > this.blocksPerRow - 1) {
@@ -125,10 +128,18 @@ class LevelArchitect {
                     this.enemies.push(new Enemy({ ...blockAbove.position }, enemySprites));
                 }
                 if (j === chestIndex) {
-                    this.items.push(new Item({ ...blockAbove.position }, blockSprites["white-key"]));
+                    const itemPosition = {
+                        x: blockAbove.position.x + Item.SIZE / 2,
+                        y: blockAbove.position.y + Item.SIZE,
+                    };
+                    this.items.push(new Item(itemPosition, blockSprites["chest"]));
                 }
                 if (j !== chestIndex) {
-                    this.items.push(new Item({ ...blockAbove.position }, blockSprites["coin-gold"]));
+                    const coinPosition = {
+                        x: blockAbove.position.x + Item.SIZE / 2,
+                        y: blockAbove.position.y + Item.SIZE,
+                    };
+                    this.items.push(new Item(coinPosition, blockSprites["coin-gold"]));
                 }
 
                 let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
@@ -147,6 +158,14 @@ class LevelArchitect {
                 block.sprite = blockSprites[`cave_wall_top_${rndFloorSprite}`];
             }
         }
+        let exitX = Math.floor(Math.random() * (this.blocksPerRow - 1)) * this.BLOCK_SIZE;
+        let exitY = (this.blocksPerColumn - 2) * this.BLOCK_SIZE;
+        this.exit = {
+            position: { x: exitX, y: exitY },
+            width: this.BLOCK_SIZE,
+            height: this.BLOCK_SIZE,
+            sprite: blockSprites["door-locked"],
+        };
     }
 
     static getColor(blockType) {
@@ -202,6 +221,8 @@ class LevelArchitect {
         sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
         sprites["chest"] = loadImage("./bug-dug/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
+        sprites["door"] = loadImage("./bug-dug/img/door.png");
+        sprites["door-locked"] = loadImage("./bug-dug/img/door_locked.png");
         sprites["white-key"] = loadImage("./bug-dug/img/animations/White_Key.png");
         sprites["coin-gold"] = loadImage("./bug-dug/img/animations/coin_gold.png");
         sprites["block-damage"] = loadImage("./bug-dug/img/animations/block_damage.png");

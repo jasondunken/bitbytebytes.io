@@ -1,15 +1,18 @@
 class Item extends GameObject {
+    static SIZE = 16;
     collected = false;
-    constructor(position, spriteSheet) {
+    itemType = "";
+    constructor(position, spriteSheet, itemType) {
         super("item", position);
-        this.animation = new Animation(spriteSheet, 90, true);
+        this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
+        this.itemType = itemType;
     }
 
     render() {
         if (this.animation) {
             this.animation.update();
-            image(this.animation.currentFrame, this.position.x + 8, this.position.y + 16, 16, 16);
+            image(this.animation.currentFrame, this.position.x, this.position.y, Item.SIZE, Item.SIZE);
         }
     }
 }
