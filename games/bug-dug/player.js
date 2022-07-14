@@ -31,8 +31,6 @@ class Player extends Entity {
         if (keyIsDown(65)) this.moveLeft();
         if (keyIsDown(68)) this.moveRight();
 
-        if (keyIsDown(32)) this.jump();
-
         if (!keyIsDown(87) && !keyIsDown(83) && !keyIsDown(65) && !keyIsDown(68) && !keyIsDown(32) && !this.mining) {
             this.state = Player.STATE.IDLE;
         }
@@ -60,12 +58,6 @@ class Player extends Entity {
     moveRight() {
         this.position.x += this.speed;
         this.state = Player.STATE.WALKING.RIGHT;
-    }
-    jump() {
-        if (this.grounded) {
-            this.position.y -= 30;
-            this.grounded = false;
-        }
     }
     dig(direction) {
         if (!this.mining) {
