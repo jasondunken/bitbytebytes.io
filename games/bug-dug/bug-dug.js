@@ -127,6 +127,29 @@ class BugDug {
                         gameObj.height
                     );
                 }
+                if (gameObj.destroyed) {
+                    const blockAbove = getBlockAbove(
+                        getGridIndex(gameObj.position, this.terrain.BLOCK_SIZE),
+                        this.terrain.blocks
+                    );
+                    if (blockAbove.destroyed || blockAbove.blockType === "air") {
+                        image(
+                            this.blockSprites["background-ladder"],
+                            gameObj.position.x,
+                            gameObj.position.y,
+                            gameObj.width,
+                            gameObj.height
+                        );
+                    } else {
+                        image(
+                            this.blockSprites["background-wall"],
+                            gameObj.position.x,
+                            gameObj.position.y,
+                            gameObj.width,
+                            gameObj.height
+                        );
+                    }
+                }
             }
         }
 

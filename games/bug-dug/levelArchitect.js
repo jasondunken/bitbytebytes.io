@@ -183,7 +183,6 @@ class LevelArchitect {
             case "bedrock":
                 return "black";
             case "air":
-                return color("#9EF6FF");
             case "none":
                 return color("#00000000");
             default:
@@ -219,6 +218,8 @@ class LevelArchitect {
         sprites["cave_wall_top_4"] = loadImage("./bug-dug/img/cave_wall_top_4.png");
         sprites["cave_wall_top_5"] = loadImage("./bug-dug/img/cave_wall_top_5.png");
         sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
+        sprites["background-wall"] = loadImage("./bug-dug/img/background_wall.png");
+        sprites["background-ladder"] = loadImage("./bug-dug/img/background_ladder.png");
         sprites["chest"] = loadImage("./bug-dug/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
         sprites["door"] = loadImage("./bug-dug/img/door.png");
