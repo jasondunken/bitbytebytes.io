@@ -29,7 +29,7 @@ class Entity extends GameObject {
         if (!this.grounded) {
             this.position.y += terrain.gravity;
         }
-        this.getInput();
+        this.getInput(terrain);
 
         // constrain x
         if (this.position.x < this.width / 2) this.setPosition({ x: this.width / 2, y: this.position.y });

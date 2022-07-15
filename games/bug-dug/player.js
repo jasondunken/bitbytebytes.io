@@ -24,9 +24,11 @@ class Player extends Entity {
         };
     }
 
-    getInput() {
+    getInput(terrain) {
         if (this.mining) this.mining--;
-        if (keyIsDown(87)) this.climbUp();
+        if (getBlockAtPosition(this.position, terrain.blocks, terrain.BLOCK_SIZE).destroyed) {
+            if (keyIsDown(87)) this.climbUp();
+        }
         if (keyIsDown(83)) this.climbDown();
         if (keyIsDown(65)) this.moveLeft();
         if (keyIsDown(68)) this.moveRight();

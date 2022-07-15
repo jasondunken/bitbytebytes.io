@@ -2,6 +2,11 @@ function getGridIndex(position, blockSize) {
     return { x: Math.floor(position.x / blockSize), y: Math.floor(position.y / blockSize) };
 }
 
+function getBlockAtPosition(position, blocks, blockSize) {
+    const index = getGridIndex(position, blockSize);
+    return blocks[index.x][index.y];
+}
+
 function getAdjacentBlocks(position, blocks, blockSize) {
     const index = getGridIndex(position, blockSize);
     return {
