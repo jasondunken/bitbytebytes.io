@@ -158,14 +158,17 @@ class LevelArchitect {
                 block.sprite = blockSprites[`cave_wall_top_${rndFloorSprite}`];
             }
         }
-        let exitX = Math.floor(Math.random() * (this.blocksPerRow - 1)) * this.BLOCK_SIZE;
-        let exitY = (this.blocksPerColumn - 2) * this.BLOCK_SIZE;
-        this.exit = {
-            position: { x: exitX, y: exitY },
-            width: this.BLOCK_SIZE,
-            height: this.BLOCK_SIZE,
-            sprite: blockSprites["door-locked"],
-        };
+        let exitX = Math.floor(Math.random() * (this.blocksPerRow - 1));
+        let exitY = this.blocksPerColumn - 2;
+
+        let blockPosition = { x: exitX * this.BLOCK_SIZE, y: exitY * this.BLOCK_SIZE };
+        this.blocks[exitX][exitY] = new Block(
+            blockPosition,
+            this.BLOCK_SIZE,
+            this.BLOCK_SIZE,
+            "exit",
+            blockSprites["door-locked"]
+        );
     }
 
     static getColor(blockType) {
