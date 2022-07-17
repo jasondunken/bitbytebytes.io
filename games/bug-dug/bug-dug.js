@@ -57,7 +57,7 @@ class BugDug {
         this.demo = true;
         this.gameOver = true;
         this.score = 0;
-        this.gameObjects = [];
+        this.gameObjects = new Set();
     }
 
     startDemo() {
@@ -86,12 +86,12 @@ class BugDug {
             enemy.update(this.terrain);
         }
 
-        for (let gameObj of this.gameObjects) {
+        this.gameObjects.forEach((gameObj) => {
             gameObj.update();
             if (gameObj.destroyed) {
                 clearForegroundAround(getGridIndex(gameObj.position, this.terrain.BLOCK_SIZE), this.foregroundLayer);
             }
-        }
+        });
     }
 
     render() {
@@ -112,7 +112,7 @@ class BugDug {
             }
         }
 
-        for (let gameObj of this.gameObjects) {
+        this.gameObjects.forEach((gameObj) => {
             gameObj.render();
             if (gameObj.type === "block") {
                 if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
@@ -151,7 +151,7 @@ class BugDug {
                     }
                 }
             }
-        }
+        });
 
         this.player.render();
         clearForegroundAround(
@@ -183,7 +183,7 @@ class BugDug {
     }
 
     loadLevel() {
-        this.gameObjects = [];
+        this.gameObjects = new Set();
         this.terrain = new LevelArchitect(
             this.width,
             this.height,
@@ -193,7 +193,7 @@ class BugDug {
         );
         this.terrain.blocks.forEach((column) => {
             column.forEach((block) => {
-                this.gameObjects.push(block);
+                this.gameObjects.add(block);
             });
         });
 
@@ -204,7 +204,7 @@ class BugDug {
 
         this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
 
-        this.gameObjects.push(new ParticleEmitter({ x: 50, y: 50 }, 10, true));
+        this.gameObjects.add(new ParticleEmitter({ x: 50, y: 50 }, 10, true));
         console.log("gameObjects: ", this.gameObjects);
     }
 }
