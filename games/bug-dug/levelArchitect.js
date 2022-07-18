@@ -29,14 +29,14 @@ class LevelArchitect {
 
         this.gravity = levelConfig.gravity;
         this.surfaceHeight = levelConfig.surfaceHeight;
-        this.playerSpawn = levelConfig.playerSpawn;
+        this.playerSpawn = new Vec2(levelConfig.playerSpawn.x, levelConfig.playerSpawn.y);
 
         for (let i = 0; i < this.blocksPerRow; i++) {
             this.blocks[i] = [];
             this.backgroundLayer[i] = [];
             this.foregroundLayer[i] = [];
             for (let j = 0; j < this.blocksPerColumn; j++) {
-                let blockPosition = { x: i * this.BLOCK_SIZE, y: j * this.BLOCK_SIZE };
+                let blockPosition = new Vec2(i * this.BLOCK_SIZE, j * this.BLOCK_SIZE);
                 if (j < this.surfaceHeight / this.BLOCK_SIZE) {
                     this.blocks[i][j] = new Block(
                         blockPosition,

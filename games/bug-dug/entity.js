@@ -11,11 +11,13 @@ class Entity extends GameObject {
     currentAnimation = null;
     walkDirection = "right";
 
+    particleEmitter = null;
+
     collider = {
-        a: { x: 0, y: 0 },
-        b: { x: 0, y: 0 },
-        c: { x: 0, y: 0 },
-        d: { x: 0, y: 0 },
+        a: Vec2.ZEROS(),
+        b: Vec2.ZEROS(),
+        c: Vec2.ZEROS(),
+        d: Vec2.ZEROS(),
     };
 
     constructor(type, position) {
@@ -77,6 +79,9 @@ class Entity extends GameObject {
         }
 
         this.updateCollider();
+        if (this.particleEmitter) {
+            this.updateParticleEmitter();
+        }
     }
 
     getInput() {
@@ -92,6 +97,8 @@ class Entity extends GameObject {
         };
     }
 
+    updateParticleEmitter() {}
+
     render() {
         if (this.currentAnimation) {
             const sprite = this.currentAnimation.currentFrame;
@@ -105,6 +112,9 @@ class Entity extends GameObject {
         } else {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
+        }
+        if (this.particleEmitter) {
+            this.particleEmitter.render();
         }
     }
 }

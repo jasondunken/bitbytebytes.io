@@ -8,33 +8,74 @@ class Particle {
 
     update() {
         this.life--;
-        this.position = { x: this.position.x + this.velocity.x, y: this.position.y + this.velocity.y + 1 };
+        this.position = this.position.add(this.velocity);
     }
 }
 
 class ParticleEmitter extends GameObject {
     particles = new Set();
-    constructor(position, numParticles, loop) {
+    constructor(position, numParticles, loopInterval, updateFunction) {
         super("particle-emitter", position);
-        for (let i = 0; i < numParticles; i++) {
-            this.particles.add(new Particle(position, { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 }, 5, 60));
-        }
+        this.numParticles = numParticles;
+        this.loopInterval = loopInterval;
+        this.loopTime = loopInterval;
+        this.update = updateFunction;
+
+        this.spawnParticles(numParticles);
     }
 
-    update() {
-        this.particles.forEach((particle) => {
-            particle.update();
-            if (particle.life <= 0) {
-                this.particles.delete(particle);
-            }
-        });
+    update() {}
+
+    setPosition(position) {
+        this.position = position;
+    }
+
+    emit() {
+        this.spawnParticles(this.numParticles);
+    }
+
+    start() {
+        this.stopped = false;
+    }
+
+    stop() {
+        this.stopped = true;
+    }
+
+    spawnParticles(numParticles) {
+        for (let i = 0; i < numParticles; i++) {
+            this.particles.add(
+                new Particle(this.position, new Vec2(Math.random() * 2 - 1, Math.random() * -0.25), 5, 60)
+            );
+        }
     }
 
     render() {
         this.particles.forEach((particle) => {
             if (particle.life > 0) {
-                fill("red");
+                let alpha = map(particle.life, 0, 60, 0, 1);
+                let color = `rgba(255, 0, 0, ${alpha})`;
+                fill(color);
+                noStroke();
                 ellipse(particle.position.x, particle.position.y, particle.size, particle.size);
+            }
+        });
+    }
+
+    static RadialBurst() {
+        if (!this.stopped && this.loopInterval) {
+            if (this.loopTime > 0) {
+                this.loopTime--;
+            }
+            if (this.loopTime <= 0) {
+                this.loopTime = this.loopInterval;
+                this.spawnParticles(this.numParticles);
+            }
+        }
+        this.particles.forEach((particle) => {
+            particle.update();
+            if (particle.life <= 0) {
+                this.particles.delete(particle);
             }
         });
     }

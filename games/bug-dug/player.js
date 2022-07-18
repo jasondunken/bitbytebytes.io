@@ -22,6 +22,12 @@ class Player extends Entity {
             "walk-left": new Animation(spriteSheets["walk-left"], 60, true),
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
         };
+        this.particleEmitter = new ParticleEmitter(
+            new Vec2(this.position.x, this.position.y),
+            10,
+            10,
+            ParticleEmitter.RadialBurst
+        );
     }
 
     getInput(terrain) {
@@ -64,21 +70,36 @@ class Player extends Entity {
     dig(direction) {
         if (!this.mining) {
             this.mining = this.MINING_TIME;
+            let block = null;
             switch (direction) {
                 case "up":
-                    this.blocks.above.takeDamage(this.pickaxeStrength);
+                    block = this.blocks.above;
                     break;
                 case "down":
-                    this.blocks.below.takeDamage(this.pickaxeStrength);
+                    block = this.blocks.below;
                     break;
                 case "left":
-                    this.blocks.left.takeDamage(this.pickaxeStrength);
+                    block = this.blocks.left;
                     break;
                 case "right":
-                    this.blocks.right.takeDamage(this.pickaxeStrength);
+                    block = this.blocks.right;
                     break;
             }
+            if (block) {
+                block.takeDamage(this.pickaxeStrength);
+            }
         }
+    }
+
+    updateParticleEmitter() {
+        const emitterPos = new Vec2(this.position.x, this.position.y + this.height / 2);
+        this.particleEmitter.setPosition(emitterPos);
+        if (this.state !== Player.STATE.WALKING.LEFT && this.state !== Player.STATE.WALKING.RIGHT) {
+            this.particleEmitter.stop();
+        } else {
+            this.particleEmitter.start();
+        }
+        this.particleEmitter.update();
     }
 
     static loadSpriteSheets() {

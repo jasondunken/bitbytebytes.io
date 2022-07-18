@@ -37,7 +37,7 @@ class BugDug {
         this.start1Player();
     });
 
-    terrain = null;
+    level = null;
     backgroundLayer = null;
     foregroundLayer = null;
     damageAnimation = null;
@@ -52,7 +52,6 @@ class BugDug {
         this.playerSprites = playerSprites;
         this.enemySprites = enemySprites;
         this.font = font;
-        this.playerSprites = playerSprites;
 
         this.demo = true;
         this.gameOver = true;
@@ -81,21 +80,21 @@ class BugDug {
     }
 
     update() {
-        this.player.update(this.terrain);
-        for (let enemy of this.terrain.enemies) {
-            enemy.update(this.terrain);
+        this.player.update(this.level);
+        for (let enemy of this.level.enemies) {
+            enemy.update(this.level);
         }
 
         this.gameObjects.forEach((gameObj) => {
             gameObj.update();
             if (gameObj.destroyed) {
-                clearForegroundAround(getGridIndex(gameObj.position, this.terrain.BLOCK_SIZE), this.foregroundLayer);
+                clearForegroundAround(getGridIndex(gameObj.position, this.level.BLOCK_SIZE), this.foregroundLayer);
             }
         });
     }
 
     render() {
-        background(color(this.terrain.skyColor));
+        background(color(this.level.skyColor));
         noStroke();
         // draw background
         for (let i = 0; i < this.backgroundLayer.length; i++) {
@@ -103,10 +102,10 @@ class BugDug {
                 if (this.backgroundLayer[i][j] !== "none") {
                     image(
                         this.backgroundLayer[i][j],
-                        i * this.terrain.BLOCK_SIZE,
-                        j * this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE
+                        i * this.level.BLOCK_SIZE,
+                        j * this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE
                     );
                 }
             }
@@ -129,8 +128,8 @@ class BugDug {
                 }
                 if (gameObj.destroyed) {
                     const blockAbove = getBlockAbove(
-                        getGridIndex(gameObj.position, this.terrain.BLOCK_SIZE),
-                        this.terrain.blocks
+                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
+                        this.level.blocks
                     );
                     if (blockAbove.destroyed || blockAbove.blockType === "air") {
                         image(
@@ -155,14 +154,14 @@ class BugDug {
 
         this.player.render();
         clearForegroundAround(
-            getGridIndex(this.player.position, this.terrain.BLOCK_SIZE),
-            this.terrain.foregroundLayer,
+            getGridIndex(this.player.position, this.level.BLOCK_SIZE),
+            this.level.foregroundLayer,
             1.75
         );
-        for (let enemy of this.terrain.enemies) {
+        for (let enemy of this.level.enemies) {
             enemy.render();
         }
-        for (let item of this.terrain.items) {
+        for (let item of this.level.items) {
             item.render();
         }
 
@@ -172,10 +171,10 @@ class BugDug {
                 if (this.foregroundLayer[i][j] !== "none") {
                     image(
                         this.foregroundLayer[i][j],
-                        i * this.terrain.BLOCK_SIZE,
-                        j * this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE,
-                        this.terrain.BLOCK_SIZE
+                        i * this.level.BLOCK_SIZE,
+                        j * this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE
                     );
                 }
             }
@@ -184,27 +183,26 @@ class BugDug {
 
     loadLevel() {
         this.gameObjects = new Set();
-        this.terrain = new LevelArchitect(
+        this.level = new LevelArchitect(
             this.width,
             this.height,
             levels[this.currentLevel],
             this.blockSprites,
             this.enemySprites
         );
-        this.terrain.blocks.forEach((column) => {
+        this.level.blocks.forEach((column) => {
             column.forEach((block) => {
                 this.gameObjects.add(block);
             });
         });
 
-        this.backgroundLayer = this.terrain.backgroundLayer;
-        this.foregroundLayer = this.terrain.foregroundLayer;
+        this.backgroundLayer = this.level.backgroundLayer;
+        this.foregroundLayer = this.level.foregroundLayer;
 
-        this.player.setPosition({ ...this.terrain.playerSpawn });
+        this.player.setPosition(this.level.playerSpawn);
 
         this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
 
-        this.gameObjects.add(new ParticleEmitter({ x: 50, y: 50 }, 10, true));
         console.log("gameObjects: ", this.gameObjects);
     }
 }
