@@ -21,6 +21,7 @@ class Player extends Entity {
             idle: new Animation(spriteSheets["idle"], 240, true),
             "walk-left": new Animation(spriteSheets["walk-left"], 60, true),
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
+            mining: new Animation(spriteSheets["mining"], 60, true),
         };
         this.particleEmitter = new ParticleEmitter(
             new Vec2(this.position.x, this.position.y),
@@ -70,6 +71,7 @@ class Player extends Entity {
     dig(direction) {
         if (!this.mining) {
             this.mining = this.MINING_TIME;
+            this.state = Player.STATE.MINING;
             let block = null;
             switch (direction) {
                 case "up":
@@ -107,6 +109,7 @@ class Player extends Entity {
         spriteSheets["idle"] = loadImage("./bug-dug/img/animations/big_mushroom_idle.png");
         spriteSheets["walk-left"] = loadImage("./bug-dug/img/animations/big_mushroom_walk_left.png");
         spriteSheets["walk-right"] = loadImage("./bug-dug/img/animations/big_mushroom_walk_right.png");
+        spriteSheets["mining"] = loadImage("./bug-dug/img/animations/big_mushroom_idle.png");
         return spriteSheets;
     }
 }

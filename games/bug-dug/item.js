@@ -16,3 +16,31 @@ class Item extends GameObject {
         }
     }
 }
+
+class Chest extends GameObject {
+    opened = false;
+    constructor(position, sprite, contents) {
+        super("chest", position);
+        this.sprite = sprite;
+        this.contents = contents;
+    }
+
+    open() {
+        this.opened = true;
+        return this.contents;
+    }
+
+    update() {}
+
+    render() {
+        if (!this.open) {
+            image(
+                this.sprite,
+                this.position.x - this.sprite.width / 2,
+                this.position.y - this.sprite.height / 2,
+                this.width,
+                this.height
+            );
+        }
+    }
+}

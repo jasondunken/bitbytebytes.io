@@ -11,6 +11,6 @@ const levels = [
         BEDROCK_BLOCK: "bedrock",
         AIR_BLOCK: "air",
         BLOCK_TYPES: ["dirt", "clay", "sand", "stone"],
-        ITEM_TYPES: ["treasure", "trap"],
+        ITEM_TYPES: ["treasure", "treasure", "key"],
     },
 ];
