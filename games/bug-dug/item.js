@@ -18,6 +18,7 @@ class Item extends GameObject {
 }
 
 class Chest extends GameObject {
+    static SIZE = 16;
     opened = false;
     constructor(position, sprite, contents) {
         super("chest", position);
@@ -33,14 +34,8 @@ class Chest extends GameObject {
     update() {}
 
     render() {
-        if (!this.open) {
-            image(
-                this.sprite,
-                this.position.x - this.sprite.width / 2,
-                this.position.y - this.sprite.height / 2,
-                this.width,
-                this.height
-            );
+        if (!this.opened) {
+            image(this.sprite, this.position.x, this.position.y, Chest.SIZE, Chest.SIZE);
         }
     }
 }

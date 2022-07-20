@@ -107,6 +107,8 @@ class LevelArchitect {
         let PLATFORM_MAX_WIDTH = 9;
         let PLATFORM_MIN_WIDTH = 4;
 
+        let items = shuffle([...levelConfig.ITEM_TYPES]);
+
         for (let i = 0; i < levelConfig.numEnemies; i++) {
             let platformWidth =
                 Math.floor(Math.random() * (PLATFORM_MAX_WIDTH - PLATFORM_MIN_WIDTH) + 1) + PLATFORM_MIN_WIDTH - 1;
@@ -128,11 +130,11 @@ class LevelArchitect {
                     this.enemies.push(new Enemy({ ...blockAbove.position }, enemySprites));
                 }
                 if (j === chestIndex) {
-                    const itemPosition = {
-                        x: blockAbove.position.x + Item.SIZE / 2,
-                        y: blockAbove.position.y + Item.SIZE,
+                    const chestPosition = {
+                        x: blockAbove.position.x + Chest.SIZE / 2,
+                        y: blockAbove.position.y + Chest.SIZE,
                     };
-                    this.items.push(new Item(itemPosition, blockSprites["chest"]));
+                    this.items.push(new Chest(chestPosition, blockSprites["chest"], items[i % items.length]));
                 }
                 if (j !== chestIndex) {
                     const coinPosition = {

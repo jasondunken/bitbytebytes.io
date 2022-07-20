@@ -166,19 +166,19 @@ class BugDug {
         }
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         if (this.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.foregroundLayer[i][j],
+        //                 i * this.level.BLOCK_SIZE,
+        //                 j * this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
     }
 
     loadLevel() {
@@ -204,5 +204,6 @@ class BugDug {
         this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
 
         console.log("gameObjects: ", this.gameObjects);
+        console.log("items: ", this.level.items);
     }
 }
