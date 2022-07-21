@@ -108,6 +108,19 @@ class ExpeditionLuna {
             this.player.position.y = this.height;
             this.player.velocity.y = 0;
         }
+        for (let i = 0; i < this.terrain.length - 1; i++) {
+            let touchL = pointOnLine(
+                [this.player.position.x - 8, this.player.position.y + 8],
+                [this.terrain[i], this.terrain[i + 1]]
+            );
+            let touchR = pointOnLine(
+                [this.player.position.x + 8, this.player.position.y + 8],
+                [this.terrain[i], this.terrain[i + 1]]
+            );
+            if (touchL || touchR) {
+                console.log("touchL: ", touchL, " | touchR: ", touchR);
+            }
+        }
     }
 
     render() {
