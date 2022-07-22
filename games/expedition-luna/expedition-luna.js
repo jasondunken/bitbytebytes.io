@@ -35,7 +35,6 @@ class ExpeditionLuna {
         this.start1Player();
     });
 
-    PIXELS_PER_METER = 4;
     gravity = new Vec2(0, 0.02);
     atmosphericDrag = 0.5;
     surfaceFriction = 5;
@@ -102,6 +101,8 @@ class ExpeditionLuna {
             } else this.player.leftRCSOn = false;
         }
         if (this.player.fuelLevel < 0) this.player.fuelLevel = 0;
+        this.player.oxygenLevel -= 0.1;
+        if (this.player.oxygenLevel < 0) this.player.oxygenLevel = 0;
         this.player.velocity = this.player.velocity.add(this.gravity);
         this.player.position = this.player.position.add(this.player.velocity);
         if (this.player.position.y >= this.height) {
@@ -149,12 +150,36 @@ class ExpeditionLuna {
         });
 
         textFont(this.font);
-        textSize(14);
+        textSize(10);
         noStroke();
         fill("white");
-        text("Fuel " + this.player.fuelLevel.toFixed(1), 20, 32);
+        text("RP-1 ", 20, 32);
+        text("O2 ", 20, 48);
         text("Altitude " + ((this.height - this.player.position.y) / PIXELS_PER_METER).toFixed(2), 240, 32);
-        text("VertVelocity " + ((this.player.velocity.y / PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 20, 64);
+        text("V-Velocity " + ((this.player.velocity.y / PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 240, 48);
+
+        stroke("white");
+        noFill();
+        rect(70, 21, 100, 10);
+        rect(70, 37, 100, 10);
+
+        fill("white");
+        const fuelBar = (this.player.fuelLevel / this.player.STARTING_FUEL) * 100;
+        rect(70, 21, fuelBar, 10);
+        const o2Bar = (this.player.oxygenLevel / this.player.STARTING_OXYGEN) * 100;
+        rect(70, 37, o2Bar, 10);
+
+        // for (let i = 0; i < 10; i++) {
+        //     if (i > 0) {
+        //         stroke("white");
+        //         const tickY = (i * this.height) / 10;
+        //         const altitude = (this.height - tickY) / PIXELS_PER_METER;
+        //         line(0, tickY, 10, tickY);
+        //         noStroke();
+        //         textSize(8);
+        //         text(`${altitude.toFixed(1)} m`, 12, tickY + 4);
+        //     }
+        // }
     }
 
     addParticles(thruster) {
@@ -180,7 +205,6 @@ class ExpeditionLuna {
                 position = new Vec2(this.player.position.x + 8, this.player.position.y);
                 break;
         }
-        new Vec2(-0.5, -0.01);
 
         for (let i = 0; i < particlesPerPulse; i++) {
             switch (thruster) {
@@ -203,7 +227,9 @@ class ExpeditionLuna {
 
 class Lander {
     STARTING_FUEL = 100;
+    STARTING_OXYGEN = 1000;
     fuelLevel = 0;
+    oxygenLevel = 0;
     position = Vec2.ZEROS();
     velocity = Vec2.ZEROS();
 
@@ -215,6 +241,7 @@ class Lander {
 
     reset(planet) {
         this.fuelLevel = this.STARTING_FUEL;
+        this.oxygenLevel = this.STARTING_OXYGEN;
         this.position = new Vec2(Math.floor(Math.random() * (planet.width - 64)) + 32, 64);
     }
 
