@@ -76,7 +76,7 @@ class ExpeditionLuna {
                 i++;
             }
         }
-        this.player.reset(this);
+        this.player.spawn(this);
     }
 
     update() {
@@ -142,8 +142,16 @@ class ExpeditionLuna {
                 line(this.terrain[i][0], this.terrain[i][1], this.terrain[i + 1][0], this.terrain[i + 1][1]);
             }
         }
+        strokeWeight(1);
         stroke("white");
-        rect(this.player.position.x - 8, this.player.position.y - 8, 16, 16);
+        this.player.polygon.forEach((point, i) => {
+            line(
+                this.player.position.x + point[0],
+                this.player.position.y + point[1],
+                this.player.position.x + this.player.polygon[(i + 1) % this.player.polygon.length][0],
+                this.player.position.y + this.player.polygon[(i + 1) % this.player.polygon.length][1]
+            );
+        });
         this.thrusterParticles.forEach((particle) => {
             particle.render();
             if (particle.life <= 0) this.thrusterParticles.delete(particle);
@@ -155,8 +163,10 @@ class ExpeditionLuna {
         fill("white");
         text("RP-1 ", 20, 32);
         text("O2 ", 20, 48);
-        text("Altitude " + ((this.height - this.player.position.y) / PIXELS_PER_METER).toFixed(2), 240, 32);
-        text("V-Velocity " + ((this.player.velocity.y / PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 240, 48);
+        text("Altitude ", 240, 32);
+        text(((this.height - this.player.position.y) / PIXELS_PER_METER).toFixed(2) + " m", 380, 32);
+        text("V-Velocity ", 240, 48);
+        text(((this.player.velocity.y / PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 380, 48);
 
         stroke("white");
         noFill();
@@ -237,9 +247,42 @@ class Lander {
     rightRCSOn = false;
     leftRCSOn = false;
 
+    // polygon = [
+    //     [-8, -8],
+    //     [0, -12],
+    //     [8, -8],
+    //     [8, 8],
+    //     [-8, 8],
+    // ];
+
+    polygon = [
+        [-6, 0],
+        [-8, -2],
+        [-8, -6],
+        [-6, -8],
+        [6, -8],
+        [8, -6],
+        [8, -2],
+        [6, 0],
+        [8, 0],
+        [8, 4],
+        [7, 4],
+        [8, 8],
+        [5, 4],
+        [2, 4],
+        [3, 8],
+        [-3, 8],
+        [-2, 4],
+        [-5, 4],
+        [-8, 8],
+        [-7, 4],
+        [-8, 4],
+        [-8, 0],
+    ];
+
     constructor() {}
 
-    reset(planet) {
+    spawn(planet) {
         this.fuelLevel = this.STARTING_FUEL;
         this.oxygenLevel = this.STARTING_OXYGEN;
         this.position = new Vec2(Math.floor(Math.random() * (planet.width - 64)) + 32, 64);
