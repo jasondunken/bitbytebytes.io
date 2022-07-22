@@ -1,5 +1,5 @@
 class Player extends Entity {
-    static STATE = {
+    static STATE = Object.freeze({
         IDLE: "idle",
         WALKING: { LEFT: "walk-left", RIGHT: "walk-right" },
         JUMPING: "jump",
@@ -8,7 +8,7 @@ class Player extends Entity {
         MINING: "mining",
         HURT: "hurt",
         DEAD: "dead",
-    };
+    });
 
     MINING_TIME = 30;
     mining = 0;
