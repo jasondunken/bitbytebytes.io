@@ -1,3 +1,8 @@
+@font-face {
+    font-family: ElfBoy;
+    src: url("font/Elfboyclassic.ttf");
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -11,6 +16,7 @@ body {
     padding: 0;
     display: grid;
     grid-template-rows: auto auto auto 1fr;
+    font-family: ElfBoy;
 }
 
 .gol-container {
@@ -25,9 +31,7 @@ body {
 
 .logo {
     user-select: none;
-    font-size: 6em;
-    font-family: "Alfa Slab One", serif;
-    color: orange;
+    font-size: 8rem;
 }
 
 .game-of-life {
