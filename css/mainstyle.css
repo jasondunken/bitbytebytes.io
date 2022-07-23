@@ -2,6 +2,10 @@
     font-family: ElfBoy;
     src: url("font/Elfboyclassic.ttf");
 }
+@font-face {
+    font-family: "8801";
+    src: url("font/8801.ttf");
+}
 
 * {
     margin: 0;

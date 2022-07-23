@@ -56,8 +56,7 @@ function draw() {
         restartTimer--;
     } else {
         // frameCount is a p5 global
-        frameCount = frameCount % DRAW_CALLS_PER_AGE_TICK;
-        if (frameCount == 0) {
+        if (frameCount % DRAW_CALLS_PER_AGE_TICK == 0) {
             incrementAge(pixels);
         }
     }
@@ -265,17 +264,25 @@ function windowResized() {
 // end of p5/gol stuff--------------------------------------->>>
 
 // Header text
+let headerIndex = 0;
+let currentColor = "";
 function updateHeaderText() {
-    if (Math.random() * 100 > 80) {
-        let letters = document.getElementsByClassName("ltr");
-        let index = Math.floor(Math.random() * letters.length);
-        let rColor = {
+    if (frameCount % 340 === 0) {
+        headerIndex = 0;
+        const rColor = {
             r: Math.floor(Math.random() * 255),
             g: Math.floor(Math.random() * 255),
             b: Math.floor(Math.random() * 255),
             a: 255,
         };
-        letters[index].style = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+        currentColor = `color: rgb(${rColor.r}, ${rColor.g}, ${rColor.b})`;
+    }
+
+    let letters = document.getElementsByClassName("ltr");
+    if (frameCount % 10 === 0) {
+        letters[headerIndex].style = currentColor;
+        headerIndex++;
+        if (headerIndex >= letters.length) headerIndex = 0;
     }
 }
 
