@@ -3,7 +3,7 @@ const INITIAL_CELL_DENSITY = 0.075;
 const SPAWN_AREA_SIZE = 11;
 let hWidth;
 let hHeight;
-let pixelAge = [];
+let pixelAge;
 
 const RESTART_DELAY = 10;
 let restartTimer = 0;
@@ -59,19 +59,16 @@ function draw() {
         if (frameCount % DRAW_CALLS_PER_AGE_TICK == 0) {
             incrementAge(pixels);
         }
+
+        // p5.js function
+        // copies the canvas' pixels a global pixels[]
+        //         px0         px1         px2 ...
+        //           |           |           |
+        // pixels = [r, g, b, a, r, g, b, a, r ...]
+        loadPixels();
+        setPixelColors(pixels);
+        updatePixels();
     }
-
-    // p5.js function
-    // copies the canvas' pixels a global pixels[]
-    //         px0         px1         px2 ...
-    //           |           |           |
-    // pixels = [r, g, b, a, r, g, b, a, r ...]
-    loadPixels();
-
-    setPixelColors(pixels);
-
-    // p5.js function
-    updatePixels();
 
     updateUfos();
     updateHeaderText();
@@ -85,14 +82,18 @@ function initializeHeaderGOL() {
     canvas.parent("p5-container");
 
     initializePixelAge(size.hWidth, size.hHeight);
-    console.log("pixelAge.length: ", pixelAge.length);
 }
 
 function restartGOL() {
     restartTimer = RESTART_DELAY;
     const size = getGOLSize();
+    console.log("size: ", size);
+
     resizeCanvas(size.hWidth, size.hHeight);
+    clear();
     initializePixelAge(size.hWidth, size.hHeight);
+    console.log("pixelAge.height: ", pixelAge.length / size.hWidth);
+    console.log("pixelAge.width: ", pixelAge.length / size.hHeight);
 }
 
 function getGOLSize() {
@@ -102,8 +103,8 @@ function getGOLSize() {
     console.log("pixelRatio: ", window.devicePixelRatio);
     console.log("pixelRatioHeight: ", header.height / window.devicePixelRatio);
 
-    hWidth = Math.floor(header.width * window.devicePixelRatio);
-    hHeight = Math.floor(header.height * window.devicePixelRatio);
+    hWidth = header.width;
+    hHeight = header.height;
     return { hWidth, hHeight };
 }
 
