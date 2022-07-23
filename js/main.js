@@ -79,24 +79,33 @@ function draw() {
 }
 
 function initializeHeaderGOL() {
-    let header = document.getElementById("gol-container").getBoundingClientRect();
-    hWidth = header.width;
-    hHeight = header.height;
+    const size = getGOLSize();
 
     // p5 canvas
-    let canvas = createCanvas(hWidth, hHeight);
+    let canvas = createCanvas(size.hWidth, size.hHeight);
     canvas.parent("p5-container");
 
-    initializePixelAge(hWidth, hHeight);
+    initializePixelAge(size.hWidth, size.hHeight);
+    console.log("pixelAge.length: ", pixelAge.length);
 }
 
 function restartGOL() {
     restartTimer = RESTART_DELAY;
+    const size = getGOLSize();
+    resizeCanvas(size.hWidth, size.hHeight);
+    initializePixelAge(size.hWidth, size.hHeight);
+}
+
+function getGOLSize() {
+    // TODO: needs to take browser zoom into consideration, breaks if zoom !== 100% currently
     let header = document.getElementById("gol-container").getBoundingClientRect();
-    hWidth = header.width;
-    hHeight = header.height;
-    resizeCanvas(hWidth, hHeight);
-    initializePixelAge(hWidth, hHeight);
+    console.log("header: ", header);
+    console.log("pixelRatio: ", window.devicePixelRatio);
+    console.log("pixelRatioHeight: ", header.height / window.devicePixelRatio);
+
+    hWidth = Math.floor(header.width * window.devicePixelRatio);
+    hHeight = Math.floor(header.height * window.devicePixelRatio);
+    return { hWidth, hHeight };
 }
 
 function initializeHeaderText() {
