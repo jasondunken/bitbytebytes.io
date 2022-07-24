@@ -36,6 +36,7 @@ body {
 .logo {
     user-select: none;
     font-size: 8rem;
+    color: lightgray;
 }
 
 .game-of-life {
@@ -51,15 +52,9 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     height: 100%;
-}
-
-.ufo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 32px;
-    width: 32px;
-    cursor: pointer;
+    position: relative;
+    display: grid;
+    justify-content: center;
 }
 
 .navigation {
@@ -166,13 +161,54 @@ body {
     border-bottom: 8px solid orange;
 }
 
-#toob img {
-    user-select: none;
-    width: 640px;
+#retro-terminal {
+    margin-top: 4rem;
+    position: relative;
 }
 
-#toob {
+.ufo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 32px;
+    width: 32px;
+    cursor: pointer;
+}
+
+#retro-terminal,
+#toob img,
+#toob-overlay img {
     user-select: none;
-    text-align: center;
-    padding-top: 4rem;
+    width: 640px;
+    height: 512px;
+}
+
+#toob,
+#toob-overlay {
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#console {
+    /* color: greenyellow; */
+    color: darkgreen;
+    font-family: "8801";
+    position: absolute;
+    top: 64px;
+    right: 64px;
+    bottom: 64px;
+    left: 64px;
+    overflow-y: hidden;
+    word-wrap: normal;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    outline: none;
+    font-size: 24px;
+    word-wrap: break-word;
+    resize: none;
 }

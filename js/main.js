@@ -8,7 +8,7 @@ let pixelAge;
 const RESTART_DELAY = 10;
 let restartTimer = 0;
 
-let toob;
+let terminal;
 let ufos = [];
 
 // called by p5 when window is ready
@@ -17,7 +17,7 @@ function setup() {
     frameRate(60);
     initializeHeaderGOL();
     initializeHeaderText();
-    initializeToob();
+    initializeTerminal();
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
         restartGOL();
@@ -57,7 +57,7 @@ function draw() {
     } else {
         // frameCount is a p5 global
         if (frameCount % DRAW_CALLS_PER_AGE_TICK == 0) {
-            incrementAge(pixels);
+            incrementAge();
         }
 
         // p5.js function
@@ -76,33 +76,24 @@ function draw() {
 
 function initializeHeaderGOL() {
     const size = getGOLSize();
-
     // p5 canvas
     let canvas = createCanvas(size.hWidth, size.hHeight);
     canvas.parent("p5-container");
 
-    initializePixelAge(size.hWidth, size.hHeight);
+    restartGOL();
 }
 
 function restartGOL() {
+    clear();
     restartTimer = RESTART_DELAY;
     const size = getGOLSize();
-    console.log("size: ", size);
-
     resizeCanvas(size.hWidth, size.hHeight);
-    clear();
     initializePixelAge(size.hWidth, size.hHeight);
-    console.log("pixelAge.height: ", pixelAge.length / size.hWidth);
-    console.log("pixelAge.width: ", pixelAge.length / size.hHeight);
 }
 
 function getGOLSize() {
     // TODO: needs to take browser zoom into consideration, breaks if zoom !== 100% currently
     let header = document.getElementById("gol-container").getBoundingClientRect();
-    console.log("header: ", header);
-    console.log("pixelRatio: ", window.devicePixelRatio);
-    console.log("pixelRatioHeight: ", header.height / window.devicePixelRatio);
-
     hWidth = header.width;
     hHeight = header.height;
     return { hWidth, hHeight };
@@ -118,14 +109,20 @@ function initializeHeaderText() {
     document.querySelector(".logo").innerHTML = _name;
 }
 
-function initializeToob() {
-    let toobHtmlElement = document.getElementById("toobImage");
-    toob = new Toob(toobHtmlElement);
+function initializeTerminal() {
+    let toobHtmlElement = document.getElementById("retro-terminal");
+    terminal = new Terminal(toobHtmlElement);
 
     initializeUfos();
 }
 
-// game of life ------------------------------->>>
+function windowResized() {
+    restartGOL();
+    initializeHeaderText();
+    initializeTerminal();
+}
+
+// game of life --------------------------------->>>
 function initializePixelAge(hWidth, hHeight) {
     pixelAge = new Array(hWidth * hHeight);
     for (let index = 0; index < hWidth * hHeight; index++) {
@@ -137,7 +134,7 @@ function initializePixelAge(hWidth, hHeight) {
     }
 }
 
-function incrementAge(pixels) {
+function incrementAge() {
     let age = 0;
     let n = 0;
     for (let index = 0; index < pixelAge.length; index++) {
@@ -162,8 +159,6 @@ function incrementAge(pixels) {
         // store the updated age
         pixelAge[index] = age;
     }
-    // update screen buffer based on new ages
-    setPixelColors(pixels);
 }
 
 function setPixelColors(pixels) {
@@ -256,13 +251,7 @@ function randomCellSpawn(x, y) {
         }
     }
 }
-
-function windowResized() {
-    restartGOL();
-    initializeHeaderText();
-    initializeToob();
-}
-// end of p5/gol stuff--------------------------------------->>>
+// end of gol ----------------------------------->>>
 
 // Header text
 let headerIndex = 0;
@@ -292,8 +281,8 @@ function initializeUfos() {
     let ufoElements = document.getElementsByClassName("ufo");
     for (let i = 0; i < ufoElements.length; i++) {
         let position = new Vec2D(
-            toob.center.x + Math.random() * toob.width - toob.width / 2,
-            toob.center.y + Math.random() * toob.height - toob.height / 2
+            terminal.center.x + Math.random() * terminal.width - terminal.width / 2,
+            terminal.center.y + Math.random() * terminal.height - terminal.height / 2
         );
         let velocity = new Vec2D(Math.random() * 2, Math.random() * 2);
         let htmlElement = ufoElements[i];
@@ -305,8 +294,8 @@ function updateUfos() {
     for (let i = 0; i < ufos.length; i++) {
         const ufo = ufos[i];
         let nextPos = ufo.pos.add(ufo.vel);
-        if (nextPos.x < toob.left || nextPos.x > toob.right) ufo.vel = ufo.vel.flipX();
-        if (nextPos.y < toob.top || nextPos.y > toob.bottom) ufo.vel = ufo.vel.flipY();
+        if (nextPos.x < terminal.left || nextPos.x > terminal.right) ufo.vel = ufo.vel.flipX();
+        if (nextPos.y < terminal.top || nextPos.y > terminal.bottom) ufo.vel = ufo.vel.flipY();
         ufo.pos = ufo.pos.add(ufo.vel);
         ufo.htmlElement.style = `transform: translate(${ufo.pos.x - ufo.SIZE / 2}px, ${ufo.pos.y - ufo.SIZE / 2}px)`;
     }
@@ -329,17 +318,104 @@ class Ufo {
     }
 }
 
-class Toob {
+class Terminal {
     TOOB_PADDING = 128;
+
+    VERSION = "JSDOS v0.0.1";
+    CURSOR = "$";
+
+    GAMES = [
+        "jump-to-orion",
+        "slider",
+        "air-defense",
+        "mine-squad-plus",
+        "planet-invaders",
+        "bug-dug",
+        "expedition-luna",
+    ];
+
     constructor(htmlElement) {
+        this.element = htmlElement;
         this.bounds = htmlElement.getBoundingClientRect();
         this.width = this.bounds.width - this.TOOB_PADDING;
         this.height = this.bounds.height - this.TOOB_PADDING;
-        this.center = new Vec2D(this.bounds.x + this.bounds.width / 2, this.bounds.y + this.bounds.height / 2);
+        this.center = new Vec2D(this.bounds.width / 2, this.bounds.height / 2);
         this.top = this.center.y - this.height / 2;
         this.right = this.center.x + this.width / 2;
         this.bottom = this.center.y + this.height / 2;
         this.left = this.center.x - this.width / 2;
+
+        this.retroConsole = document.getElementById("console");
+        this.retroConsole.addEventListener("keypress", (event) => {
+            this.handleKeyEvent(event);
+        });
+    }
+
+    handleKeyEvent(keyEvent) {
+        if (keyEvent.keyCode === 13) {
+            const consoleBuffer = keyEvent.target.value.split("\n");
+            const newCommand = consoleBuffer[consoleBuffer.length - 1].split(" ");
+            const command = newCommand[0]?.toLowerCase();
+            const arg = newCommand[1]?.toLowerCase();
+            switch (command) {
+                case "version":
+                case "-v":
+                    this.showVersion();
+                    break;
+                case "help":
+                case "-h":
+                    this.showHelp();
+                    break;
+                case "catalog":
+                case "-c":
+                    this.listGames();
+                    break;
+                case "run":
+                case "-r":
+                    this.runGame(arg);
+                    break;
+                default:
+                    this.commandError(command, "command invalid");
+                    break;
+            }
+        }
+    }
+
+    showVersion() {
+        this.appendConsole(this.VERSION);
+    }
+
+    showHelp(command) {
+        const help = `Available commands: help, catalog, run`;
+        this.appendConsole(help);
+    }
+
+    listGames() {
+        let text = "\n";
+        for (let game of this.GAMES) {
+            text += game + "\n";
+        }
+        this.appendConsole(text);
+    }
+
+    runGame(arg) {
+        if (this.GAMES.includes(arg)) {
+            window.location.href = `./games/${arg}.html`;
+            return;
+        }
+        if (!arg || arg.length < 1) {
+            this.commandError("", "run requires an argument");
+        } else {
+            this.commandError("", `${arg} not found`);
+        }
+    }
+
+    commandError(command, error) {
+        this.appendConsole(`error ${command} ${error}`);
+    }
+
+    appendConsole(text) {
+        this.retroConsole.value += `\n${text}`;
     }
 }
 
