@@ -319,10 +319,12 @@ class Ufo {
 }
 
 class Terminal {
-    TOOB_PADDING = 128;
+    TERMINAL_PADDING = 128;
 
-    VERSION = "JSDOS v0.0.1";
-    CURSOR = "$";
+    VERSION = "BBBDOS v0.0.1";
+    PROMPT = "guest@bitbytebytes$";
+    CURSOR = "█";
+    CURSORS = ["▀", "▄", "█", "▌", "▐", "░", "▒", "▓"];
 
     GAMES = [
         "jump-to-orion",
@@ -334,29 +336,54 @@ class Terminal {
         "expedition-luna",
     ];
 
+    loading = false;
+
     constructor(htmlElement) {
         this.element = htmlElement;
         this.bounds = htmlElement.getBoundingClientRect();
-        this.width = this.bounds.width - this.TOOB_PADDING;
-        this.height = this.bounds.height - this.TOOB_PADDING;
+        this.width = this.bounds.width - this.TERMINAL_PADDING;
+        this.height = this.bounds.height - this.TERMINAL_PADDING;
         this.center = new Vec2D(this.bounds.width / 2, this.bounds.height / 2);
         this.top = this.center.y - this.height / 2;
         this.right = this.center.x + this.width / 2;
         this.bottom = this.center.y + this.height / 2;
         this.left = this.center.x - this.width / 2;
 
-        this.retroConsole = document.getElementById("console");
-        this.retroConsole.addEventListener("keypress", (event) => {
+        this.console = document.getElementById("console");
+        this.console.addEventListener("click", () => {
+            this.focusCMD();
+        });
+        this.consoleOutput = document.getElementById("console-output");
+        this.outputInsertPoint = document.getElementById("output-bottom");
+
+        this.commandLine = document.getElementById("command-line");
+        this.hiddenInput = document.getElementById("hidden-input");
+        this.hiddenInput.addEventListener("keyup", (event) => {
             this.handleKeyEvent(event);
         });
+        this.focusCMD();
+
+        this.prompt = document.getElementById("prompt");
+        this.prompt.innerHTML = this.PROMPT;
+        this.dummyInput = document.getElementById("dummy-input");
+        this.cursor = document.getElementById("cursor");
+        this.cursor.innerHTML = this.CURSOR;
+
+        this.addWelcome();
+    }
+
+    focusCMD() {
+        this.hiddenInput.focus();
     }
 
     handleKeyEvent(keyEvent) {
+        this.dummyInput.innerHTML = keyEvent.target.value;
         if (keyEvent.keyCode === 13) {
-            const consoleBuffer = keyEvent.target.value.split("\n");
-            const newCommand = consoleBuffer[consoleBuffer.length - 1].split(" ");
-            const command = newCommand[0]?.toLowerCase();
-            const arg = newCommand[1]?.toLowerCase();
+            const newCommand = keyEvent.target.value.split(" ");
+            const command = newCommand[0]?.trim().toLowerCase();
+            const arg = newCommand[1]?.trim().toLowerCase();
+            this.hiddenInput.value = "";
+            this.dummyInput.innerHTML = "";
             switch (command) {
                 case "version":
                 case "-v":
@@ -367,6 +394,7 @@ class Terminal {
                     this.showHelp();
                     break;
                 case "catalog":
+                case "cat":
                 case "-c":
                     this.listGames();
                     break;
@@ -381,6 +409,12 @@ class Terminal {
         }
     }
 
+    addWelcome() {
+        this.appendConsole("Welcome to BitByteBytes!");
+        this.appendConsole(this.VERSION);
+        this.appendConsole("Last login 01/01/1970 16:20:00");
+    }
+
     showVersion() {
         this.appendConsole(this.VERSION);
     }
@@ -391,16 +425,23 @@ class Terminal {
     }
 
     listGames() {
-        let text = "\n";
+        this.appendConsole("</br>");
+        this.appendConsole("Currently installed games");
+        this.appendConsole("----------------------------");
         for (let game of this.GAMES) {
-            text += game + "\n";
+            this.appendConsole(game);
         }
-        this.appendConsole(text);
+        this.appendConsole("----------------------------");
+        this.appendConsole("</br>");
     }
 
     runGame(arg) {
-        if (this.GAMES.includes(arg)) {
-            window.location.href = `./games/${arg}.html`;
+        if (this.GAMES.includes(arg) && !this.loading) {
+            this.appendConsole(`Loading ${arg}`);
+            this.loading = true;
+            setTimeout(() => {
+                window.location.href = `./games/${arg}.html`;
+            }, 3000);
             return;
         }
         if (!arg || arg.length < 1) {
@@ -415,7 +456,10 @@ class Terminal {
     }
 
     appendConsole(text) {
-        this.retroConsole.value += `\n${text}`;
+        let newLine = document.createElement("p");
+        newLine.innerHTML = text;
+
+        this.outputInsertPoint.parentNode.insertBefore(newLine, this.outputInsertPoint);
     }
 }
 

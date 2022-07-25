@@ -78,7 +78,16 @@
                     <img src="./img/old_tv.png" alt="toob" id="toobImage" />
                 </div>
 
-                <textarea id="console" spellcheck="false" autofocus="true" caret="wide"></textarea>
+                <div id="console">
+                    <div id="console-output">
+                        <a id="output-bottom"></a>
+                    </div>
+                    <div id="command-line">
+                        <textarea id="hidden-input"></textarea>
+                        <span id="prompt"></span>
+                        <span id="dummy-input"></span><b id="cursor"></b>
+                    </div>
+                </div>
 
                 <div class="ufo">
                     <a href="games/jump-to-orion.html"> <image src="img/orion.png" /></a>

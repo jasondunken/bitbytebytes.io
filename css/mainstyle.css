@@ -6,6 +6,10 @@
     font-family: "8801";
     src: url("font/8801.ttf");
 }
+@font-face {
+    font-family: "AppleII";
+    src: url("font/AppleII.ttf");
+}
 
 * {
     margin: 0;
@@ -196,8 +200,8 @@ body {
 
 #console {
     /* color: greenyellow; */
-    color: darkgreen;
-    font-family: "8801";
+    color: rgb(0, 103, 0);
+    font-family: "AppleII";
     position: absolute;
     top: 64px;
     right: 64px;
@@ -208,7 +212,30 @@ body {
     background-color: rgba(0, 0, 0, 0);
     border: none;
     outline: none;
-    font-size: 24px;
+    font-size: 18px;
     word-wrap: break-word;
     resize: none;
+}
+
+#hidden-input {
+    position: absolute;
+    left: -1000px;
+}
+
+#prompt {
+}
+
+#cursor {
+    position: relative;
+    animation: blink 1s linear infinite;
+    display: inline-block;
+    text-indent: -10px;
+    height: 1ch;
+    width: 1ch;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
 }
