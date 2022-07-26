@@ -36,7 +36,7 @@ function setup() {
 function momentarySwitch(switchElement) {
     switchElement.classList.remove("switch-off");
     switchElement.classList.remove("momentary-animation");
-    switchElement.offsetWidth; // hack to get animation to restart on subsequent clicks
+    switchElement.offsetWidth; // hack to get switch animation to restart on subsequent clicks
     switchElement.classList.add("momentary-animation");
 }
 
@@ -59,14 +59,16 @@ function draw() {
         if (frameCount % DRAW_CALLS_PER_AGE_TICK == 0) {
             incrementAge();
         }
-
         // p5.js function
         // copies the canvas' pixels a global pixels[]
         //         px0         px1         px2 ...
         //           |           |           |
         // pixels = [r, g, b, a, r, g, b, a, r ...]
         loadPixels();
+        // sets pixel color based on its age
         setPixelColors(pixels);
+        // p5.js function
+        // updates screen buffer with pixels[]
         updatePixels();
     }
 
@@ -101,7 +103,7 @@ function getGOLSize() {
 
 function initializeHeaderText() {
     let _name = "";
-    let name_ = "BITbyteBYTES.io";
+    let name_ = "bitbytebytes.io";
     for (let l = 0; l < name_.length; l++) {
         let next = "<span class='ltr'>" + name_[l] + "</span>";
         _name += next;
@@ -110,16 +112,12 @@ function initializeHeaderText() {
 }
 
 function initializeTerminal() {
-    let toobHtmlElement = document.getElementById("retro-terminal");
-    terminal = new Terminal(toobHtmlElement);
-
+    terminal = new Terminal(document.getElementById("retro-terminal"));
     initializeUfos();
 }
 
 function windowResized() {
     restartGOL();
-    initializeHeaderText();
-    initializeTerminal();
 }
 
 // game of life --------------------------------->>>
@@ -161,7 +159,12 @@ function incrementAge() {
     }
 }
 
+let randomColorDelta = 0;
+let currentRandomColor = null;
 function setPixelColors(pixels) {
+    randomColorDelta += 0.001;
+    currentRandomColor = hslToRgb(Math.sin(randomColorDelta), 0.5, 0.5);
+
     let age = 0;
     for (let index = 0; index < pixelAge.length; index++) {
         age = pixelAge[index];
@@ -194,15 +197,9 @@ function setPixelColors(pixels) {
                 pixels[index * 4 + 2] = 255;
                 pixels[index * 4 + 3] = 255;
             } else {
-                let rColor = {
-                    r: Math.floor(Math.random() * 254 + 1),
-                    g: Math.floor(Math.random() * 255),
-                    b: Math.floor(Math.random() * 255),
-                    a: 255,
-                };
-                pixels[index * 4] = rColor.r;
-                pixels[index * 4 + 1] = rColor.g;
-                pixels[index * 4 + 2] = rColor.b;
+                pixels[index * 4] = currentRandomColor.r;
+                pixels[index * 4 + 1] = currentRandomColor.g;
+                pixels[index * 4 + 2] = currentRandomColor.b;
                 pixels[index * 4 + 3] = 255;
             }
         } else {
@@ -321,10 +318,10 @@ class Ufo {
 class Terminal {
     TERMINAL_PADDING = 128;
 
-    VERSION = "BBBDOS v0.0.1";
-    PROMPT = "guest@bitbytebytes$";
-    CURSOR = "█";
+    VERSION = "BBBDOS v0.0.1b";
+    PROMPT = "guest@bitbytebytes:~$";
     CURSORS = ["▀", "▄", "█", "▌", "▐", "░", "▒", "▓"];
+    CURSOR = this.CURSORS[6];
 
     GAMES = [
         "jump-to-orion",
@@ -337,6 +334,7 @@ class Terminal {
     ];
 
     loading = false;
+    settings = null;
 
     constructor(htmlElement) {
         this.element = htmlElement;
@@ -349,8 +347,8 @@ class Terminal {
         this.bottom = this.center.y + this.height / 2;
         this.left = this.center.x - this.width / 2;
 
-        this.console = document.getElementById("console");
-        this.console.addEventListener("click", () => {
+        this.retroConsole = document.getElementById("console");
+        this.retroConsole.addEventListener("click", () => {
             this.focusCMD();
         });
         this.consoleOutput = document.getElementById("console-output");
@@ -369,7 +367,9 @@ class Terminal {
         this.cursor = document.getElementById("cursor");
         this.cursor.innerHTML = this.CURSOR;
 
+        this.loadSettings();
         this.addWelcome();
+        this.login();
     }
 
     focusCMD() {
@@ -379,9 +379,10 @@ class Terminal {
     handleKeyEvent(keyEvent) {
         this.dummyInput.innerHTML = keyEvent.target.value;
         if (keyEvent.keyCode === 13) {
+            this.appendConsole(this.PROMPT + " " + keyEvent.target.value);
             const newCommand = keyEvent.target.value.split(" ");
             const command = newCommand[0]?.trim().toLowerCase();
-            const arg = newCommand[1]?.trim().toLowerCase();
+            const args = newCommand.splice(1);
             this.hiddenInput.value = "";
             this.dummyInput.innerHTML = "";
             switch (command) {
@@ -400,7 +401,13 @@ class Terminal {
                     break;
                 case "run":
                 case "-r":
-                    this.runGame(arg);
+                    this.runGame(args);
+                    break;
+                case "reset":
+                    this.reset(args);
+                    break;
+                case "about":
+                    this.addWelcome();
                     break;
                 default:
                     this.commandError(command, "command invalid");
@@ -410,9 +417,13 @@ class Terminal {
     }
 
     addWelcome() {
-        this.appendConsole("Welcome to BitByteBytes!");
+        this.appendConsole(`        ______ ______ ______       __               `);
+        this.appendConsole(`       |   __ |   __ |   __ .--.--|  |_.-----.-----.`);
+        this.appendConsole(`       |   __ |   __ |   __ |  |  |   _|  -__|__ --|`);
+        this.appendConsole(`       |______|______|______|___  |____|_____|_____|`);
+        this.appendConsole(`  +---+---+---+---+---+---+-|_____|Welcome to BitByteBytes!`);
         this.appendConsole(this.VERSION);
-        this.appendConsole("Last login 01/01/1970 16:20:00");
+        this.appendConsole(`Last Login:${this.getLastLogin()}`);
     }
 
     showVersion() {
@@ -420,13 +431,13 @@ class Terminal {
     }
 
     showHelp(command) {
-        const help = `Available commands: help, catalog, run`;
+        const help = `Available commands: help, catalog, run, version`;
         this.appendConsole(help);
     }
 
     listGames() {
         this.appendConsole("</br>");
-        this.appendConsole("Currently installed games");
+        this.appendConsole("Currently available games");
         this.appendConsole("----------------------------");
         for (let game of this.GAMES) {
             this.appendConsole(game);
@@ -435,31 +446,108 @@ class Terminal {
         this.appendConsole("</br>");
     }
 
-    runGame(arg) {
-        if (this.GAMES.includes(arg) && !this.loading) {
-            this.appendConsole(`Loading ${arg}`);
+    runGame(args) {
+        const game = args[0].trim();
+        if (this.GAMES.includes(game) && !this.loading) {
+            this.appendConsole(`Loading ${game}`);
             this.loading = true;
             setTimeout(() => {
-                window.location.href = `./games/${arg}.html`;
+                window.location.href = `./games/${game}.html`;
             }, 3000);
             return;
         }
-        if (!arg || arg.length < 1) {
-            this.commandError("", "run requires an argument");
+        if (!game || game.length < 1) {
+            this.commandError("run", "requires an argument");
         } else {
-            this.commandError("", `${arg} not found`);
+            this.commandError("run", `${game} not found`);
         }
     }
 
     commandError(command, error) {
-        this.appendConsole(`error ${command} ${error}`);
+        this.appendConsole(`ERROR: ${command} ${error}`);
     }
 
-    appendConsole(text) {
+    appendConsole(line) {
+        line = this.encodeLine(line);
         let newLine = document.createElement("p");
-        newLine.innerHTML = text;
+        newLine.innerHTML = line;
 
         this.outputInsertPoint.parentNode.insertBefore(newLine, this.outputInsertPoint);
+        this.retroConsole.scrollTo(0, document.body.offsetHeight);
+    }
+
+    encodeLine(line) {
+        let encodedString = "";
+        for (let i = 0; i < line.length; i++) {
+            if (i === 0 && line.charAt(i) == " ") {
+                encodedString += "&#160;";
+            } else if (line.charAt(i) == " " && line.charAt(i + 1) == " ") {
+                encodedString += "&#160;&#160;";
+                i++;
+            } else {
+                encodedString += line.charAt(i);
+            }
+        }
+        return encodedString;
+    }
+
+    getLastLogin() {
+        const date = new Date(this.settings["last-login"]);
+        return this.formatDate(date);
+    }
+
+    login() {
+        const thisLogin = new Date(Date.now() - new Date("2022-01-01"));
+        this.updateSettings("last-login", thisLogin);
+    }
+
+    initSettings() {
+        this.appendConsole("initializing settings...");
+        localStorage.clear();
+        this.settings = {
+            "last-login": new Date("1970-01-01T16:20:00"),
+        };
+        this.saveSettings();
+    }
+
+    loadSettings() {
+        const settings = localStorage.getItem("bbbdos-settings");
+        if (!settings) {
+            this.initSettings();
+        } else {
+            this.settings = JSON.parse(settings);
+        }
+    }
+
+    updateSettings(setting, value) {
+        this.settings[setting] = value;
+        this.saveSettings();
+    }
+
+    saveSettings() {
+        localStorage.setItem("bbbdos-settings", JSON.stringify(this.settings));
+    }
+
+    reset(args) {
+        const arg1 = args[0].trim();
+        console.log("args: ", args);
+        switch (arg1) {
+            case "settings":
+                this.initSettings();
+                break;
+            default:
+                this.appendConsole(`unauthorized reset of ${arg1}`);
+                this.appendConsole(`reset command cancelled`);
+        }
+    }
+
+    formatDate(date) {
+        const dateString = date.toDateString();
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, 0);
+        const seconds = String(date.getSeconds()).padStart(2, 0);
+        const millis = String(date.getMilliseconds()).padStart(4, 0);
+        return `${dateString} ${hours}:${minutes}:${seconds}:${millis}`;
     }
 }
 
@@ -484,4 +572,34 @@ class Vec2D {
     flipY() {
         return new Vec2D(this.x, -this.y);
     }
+}
+
+// converts h(0-1)s(0-1)l(0-1) to rgb
+function hslToRgb(h, s, l) {
+    let r, g, b;
+    if (s == 0) {
+        r = g = b = l;
+    } else {
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+
+        r = hue2rgb(p, q, h + 1 / 3.0);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3.0);
+    }
+
+    return {
+        r: Math.round(r * 254) + 1, // +1 is for the age check
+        g: Math.round(g * 255),
+        b: Math.round(b * 255),
+    };
+}
+
+function hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6.0) return p + (q - p) * 6 * t;
+    if (t < 1 / 2.0) return q;
+    if (t < 2 / 3.0) return p + (q - p) * 6 * (2 / 3.0 - t);
+    return p;
 }
