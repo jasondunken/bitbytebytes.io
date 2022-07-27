@@ -368,7 +368,7 @@ class Terminal {
         this.cursor.innerHTML = this.CURSOR;
 
         this.loadSettings();
-        this.addWelcome();
+        this.showWelcome();
         this.login();
     }
 
@@ -394,7 +394,6 @@ class Terminal {
                 case "-h":
                     this.showHelp();
                     break;
-                case "catalog":
                 case "cat":
                 case "-c":
                     this.listGames();
@@ -403,11 +402,16 @@ class Terminal {
                 case "-r":
                     this.runGame(args);
                     break;
+                case "motd":
+                case "-m":
+                    this.showWelcome();
+                    break;
+                case "ifconfig":
+                case "-i":
+                    this.showClientInfo();
+                    break;
                 case "reset":
                     this.reset(args);
-                    break;
-                case "about":
-                    this.addWelcome();
                     break;
                 default:
                     this.commandError(command, "command invalid");
@@ -416,7 +420,7 @@ class Terminal {
         }
     }
 
-    addWelcome() {
+    showWelcome() {
         this.appendConsole(`        ______ ______ ______       __               `);
         this.appendConsole(`       |   __ |   __ |   __ .--.--|  |_.-----.-----.`);
         this.appendConsole(`       |   __ |   __ |   __ |  |  |   _|  -__|__ --|`);
@@ -431,18 +435,24 @@ class Terminal {
     }
 
     showHelp(command) {
-        const help = `Available commands: help, catalog, run, version`;
-        this.appendConsole(help);
+        this.appendConsole("</br>");
+        this.appendConsole(`Available commands:`);
+        this.appendConsole(`version, -v: shows bbbdos version information`);
+        this.appendConsole(`help, -h: shows this help page`);
+        this.appendConsole(`cat, -c: lists currently available bbbdos games`);
+        this.appendConsole(`run, -r: runs a game program`);
+        this.appendConsole(`motd, -m: shows message of the day`);
+        this.appendConsole(`ifconfig, -i: shows connection information`);
+        this.appendConsole("</br>");
     }
 
     listGames() {
         this.appendConsole("</br>");
-        this.appendConsole("Currently available games");
-        this.appendConsole("----------------------------");
         for (let game of this.GAMES) {
-            this.appendConsole(game);
+            this.appendConsole(`--x   ${game}`);
         }
-        this.appendConsole("----------------------------");
+        this.appendConsole(`---   toad-runner`);
+        this.appendConsole(`---   hexbert`);
         this.appendConsole("</br>");
     }
 
@@ -461,6 +471,28 @@ class Terminal {
         } else {
             this.commandError("run", `${game} not found`);
         }
+    }
+
+    async showClientInfo() {
+        console.log("window: ", window);
+        let ip = await this.getIP();
+        if (!ip) ip = "***.***.***.***";
+        this.appendConsole("-----------------");
+        this.appendConsole(`host: ${window.location.host}`);
+        this.appendConsole(`client: ${ip}`);
+        this.appendConsole(`connected: ${window.clientInformation.onLine}`);
+        this.appendConsole("-----------------");
+    }
+
+    async getIP() {
+        const ipify = await fetch("https://api.ipify.org?format=json").catch((error) => {
+            // console.log("catch.error: ", error);
+        });
+        if (ipify) {
+            const data = await ipify.json();
+            return data.ip;
+        }
+        return null;
     }
 
     commandError(command, error) {
@@ -546,7 +578,7 @@ class Terminal {
         const hours = date.getHours();
         const minutes = String(date.getMinutes()).padStart(2, 0);
         const seconds = String(date.getSeconds()).padStart(2, 0);
-        const millis = String(date.getMilliseconds()).padStart(4, 0);
+        const millis = String(date.getMilliseconds()).padStart(3, 0);
         return `${dateString} ${hours}:${minutes}:${seconds}:${millis}`;
     }
 }
