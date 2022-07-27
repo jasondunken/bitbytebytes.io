@@ -9,7 +9,7 @@ class EnemyAircraft extends GameObject {
     cooldownTimer = 0;
 
     constructor(position, spriteL, spriteR) {
-        super("enemy", position);
+        super("bomber", position);
         this.spriteL = spriteL;
         this.spriteR = spriteR;
         this.health = this.MAX_HEALTH;
@@ -66,5 +66,36 @@ class Bomb extends GameObject {
     render() {
         setColor("brown");
         ellipse(this.position.x, this.position.y, 5, 5);
+    }
+}
+
+class AirborneTransport extends GameObject {
+    MAX_HEALTH = 100;
+    MOVE_SPEED = 5;
+    PARATROOPER_COUNT = 20;
+
+    health;
+    paratroopers;
+
+    constructor(position, spriteL, spriteR) {
+        super("airborne", position);
+        this.spriteL = spriteL;
+        this.spriteR = spriteR;
+        this.health = this.MAX_HEALTH;
+        this.paratroopers = this.PARATROOPER_COUNT;
+    }
+
+    update() {
+        this.position.x += this.position.z;
+    }
+
+    render() {
+        // since this is a 2d game, x & y will be screen pos, z will be used to indicate direction;
+        // z === -1: left | z === 0: not moving | z === 1: right
+        if (this.position.z < 0) {
+            image(this.spriteL, this.position.x - 48, this.position.y - 16, 96, 32);
+        } else {
+            image(this.spriteR, this.position.x - 48, this.position.y - 16, 96, 32);
+        }
     }
 }
