@@ -8,16 +8,13 @@ let pixelAge;
 const RESTART_DELAY = 10;
 let restartTimer = 0;
 
+let gol;
 let terminal;
-let ufos = [];
 
 // called by p5 when window is ready
 function setup() {
     // p5.draw calls/second
     frameRate(60);
-    initializeHeaderGOL();
-    initializeHeaderText();
-    initializeTerminal();
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
         restartGOL();
@@ -31,6 +28,10 @@ function setup() {
     document.getElementById("toggle-4").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
     });
+
+    initializeGOL();
+    initializeBanner();
+    initializeTerminal();
 }
 
 function momentarySwitch(switchElement) {
@@ -71,12 +72,10 @@ function draw() {
         // updates screen buffer with pixels[]
         updatePixels();
     }
-
-    updateUfos();
     updateHeaderText();
 }
 
-function initializeHeaderGOL() {
+function initializeGOL() {
     const size = getGOLSize();
     // p5 canvas
     let canvas = createCanvas(size.hWidth, size.hHeight);
@@ -101,7 +100,7 @@ function getGOLSize() {
     return { hWidth, hHeight };
 }
 
-function initializeHeaderText() {
+function initializeBanner() {
     let _name = "";
     let name_ = "bitbytebytes.io";
     for (let l = 0; l < name_.length; l++) {
@@ -113,7 +112,6 @@ function initializeHeaderText() {
 
 function initializeTerminal() {
     terminal = new Terminal(document.getElementById("retro-terminal"));
-    initializeUfos();
 }
 
 function windowResized() {
@@ -273,48 +271,6 @@ function updateHeaderText() {
     }
 }
 
-// Toob icons
-function initializeUfos() {
-    let ufoElements = document.getElementsByClassName("ufo");
-    for (let i = 0; i < ufoElements.length; i++) {
-        let position = new Vec2D(
-            terminal.center.x + Math.random() * terminal.width - terminal.width / 2,
-            terminal.center.y + Math.random() * terminal.height - terminal.height / 2
-        );
-        let velocity = new Vec2D(Math.random() * 2, Math.random() * 2);
-        let htmlElement = ufoElements[i];
-        ufos[i] = new Ufo(position, velocity, htmlElement);
-    }
-}
-
-function updateUfos() {
-    for (let i = 0; i < ufos.length; i++) {
-        const ufo = ufos[i];
-        let nextPos = ufo.pos.add(ufo.vel);
-        if (nextPos.x < terminal.left || nextPos.x > terminal.right) ufo.vel = ufo.vel.flipX();
-        if (nextPos.y < terminal.top || nextPos.y > terminal.bottom) ufo.vel = ufo.vel.flipY();
-        ufo.pos = ufo.pos.add(ufo.vel);
-        ufo.htmlElement.style = `transform: translate(${ufo.pos.x - ufo.SIZE / 2}px, ${ufo.pos.y - ufo.SIZE / 2}px)`;
-    }
-}
-
-class Ufo {
-    SIZE = 32;
-    constructor(position, velocity, element) {
-        this.pos = position;
-        this.vel = velocity;
-        this.htmlElement = element;
-    }
-
-    setPosition(position) {
-        this.pos = position;
-    }
-
-    setVelocity(velocity) {
-        this.vel = velocity;
-    }
-}
-
 class Terminal {
     TERMINAL_PADDING = 128;
 
@@ -341,11 +297,6 @@ class Terminal {
         this.bounds = htmlElement.getBoundingClientRect();
         this.width = this.bounds.width - this.TERMINAL_PADDING;
         this.height = this.bounds.height - this.TERMINAL_PADDING;
-        this.center = new Vec2D(this.bounds.width / 2, this.bounds.height / 2);
-        this.top = this.center.y - this.height / 2;
-        this.right = this.center.x + this.width / 2;
-        this.bottom = this.center.y + this.height / 2;
-        this.left = this.center.x - this.width / 2;
 
         this.retroConsole = document.getElementById("console");
         this.retroConsole.addEventListener("click", () => {
@@ -580,29 +531,6 @@ class Terminal {
         const seconds = String(date.getSeconds()).padStart(2, 0);
         const millis = String(date.getMilliseconds()).padStart(3, 0);
         return `${dateString} ${hours}:${minutes}:${seconds}:${millis}`;
-    }
-}
-
-class Vec2D {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    add(vector2D) {
-        return new Vec2D(this.x + vector2D.x, this.y + vector2D.y);
-    }
-
-    sub(vector2D) {
-        return new Vec2D(this.x - vector2D.x, this.y - vector2D.y);
-    }
-
-    flipX() {
-        return new Vec2D(-this.x, this.y);
-    }
-
-    flipY() {
-        return new Vec2D(this.x, -this.y);
     }
 }
 
