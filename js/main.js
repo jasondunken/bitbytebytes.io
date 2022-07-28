@@ -1,13 +1,3 @@
-const DRAW_CALLS_PER_AGE_TICK = 2;
-const INITIAL_CELL_DENSITY = 0.075;
-const SPAWN_AREA_SIZE = 11;
-let hWidth;
-let hHeight;
-let pixelAge;
-
-const RESTART_DELAY = 10;
-let restartTimer = 0;
-
 let gol;
 let terminal;
 
@@ -17,7 +7,7 @@ function setup() {
     frameRate(60);
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
-        restartGOL();
+        this.restartGOL();
     });
     document.getElementById("toggle-2").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -51,53 +41,31 @@ function toggleSwitch(switchElement) {
     }
 }
 
-// called by p5 when window is ready
+// called by p5 when setup is resolved
+// @ framerate/second
 function draw() {
-    if (restartTimer > 0) {
-        restartTimer--;
-    } else {
-        // frameCount is a p5 global
-        if (frameCount % DRAW_CALLS_PER_AGE_TICK == 0) {
-            incrementAge();
-        }
-        // p5.js function
-        // copies the canvas' pixels a global pixels[]
-        //         px0         px1         px2 ...
-        //           |           |           |
-        // pixels = [r, g, b, a, r, g, b, a, r ...]
-        loadPixels();
-        // sets pixel color based on its age
-        setPixelColors(pixels);
-        // p5.js function
-        // updates screen buffer with pixels[]
-        updatePixels();
-    }
+    // p5.js function
+    // copies the canvas' pixels a global pixels[]
+    //         px0         px1         px2 ...
+    //           |           |           |
+    // pixels = [r, g, b, a, r, g, b, a, r ...]
+    loadPixels();
+    this.gol.update(pixels);
+    this.gol.draw(pixels);
+    // p5.js function
+    // updates screen buffer with pixels[]
+    updatePixels();
     updateHeaderText();
 }
 
 function initializeGOL() {
-    const size = getGOLSize();
-    // p5 canvas
-    let canvas = createCanvas(size.hWidth, size.hHeight);
-    canvas.parent("p5-container");
-
-    restartGOL();
+    let header = document.getElementById("gol-container").getBoundingClientRect();
+    this.gol = new GOL(header.width, header.height);
 }
 
 function restartGOL() {
-    clear();
-    restartTimer = RESTART_DELAY;
-    const size = getGOLSize();
-    resizeCanvas(size.hWidth, size.hHeight);
-    initializePixelAge(size.hWidth, size.hHeight);
-}
-
-function getGOLSize() {
-    // TODO: needs to take browser zoom into consideration, breaks if zoom !== 100% currently
-    let header = document.getElementById("gol-container").getBoundingClientRect();
-    hWidth = header.width;
-    hHeight = header.height;
-    return { hWidth, hHeight };
+    const header = document.getElementById("gol-container").getBoundingClientRect();
+    this.gol.restart(header.width, header.height);
 }
 
 function initializeBanner() {
@@ -115,138 +83,20 @@ function initializeTerminal() {
 }
 
 function windowResized() {
-    restartGOL();
+    this.restartGOL();
 }
 
-// game of life --------------------------------->>>
-function initializePixelAge(hWidth, hHeight) {
-    pixelAge = new Array(hWidth * hHeight);
-    for (let index = 0; index < hWidth * hHeight; index++) {
-        pixelAge[index] = 0;
-    }
-    for (let i = 0; i < hWidth * hHeight * INITIAL_CELL_DENSITY; i++) {
-        const index = Math.floor(Math.random() * pixelAge.length);
-        pixelAge[index] = 1;
-    }
-}
-
-function incrementAge() {
-    let age = 0;
-    let n = 0;
-    for (let index = 0; index < pixelAge.length; index++) {
-        // get age from pixelAge array
-        age = pixelAge[index];
-        // determine neighbors from previous screen buffer
-        n = getNumNeighbors(index);
-
-        if (age >= 1) {
-            if (n == 2 || n == 3) {
-                // Any live cell with two or three live neighbors lives on to the next generation..
-                age++;
-            } else {
-                // any live cell with fewer than two live neighbors dies, as if caused by under-population.
-                // or live cell with more than three live neighbors dies, as if by overcrowding.
-                age = 0;
-            }
-        } else if (n == 3) {
-            //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-            age = 1;
-        }
-        // store the updated age
-        pixelAge[index] = age;
-    }
-}
-
-let randomColorDelta = 0;
-let currentRandomColor = null;
-function setPixelColors(pixels) {
-    randomColorDelta += 0.001;
-    currentRandomColor = hslToRgb(Math.sin(randomColorDelta), 0.5, 0.5);
-
-    let age = 0;
-    for (let index = 0; index < pixelAge.length; index++) {
-        age = pixelAge[index];
-        if (age >= 1) {
-            if (age > 1024) pAge = 1;
-            // a pixel is considered alive if it has > 0 in red channel
-            // dead if 0
-            if (age < 128) {
-                // red
-                pixels[index * 4] = 255;
-                // green
-                pixels[index * 4 + 1] = 255;
-                // blue
-                pixels[index * 4 + 2] = 255;
-                // alpha
-                pixels[index * 4 + 3] = 255;
-            } else if (age < 256) {
-                pixels[index * 4] = 255;
-                pixels[index * 4 + 1] = 0;
-                pixels[index * 4 + 2] = 0;
-                pixels[index * 4 + 3] = 255;
-            } else if (age < 512) {
-                pixels[index * 4] = 1;
-                pixels[index * 4 + 1] = 255;
-                pixels[index * 4 + 2] = 0;
-                pixels[index * 4 + 3] = 255;
-            } else if (age < 768) {
-                pixels[index * 4] = 1;
-                pixels[index * 4 + 1] = 0;
-                pixels[index * 4 + 2] = 255;
-                pixels[index * 4 + 3] = 255;
-            } else {
-                pixels[index * 4] = currentRandomColor.r;
-                pixels[index * 4 + 1] = currentRandomColor.g;
-                pixels[index * 4 + 2] = currentRandomColor.b;
-                pixels[index * 4 + 3] = 255;
-            }
-        } else {
-            pixels[index * 4] = pixels[index * 4 + 1] = pixels[index * 4 + 2] = 0;
-            pixels[index * 4 + 3] = 255;
-        }
-    }
-}
-
-function getNumNeighbors(index) {
-    index = index * 4;
-    let neighbors = 0;
-    let nIndex = 0;
-    for (let i = -4; i <= 4; i += 4) {
-        for (let j = -4; j <= 4; j += 4) {
-            nIndex = index + i + j * hWidth;
-            if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
-                // pixel red channel > 0 is alive
-                if (pixels[nIndex] > 0) {
-                    neighbors++;
-                }
-            }
-        }
-    }
-    return neighbors;
+function mouseReleased(e) {
+    this.gol.randomCellSpawn(e.pageX, e.pageY);
 }
 
 function mouseClicked(e) {
-    if (e.pageY <= hHeight) {
-        randomCellSpawn(e.pageX, e.pageY);
-    }
+    this.gol.randomCellSpawn(e.pageX, e.pageY);
 }
 
 function mouseDragged(e) {
-    randomCellSpawn(e.pageX, e.pageY);
+    this.gol.randomCellSpawn(e.pageX, e.pageY);
 }
-
-function randomCellSpawn(x, y) {
-    let cellIndex = y * hWidth + x;
-    for (let i = -Math.floor(SPAWN_AREA_SIZE / 2); i < SPAWN_AREA_SIZE; i++) {
-        for (let j = -Math.floor(SPAWN_AREA_SIZE / 2); j < SPAWN_AREA_SIZE; j++) {
-            index = cellIndex + i + j * hWidth;
-            if (index > 0 && index < pixelAge.length) {
-                pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
-            }
-        }
-    }
-}
-// end of gol ----------------------------------->>>
 
 // Header text
 let headerIndex = 0;
@@ -268,6 +118,183 @@ function updateHeaderText() {
         letters[headerIndex].style = currentColor;
         headerIndex++;
         if (headerIndex >= letters.length) headerIndex = 0;
+    }
+}
+
+class GOL {
+    DRAW_CALLS_PER_AGE_TICK = 2;
+    INITIAL_CELL_DENSITY = 0.075;
+    SPAWN_AREA_SIZE = 11;
+
+    RESTART_DELAY = 10;
+    restartTime = 0;
+
+    golCanvas = null;
+    pixelAge;
+
+    STATES = { STARTING: 0, RUNNING: 1, PAUSED: 2 };
+    state = this.STATES.STARTING;
+
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.golCanvas = createCanvas(width, height);
+        this.golCanvas.parent("p5-container");
+        this.initializeGOL(width, height);
+        this.initialSpawn(width, height);
+    }
+
+    restart(width, height) {
+        this.state = this.STATES.STARTING;
+        this.restartTime = this.RESTART_DELAY;
+        this.width = width;
+        this.height = height;
+        this.golCanvas.resize(width, height);
+        this.initializeGOL(width, height);
+        this.initialSpawn(width, height);
+    }
+
+    initializeGOL(width, height) {
+        this.pixelAge = new Array(width * height).fill(0);
+    }
+
+    initialSpawn(width, height) {
+        for (let i = 0; i < width * height * this.INITIAL_CELL_DENSITY; i++) {
+            const index = Math.floor(Math.random() * this.pixelAge.length);
+            this.pixelAge[index] = 1;
+        }
+    }
+
+    update(pixels) {
+        if (this.restartTime > 0) {
+            this.restartTime--;
+        } else this.state = this.STATES.RUNNING;
+
+        if (this.state === this.STATES.RUNNING) {
+            // frameCount is a p5 global
+            if (frameCount % this.DRAW_CALLS_PER_AGE_TICK == 0) {
+                this.incrementAge(pixels);
+            }
+        }
+    }
+
+    incrementAge(pixels) {
+        let age = 0;
+        let n = 0;
+        for (let index = 0; index < this.pixelAge.length; index++) {
+            // get age from pixelAge array
+            age = this.pixelAge[index];
+            // determine neighbors from previous screen buffer
+            n = this.getNumNeighbors(index, pixels);
+
+            if (age >= 1) {
+                if (n == 2 || n == 3) {
+                    // Any live cell with two or three live neighbors lives on to the next generation..
+                    age++;
+                } else {
+                    // any live cell with fewer than two live neighbors dies, as if caused by under-population.
+                    // or live cell with more than three live neighbors dies, as if by overcrowding.
+                    age = 0;
+                }
+            } else if (n == 3) {
+                //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+                age = 1;
+            }
+            // store the updated age
+            this.pixelAge[index] = age;
+        }
+    }
+
+    draw(pixels) {
+        if (this.state === this.STATES.STARTING) {
+            // sets pixel color based on its age
+            for (let i = 0; i < pixels.length; i++) {
+                pixels[i] = 0;
+            }
+        }
+        if (this.state === this.STATES.RUNNING) {
+            // sets pixel color based on its age
+            this.setPixelColors(pixels);
+        }
+    }
+
+    randomColorDelta = 0;
+    currentRandomColor = null;
+    setPixelColors(pixels) {
+        this.randomColorDelta += 0.001;
+        this.currentRandomColor = hslToRgb(Math.sin(this.randomColorDelta), 0.5, 0.5);
+
+        let age = 0;
+        for (let index = 0; index < this.pixelAge.length; index++) {
+            age = this.pixelAge[index];
+            if (age >= 1) {
+                // a pixel is considered alive if it has > 0 in red channel
+                // dead if 0
+                if (age < 128) {
+                    // red
+                    pixels[index * 4] = 255;
+                    // green
+                    pixels[index * 4 + 1] = 255;
+                    // blue
+                    pixels[index * 4 + 2] = 255;
+                    // alpha
+                    pixels[index * 4 + 3] = 255;
+                } else if (age < 256) {
+                    pixels[index * 4] = 255;
+                    pixels[index * 4 + 1] = 0;
+                    pixels[index * 4 + 2] = 0;
+                    pixels[index * 4 + 3] = 255;
+                } else if (age < 512) {
+                    pixels[index * 4] = 1;
+                    pixels[index * 4 + 1] = 255;
+                    pixels[index * 4 + 2] = 0;
+                    pixels[index * 4 + 3] = 255;
+                } else if (age < 768) {
+                    pixels[index * 4] = 1;
+                    pixels[index * 4 + 1] = 0;
+                    pixels[index * 4 + 2] = 255;
+                    pixels[index * 4 + 3] = 255;
+                } else {
+                    pixels[index * 4] = this.currentRandomColor.r;
+                    pixels[index * 4 + 1] = this.currentRandomColor.g;
+                    pixels[index * 4 + 2] = this.currentRandomColor.b;
+                    pixels[index * 4 + 3] = 255;
+                }
+            } else {
+                pixels[index * 4] = pixels[index * 4 + 1] = pixels[index * 4 + 2] = 0;
+                pixels[index * 4 + 3] = 255;
+            }
+        }
+    }
+
+    getNumNeighbors(index, pixels) {
+        index = index * 4;
+        let neighbors = 0;
+        let nIndex = 0;
+        for (let i = -4; i <= 4; i += 4) {
+            for (let j = -4; j <= 4; j += 4) {
+                nIndex = index + i + j * this.width;
+                if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
+                    // pixel red channel > 0 is alive
+                    if (pixels[nIndex] > 0) {
+                        neighbors++;
+                    }
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    randomCellSpawn(x, y) {
+        let cellIndex = y * this.width + x;
+        for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
+            for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
+                const index = cellIndex + i + j * this.width;
+                if (index > 0 && index < this.pixelAge.length) {
+                    this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
+                }
+            }
+        }
     }
 }
 
