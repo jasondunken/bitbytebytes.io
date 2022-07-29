@@ -431,6 +431,7 @@ class Terminal {
         }
         this.appendConsole(`---   toad-runner`);
         this.appendConsole(`---   hexbert`);
+        this.appendConsole(`---   chateau-hasenpfeffer`);
         this.appendConsole("</br>");
     }
 
