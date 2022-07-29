@@ -11,6 +11,7 @@ const GameState = {
 
 function preload() {
     const sprites = [];
+    sprites["paratrooper"] = loadImage("./air-defense/img/paratrooper.png");
     sprites["background"] = loadImage("./air-defense/img/background.png");
     sprites["foreground"] = loadImage("./air-defense/img/foreground.png");
     sprites["blue_1_1_L"] = loadImage("./air-defense/img/blue_1_1_L.png");
@@ -19,7 +20,6 @@ function preload() {
     sprites["blue_1_2_R"] = loadImage("./air-defense/img/blue_1_2_R.png");
     sprites["airborne_left"] = loadImage("./air-defense/img/airborne_left.png");
     sprites["airborne_right"] = loadImage("./air-defense/img/airborne_right.png");
-    sprites["paratrooper"] = loadImage("./air-defense/img/paratrooper.png");
 
     game = new AirDefense(WIDTH, HEIGHT, sprites);
 }
@@ -27,6 +27,8 @@ function preload() {
 function setup() {
     const canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent("game");
+    frameRate(60);
+    noSmooth();
     game.start1Player();
 }
 
@@ -53,6 +55,8 @@ class AirDefense {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
+
+        this.paratrooper = new Paratrooper({ x: 50, y: 50, z: -1 }, sprites["paratrooper"], sprites["paratrooper"]);
     }
 
     initGame() {}
@@ -101,6 +105,30 @@ class AirDefense {
                 }
             }
             if (gameObj.type === "bomb" && gameObj.position.y > this.height) gameObj.dead = true;
+
+            if (
+                gameObj.type === "airborne" &&
+                Math.abs(this.turret.position.x - gameObj.position.x) < gameObj.JUMP_RANGE
+            ) {
+                if (gameObj.canDeploy()) {
+                    this.gameObjects.push(
+                        new Paratrooper(
+                            { x: gameObj.position.x, y: gameObj.position.y },
+                            this.sprites["paratrooper"],
+                            this.sprites["paratrooper"]
+                        )
+                    );
+                }
+            }
+
+            if (gameObj.type === "paratrooper" && gameObj.position.y >= this.height - this.GROUND_HEIGHT - 8) {
+                gameObj.grounded = true;
+            }
+        }
+
+        this.paratrooper.update();
+        if (this.paratrooper.position.y >= this.height - this.GROUND_HEIGHT - 8) {
+            this.paratrooper.grounded = true;
         }
 
         for (let i = this.gameObjects.length - 1; i >= 0; i--) {
@@ -141,6 +169,7 @@ class AirDefense {
         }
 
         this.turret.render();
+        this.paratrooper.render();
 
         image(
             this.sprites["foreground"],

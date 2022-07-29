@@ -73,9 +73,13 @@ class AirborneTransport extends GameObject {
     MAX_HEALTH = 100;
     MOVE_SPEED = 5;
     PARATROOPER_COUNT = 20;
+    JUMP_RANGE = 200;
+    JUMP_INTERVAL = 20;
 
     health;
     paratroopers;
+
+    jumpTimer = 0;
 
     constructor(position, spriteL, spriteR) {
         super("airborne", position);
@@ -87,6 +91,16 @@ class AirborneTransport extends GameObject {
 
     update() {
         this.position.x += this.position.z;
+        if (this.jumpTimer > 0) this.jumpTimer--;
+    }
+
+    canDeploy() {
+        if (this.jumpTimer === 0 && this.paratroopers > 0) {
+            this.jumpTimer = this.JUMP_INTERVAL;
+            this.paratroopers--;
+            return true;
+        }
+        return false;
     }
 
     render() {
@@ -97,5 +111,79 @@ class AirborneTransport extends GameObject {
         } else {
             image(this.spriteR, this.position.x - 48, this.position.y - 16, 96, 32);
         }
+    }
+}
+
+class Paratrooper extends GameObject {
+    FALLING_SPEED = 1;
+    MOVE_SPEED = 0.5;
+
+    animations = null;
+    parachute = null;
+    parachuting = null;
+
+    grounded = false;
+
+    constructor(position, spriteSheet) {
+        super("paratrooper", position);
+        this.spriteSheet = spriteSheet;
+    }
+
+    update() {
+        if (!this.grounded) {
+            this.position.y += this.FALLING_SPEED;
+        } else {
+            if (this.currentAnimation === this.animations.get("parachuting")) {
+                this.parachute = false;
+                this.currentAnimation = this.animations.get("walk-right");
+            }
+            this.position.x += this.MOVE_SPEED;
+        }
+        if (!this.animations) {
+            this.animations = new Map();
+            this.createSprites();
+        }
+        this.currentAnimation.update();
+    }
+
+    render() {
+        stroke("red");
+        noFill();
+        image(this.currentAnimation.currentFrame, this.position.x - 8, this.position.y - 8, 16, 16);
+        if (this.parachute) {
+            image(this.parachute, this.position.x - 8, this.position.y - 24, 16, 16);
+        }
+    }
+
+    createSprites() {
+        const cellHeight = this.spriteSheet.height;
+        const cells = this.spriteSheet.width / cellHeight;
+        const cellWidth = this.spriteSheet.width / cells;
+
+        const walkingLeftCells = createImage(cellWidth * 4, cellHeight);
+        walkingLeftCells.copy(this.spriteSheet, 0, 0, cellWidth * 4, cellHeight, 0, 0, cellWidth * 4, cellHeight);
+        this.animations.set("walk-left", new Animation(walkingLeftCells, 60, true));
+        const walkingRightCells = createImage(cellWidth * 4, cellHeight);
+        walkingRightCells.copy(
+            this.spriteSheet,
+            cellWidth * 6,
+            0,
+            cellWidth * 4,
+            cellHeight,
+            0,
+            0,
+            cellWidth * 4,
+            cellHeight
+        );
+        this.animations.set("walk-right", new Animation(walkingRightCells, 60, true));
+
+        const parachuteCells = createImage(cellWidth, cellHeight);
+        parachuteCells.copy(this.spriteSheet, cellWidth * 10, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+        this.parachute = parachuteCells;
+        const parachutingCells = createImage(cellWidth, cellHeight);
+        parachutingCells.copy(this.spriteSheet, cellWidth * 5, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+        this.animations.set("parachuting", new Animation(parachutingCells, 60, true));
+
+        this.currentAnimation = this.animations.get("parachuting");
     }
 }
