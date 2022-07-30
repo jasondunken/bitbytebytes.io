@@ -1,7 +1,9 @@
 class EnemyAircraft extends GameObject {
     MAX_HEALTH = 10;
-    MOVE_SPEED = 5;
+    MOVE_SPEED = 5.5;
     MAX_BOMBS = 2;
+
+    DROP_RANGE = 100;
     BOMB_RELOAD_TIME = 20;
 
     health;
@@ -22,6 +24,11 @@ class EnemyAircraft extends GameObject {
         if (this.cooldownTimer > 0) {
             this.cooldownTimer--;
         }
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
     }
 
     render() {
@@ -52,15 +59,25 @@ class EnemyAircraft extends GameObject {
 }
 
 class Bomb extends GameObject {
+    MAX_HEALTH = 5;
     FALLING_SPEED = 3;
+    DAMAGE = 100;
+
+    health;
     constructor(position, direction) {
         super("bomb", position);
         this.direction = direction;
+        this.health = this.MAX_HEALTH;
     }
 
     update() {
         this.position.x += this.direction.x;
         this.position.y += this.FALLING_SPEED;
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
     }
 
     render() {
@@ -70,11 +87,11 @@ class Bomb extends GameObject {
 }
 
 class AirborneTransport extends GameObject {
-    MAX_HEALTH = 100;
-    MOVE_SPEED = 5;
-    PARATROOPER_COUNT = 20;
-    JUMP_RANGE = 200;
-    JUMP_INTERVAL = 20;
+    MAX_HEALTH = 50;
+    MOVE_SPEED = 3.5;
+    PARATROOPER_COUNT = 10;
+    DROP_RANGE = 200;
+    JUMP_INTERVAL = 30;
 
     health;
     paratroopers;
@@ -94,6 +111,11 @@ class AirborneTransport extends GameObject {
         if (this.jumpTimer > 0) this.jumpTimer--;
     }
 
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
+    }
+
     canDeploy() {
         if (this.jumpTimer === 0 && this.paratroopers > 0) {
             this.jumpTimer = this.JUMP_INTERVAL;
@@ -104,8 +126,6 @@ class AirborneTransport extends GameObject {
     }
 
     render() {
-        // since this is a 2d game, x & y will be screen pos, z will be used to indicate direction;
-        // z === -1: left | z === 0: not moving | z === 1: right
         if (this.position.z < 0) {
             image(this.spriteL, this.position.x - 48, this.position.y - 16, 96, 32);
         } else {
@@ -115,29 +135,46 @@ class AirborneTransport extends GameObject {
 }
 
 class Paratrooper extends GameObject {
-    FALLING_SPEED = 1;
-    MOVE_SPEED = 0.5;
+    FALLING_SPEED = 3;
+    MOVE_SPEED = 0.25;
 
     animations = null;
     parachute = null;
     parachuting = null;
+    CHUTE_OPEN_DELAY = 40;
+    chuteOpenHeight;
+    chuteOpen = false;
 
     grounded = false;
+
+    MAX_HEALTH = 10;
+    health;
 
     constructor(position, spriteSheet) {
         super("paratrooper", position);
         this.spriteSheet = spriteSheet;
+        this.chuteOpenHeight = position.y + this.CHUTE_OPEN_DELAY;
+        this.health = this.MAX_HEALTH;
     }
 
     update() {
         if (!this.grounded) {
             this.position.y += this.FALLING_SPEED;
+            if (this.position.y > this.chuteOpenHeight && !this.chuteOpen) {
+                this.FALLING_SPEED = this.FALLING_SPEED / 5;
+                this.chuteOpen = true;
+            }
         } else {
             if (this.currentAnimation === this.animations.get("parachuting")) {
                 this.parachute = false;
-                this.currentAnimation = this.animations.get("walk-right");
+                if (this.position.z < 0) {
+                    this.currentAnimation = this.animations.get("walk-left");
+                }
+                if (this.position.z > 0) {
+                    this.currentAnimation = this.animations.get("walk-right");
+                }
             }
-            this.position.x += this.MOVE_SPEED;
+            this.position.x += this.MOVE_SPEED * this.position.z;
         }
         if (!this.animations) {
             this.animations = new Map();
@@ -146,11 +183,16 @@ class Paratrooper extends GameObject {
         this.currentAnimation.update();
     }
 
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
+    }
+
     render() {
         stroke("red");
         noFill();
         image(this.currentAnimation.currentFrame, this.position.x - 8, this.position.y - 8, 16, 16);
-        if (this.parachute) {
+        if (this.parachute && this.position.y > this.chuteOpenHeight) {
             image(this.parachute, this.position.x - 8, this.position.y - 24, 16, 16);
         }
     }
@@ -162,7 +204,7 @@ class Paratrooper extends GameObject {
 
         const walkingLeftCells = createImage(cellWidth * 4, cellHeight);
         walkingLeftCells.copy(this.spriteSheet, 0, 0, cellWidth * 4, cellHeight, 0, 0, cellWidth * 4, cellHeight);
-        this.animations.set("walk-left", new Animation(walkingLeftCells, 60, true));
+        this.animations.set("walk-left", new Animation(walkingLeftCells, 30, true));
         const walkingRightCells = createImage(cellWidth * 4, cellHeight);
         walkingRightCells.copy(
             this.spriteSheet,
@@ -175,7 +217,7 @@ class Paratrooper extends GameObject {
             cellWidth * 4,
             cellHeight
         );
-        this.animations.set("walk-right", new Animation(walkingRightCells, 60, true));
+        this.animations.set("walk-right", new Animation(walkingRightCells, 30, true));
 
         const parachuteCells = createImage(cellWidth, cellHeight);
         parachuteCells.copy(this.spriteSheet, cellWidth * 10, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);

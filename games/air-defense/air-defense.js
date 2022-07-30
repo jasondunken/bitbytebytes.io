@@ -20,6 +20,9 @@ function preload() {
     sprites["blue_1_2_R"] = loadImage("./air-defense/img/blue_1_2_R.png");
     sprites["airborne_left"] = loadImage("./air-defense/img/airborne_left.png");
     sprites["airborne_right"] = loadImage("./air-defense/img/airborne_right.png");
+    sprites["red-block"] = loadImage("./air-defense/img/redblock.png");
+    sprites["red-block"] = loadImage("./air-defense/img/greenblock.png");
+    sprites["generator"] = loadImage("./air-defense/img/generator.png");
 
     game = new AirDefense(WIDTH, HEIGHT, sprites);
 }
@@ -55,8 +58,6 @@ class AirDefense {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
-
-        this.paratrooper = new Paratrooper({ x: 50, y: 50, z: -1 }, sprites["paratrooper"], sprites["paratrooper"]);
     }
 
     initGame() {}
@@ -77,43 +78,69 @@ class AirDefense {
 
     startGame() {
         this.score = 0;
-        this.gameObjects = [];
+        this.gameObjects = new Set();
     }
 
     update() {
+        // console.log("gameObjects.size: ", this.gameObjects.size);
         this.turret.update();
+
+        const bullets = Array.from(this.gameObjects).filter((element) => {
+            return element.type === "bullet";
+        });
 
         for (let gameObj of this.gameObjects) {
             gameObj.update();
-            if (gameObj.type === "bomber") {
-                if (
-                    (gameObj.position.x <= -32 && gameObj.position.z === -1) ||
-                    (gameObj.position.x >= this.width + 32 && gameObj.position.z === 1)
-                ) {
-                    gameObj.dead = true;
-                }
-                if (
-                    !gameObj.dead &&
-                    gameObj.position.x < this.turret.position.x + this.turret.BASE_WIDTH &&
-                    gameObj.position.x > this.turret.position.x - this.turret.BASE_WIDTH
-                ) {
-                    if (gameObj.dropBomb()) {
-                        this.gameObjects.push(
-                            new Bomb({ x: gameObj.position.x, y: gameObj.position.y }, { x: gameObj.position.z, y: 0 })
-                        );
+
+            if (this.outOfBounds(gameObj) || gameObj.dead) {
+                this.gameObjects.delete(gameObj);
+                continue;
+            }
+
+            if (gameObj.type === "bullet") continue;
+            if (
+                gameObj.type === "bomber" ||
+                gameObj.type === "airborne" ||
+                gameObj.type === "paratrooper" ||
+                gameObj.type === "bomb"
+            ) {
+                bullets.forEach((bullet) => {
+                    if (!bullet.dead && this.isCollision(gameObj, bullet)) {
+                        bullet.dead = true;
+                        gameObj.takeDamage(5);
+                        if (gameObj.type === "paratrooper") {
+                            this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
+                        } else {
+                            this.gameObjects.add(new Explosion(gameObj.position, bullet.direction));
+                        }
                     }
+                    if (gameObj.dead) {
+                        if (gameObj.type === "paratrooper") {
+                            this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
+                        } else {
+                            this.gameObjects.add(new Explosion(gameObj.position, bullet.direction));
+                        }
+                    }
+                });
+            }
+
+            if (gameObj.type === "bomber" && this.isOverTarget(gameObj)) {
+                if (gameObj.dropBomb()) {
+                    this.gameObjects.add(
+                        new Bomb({ x: gameObj.position.x, y: gameObj.position.y }, { x: gameObj.position.z, y: 0 })
+                    );
                 }
             }
-            if (gameObj.type === "bomb" && gameObj.position.y > this.height) gameObj.dead = true;
 
-            if (
-                gameObj.type === "airborne" &&
-                Math.abs(this.turret.position.x - gameObj.position.x) < gameObj.JUMP_RANGE
-            ) {
+            if (gameObj.type === "airborne" && this.isOverTarget(gameObj)) {
                 if (gameObj.canDeploy()) {
-                    this.gameObjects.push(
+                    this.gameObjects.add(
                         new Paratrooper(
-                            { x: gameObj.position.x, y: gameObj.position.y },
+                            {
+                                x: gameObj.position.x + 16 * -gameObj.position.z,
+                                y: gameObj.position.y,
+                                z: gameObj.position.z,
+                            },
                             this.sprites["paratrooper"],
                             this.sprites["paratrooper"]
                         )
@@ -126,17 +153,6 @@ class AirDefense {
             }
         }
 
-        this.paratrooper.update();
-        if (this.paratrooper.position.y >= this.height - this.GROUND_HEIGHT - 8) {
-            this.paratrooper.grounded = true;
-        }
-
-        for (let i = this.gameObjects.length - 1; i >= 0; i--) {
-            if (this.gameObjects[i].dead) {
-                this.gameObjects.splice(i, 1);
-            }
-        }
-
         if (frameCount % 320 === 0) {
             for (let i = 0; i < 3; i++) {
                 let spawnPos = this.getEnemySpawnPos(
@@ -144,13 +160,13 @@ class AirDefense {
                     this.height - this.BOMBER_MAX_ALT
                 );
                 spawnPos.x = spawnPos.x - spawnPos.z * i * 64;
-                this.gameObjects.push(
+                this.gameObjects.add(
                     new EnemyAircraft(spawnPos, this.sprites["blue_1_1_L"], this.sprites["blue_1_1_R"])
                 );
             }
         }
         if (frameCount % 1200 === 0) {
-            this.gameObjects.push(
+            this.gameObjects.add(
                 new AirborneTransport(
                     this.getEnemySpawnPos(this.height - this.PARATROOPER_MIN_ALT, 15),
                     this.sprites["airborne_left"],
@@ -169,7 +185,6 @@ class AirDefense {
         }
 
         this.turret.render();
-        this.paratrooper.render();
 
         image(
             this.sprites["foreground"],
@@ -191,17 +206,14 @@ class AirDefense {
         text(this.score, 10, 20);
     }
 
-    checkForHit(bullet) {
-        for (let e in enemy) {
-            if (!enemy[e].dead) {
-                const enemy = enemy[e];
-                if (dist(bullet.pos.x, bullet.pos.y, enemy._pos.x, enemy._pos.y) <= enemy.diameter + bulletDiameter) {
-                    enemy.hit(bullet.damage);
-                    explode(new p5.Vector(bullet.pos.x, bullet.pos.y), new p5.Vector(bullet.dir.x, bullet.dir.y));
-                    score++;
-                }
-            }
+    isCollision(gameObj, bullet) {
+        if (
+            dist(gameObj.position.x, gameObj.position.y, bullet.position.x, bullet.position.y) <=
+            16 + bullet.BULLET_DIAMETER
+        ) {
+            return true;
         }
+        return false;
     }
 
     getEnemySpawnPos(min, max) {
@@ -209,6 +221,19 @@ class AirDefense {
         let y = Math.random() * (max - min) + min;
         let z = x < 0 ? 1 : -1;
         return { x, y, z };
+    }
+
+    isOverTarget(gameObj) {
+        return Math.abs(this.turret.position.x - gameObj.position.x) < gameObj.DROP_RANGE;
+    }
+
+    outOfBounds(gameObj) {
+        return (
+            (gameObj.position.x <= -32 && gameObj.position.z === -1) ||
+            (gameObj.position.x >= this.width + 32 && gameObj.position.z === 1) ||
+            gameObj.position.y > this.height + 32 ||
+            gameObj.position.y < -32
+        );
     }
 }
 
@@ -221,4 +246,69 @@ class GameObject {
 
     update() {}
     render() {}
+}
+
+class Explosion extends GameObject {
+    duration = 30;
+    MAX_RADIUS = 25;
+    constructor(position, direction) {
+        super("explosion", position);
+        this.direction = direction;
+    }
+
+    update() {
+        this.duration--;
+        if (this.duration <= 0) this.dead = true;
+    }
+
+    render() {
+        const radius = Math.random() * this.MAX_RADIUS;
+        const color = `rgba(${Math.floor(Math.random() * 128) + 128}, 0, 0, ${Math.floor(Math.random() * 256)})`;
+        setColor(color);
+        ellipse(this.position.x, this.position.y, radius, radius);
+    }
+}
+
+class Splatter extends GameObject {
+    MAX_DURATION = 100;
+    MAX_PARTICLES = 5;
+    MAX_RADIUS = 3;
+    SPLAT_GRAVITY = 3;
+    particles = new Set();
+    constructor(position, direction) {
+        super("splatter", position);
+        for (let i = 0; i < this.MAX_PARTICLES; i++) {
+            this.particles.add({
+                id: i,
+                position: {
+                    x: position.x + Math.random() * 10 - 5,
+                    y: position.y + Math.random() * 10 - 5,
+                },
+                direction: {
+                    x: (direction.x + Math.random() * 5 - 2.5) / 10,
+                    y: (direction.y + Math.random() * 5 - 2.5) / 10,
+                },
+                radius: Math.random() * this.MAX_RADIUS + 1,
+                life: Math.random() * (this.MAX_DURATION / 2) + this.MAX_DURATION / 2,
+            });
+        }
+    }
+
+    update() {
+        this.particles.forEach((particle) => {
+            particle.position.x = particle.position.x + particle.direction.x;
+            particle.position.y = particle.position.y + particle.direction.y + this.SPLAT_GRAVITY;
+            particle.life--;
+            if (particle.life <= 0) this.particles.delete(particle);
+        });
+        if (this.particles.size === 0) this.dead = true;
+    }
+
+    render() {
+        this.particles.forEach((particle) => {
+            const color = `rgba(${Math.floor(Math.random() * 128) + 128}, 0, 0, ${Math.floor(Math.random() * 256)})`;
+            setColor(color);
+            ellipse(particle.position.x, particle.position.y, particle.radius, particle.radius);
+        });
+    }
 }

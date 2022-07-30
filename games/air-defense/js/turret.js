@@ -59,7 +59,7 @@ class Turret {
         if (this.cooldownTimer <= 0) {
             this.cooldownTimer = this.RELOAD_TIME;
             this.ammo--;
-            this.game.gameObjects.push(
+            this.game.gameObjects.add(
                 new Bullet(
                     new p5.Vector(this.endOfBarrel.x, this.endOfBarrel.y),
                     new p5.Vector(this.endOfBarrel.x - this.turretCenter.x, this.endOfBarrel.y - this.turretCenter.y)
@@ -93,13 +93,13 @@ class Bullet extends GameObject {
     constructor(position, direction) {
         super("bullet", position);
         this.damage = 10;
-        this.dir = direction;
+        this.direction = direction;
     }
 
     update() {
         this.position = new p5.Vector(
-            this.position.x + this.dir.x / this.BULLET_SPEED,
-            this.position.y + this.dir.y / this.BULLET_SPEED
+            this.position.x + this.direction.x / this.BULLET_SPEED,
+            this.position.y + this.direction.y / this.BULLET_SPEED
         );
     }
 
