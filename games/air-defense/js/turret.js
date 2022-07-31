@@ -1,29 +1,34 @@
 class Turret {
     MAX_AMMO = 10000;
-    MAX_HEALTH = 5000;
-    BASE_WIDTH = 80;
-    BASE_HEIGHT = 40;
-    TURRET_DIAMETER = 60;
-    TURRET_BARREL_LENGTH = 50;
-    TURRET_ROTATION_SPEED = 0.01;
+    HALF_BASE_WIDTH = 50;
+    HALF_BASE_HEIGHT = 30;
+    BLOCK_SIZE = 10;
+    CORE_SIZE = 30;
+    TURRET_DIAMETER = 50;
+    TURRET_BARREL_LENGTH = 57;
+    TURRET_ROTATION_SPEED = 0.02;
 
     RELOAD_TIME = 5;
 
     turretCenter;
     endOfBarrel;
     barrelAngle = -Math.PI / 2;
-    cooldownTimer = 0;
+    reloadTimer = 0;
 
-    health = 0;
+    sprites = null;
+    blocks = new Set();
+    core = null;
+    ammoStockpile = new Set();
     ammo = 0;
 
-    constructor(game, position) {
+    constructor(game, position, turretBlocks) {
         this.game = game;
         this.position = position;
-        this.turretCenter = { x: position.x, y: position.y - this.BASE_HEIGHT };
-        this.endOfBarrel = { x: position.x, y: position.y - this.BASE_HEIGHT - this.TURRET_BARREL_LENGTH };
-        this.health = this.MAX_HEALTH;
+        this.turretCenter = { x: position.x, y: position.y - this.HALF_BASE_HEIGHT * 2 + this.BLOCK_SIZE };
+        this.endOfBarrel = { x: position.x, y: position.y - this.HALF_BASE_HEIGHT * 2 - this.TURRET_BARREL_LENGTH };
         this.ammo = this.MAX_AMMO;
+        this.sprites = turretBlocks;
+        this.buildBattery();
     }
 
     update() {
@@ -39,9 +44,10 @@ class Turret {
             this.fire();
         }
 
-        if (this.cooldownTimer > 0) {
-            this.cooldownTimer--;
+        if (this.reloadTimer > 0) {
+            this.reloadTimer--;
         }
+        this.core.update();
     }
 
     move(amount) {
@@ -56,9 +62,12 @@ class Turret {
     }
 
     fire() {
-        if (this.cooldownTimer <= 0) {
-            this.cooldownTimer = this.RELOAD_TIME;
+        if (this.reloadTimer <= 0) {
+            this.reloadTimer = this.RELOAD_TIME;
             this.ammo--;
+            const sound = new Audio();
+            sound.src = "./air-defense/snd/fire_1.wav";
+            sound.play();
             this.game.gameObjects.add(
                 new Bullet(
                     new p5.Vector(this.endOfBarrel.x, this.endOfBarrel.y),
@@ -70,7 +79,7 @@ class Turret {
 
     render() {
         setColor("gray");
-        strokeWeight(5);
+        strokeWeight(10);
         line(this.turretCenter.x, this.turretCenter.y, this.endOfBarrel.x, this.endOfBarrel.y);
         strokeWeight(1);
         setColor("silver");
@@ -79,11 +88,52 @@ class Turret {
         // draw stationary part of base
         setColor("brown");
         rect(
-            this.position.x - this.BASE_WIDTH / 2,
-            this.position.y - this.BASE_HEIGHT,
-            this.BASE_WIDTH,
-            this.BASE_HEIGHT
+            this.position.x - this.HALF_BASE_WIDTH / 2,
+            this.position.y - this.HALF_BASE_HEIGHT * 2,
+            this.HALF_BASE_WIDTH,
+            this.HALF_BASE_HEIGHT * 2
         );
+        this.core.render();
+        this.blocks.forEach((block) => {
+            block.render();
+        });
+        this.ammoStockpile.forEach((crate) => {
+            crate.render();
+        });
+    }
+
+    buildBattery() {
+        // turret position is center point of where it touches the ground
+        const width = this.HALF_BASE_WIDTH * 2;
+        const height = this.HALF_BASE_HEIGHT * 2;
+        const topLeft = {
+            x: this.position.x - this.HALF_BASE_WIDTH,
+            y: this.position.y - height,
+        };
+        for (let x = 0; x < width / this.BLOCK_SIZE; x++) {
+            for (let y = 0; y < height / this.BLOCK_SIZE; y++) {
+                this.blocks.add(
+                    new Block(
+                        { x: x * this.BLOCK_SIZE + topLeft.x, y: y * this.BLOCK_SIZE + topLeft.y },
+                        this.sprites["green-block"],
+                        this.BLOCK_SIZE,
+                        this.BLOCK_SIZE
+                    )
+                );
+            }
+        }
+        this.core = new Core(
+            { x: this.position.x - this.CORE_SIZE / 2, y: this.position.y - this.CORE_SIZE },
+            this.sprites["generator"],
+            this.CORE_SIZE,
+            this.CORE_SIZE
+        );
+
+        for (let i = 0; i < this.MAX_AMMO / 500; i++) {
+            this.ammoStockpile.add(
+                new AmmoCrate({ x: Math.random() * this.game.width, y: 400 - 32 }, this.sprites["ammo-crate-500"])
+            );
+        }
     }
 }
 
@@ -106,5 +156,88 @@ class Bullet extends GameObject {
     render() {
         setColor("black");
         ellipse(this.position.x, this.position.y, this.BULLET_DIAMETER, this.BULLET_DIAMETER);
+    }
+}
+
+class AmmoCrate extends GameObject {
+    center;
+    constructor(position, sprite) {
+        super("ammo", position);
+        this.sprite = sprite;
+        this.width = sprite.width;
+        this.height = sprite.height;
+        this.center = {
+            x: position.x + width / 2,
+            y: position.y + height / 2,
+        };
+    }
+
+    takeDamage(amount) {
+        this.dead = true;
+    }
+
+    render() {
+        image(this.sprite, this.position.x, this.position.y, this.width, this.height);
+    }
+}
+
+class Block extends GameObject {
+    MAX_HEALTH = 100;
+    health;
+
+    center;
+
+    constructor(position, sprite, width, height) {
+        super("block", position);
+        this.sprite = sprite;
+        this.width = width;
+        this.height = height;
+        this.health = this.MAX_HEALTH;
+        this.center = {
+            x: position.x + width / 2,
+            y: position.y + height / 2,
+        };
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
+    }
+
+    render() {
+        image(this.sprite, this.position.x, this.position.y, this.width, this.height);
+    }
+}
+
+class Core extends GameObject {
+    MAX_HEALTH = 1000;
+    health;
+
+    center;
+
+    animation = null;
+    constructor(position, sprite, width, height) {
+        super("core", position);
+        this.animation = new Animation(sprite, 60, true);
+        this.width = width;
+        this.height = height;
+        this.center = {
+            x: this.position.x + width / 2,
+            y: this.position.y + height / 2,
+        };
+        this.health = this.MAX_HEALTH;
+    }
+
+    update() {
+        this.animation.update();
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) this.dead = true;
+    }
+
+    render() {
+        image(this.animation.currentFrame, this.position.x, this.position.y, this.width, this.height);
     }
 }

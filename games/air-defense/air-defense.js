@@ -11,6 +11,7 @@ const GameState = {
 
 function preload() {
     const sprites = [];
+    const turretBlocks = [];
     sprites["paratrooper"] = loadImage("./air-defense/img/paratrooper.png");
     sprites["background"] = loadImage("./air-defense/img/background.png");
     sprites["foreground"] = loadImage("./air-defense/img/foreground.png");
@@ -20,11 +21,12 @@ function preload() {
     sprites["blue_1_2_R"] = loadImage("./air-defense/img/blue_1_2_R.png");
     sprites["airborne_left"] = loadImage("./air-defense/img/airborne_left.png");
     sprites["airborne_right"] = loadImage("./air-defense/img/airborne_right.png");
-    sprites["red-block"] = loadImage("./air-defense/img/redblock.png");
-    sprites["red-block"] = loadImage("./air-defense/img/greenblock.png");
-    sprites["generator"] = loadImage("./air-defense/img/generator.png");
+    turretBlocks["red-block"] = loadImage("./air-defense/img/redblock.png");
+    turretBlocks["green-block"] = loadImage("./air-defense/img/greenblock.png");
+    turretBlocks["generator"] = loadImage("./air-defense/img/generator.png");
+    turretBlocks["ammo-crate-500"] = loadImage("./air-defense/img/ammo_crate_500.png");
 
-    game = new AirDefense(WIDTH, HEIGHT, sprites);
+    game = new AirDefense(WIDTH, HEIGHT, sprites, turretBlocks);
 }
 
 function setup() {
@@ -54,24 +56,29 @@ class AirDefense {
     gameObjects = [];
     score = 0;
 
-    constructor(width, height, sprites) {
+    constructor(width, height, sprites, turretBlocks) {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
+        this.turretBlocks = turretBlocks;
     }
 
     initGame() {}
 
     startDemo() {
         this.inDemo = true;
-        this.turret = new DemoTurret(this, { x: this.width / 2, y: this.height - this.GROUND_HEIGHT });
+        this.turret = new DemoTurret(
+            this,
+            { x: this.width / 2, y: this.height - this.GROUND_HEIGHT },
+            this.turretBlocks
+        );
         this.gameState = GameState.DEMO;
         this.startGame();
     }
 
     start1Player() {
         this.inDemo = false;
-        this.turret = new Turret(this, { x: this.width / 2, y: this.height - this.GROUND_HEIGHT });
+        this.turret = new Turret(this, { x: this.width / 2, y: this.height - this.GROUND_HEIGHT }, this.turretBlocks);
         this.gameState = GameState.PLAY;
         this.startGame();
     }
@@ -105,20 +112,33 @@ class AirDefense {
                 gameObj.type === "bomb"
             ) {
                 bullets.forEach((bullet) => {
-                    if (!bullet.dead && this.isCollision(gameObj, bullet)) {
+                    if (!bullet.dead && this.isBulletCollision(gameObj, bullet)) {
                         bullet.dead = true;
                         gameObj.takeDamage(5);
                         if (gameObj.type === "paratrooper") {
                             this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
                         } else {
-                            this.gameObjects.add(new Explosion(gameObj.position, bullet.direction));
+                            this.gameObjects.add(new Explosion(gameObj.position));
                         }
-                    }
-                    if (gameObj.dead) {
-                        if (gameObj.type === "paratrooper") {
-                            this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
-                        } else {
-                            this.gameObjects.add(new Explosion(gameObj.position, bullet.direction));
+                        if (gameObj.dead) {
+                            switch (gameObj.type) {
+                                case "bomber":
+                                    this.gameObjects.add(new Explosion(gameObj.position));
+                                    this.score += 20;
+                                    break;
+                                case "airborne":
+                                    this.gameObjects.add(new Explosion(gameObj.position));
+                                    this.score += 100;
+                                    break;
+                                case "paratrooper":
+                                    this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
+                                    this.score += 10;
+                                    break;
+                                case "bomb":
+                                    this.gameObjects.add(new Explosion(gameObj.position));
+                                    this.score += 5;
+                                    break;
+                            }
                         }
                     }
                 });
@@ -130,6 +150,22 @@ class AirDefense {
                         new Bomb({ x: gameObj.position.x, y: gameObj.position.y }, { x: gameObj.position.z, y: 0 })
                     );
                 }
+            }
+
+            if (gameObj.type === "bomb") {
+                this.turret.blocks.forEach((block) => {
+                    if (this.isBlockCollision(gameObj, block)) {
+                        gameObj.dead = true;
+                        block.takeDamage(gameObj.DAMAGE);
+                        if (block.dead) {
+                            this.turret.blocks.delete(block);
+                        }
+                        this.gameObjects.add(new Explosion(gameObj.position));
+                        if (block.dead) {
+                            this.gameObjects.add(new Explosion(block.position));
+                        }
+                    }
+                });
             }
 
             if (gameObj.type === "airborne" && this.isOverTarget(gameObj)) {
@@ -178,13 +214,13 @@ class AirDefense {
 
     render() {
         image(this.sprites["background"], 0, 0, this.width, this.height);
+
         strokeWeight(1);
+        this.turret.render();
 
         for (let gameObj of this.gameObjects) {
             gameObj.render();
         }
-
-        this.turret.render();
 
         image(
             this.sprites["foreground"],
@@ -206,10 +242,20 @@ class AirDefense {
         text(this.score, 10, 20);
     }
 
-    isCollision(gameObj, bullet) {
+    isBulletCollision(gameObj, bullet) {
         if (
             dist(gameObj.position.x, gameObj.position.y, bullet.position.x, bullet.position.y) <=
             16 + bullet.BULLET_DIAMETER
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    isBlockCollision(bomb, block) {
+        if (
+            dist(bomb.position.x, bomb.position.y, block.center.x, block.center.y) <=
+            bomb.DIAMETER / 2 + block.width / 2
         ) {
             return true;
         }
@@ -251,9 +297,11 @@ class GameObject {
 class Explosion extends GameObject {
     duration = 30;
     MAX_RADIUS = 25;
-    constructor(position, direction) {
+    constructor(position) {
         super("explosion", position);
-        this.direction = direction;
+        const sound = new Audio();
+        sound.src = "./air-defense/snd/explosion_1.wav";
+        sound.play();
     }
 
     update() {

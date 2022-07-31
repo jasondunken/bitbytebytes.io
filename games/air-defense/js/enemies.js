@@ -62,6 +62,7 @@ class Bomb extends GameObject {
     MAX_HEALTH = 5;
     FALLING_SPEED = 3;
     DAMAGE = 100;
+    DIAMETER = 5;
 
     health;
     constructor(position, direction) {
@@ -82,7 +83,7 @@ class Bomb extends GameObject {
 
     render() {
         setColor("brown");
-        ellipse(this.position.x, this.position.y, 5, 5);
+        ellipse(this.position.x, this.position.y, this.DIAMETER, this.DIAMETER);
     }
 }
 
