@@ -24,7 +24,7 @@ body {
 
 .logo {
     user-select: none;
-    font-size: 6em;
+    font-size: 4em;
     font-family: "Alfa Slab One", serif;
 }
 
@@ -38,6 +38,11 @@ body {
     margin-right: auto;
     margin-left: auto;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: rgb(44, 44, 44);
+    padding: 1rem;
+    width: 512px;
+    border-top: 4px solid darkgray;
+    border-bottom: 4px solid darkgray;
 }
 
 .button {

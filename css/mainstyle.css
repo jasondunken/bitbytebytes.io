@@ -207,9 +207,7 @@ body {
 }
 
 #console {
-    /* color: greenyellow; */
     color: rgb(0, 103, 0);
-    /* color: rgb(255, 0, 0); */
     font-family: "GNUUniform";
     font-weight: 700;
     position: absolute;

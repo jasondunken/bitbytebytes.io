@@ -63,7 +63,7 @@ function initGame() {
             };
         }
     }
-    shuffleTiles(1000);
+    shuffleTiles(999);
 }
 
 function update() {
@@ -192,12 +192,13 @@ function draw() {
         }
     }
     if (playing) {
-        setColor("red", true);
+        setColor("green", true);
+        strokeWeight(4);
         rect(
-            Math.floor(mouseX / tileSize) * tileSize,
-            Math.floor(mouseY / tileSize) * tileSize,
-            tileSize - 2,
-            tileSize - 2
+            Math.floor(mouseX / tileSize) * tileSize + 2,
+            Math.floor(mouseY / tileSize) * tileSize + 2,
+            tileSize - 4,
+            tileSize - 4
         );
     }
 }

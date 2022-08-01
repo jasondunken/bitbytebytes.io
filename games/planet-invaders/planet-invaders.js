@@ -1,7 +1,7 @@
 let game = null;
 
 function setup() {
-    let canvas = createCanvas(400, 300);
+    let canvas = createCanvas(512, 400);
     canvas.parent("game");
 
     frameRate(60);

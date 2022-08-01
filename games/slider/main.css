@@ -1,8 +1,15 @@
 body {
-    background-color: bisque;
+    background-color: rgb(195, 113, 13);
 }
 
-.game {
-    text-align: center;
-    align-content: center;
+canvas {
+    border: 8px solid brown;
+}
+
+.buttons {
+    background-color: rgb(44, 44, 44);
+    padding: 1rem;
+    width: 512px;
+    border-top: 4px solid darkgray;
+    border-bottom: 4px solid darkgray;
 }

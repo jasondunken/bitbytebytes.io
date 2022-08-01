@@ -1,8 +1,12 @@
 body {
-    background-color: bisque;
+    background-color: rgb(47, 92, 50);
 }
 
 .game {
     text-align: center;
     align-content: center;
+}
+
+.buttons {
+    width: 600px;
 }
