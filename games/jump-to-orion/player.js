@@ -20,10 +20,14 @@ class Player extends GameObject {
     updateDelta = false;
     shieldOrbitDelta = 0;
 
+    shieldSound = new Audio();
+
     constructor(initialPos, speed, size, imagePlayer) {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
         this.smokeEmitter = new SmokeEmitter(this.STARTING_HEALTH / 2);
+        this.shieldSound.src = "./jump-to-orion/snd/shield_loop.wav";
+        this.shieldSound.loop = true;
     }
 
     update() {
@@ -47,7 +51,7 @@ class Player extends GameObject {
         if (keyIsDown(81)) {
             this.raiseShield();
         } else {
-            this.shieldsRaised = false;
+            this.lowerShield();
         }
 
         if (this.shieldsRaised) {
@@ -58,6 +62,9 @@ class Player extends GameObject {
     }
 
     updateDamage() {
+        if (this.shieldsRaised && this.shield > 0) {
+            this.shield--;
+        }
         let damageDir = this.health - this.lastHealth > 0 ? "up" : this.health - this.lastHealth < 0 ? "down" : "none";
         if (this.health <= 30 && damageDir === "down" && this.lastHealth > 30) {
             this.updateDelta = true;
@@ -121,16 +128,25 @@ class Player extends GameObject {
         if (this.ammo > 0 && this.fireReady === 0) {
             this.ammo--;
             this.fireReady = this.loadSpeed;
+            const fire = new Audio();
+            fire.src = "./jump-to-orion/snd/explodemini.wav";
+            fire.play();
             return true;
         }
     }
 
     raiseShield() {
-        if (this.shield > 0) {
-            this.shield--;
+        if (!this.shieldsRaised) {
             this.shieldsRaised = true;
-        } else {
+            this.shieldSound.currentTime = 0;
+            this.shieldSound.play();
+        }
+    }
+
+    lowerShield() {
+        if (this.shieldsRaised) {
             this.shieldsRaised = false;
+            this.shieldSound.pause();
         }
     }
 
@@ -210,10 +226,6 @@ class DemoPlayer extends Player {
         }
     }
 
-    lowerShield() {
-        this.shieldsRaised = false;
-    }
-
     update() {
         // move demo player
         if (this.moveTimer === 0) {
@@ -252,11 +264,26 @@ class DemoPlayer extends Player {
                 y: targetPos.y - this.cursorPos.y,
             };
             const targetDist = Math.sqrt(targetVector.x * targetVector.x + targetVector.y * targetVector.y);
-            if (targetDist < this.targetLocked.size / 2) {
+            if (targetDist < this.targetLocked.size / 5) {
                 this.targetLocked.remove = true;
-                if (this.targetLocked.id === "ammo") this.addAmmo(this.targetLocked.value);
-                if (this.targetLocked.id === "shield") this.addShield(this.targetLocked.value);
-                if (this.targetLocked.id === "health") this.addHealth(this.targetLocked.value);
+                if (this.targetLocked.id === "ammo") {
+                    this.addAmmo(this.targetLocked.value);
+                    const reloadSound = new Audio();
+                    reloadSound.src = "./jump-to-orion/snd/reload.wav";
+                    reloadSound.play();
+                }
+                if (this.targetLocked.id === "shield") {
+                    this.addShield(this.targetLocked.value);
+                    const shieldChargeSound = new Audio();
+                    shieldChargeSound.src = "./jump-to-orion/snd/got_it.wav";
+                    shieldChargeSound.play();
+                }
+                if (this.targetLocked.id === "health") {
+                    this.addHealth(this.targetLocked.value);
+                    const healthSound = new Audio();
+                    healthSound.src = "./jump-to-orion/snd/health_1.wav";
+                    healthSound.play();
+                }
             } else {
                 const targetVectorNormal = {
                     x: targetVector.x / targetDist,
@@ -286,9 +313,9 @@ class DemoPlayer extends Player {
 
     drawCursor() {
         if (this.cursorPos) {
-            stroke("red");
+            stroke("yellow");
             noFill();
-            ellipse(this.cursorPos.x, this.cursorPos.y, 5, 5);
+            ellipse(this.cursorPos.x, this.cursorPos.y, 3, 3);
         }
     }
 }

@@ -44,11 +44,3 @@ class GameObject {
         };
     }
 }
-
-class Animation {
-    constructor(frames, duration, loop) {
-        this.frames = frames;
-        this.duration = duration;
-        this.loop = loop;
-    }
-}

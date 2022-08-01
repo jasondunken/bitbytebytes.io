@@ -36,6 +36,7 @@ function preload() {
     sprites["player"] = loadImage("./jump-to-orion/img/sprite1.png");
     sprites["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
     sprites["alien"] = loadImage("./jump-to-orion/img/alien.png");
+    sprites["alien-spriteSheet"] = loadImage("./jump-to-orion/img/alienStrip.png");
     sprites["alienRocket"] = loadImage("./jump-to-orion/img/rocket-alien.png");
     sprites["healthSML"] = loadImage("./jump-to-orion/img/healthSMLImage.png");
     sprites["healthMED"] = loadImage("./jump-to-orion/img/healthMEDImage.png");
@@ -51,15 +52,9 @@ function preload() {
     sprites["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
     sprites["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
 
-    let sounds = {};
-    // sounds["fire_1"] = loadSound("./jump-to-orion/snd/fire_1.mp3");
-    // sounds["fire_1"].playMode("restart");
-    // sounds["explosion_1"] = loadSound("./jump-to-orion/snd/explosion_1.mp3");
-    // sounds["explosion_1"].playMode("restart");
-
     let font = loadFont("./jump-to-orion/font/PressStart2P.ttf");
 
-    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, sounds, font);
+    game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, font);
 }
 
 function setup() {
@@ -108,13 +103,17 @@ class JumpToOrion {
 
     gameObjects = [];
 
-    constructor(width, height, scenery, sprites, sounds, font) {
+    constructor(width, height, scenery, sprites, font) {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.scenery = scenery;
         this.sprites = sprites;
-        this.sounds = sounds;
         this.font = font;
+        this.titleMusic = new Audio();
+        this.titleMusic.src = "./jump-to-orion/snd/Juhani Junkala-Title Screen.wav";
+        this.bgMusic = new Audio();
+        this.bgMusic.src = "./jump-to-orion/snd/Juhani Junkala-Level 1.wav";
+        this.bgMusic.loop = true;
     }
 
     mousePressed(pos) {
@@ -127,15 +126,24 @@ class JumpToOrion {
                             case "healthMED":
                             case "healthLRG":
                                 this.player.addHealth(gameObj.value);
+                                const healthSound = new Audio();
+                                healthSound.src = "./jump-to-orion/snd/health_1.wav";
+                                healthSound.play();
                                 break;
                             case "ammo":
                                 this.player.addAmmo(gameObj.value);
+                                const reloadSound = new Audio();
+                                reloadSound.src = "./jump-to-orion/snd/reload.wav";
+                                reloadSound.play();
                                 break;
                             case "shield":
                                 this.player.addShield(gameObj.value);
+                                const shieldChargeSound = new Audio();
+                                shieldChargeSound.src = "./jump-to-orion/snd/got_it.wav";
+                                shieldChargeSound.play();
+                                break;
                         }
                         this.gameObjects.splice(this.gameObjects.indexOf(gameObj), 1);
-                        return;
                     }
                 }
             }
@@ -159,6 +167,8 @@ class JumpToOrion {
         this.score = 0;
         this.gameObjects = [];
         this.resetScenery();
+        this.bgMusic.currentTime = 0;
+        this.bgMusic.play();
     }
 
     update() {
@@ -183,6 +193,11 @@ class JumpToOrion {
                         x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
                         y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
                     });
+                    const explosion = new Audio();
+                    explosion.src = "./jump-to-orion/snd/deep_boom.wav";
+                    // Audio.volume = [0, 1]
+                    explosion.volume = 1;
+                    explosion.play();
                 }
                 this.endGame();
             }
@@ -191,7 +206,6 @@ class JumpToOrion {
                 if (keyIsDown(32)) {
                     if (this.player.fire()) {
                         this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
-                        // this.sounds["fire_1"].play(0);
                     }
                 }
             }
@@ -206,6 +220,7 @@ class JumpToOrion {
             }
         }
 
+        let demoPlayerRaiseShield = false;
         for (let gameObj of this.gameObjects) {
             if (this.demo) {
                 if (
@@ -224,7 +239,6 @@ class JumpToOrion {
                         }
                     }
                 }
-                this.player.lowerShield();
                 if (
                     gameObj.type != "rocket" &&
                     dist(
@@ -234,7 +248,7 @@ class JumpToOrion {
                         gameObj.currentPos.y
                     ) < 80
                 ) {
-                    this.player.raiseShield();
+                    demoPlayerRaiseShield = true;
                 }
             }
             gameObj.update();
@@ -249,10 +263,18 @@ class JumpToOrion {
                 if (rocketCollision) this.score++;
                 if (playerCollision || rocketCollision) {
                     gameObj.remove = true;
-                    // this.sounds["explosion_1"].play(0);
                     this.addExplosion({ x: gameObj.currentPos.x, y: gameObj.currentPos.y });
+                    const explosion = new Audio();
+                    explosion.src = "./jump-to-orion/snd/deep_boom.wav";
+                    explosion.play();
                 }
             }
+        }
+
+        if (demoPlayerRaiseShield && this.player.shield > 0) {
+            this.player.raiseShield();
+        } else if (this.demo) {
+            this.player.lowerShield();
         }
 
         for (let i = this.gameObjects.length - 1; i >= 0; i--) {
@@ -274,7 +296,8 @@ class JumpToOrion {
                         },
                         -3,
                         32,
-                        this.sprites["alien"]
+                        this.sprites["alien"],
+                        this.sprites["alien-spriteSheet"]
                     );
                     this.gameObjects.push(lastAlien);
                     continue;
@@ -283,7 +306,8 @@ class JumpToOrion {
                     { x: lastAlien.currentPos.x + 32 + Math.random() * 64, y: Math.floor(Math.random() * this.HEIGHT) },
                     -3,
                     32,
-                    this.sprites["alien"]
+                    this.sprites["alien"],
+                    this.sprites["alien-spriteSheet"]
                 );
                 this.gameObjects.push(newAlien);
                 lastAlien = newAlien;
@@ -315,7 +339,7 @@ class JumpToOrion {
                 pos,
                 -1,
                 32,
-                new Animation(
+                new KeyframesAnimation(
                     [
                         this.sprites["explosion_0"],
                         this.sprites["explosion_1"],
@@ -424,7 +448,6 @@ class JumpToOrion {
         fill("red");
         textFont(this.font);
         textSize(18);
-        // text(`Score 0000`, this.WIDTH - 190, this.HEIGHT - 10);
         text(`Score ${this.score}`, this.WIDTH - 190, this.HEIGHT - 10);
 
         if (this.gameOver && !this.demo) {
