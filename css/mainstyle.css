@@ -137,10 +137,20 @@ body {
     height: 64px;
 }
 
-.switch-options-label {
+.switch-options-text-label,
+.switch-options-graphic-label {
     position: absolute;
     top: 0;
     left: 32px;
+}
+
+.switch-options-text-label {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+    padding-top: 5px;
+    padding-left: 4px;
+    justify-items: left;
 }
 
 .switch-toggle {
