@@ -29,7 +29,8 @@ body {
     background: rgb(31, 31, 31);
     height: 100vh;
     display: grid;
-    font-family: ElfBoy;
+    grid-template-rows: auto auto auto 100%;
+    overflow: hidden;
 }
 
 .gol-container {
@@ -43,6 +44,7 @@ body {
 
 .logo {
     user-select: none;
+    font-family: ElfBoy;
     color: lightgray;
 }
 
@@ -56,7 +58,6 @@ body {
 .main {
     background-image: url(../img/2600-grill.png);
     background-position: center;
-    background-repeat: no-repeat;
     background-size: cover;
     height: 100%;
     position: relative;
@@ -66,6 +67,7 @@ body {
 
 .navigation {
     width: 100%;
+    height: 116px;
     user-select: none;
     border-top: 8px solid black;
     border-bottom: 8px solid black;
@@ -85,6 +87,13 @@ body {
     width: 100%;
 }
 
+.switch-container {
+    display: grid;
+    place-items: center;
+    position: relative;
+    grid-template-rows: 28px 1fr 12px;
+}
+
 .switch-label {
     color: orange;
     font-weight: 900;
@@ -93,26 +102,9 @@ body {
     margin-bottom: 4px;
 }
 
-.switch-container {
-    display: grid;
-    place-items: center;
-    position: relative;
-}
-
 .switch {
     position: relative;
     display: inline-block;
-}
-
-.switch-on {
-    bottom: 0;
-}
-
-.switch-off {
-    top: 0;
-}
-
-.switch {
     height: 64px;
 }
 
@@ -143,6 +135,14 @@ body {
     width: 32px;
     height: 32px;
     cursor: pointer;
+}
+
+.switch-on {
+    top: 0;
+}
+
+.switch-off {
+    bottom: 0;
 }
 
 .momentary-animation {
@@ -225,11 +225,36 @@ p,
     }
 }
 
-@media (min-width: 950px) {
-    body {
-        grid-template-rows: auto auto auto 1fr;
+#retro-terminal,
+#toob img,
+#toob-overlay img {
+    width: 672px;
+    height: 512px;
+}
+
+#console {
+    top: 64px;
+    right: 64px;
+    bottom: 64px;
+    left: 64px;
+    font-size: 18px;
+}
+
+@media (max-width: 949px) {
+    .gol-container {
+        height: 7rem;
     }
 
+    .logo {
+        font-size: 5rem;
+    }
+
+    #retro-terminal {
+        margin-top: 2rem;
+    }
+}
+
+@media (min-width: 950px) {
     .gol-container {
         height: 10rem;
     }
@@ -238,30 +263,7 @@ p,
         font-size: 8rem;
     }
 
-    .navigation {
-        height: 116px;
-    }
-
-    .switch-container {
-        grid-template-rows: 28px 1fr 12px;
-    }
-
     #retro-terminal {
         margin-top: 4rem;
-    }
-
-    #retro-terminal,
-    #toob img,
-    #toob-overlay img {
-        width: 672px;
-        height: 512px;
-    }
-
-    #console {
-        top: 64px;
-        right: 64px;
-        bottom: 64px;
-        left: 64px;
-        font-size: 18px;
     }
 }
