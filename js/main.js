@@ -319,6 +319,9 @@ class Terminal {
     loading = false;
     settings = null;
 
+    cmdHistory = [];
+    cmdHistoryIndex = 0;
+
     constructor(htmlElement) {
         this.element = htmlElement;
         this.bounds = htmlElement.getBoundingClientRect();
@@ -356,9 +359,31 @@ class Terminal {
 
     handleKeyEvent(keyEvent) {
         this.dummyInput.innerHTML = keyEvent.target.value;
-        if (keyEvent.keyCode === 13) {
-            this.appendConsole(this.PROMPT + " " + keyEvent.target.value);
-            const newCommand = keyEvent.target.value.split(" ");
+        if (keyEvent.key === "ArrowUp") {
+            if (this.cmdHistoryIndex > 0) {
+                this.cmdHistoryIndex--;
+            }
+            if (this.cmdHistory.length) {
+                this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
+                this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+            }
+        }
+        if (keyEvent.key === "ArrowDown") {
+            if (this.cmdHistoryIndex < this.cmdHistory.length - 1) {
+                this.cmdHistoryIndex++;
+            }
+            if (this.cmdHistory.length) {
+                this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
+                this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+            }
+        }
+        if (keyEvent.key === "Enter") {
+            const commandString = keyEvent.target.value.trim();
+            this.cmdHistory.push(commandString);
+            this.cmdHistoryIndex = this.cmdHistory.length - 1;
+            this.appendConsole(this.PROMPT + " " + commandString);
+
+            const newCommand = commandString.split(" ");
             const command = newCommand[0]?.trim().toLowerCase();
             const args = newCommand.splice(1);
             this.hiddenInput.value = "";
