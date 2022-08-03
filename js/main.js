@@ -382,7 +382,7 @@ class Terminal {
             if (!commandString.length) return;
 
             this.cmdHistory.push(commandString);
-            this.cmdHistoryIndex = this.cmdHistory.length - 1;
+            this.cmdHistoryIndex = this.cmdHistory.length;
             this.appendConsole(this.PROMPT + " " + commandString);
 
             const newCommand = commandString.split(" ");
