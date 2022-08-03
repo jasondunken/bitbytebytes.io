@@ -379,6 +379,8 @@ class Terminal {
         }
         if (keyEvent.key === "Enter") {
             const commandString = keyEvent.target.value.trim();
+            if (!commandString.length) return;
+
             this.cmdHistory.push(commandString);
             this.cmdHistoryIndex = this.cmdHistory.length - 1;
             this.appendConsole(this.PROMPT + " " + commandString);
