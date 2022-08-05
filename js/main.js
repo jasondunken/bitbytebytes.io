@@ -44,22 +44,24 @@ function toggleSwitch(switchElement) {
 // called by p5 when setup is resolved
 // @ framerate/second
 function draw() {
-    // p5.js function
-    // copies the canvas' pixels a global pixels[]
-    //         px0         px1         px2 ...
-    //           |           |           |
-    // pixels = [r, g, b, a, r, g, b, a, r ...]
-    loadPixels();
-    this.gol.update(pixels);
-    this.gol.draw(pixels);
-    // p5.js function
-    // updates screen buffer with pixels[]
-    updatePixels();
+    if (this.gol && (this.gol.state === this.gol.STATES.READY || this.gol.state === this.gol.STATES.RUNNING)) {
+        // p5.js function
+        // copies the canvas' pixels a global pixels[]
+        //         px0         px1         px2 ...
+        //           |           |           |
+        // pixels = [r, g, b, a, r, g, b, a, r ...]
+        loadPixels();
+        this.gol.update(pixels);
+        this.gol.draw(pixels);
+        // p5.js function
+        // updates screen buffer with pixels[]
+        updatePixels();
+    }
     updateHeaderText();
 }
 
 function initializeGOL() {
-    let header = document.getElementById("gol-container").getBoundingClientRect();
+    const header = document.getElementById("gol-container").getBoundingClientRect();
     this.gol = new GOL(header.width, header.height);
 }
 
@@ -126,43 +128,44 @@ class GOL {
     INITIAL_CELL_DENSITY = 0.075;
     SPAWN_AREA_SIZE = 11;
 
-    RESTART_DELAY = 10;
+    RESTART_DELAY = 20;
     restartTime = 0;
 
     golCanvas = null;
     pixelAge;
 
-    STATES = { STARTING: 0, RUNNING: 1, PAUSED: 2 };
+    STATES = { STARTING: 0, READY: 1, RUNNING: 2, PAUSED: 3 };
     state = this.STATES.STARTING;
 
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.golCanvas = createCanvas(width, height);
-        this.golCanvas.parent("p5-container");
-        this.initializeGOL(width, height);
-        this.initialSpawn(width, height);
+        this.restart(width, height);
     }
 
     restart(width, height) {
+        if (this.golCanvas) {
+            const p5Container = document.getElementById("p5-container");
+            p5Container.removeChild(p5Container.firstChild);
+            this.golCanvas = null;
+        }
         this.state = this.STATES.STARTING;
         this.restartTime = this.RESTART_DELAY;
         this.width = width;
         this.height = height;
-        this.golCanvas.resize(width, height);
+        this.golCanvas = createCanvas(width, height);
+        this.golCanvas.parent("p5-container");
+        this.pixelAge = [];
         this.initializeGOL(width, height);
-        this.initialSpawn(width, height);
     }
 
     initializeGOL(width, height) {
-        this.pixelAge = new Array(width * height).fill(0);
-    }
-
-    initialSpawn(width, height) {
+        this.pixelAge = new Array(width * height);
         for (let i = 0; i < width * height * this.INITIAL_CELL_DENSITY; i++) {
             const index = Math.floor(Math.random() * this.pixelAge.length);
             this.pixelAge[index] = 1;
         }
+        this.state = this.STATES.READY;
     }
 
     update(pixels) {
