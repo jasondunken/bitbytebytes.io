@@ -115,7 +115,7 @@ function updateHeaderText() {
 
 class GOL {
     DRAW_CALLS_PER_AGE_TICK = 2;
-    INITIAL_CELL_DENSITY = 0.1;
+    INITIAL_CELL_DENSITY = 0.08;
     SPAWN_AREA_SIZE = 11;
 
     RESTART_DELAY = 10;
@@ -185,13 +185,9 @@ class GOL {
         }
     }
 
-    draw(pixels) {
-        this.setPixelColors(pixels);
-    }
-
     randomColorDelta = 0;
     currentRandomColor = null;
-    setPixelColors(pixels) {
+    draw(pixels) {
         this.randomColorDelta += 0.001;
         this.currentRandomColor = hslToRgb(Math.sin(this.randomColorDelta), 0.5, 0.5);
 
