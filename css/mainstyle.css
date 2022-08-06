@@ -46,6 +46,11 @@ body {
     user-select: none;
     font-family: ElfBoy;
     color: lightgray;
+    margin-top: -10px;
+}
+
+canvas {
+    background-color: antiquewhite;
 }
 
 .game-of-life {

@@ -7,7 +7,7 @@ function setup() {
     frameRate(60);
     document.getElementById("toggle-1").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
-        this.restartGOL();
+        this.gol.restart();
     });
     document.getElementById("toggle-2").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -44,30 +44,20 @@ function toggleSwitch(switchElement) {
 // called by p5 when setup is resolved
 // @ framerate/second
 function draw() {
-    if (this.gol && (this.gol.state === this.gol.STATES.READY || this.gol.state === this.gol.STATES.RUNNING)) {
-        // p5.js function
-        // copies the canvas' pixels a global pixels[]
-        //         px0         px1         px2 ...
-        //           |           |           |
-        // pixels = [r, g, b, a, r, g, b, a, r ...]
-        loadPixels();
-        this.gol.update(pixels);
-        this.gol.draw(pixels);
-        // p5.js function
-        // updates screen buffer with pixels[]
-        updatePixels();
-    }
+    loadPixels();
+    this.gol.update(pixels);
+    this.gol.draw(pixels);
+    updatePixels();
+
     updateHeaderText();
 }
 
 function initializeGOL() {
-    const header = document.getElementById("gol-container").getBoundingClientRect();
-    this.gol = new GOL(header.width, header.height);
+    this.gol = new GOL(document.getElementById("gol-container").getBoundingClientRect());
 }
 
-function restartGOL() {
-    const header = document.getElementById("gol-container").getBoundingClientRect();
-    this.gol.restart(header.width, header.height);
+function setSizeGOL() {
+    this.gol.resize(document.getElementById("gol-container").getBoundingClientRect());
 }
 
 function initializeBanner() {
@@ -85,7 +75,7 @@ function initializeTerminal() {
 }
 
 function windowResized() {
-    this.restartGOL();
+    this.setSizeGOL();
 }
 
 function mouseReleased(e) {
@@ -125,55 +115,42 @@ function updateHeaderText() {
 
 class GOL {
     DRAW_CALLS_PER_AGE_TICK = 2;
-    INITIAL_CELL_DENSITY = 0.075;
+    INITIAL_CELL_DENSITY = 0.1;
     SPAWN_AREA_SIZE = 11;
 
-    RESTART_DELAY = 20;
+    RESTART_DELAY = 10;
     restartTime = 0;
 
     golCanvas = null;
     pixelAge;
 
-    STATES = { STARTING: 0, READY: 1, RUNNING: 2, PAUSED: 3 };
-    state = this.STATES.STARTING;
-
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
-        this.restart(width, height);
-    }
-
-    restart(width, height) {
-        if (this.golCanvas) {
-            const p5Container = document.getElementById("p5-container");
-            p5Container.removeChild(p5Container.firstChild);
-            this.golCanvas = null;
-        }
-        this.state = this.STATES.STARTING;
-        this.restartTime = this.RESTART_DELAY;
-        this.width = width;
-        this.height = height;
-        this.golCanvas = createCanvas(width, height);
+    constructor(bounds) {
+        this.bounds = bounds;
+        this.golCanvas = createCanvas(bounds.width, bounds.height);
         this.golCanvas.parent("p5-container");
-        this.pixelAge = [];
-        this.initializeGOL(width, height);
+        this.restart();
     }
 
-    initializeGOL(width, height) {
-        this.pixelAge = new Array(width * height);
-        for (let i = 0; i < width * height * this.INITIAL_CELL_DENSITY; i++) {
+    resize(bounds) {
+        this.bounds = bounds;
+        resizeCanvas(bounds.width, bounds.height);
+        this.restart();
+    }
+
+    restart() {
+        this.restartTime = this.RESTART_DELAY;
+        clear();
+        this.pixelAge = new Array(this.bounds.width * this.bounds.height).fill(0);
+        for (let i = 0; i < this.bounds.width * this.bounds.height * this.INITIAL_CELL_DENSITY; i++) {
             const index = Math.floor(Math.random() * this.pixelAge.length);
             this.pixelAge[index] = 1;
         }
-        this.state = this.STATES.READY;
     }
 
     update(pixels) {
         if (this.restartTime > 0) {
             this.restartTime--;
-        } else this.state = this.STATES.RUNNING;
-
-        if (this.state === this.STATES.RUNNING) {
+        } else {
             // frameCount is a p5 global
             if (frameCount % this.DRAW_CALLS_PER_AGE_TICK == 0) {
                 this.incrementAge(pixels);
@@ -209,16 +186,7 @@ class GOL {
     }
 
     draw(pixels) {
-        if (this.state === this.STATES.STARTING) {
-            // sets pixel color based on its age
-            for (let i = 0; i < pixels.length; i++) {
-                pixels[i] = 0;
-            }
-        }
-        if (this.state === this.STATES.RUNNING) {
-            // sets pixel color based on its age
-            this.setPixelColors(pixels);
-        }
+        this.setPixelColors(pixels);
     }
 
     randomColorDelta = 0;
@@ -276,7 +244,7 @@ class GOL {
         let nIndex = 0;
         for (let i = -4; i <= 4; i += 4) {
             for (let j = -4; j <= 4; j += 4) {
-                nIndex = index + i + j * this.width;
+                nIndex = index + i + j * this.bounds.width;
                 if (nIndex !== index && nIndex >= 0 && nIndex < pixels.length) {
                     // pixel red channel > 0 is alive
                     if (pixels[nIndex] > 0) {
@@ -289,10 +257,10 @@ class GOL {
     }
 
     randomCellSpawn(x, y) {
-        let cellIndex = y * this.width + x;
+        let cellIndex = y * this.bounds.width + x;
         for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
             for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
-                const index = cellIndex + i + j * this.width;
+                const index = cellIndex + i + j * this.bounds.width;
                 if (index > 0 && index < this.pixelAge.length) {
                     this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
                 }
