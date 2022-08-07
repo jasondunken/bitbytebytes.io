@@ -6,5 +6,5 @@ You can find it here (but not yet) [:mage:](http://www.bitbytebytes.io)
 
 -   :genie: Conway's Game of Life in the header, click and drag to be mesmerized!
 -   :mermaid: Retro console styling with functional controls!
--   :elf: Bouncing game icons!
+-   :elf: A working retro Terminal!
 -   :lotus_position: Hidden bonuses! :grinning:
