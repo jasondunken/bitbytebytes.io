@@ -5,23 +5,25 @@ let terminal;
 function setup() {
     // p5.draw calls/second
     frameRate(60);
-    document.getElementById("toggle-1").addEventListener("click", ($event) => {
-        this.momentarySwitch($event.target);
-        this.gol.restart();
-    });
-    document.getElementById("toggle-2").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-    });
-    document.getElementById("toggle-3").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-    });
-    document.getElementById("toggle-4").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-    });
 
     initializeGOL();
     initializeBanner();
     initializeTerminal();
+
+    document.getElementById("toggle-power").addEventListener("click", ($event) => {
+        this.toggleSwitch($event.target);
+    });
+    document.getElementById("toggle-mode").addEventListener("click", ($event) => {
+        this.toggleSwitch($event.target);
+        this.terminal.toggleMode();
+    });
+    document.getElementById("toggle-size").addEventListener("click", ($event) => {
+        this.toggleSwitch($event.target);
+    });
+    document.getElementById("toggle-reset").addEventListener("click", ($event) => {
+        this.momentarySwitch($event.target);
+        this.gol.restart();
+    });
 }
 
 function momentarySwitch(switchElement) {
@@ -71,7 +73,7 @@ function initializeBanner() {
 }
 
 function initializeTerminal() {
-    terminal = new Terminal(document.getElementById("retro-terminal"));
+    this.terminal = new Terminal(document.getElementById("retro-terminal"));
 }
 
 function windowResized() {
@@ -268,6 +270,9 @@ class GOL {
 class Terminal {
     TERMINAL_PADDING = 128;
 
+    MODES = { CLI: 0, GUI: 1 };
+    mode = this.MODES.CLI;
+
     VERSION = "BBBDOS v0.0.1b";
     PROMPT = "guest@bitbytebytes:~$";
     CURSORS = ["▀", "▄", "█", "▌", "▐", "░", "▒", "▓"];
@@ -324,70 +329,77 @@ class Terminal {
         this.hiddenInput.focus();
     }
 
+    toggleMode() {
+        this.mode = this.mode === this.MODES.CLI ? this.MODES.GUI : this.MODES.CLI;
+        if (this.mode === this.MODES.CLI) this.focusCMD();
+    }
+
     handleKeyEvent(keyEvent) {
-        this.dummyInput.innerHTML = keyEvent.target.value;
-        if (keyEvent.key === "ArrowUp") {
-            if (this.cmdHistoryIndex > 0) {
-                this.cmdHistoryIndex--;
+        if (this.mode === this.MODES.CLI) {
+            this.dummyInput.innerHTML = keyEvent.target.value;
+            if (keyEvent.key === "ArrowUp") {
+                if (this.cmdHistoryIndex > 0) {
+                    this.cmdHistoryIndex--;
+                }
+                if (this.cmdHistory.length) {
+                    this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
+                    this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+                }
             }
-            if (this.cmdHistory.length) {
-                this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
-                this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+            if (keyEvent.key === "ArrowDown") {
+                if (this.cmdHistoryIndex < this.cmdHistory.length - 1) {
+                    this.cmdHistoryIndex++;
+                }
+                if (this.cmdHistory.length) {
+                    this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
+                    this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+                }
             }
-        }
-        if (keyEvent.key === "ArrowDown") {
-            if (this.cmdHistoryIndex < this.cmdHistory.length - 1) {
-                this.cmdHistoryIndex++;
-            }
-            if (this.cmdHistory.length) {
-                this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
-                this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
-            }
-        }
-        if (keyEvent.key === "Enter") {
-            const commandString = keyEvent.target.value.trim();
-            if (!commandString.length) return;
+            if (keyEvent.key === "Enter") {
+                const commandString = keyEvent.target.value.trim();
+                if (!commandString.length) return;
 
-            this.cmdHistory.push(commandString);
-            this.cmdHistoryIndex = this.cmdHistory.length;
-            this.appendConsole(this.PROMPT + " " + commandString);
+                this.cmdHistory.push(commandString);
+                this.cmdHistoryIndex = this.cmdHistory.length;
+                this.appendConsole(this.PROMPT + " " + commandString);
 
-            const newCommand = commandString.split(" ");
-            const command = newCommand[0]?.trim().toLowerCase();
-            const args = newCommand.splice(1);
-            this.hiddenInput.value = "";
-            this.dummyInput.innerHTML = "";
-            switch (command) {
-                case "version":
-                case "-v":
-                    this.showVersion();
-                    break;
-                case "help":
-                case "-h":
-                    this.showHelp();
-                    break;
-                case "cat":
-                case "-c":
-                    this.listGames();
-                    break;
-                case "run":
-                case "-r":
-                    this.runGame(args);
-                    break;
-                case "motd":
-                case "-m":
-                    this.showWelcome();
-                    break;
-                case "ifconfig":
-                case "-i":
-                    this.showClientInfo();
-                    break;
-                case "reset":
-                    this.reset(args);
-                    break;
-                default:
-                    this.commandError(command, "command invalid");
-                    break;
+                const newCommand = commandString.split(" ");
+                const command = newCommand[0]?.trim().toLowerCase();
+                const args = newCommand.splice(1);
+                this.hiddenInput.value = "";
+                this.dummyInput.innerHTML = "";
+                switch (command) {
+                    case "version":
+                    case "-v":
+                        this.showVersion();
+                        break;
+                    case "help":
+                    case "-h":
+                        this.showHelp();
+                        break;
+                    case "cat":
+                    case "-c":
+                        this.listGames();
+                        break;
+                    case "run":
+                    case "-r":
+                        this.runGame(args);
+                        break;
+                    case "motd":
+                    case "-m":
+                        this.showWelcome();
+                        break;
+                    case "ifconfig":
+                    case "-i":
+                        this.showClientInfo();
+                        break;
+                    case "reset":
+                        this.reset(args);
+                        break;
+                    default:
+                        this.commandError(command, "command invalid");
+                        break;
+                }
             }
         }
     }
