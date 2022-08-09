@@ -243,8 +243,7 @@ p,
 }
 
 #desktop {
-    color: black;
-    background-color: aquamarine;
+    background-image: url("../img/desktop.png");
     padding: 10px;
     height: 100%;
     display: flex;
@@ -257,6 +256,12 @@ p,
     height: 72px;
     display: grid;
     grid-template-columns: 1fr;
+    text-decoration: none;
+    color: white;
+}
+
+.gui-icon:visited {
+    color: white;
 }
 
 .gui-icon-image {
@@ -264,6 +269,8 @@ p,
     margin-left: auto;
     height: 32px;
     width: 32px;
+    background: white;
+    border: 1px solid black;
 }
 
 .gui-icon-label {
