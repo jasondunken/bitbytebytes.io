@@ -330,8 +330,19 @@ class Terminal {
     }
 
     toggleMode() {
+        const guiElement = document.getElementById("gui");
+        const consoleElement = document.getElementById("console");
         this.mode = this.mode === this.MODES.CLI ? this.MODES.GUI : this.MODES.CLI;
-        if (this.mode === this.MODES.CLI) this.focusCMD();
+        if (this.mode === this.MODES.GUI) {
+            guiElement.style.display = "block";
+            guiElement.focus();
+            consoleElement.style.display = "none";
+        }
+        if (this.mode === this.MODES.CLI) {
+            guiElement.style.display = "none";
+            consoleElement.style.display = "block";
+            this.focusCMD();
+        }
     }
 
     handleKeyEvent(keyEvent) {

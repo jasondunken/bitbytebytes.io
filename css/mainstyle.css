@@ -180,6 +180,8 @@ canvas {
 #toob img,
 #toob-overlay img {
     user-select: none;
+    width: 672px;
+    height: 512px;
 }
 
 #toob,
@@ -193,6 +195,7 @@ canvas {
     left: 0;
 }
 
+#gui,
 #console {
     color: rgb(0, 103, 0);
     font-family: "GNUUniform";
@@ -206,6 +209,16 @@ canvas {
     font-size: 18px;
     word-wrap: break-word;
     resize: none;
+    top: 64px;
+    right: 64px;
+    bottom: 64px;
+    left: 64px;
+}
+
+#gui {
+    color: black;
+    background-color: aquamarine;
+    display: none;
 }
 
 p,
@@ -228,21 +241,6 @@ p,
     50% {
         opacity: 0;
     }
-}
-
-#retro-terminal,
-#toob img,
-#toob-overlay img {
-    width: 672px;
-    height: 512px;
-}
-
-#console {
-    top: 64px;
-    right: 64px;
-    bottom: 64px;
-    left: 64px;
-    font-size: 18px;
 }
 
 @media (max-width: 949px) {
