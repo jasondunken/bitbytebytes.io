@@ -271,6 +271,7 @@ p,
     width: 32px;
     background: white;
     border: 1px solid black;
+    border-radius: 5px;
 }
 
 .gui-icon-label {

@@ -1,7 +1,12 @@
+const GAME_WIDTH = 512; // 32 x 16px
+const GAME_HEIGHT = 400; // 25 x 16px
+
 let game = null;
 
+function preload() {}
+
 function setup() {
-    let canvas = createCanvas(512, 400);
+    let canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
 
     frameRate(60);
@@ -10,7 +15,7 @@ function setup() {
 }
 
 function initGame() {
-    game = new PlanetInvaders();
+    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT);
     game.startDemo();
 }
 
@@ -20,40 +25,56 @@ function draw() {
 }
 
 // PlanetInvaders
-const STARTING_LIVES = 3;
-const SCOREBOARD_HEIGHT = 48;
-
 class PlanetInvaders {
     PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
         this.start1Player();
     });
-
-    levelManager = new LevelManager();
-    isDemo = false;
-
-    currentLives = 0;
-    score = 0;
-    gameOver = false;
-
-    levels = ["level_1", "level_2", "level_3", "level_4", "level_5"];
-    level = null;
-    levelTime = 0;
-
-    bonus = null;
+    SCOREBOARD_HEIGHT = 48;
+    display = null;
 
     START_DELAY = 60;
 
-    constructor() {}
+    STARTING_LIVES = 3;
+    DEMO_STARTING_LIVES = 1;
+    isDemo = true;
+
+    currentLives = 0;
+    score = 0;
+    gameOver = true;
+
+    levelLoader = new LevelLoader();
+    level = null;
+    levelTime = 0;
+
+    player = null;
+    aliens = null;
+    shots = null;
+
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.display = { width, height, scoreboardHeight: this.SCOREBOARD_HEIGHT };
+    }
 
     startDemo() {
         this.isDemo = true;
-        this.loadLevel("level_1", true);
+        this.player = new DemoPlayer(this);
+        this.currentLives = this.DEMO_STARTING_LIVES;
+        this.startGame();
     }
 
     start1Player() {
         this.isDemo = false;
-        this.currentLives = STARTING_LIVES;
-        this.loadLevel("level_1", false);
+        this.player = new Player(this);
+        this.currentLives = this.STARTING_LIVES;
+        this.startGame();
+    }
+
+    startGame() {
+        console.log("player: ", this.player);
+        this.score = 0;
+        this.gameOver = false;
+        this.loadLevel("level_1");
     }
 
     update() {
@@ -62,117 +83,42 @@ class PlanetInvaders {
                 this.levelTime++;
                 if (this.levelTime < this.START_DELAY) return;
 
-                this.level.player.update();
-                if (this.level.player.pos.x < 0 + this.level.player.size / 2)
-                    this.level.player.pos.x = this.level.player.size / 2;
-                if (this.level.player.pos.x > width - this.level.player.size / 2)
-                    this.level.player.pos.x = width - this.level.player.size / 2;
+                this.player.update();
 
-                if (this.bonus) {
-                    this.bonus.update();
-                    if (this.bonus.pos.x > width + this.bonus.size && this.bonus.speed > 0) {
-                        this.bonus = null;
-                    } else if (this.bonus.pos.x < -this.bonus.size && this.bonus.speed < 0) {
-                        this.bonus = null;
-                    }
-                }
+                this.shots = Array.from(this.level.gameObjects).filter((gameObj) => {
+                    return gameObj.type === "shot";
+                });
 
                 let moveDown = false;
-                for (let row of this.level.aliens) {
-                    let changeRowDirection = false;
-                    for (let alien of row) {
-                        alien.update();
-                        if (alien.pos.x <= 0 + alien.size / 2 || alien.pos.x > width - alien.size / 2) {
-                            changeRowDirection = true;
-                            break;
-                        }
+                this.level.gameObjects.forEach((gameObj) => {
+                    gameObj.update();
+                    if (this.outOfBounds(gameObj) || gameObj.remove) {
+                        this.level.gameObjects.delete(gameObj);
                     }
-                    if (changeRowDirection) {
-                        // if a row has changed direction move all aliens down
-                        moveDown = changeRowDirection;
-                        for (let alien of row) {
-                            alien.speed = -alien.speed;
-                        }
+                    if (gameObj.type != "shot") {
+                        this.shots.forEach((shot) => {
+                            if (
+                                shot.position.x > gameObj.position.x - gameObj.size / 2 &&
+                                shot.position.x < gameObj.position.x + gameObj.size / 2 &&
+                                shot.position.y > gameObj.position.y - gameObj.size / 2 &&
+                                shot.position.y < gameObj.position.y + gameObj.size / 2
+                            ) {
+                                shot.remove = true;
+                                gameObj.remove = true;
+                            }
+                        });
                     }
-                }
+                    if (gameObj.type === "alien") {
+                        if (gameObj.position.x < gameObj.size / 2 || gameObj.position.x > this.width - gameObj.size / 2)
+                            moveDown = true;
+                    }
+                });
                 if (moveDown) {
-                    for (let row of this.level.aliens) {
-                        for (let alien of row) {
-                            alien.moveDown();
+                    this.level.gameObjects.forEach((gameObj) => {
+                        if (gameObj.type === "alien") {
+                            gameObj.moveDown();
                         }
-                    }
-                }
-
-                //check for alien/bonus/shot collision
-                for (let i = this.level.player.shots.length - 1; i >= 0; i--) {
-                    const shot = this.level.player.shots[i];
-                    if (this.bonus) {
-                        let d = dist(shot.pos.x, shot.pos.y, this.bonus.pos.x, this.bonus.pos.y);
-                        if (d <= shot.size + this.bonus.size) {
-                            this.bonus = null;
-                            this.score += 250;
-                        }
-                    }
-                    for (let row of this.level.aliens) {
-                        for (let j = row.length - 1; j >= 0; j--) {
-                            let d = dist(shot.pos.x, shot.pos.y, row[j].pos.x, row[j].pos.y);
-                            if (d <= shot.size / 2 + row[j].size / 2) {
-                                shot.dead = true;
-                                row.splice(j, 1);
-                                this.level.totalAliens -= 1;
-                                this.score += 10;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // //check for alien/player collision
-                // for (let i = 0; i < this.aliens.length; i++) {
-                //     let d = dist(this.player.pos.x, this.player.pos.y, this.aliens[i].pos.x, this.aliens[i].pos.y);
-                //     if (d < this.player.size / 2 + this.aliens[i].size / 2) {
-                //         this.gameOver = true;
-                //     }
-                // }
-
-                // //Check if aliens have reached bottom
-                // for (let i = 0; i < this.aliens.length; i++) {
-                //     if (this.aliens[i].pos.y >= height) {
-                //         this.gameOver = true;
-                //     }
-                // }
-
-                //Check if aliens have reached barriers
-                let barrierHit = false;
-                for (let row of this.level.aliens) {
-                    for (let alien of row) {
-                        for (let barrier of this.level.barriers) {
-                            let d = dist(alien.pos.x, alien.pos.y, barrier.pos.x, barrier.pos.y);
-                            if (d < alien.size + barrier.size) {
-                                barrierHit = true;
-                            }
-                        }
-                    }
-                }
-                if (barrierHit) {
-                    this.currentLives--;
-                    if (this.currentLives < 1) {
-                        this.gameOver = true;
-                    } else {
-                        this.loadLevel(this.level.name, this.isDemo);
-                        return;
-                    }
-                }
-
-                //check if all the aliens are dead
-                if (this.level.totalAliens < 1) {
-                    this.loadLevel(this.levels[Math.floor(Math.random() * this.levels.length)], this.isDemo);
-                    return;
-                }
-
-                // spawn a bonus?
-                if (this.levelTime % this.levelManager.BONUS_INTERVAL == 0) {
-                    this.bonus = this.levelManager.getBonus();
+                    });
                 }
             } else {
                 // game over update
@@ -183,21 +129,11 @@ class PlanetInvaders {
     render() {
         if (this.level) {
             background(this.level.backgroundImage);
-            this.level.player.render();
 
-            if (this.bonus) {
-                this.bonus.render();
-            }
-
-            for (let row of this.level.aliens) {
-                for (let alien of row) {
-                    alien.render();
-                }
-            }
-
-            for (let barrier of this.level.barriers) {
-                barrier.render();
-            }
+            this.level.gameObjects.forEach((gameObj) => {
+                gameObj.render();
+            });
+            this.player.render();
 
             if (this.gameOver) {
                 stroke("white");
@@ -217,15 +153,24 @@ class PlanetInvaders {
             text(`SCORE ${this.score}`, 24, 22);
 
             for (let i = 0; i < this.currentLives; i++) {
-                image(this.level.player.sprite, width - 48 - i * 32, 0, 32, 32);
+                image(this.player.sprite, width - 48 - i * 32, 0, 32, 32);
             }
         }
     }
 
-    async loadLevel(level, isDemo) {
-        const display = { width, height, SCOREBOARD_HEIGHT };
-        this.level = await this.levelManager.initializeLevel(display, level, isDemo);
+    async loadLevel(level) {
+        this.level = await this.levelLoader.initializeLevel(level, this.player, this.display);
         this.levelTime = 0;
-        this.bonus = null;
+    }
+
+    outOfBounds(gameObj) {
+        if (
+            gameObj.position.x < 0 - gameObj.size ||
+            gameObj.position.y < 0 - gameObj.size ||
+            gameObj.position.x > this.width + gameObj.size ||
+            gameObj.position.y > this.height + gameObj.size
+        )
+            return true;
+        return false;
     }
 }
