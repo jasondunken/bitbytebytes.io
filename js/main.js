@@ -4,7 +4,7 @@ let terminal;
 // called by p5 when window is ready
 function setup() {
     // p5.draw calls/second
-    frameRate(60);
+    frameRate(120);
 
     initializeGOL();
     initializeBanner();
