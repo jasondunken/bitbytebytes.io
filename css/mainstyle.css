@@ -215,12 +215,6 @@ canvas {
     left: 64px;
 }
 
-#gui {
-    color: black;
-    background-color: aquamarine;
-    display: none;
-}
-
 p,
 #command-line {
     margin-top: 2px;
@@ -241,6 +235,39 @@ p,
     50% {
         opacity: 0;
     }
+}
+
+#gui {
+    display: none;
+    font-size: 12px;
+}
+
+#desktop {
+    color: black;
+    background-color: aquamarine;
+    padding: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.gui-icon {
+    width: 72px;
+    height: 72px;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.gui-icon-image {
+    margin-right: auto;
+    margin-left: auto;
+    height: 32px;
+    width: 32px;
+}
+
+.gui-icon-label {
+    text-align: center;
 }
 
 @media (max-width: 949px) {
