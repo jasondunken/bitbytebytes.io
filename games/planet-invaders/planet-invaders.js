@@ -71,7 +71,6 @@ class PlanetInvaders {
     }
 
     startGame() {
-        console.log("player: ", this.player);
         this.score = 0;
         this.gameOver = false;
         this.loadLevel(this.currentLevel);
