@@ -1,7 +1,6 @@
 class LevelLoader {
     async initializeLevel(level, player, display) {
         const levelData = WORLD.LEVELS[level];
-        console.log("levelData: ", levelData);
         const backgroundImage = await loadImage(levelData.backgroundImage);
         const levelSprites = await SpriteLoader.loadSprites(levelData.spriteSheetData);
 
@@ -17,6 +16,7 @@ class LevelLoader {
         const alienNames = Object.keys(levelSprites).filter((spriteName) => {
             return spriteName.startsWith("alien_");
         });
+        let alienCount = 0;
         for (let j = 0; j < levelData.map.length; j++) {
             const spacing = spawnAreaWidth / (levelData.map[j].length - 1);
             for (let i = 0; i < levelData.map[j].length; i++) {
@@ -27,12 +27,14 @@ class LevelLoader {
                             levelSprites[alienNames[Math.floor(Math.random() * alienNames.length)]]
                         )
                     );
+                    alienCount++;
                 }
             }
         }
         return {
             backgroundImage,
             gameObjects,
+            alienCount,
         };
     }
 }

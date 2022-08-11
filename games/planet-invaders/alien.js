@@ -1,6 +1,6 @@
 class Alien extends GameObject {
     delta = 0;
-    yRange = 5;
+    yRange = 2;
     constructor(position, sprite) {
         super("alien", position, WORLD.METADATA.ALIEN_SIZE);
         this.moveSpeed = WORLD.METADATA.ALIEN_SPEED;
@@ -13,6 +13,7 @@ class Alien extends GameObject {
         this.delta += 0.08;
         if (this.delta >= 2 * PI) this.delta = 0;
         this.position.x = this.position.x + this.moveSpeed;
+        this.position.y = this.position.y + Math.sin(this.delta);
     }
 
     moveDown() {
@@ -22,13 +23,7 @@ class Alien extends GameObject {
 
     render() {
         if (this.sprite) {
-            image(
-                this.sprite,
-                this.position.x - this.size,
-                this.position.y - this.size + this.yRange * Math.sin(this.delta),
-                this.size * 2,
-                this.size * 2
-            );
+            image(this.sprite, this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
         }
     }
 }

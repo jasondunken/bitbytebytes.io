@@ -3,8 +3,6 @@ const GAME_HEIGHT = 400; // 25 x 16px
 
 let game = null;
 
-function preload() {}
-
 function setup() {
     let canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
@@ -42,6 +40,8 @@ class PlanetInvaders {
     score = 0;
     gameOver = true;
 
+    levels = Object.keys(WORLD.LEVELS);
+    currentLevel = this.levels[0];
     levelLoader = new LevelLoader();
     level = null;
     levelTime = 0;
@@ -74,7 +74,7 @@ class PlanetInvaders {
         console.log("player: ", this.player);
         this.score = 0;
         this.gameOver = false;
-        this.loadLevel("level_1");
+        this.loadLevel(this.currentLevel);
     }
 
     update() {
@@ -103,6 +103,8 @@ class PlanetInvaders {
                                 shot.position.y > gameObj.position.y - gameObj.size / 2 &&
                                 shot.position.y < gameObj.position.y + gameObj.size / 2
                             ) {
+                                this.score += 10;
+                                this.level.alienCount--;
                                 shot.remove = true;
                                 gameObj.remove = true;
                             }
@@ -119,6 +121,11 @@ class PlanetInvaders {
                             gameObj.moveDown();
                         }
                     });
+                }
+
+                if (this.level.alienCount <= 0) {
+                    this.currentLevel = this.levels[(this.levels.indexOf(this.currentLevel) + 1) % this.levels.length];
+                    this.loadLevel(this.currentLevel);
                 }
             } else {
                 // game over update

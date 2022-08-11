@@ -118,7 +118,7 @@ class AirDefense {
                         if (gameObj.type === "paratrooper") {
                             this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
                         } else {
-                            this.gameObjects.add(new Explosion(gameObj.position));
+                            this.gameObjects.add(new Explosion(bullet.position));
                         }
                         if (gameObj.dead) {
                             switch (gameObj.type) {
