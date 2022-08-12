@@ -5,16 +5,15 @@ class SpriteLoader {
             let sprites = {};
             const names = spriteSheetData.names;
             const path = spriteSheetData.spriteSheetPath;
-            const color = (() => {
-                if (spriteSheetData.color != "") {
-                    const rgba = spriteSheetData.color;
-                    const r = (rgba >> 24) & 255;
-                    const g = (rgba >> 16) & 255;
-                    const b = (rgba >> 8) & 255;
-                    const a = rgba & 255;
-                    return { r, g, b, a };
-                }
-            })();
+            let color = { r: 0, g: 0, b: 0, a: 0 };
+            if (spriteSheetData.color != "") {
+                const rgba = spriteSheetData.color;
+                const r = (rgba >> 24) & 255;
+                const g = (rgba >> 16) & 255;
+                const b = (rgba >> 8) & 255;
+                const a = rgba & 255;
+                color = { r, g, b, a };
+            }
             loadImage(
                 path,
                 (spriteSheet) => {
@@ -26,14 +25,11 @@ class SpriteLoader {
                         sprite.loadPixels();
                         for (let i = 0; i < SPRITE_SIZE; i++) {
                             for (let j = 0; j < SPRITE_SIZE; j++) {
-                                sprite.set(i, j, [
-                                    color.r,
-                                    color.g,
-                                    color.b,
+                                if (
                                     spriteSheet.pixels[i * 4 + SPRITE_SIZE * s * 4 + j * 4 * spriteSheet.width + 3] > 0
-                                        ? color.a
-                                        : 0,
-                                ]);
+                                ) {
+                                    sprite.set(i, j, [color.r, color.g, color.b, color.a]);
+                                }
                             }
                         }
                         if (names[s] == "bonus") {
