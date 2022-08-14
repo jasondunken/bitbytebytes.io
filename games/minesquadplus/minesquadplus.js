@@ -38,8 +38,11 @@ class MineSquadPlus {
     MAX_MINES = 99;
     MAX_SQUADS = 3;
     SQUAD_COST = 1000;
+    TILE_SCORE = 10;
+    TILE_BONUS = 100;
 
     playing = false;
+    winner = false;
     board = [];
     score = 0;
     time = 0;
@@ -66,6 +69,7 @@ class MineSquadPlus {
         this.minesUncovered = 0;
         this.board = this.initializeBoard();
         this.playing = true;
+        this.winner = false;
     }
 
     update() {}
@@ -74,7 +78,8 @@ class MineSquadPlus {
         const minesLeftBox = Math.floor(this.SCOREBOARD_HEIGHT / 2);
         textSize(this.TILE_HEIGHT);
         textAlign(CENTER, CENTER);
-        for (let i = 0; i < this.board.length; i++) {
+        textSize(28);
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
             const x = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
             const y = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
             const tile = this.board[i];
@@ -100,9 +105,9 @@ class MineSquadPlus {
                     stroke("black");
                     fill("black");
                     if (tile.value === 1) {
-                        setColor("blue");
+                        setColor("black");
                     } else if (tile.value === 2) {
-                        setColor("green");
+                        setColor("blue");
                     } else if (tile.value === 3) {
                         setColor("purple");
                     } else if (tile.value === 4) {
@@ -128,7 +133,7 @@ class MineSquadPlus {
 
                 if (!this.playing) {
                     if (tile.flagged === true) {
-                        if (tile.type === "mine") {
+                        if (tile.bomb === Tile.BOMB_TYPE.MINE || tile.bomb === Tile.BOMB_TYPE.MINI) {
                             stroke("green");
                         } else {
                             stroke("red");
@@ -168,11 +173,11 @@ class MineSquadPlus {
         let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
         rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox, minesLeftBox);
         fill("red");
-        text(
-            "" + (this.MAX_MINES - this.getNumFlags() - this.minesUncovered),
-            minesLeftBoxX + minesLeftBox / 2,
-            minesLeftBoxY + minesLeftBox / 2
-        );
+        if (this.playing) {
+            text("" + this.getNumMinesNotFound(), minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+        } else {
+            text("X", minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+        }
 
         // draws bomb squads left
         fill("magenta");
@@ -181,8 +186,8 @@ class MineSquadPlus {
                 fill("green");
             }
             ellipse(
-                this.TILE_HEIGHT / 2 + this.TILE_HEIGHT * 2 + i * (this.TILE_HEIGHT * 2),
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox - this.TILE_HEIGHT / 2,
+                this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
+                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.SCOREBOARD_HEIGHT / 2,
                 this.BOMB_HEIGHT,
                 this.BOMB_HEIGHT
             );
@@ -192,9 +197,20 @@ class MineSquadPlus {
         fill("white");
         text(
             "" + this.score,
-            this.TILE_HEIGHT / 2 + this.TILE_HEIGHT * 2,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox - this.TILE_HEIGHT / 2 + this.TILE_HEIGHT
+            this.TILE_HEIGHT * 8,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.SCOREBOARD_HEIGHT / 2
         );
+
+        // draw winner
+        textSize(64);
+        if (this.winner) {
+            fill("white");
+            text(
+                "You Win!",
+                (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
+                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT
+            );
+        }
     }
 
     initializeBoard() {
@@ -290,19 +306,21 @@ class MineSquadPlus {
         }
     }
 
-    getNumFlags() {
+    getNumMinesNotFound() {
         let result = 0;
-        for (let i = 0; i < this.board.length; i++) {
-            if (this.board[i].flagged) {
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
+            const tile = this.board[i];
+            if (tile.flagged || (tile.bomb != Tile.BOMB_TYPE.NONE && !tile.hidden)) {
                 result++;
             }
         }
-        return result;
+        return this.MAX_MINES - result;
     }
 
     unhide(tile, checked) {
         if (this.board[tile].flagged === false) {
             this.board[tile].hidden = false;
+            this.score += this.TILE_SCORE;
         }
         // if tile.value is zero, uncover all the tiles around it
         // if one of the ones uncovered is a zero uncover all the ones around it and so on
@@ -324,9 +342,11 @@ class MineSquadPlus {
         damage.push(tileIndex + this.TILES_PER_ROW * 2);
         damage.push(tileIndex - this.TILES_PER_ROW * 2);
         for (let i = 0; i < damage.length; i++) {
-            this.board[damage[i]].hidden = false;
-            if (this.board[i].bomb === Tile.BOMB_TYPE.MINE || this.board[i].bomb === Tile.BOMB_TYPE.MINI) {
-                this.minesUncovered++;
+            if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
+                this.board[damage[i]].hidden = false;
+                if (this.board[i].bomb === Tile.BOMB_TYPE.MINE || this.board[i].bomb === Tile.BOMB_TYPE.MINI) {
+                    this.minesUncovered++;
+                }
             }
         }
     }
@@ -358,7 +378,7 @@ class MineSquadPlus {
                     tile.flagged = false;
                 } else {
                     if (keyIsDown(SHIFT)) {
-                        if (this.squadsLeft > 0 && score > this.SQUAD_COST) {
+                        if (this.squadsLeft > 0 && this.score > this.SQUAD_COST) {
                             this.bombSquad(tileIndex);
                         }
                     } else if (tile.bomb === Tile.BOMB_TYPE.MINI) {
@@ -375,17 +395,37 @@ class MineSquadPlus {
                     }
                 }
             }
+            if (this.playing) {
+                this.checkForWin();
+            }
+        }
+    }
+
+    checkForWin() {
+        let win = true;
+        this.board.forEach((tile) => {
+            if (tile.bomb === Tile.BOMB_TYPE.NONE && tile.hidden === true) win = false;
+        });
+
+        if (win) {
+            this.winner = true;
+            this.gameOver();
         }
     }
 
     gameOver() {
-        for (let i = 0; i < this.board.length; i++) {
-            if (this.board[i].hidden === false) {
-                this.score += 100;
+        this.calculateScore();
+        this.playing = false;
+    }
+
+    calculateScore() {
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
+            if (this.board[i].hidden === false && this.winner) {
+                this.score += this.TILE_BONUS;
             }
             this.board[i].hidden = false;
         }
-        this.playing = false;
+        this.score += this.squadsLeft * this.squadsLeft * this.SQUAD_COST;
     }
 }
 
