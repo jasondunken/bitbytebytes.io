@@ -404,6 +404,10 @@ class Terminal {
                     case "-i":
                         this.showClientInfo();
                         break;
+                    case "finger":
+                    case "-f":
+                        this.showProjFile(args);
+                        break;
                     case "reset":
                         this.reset(args);
                         break;
@@ -489,6 +493,10 @@ class Terminal {
             return data.ip;
         }
         return null;
+    }
+
+    showProjFile(args) {
+        // display the .proj file for bitbytebytes.io
     }
 
     commandError(command, error) {
