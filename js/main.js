@@ -495,8 +495,18 @@ class Terminal {
         return null;
     }
 
-    showProjFile(args) {
+    async showProjFile(args) {
         // display the .proj file for bitbytebytes.io
+        const proj = await fetch("public/bitbytebytes.proj")
+            .then((proj) => proj.text())
+            .catch((error) => {
+                console.log("error: ", error);
+            });
+        console.log("proj: ", proj);
+        const lines = proj.split("\n");
+        for (let line of lines) {
+            this.appendConsole(line);
+        }
     }
 
     commandError(command, error) {
