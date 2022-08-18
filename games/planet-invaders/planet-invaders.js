@@ -137,7 +137,6 @@ class PlanetInvaders {
                     this.level.bonus.active = false;
                 }
                 if (frameCount % this.level.bonus.interval === 0) {
-                    console.log("add bonus!");
                     this.level.bonus.reset(
                         Math.random() > 0.5 ? -this.level.bonus.size : this.width + this.level.bonus.size
                     );

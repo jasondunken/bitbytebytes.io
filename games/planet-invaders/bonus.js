@@ -16,7 +16,6 @@ class Bonus {
 
     update() {
         if (this.active) {
-            console.log("bonus pos: ", this.position);
             this.position.x = this.position.x + this.speed;
         }
     }
