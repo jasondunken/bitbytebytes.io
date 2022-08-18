@@ -96,12 +96,7 @@ class PlanetInvaders {
                     }
                     if (gameObj.type != "shot") {
                         this.shots.forEach((shot) => {
-                            if (
-                                shot.position.x > gameObj.position.x - gameObj.size / 2 &&
-                                shot.position.x < gameObj.position.x + gameObj.size / 2 &&
-                                shot.position.y > gameObj.position.y - gameObj.size / 2 &&
-                                shot.position.y < gameObj.position.y + gameObj.size / 2
-                            ) {
+                            if (this.shotCollision(shot, gameObj)) {
                                 this.score += 10;
                                 this.level.alienCount--;
                                 shot.remove = true;
@@ -126,6 +121,27 @@ class PlanetInvaders {
                     this.currentLevel = this.levels[(this.levels.indexOf(this.currentLevel) + 1) % this.levels.length];
                     this.loadLevel(this.currentLevel);
                 }
+
+                this.level.bonus.update();
+                this.shots.forEach((shot) => {
+                    if (this.shotCollision(shot, this.level.bonus)) {
+                        this.score += 1000;
+                        shot.remove = true;
+                        this.level.bonus.active = false;
+                    }
+                });
+                if (
+                    (this.level.bonus.position.x < this.level.bonus.size) & -2 ||
+                    this.level.bonus.position.x > this.width + this.level.bonus.size * 2
+                ) {
+                    this.level.bonus.active = false;
+                }
+                if (frameCount % this.level.bonus.interval === 0) {
+                    console.log("add bonus!");
+                    this.level.bonus.reset(
+                        Math.random() > 0.5 ? -this.level.bonus.size : this.width + this.level.bonus.size
+                    );
+                }
             } else {
                 // game over update
             }
@@ -140,6 +156,7 @@ class PlanetInvaders {
                 gameObj.render();
             });
             this.player.render();
+            this.level.bonus.render();
 
             if (this.gameOver) {
                 stroke("white");
@@ -178,5 +195,14 @@ class PlanetInvaders {
         )
             return true;
         return false;
+    }
+
+    shotCollision(shot, gameObj) {
+        return (
+            shot.position.x > gameObj.position.x - gameObj.size / 2 &&
+            shot.position.x < gameObj.position.x + gameObj.size / 2 &&
+            shot.position.y > gameObj.position.y - gameObj.size / 2 &&
+            shot.position.y < gameObj.position.y + gameObj.size / 2
+        );
     }
 }

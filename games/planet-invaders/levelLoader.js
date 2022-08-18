@@ -31,10 +31,18 @@ class LevelLoader {
                 }
             }
         }
+        const bonus = new Bonus(
+            new Vec2(-WORLD.METADATA.BONUS_SIZE, display.scoreboardHeight / 2),
+            WORLD.METADATA.BONUS_SIZE,
+            WORLD.METADATA.BONUS_SPEED,
+            WORLD.METADATA.BONUS_INTERVAL,
+            levelSprites["bonus"]
+        );
         return {
             backgroundImage,
             gameObjects,
             alienCount,
+            bonus,
         };
     }
 }

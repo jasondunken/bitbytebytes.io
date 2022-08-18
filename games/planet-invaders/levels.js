@@ -7,6 +7,7 @@ const WORLD = {
         BARRIER_SIZE: 24,
         GUTTER_WIDTH: 32,
         BONUS_SIZE: 16,
+        BONUS_SPEED: 1,
         BONUS_INTERVAL: 1000,
     },
     LEVELS: {

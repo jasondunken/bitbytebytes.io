@@ -1,17 +1,29 @@
 class Bonus {
-    constructor(size, position, speed, sprite) {
+    constructor(position, size, speed, interval, sprite) {
+        this.position = position;
         this.size = size;
-        this.pos = position;
-        this.speed = speed;
-        this.dead = false;
+        this.moveSpeed = speed;
+        this.interval = interval;
         this.sprite = sprite;
+        this.active = false;
+    }
+
+    reset(positionX) {
+        this.position.x = positionX;
+        this.speed = this.moveSpeed * positionX < 0 ? 1 : -1;
+        this.active = true;
     }
 
     update() {
-        this.pos.x = this.pos.x + this.speed;
+        if (this.active) {
+            console.log("bonus pos: ", this.position);
+            this.position.x = this.position.x + this.speed;
+        }
     }
 
     render() {
-        image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
+        if (this.active) {
+            image(this.sprite, this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
+        }
     }
 }
