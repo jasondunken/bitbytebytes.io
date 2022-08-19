@@ -398,6 +398,8 @@ class MineSquadPlus {
             if (this.playing) {
                 this.checkForWin();
             }
+        } else if (!this.playing) {
+            this.start1Player();
         }
     }
 
