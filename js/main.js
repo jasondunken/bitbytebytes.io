@@ -12,6 +12,10 @@ function setup() {
 
     document.getElementById("toggle-power").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
+        this.terminal.shutdown();
+        setTimeout(() => {
+            window.location.href = "./games/games.html";
+        }, 2000);
     });
     document.getElementById("toggle-mode").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -270,7 +274,7 @@ class GOL {
 class Terminal {
     TERMINAL_PADDING = 128;
 
-    MODES = { CLI: 0, GUI: 1 };
+    MODES = { CLI: 0, GUI: 1, SHUTDOWN: 2 };
     mode = this.MODES.CLI;
 
     VERSION = "BBBDOS v0.0.1b";
@@ -585,6 +589,11 @@ class Terminal {
                 this.appendConsole(`unauthorized reset of ${arg1}`);
                 this.appendConsole(`reset command cancelled`);
         }
+    }
+
+    shutdown() {
+        this.appendConsole("shutting down...");
+        this.mode = this.MODES.SHUTDOWN;
     }
 
     formatDate(date) {
