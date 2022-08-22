@@ -404,6 +404,10 @@ class Terminal {
                     case "-m":
                         this.showWelcome();
                         break;
+                    case "ng":
+                    case "-a":
+                        this.ngServe();
+                        break;
                     case "ifconfig":
                     case "-i":
                         this.showClientInfo();
@@ -511,6 +515,14 @@ class Terminal {
         for (let line of lines) {
             this.appendConsole(line);
         }
+    }
+
+    ngServe() {
+        this.appendConsole("launching Angular site...");
+        this.mode = this.MODES.SHUTDOWN;
+        setTimeout(() => {
+            window.location.href = "./ngSite/index.html";
+        }, 3000);
     }
 
     commandError(command, error) {
