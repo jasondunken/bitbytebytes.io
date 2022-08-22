@@ -52,30 +52,25 @@ for (let game of GAMES) {
     const container = menuDiv.querySelector(".container");
     const card = menuDiv.querySelector(".card");
     const icon = menuDiv.querySelector(".icon");
-    const title = menuDiv.querySelector(".title");
     const description = menuDiv.querySelector(".info");
     const play = menuDiv.querySelector(".play");
 
     container.addEventListener("mousemove", (e) => {
-        let bb = card.getBoundingClientRect();
-        let yRotation = (bb.x + bb.width / 2 - e.pageX) / 30;
-        let xRotation = (window.pageYOffset + bb.height / 2 - e.pageY) / 30;
-        if (xRotation > 10) xRotation = 10;
-        if (xRotation < -10) xRotation = -10;
-        card.style.transform = `rotateY(${-yRotation}deg) rotateX(${-xRotation}deg)`;
+        const bb = card.getBoundingClientRect();
+        let yRotation = (bb.x + bb.width / 2 - e.pageX) / 15;
+        let xRotation = (bb.y + bb.height / 2 - e.pageY) / 15;
+        card.style.transform = `rotateY(${-yRotation}deg) rotateX(${xRotation}deg)`;
     });
     container.addEventListener("mouseenter", () => {
         card.style.transition = "none";
-        title.style.transform = "translateZ(25px)";
-        description.style.transform = "translateZ(25px)";
-        icon.style.transform = "translateZ(25px)";
+        icon.style.transform = "translateZ(75px)";
+        description.style.transform = "translateZ(75px)";
         play.style.transform = "translateZ(75px)";
     });
     container.addEventListener("mouseleave", (e) => {
-        card.style.transition = "all 0.7s ease";
+        card.style.transition = "all 1.0s ease";
         card.style.transform = `rotateY(0deg) rotateX(0deg)`;
         icon.style.transform = "translateZ(0px)";
-        title.style.transform = "translateZ(0px)";
         description.style.transform = "translateZ(0px)";
         play.style.transform = "translateZ(0px)";
     });
