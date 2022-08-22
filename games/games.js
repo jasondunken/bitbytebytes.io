@@ -31,7 +31,7 @@ const GAMES = [
     },
 ];
 
-const body = document.querySelector("body");
+const body = document.getElementById("games-carousel");
 for (let game of GAMES) {
     let menuDiv = document.createElement("div");
     menuDiv.innerHTML = `<div class="container">
@@ -41,7 +41,7 @@ for (let game of GAMES) {
             </div>
             <div class="info">
                 <h1 class="title">${game.title}</h1>
-                <h3>${game.description}</h3>
+                <div>${game.description}</div>
             </div>
             <div class="play">
                 <a href="${game.file}"><button>Play</button></a>
@@ -49,11 +49,11 @@ for (let game of GAMES) {
         </div>
     </div>`;
 
-    const card = menuDiv.querySelector(".card");
     const container = menuDiv.querySelector(".container");
-    const icon = menuDiv.querySelector(".icon img");
+    const card = menuDiv.querySelector(".card");
+    const icon = menuDiv.querySelector(".icon");
     const title = menuDiv.querySelector(".title");
-    const description = menuDiv.querySelector(".info h3");
+    const description = menuDiv.querySelector(".info");
     const play = menuDiv.querySelector(".play");
 
     container.addEventListener("mousemove", (e) => {
@@ -66,10 +66,10 @@ for (let game of GAMES) {
     });
     container.addEventListener("mouseenter", () => {
         card.style.transition = "none";
-        icon.style.transform = "translateZ(150px)";
-        title.style.transform = "translateZ(125px)";
-        description.style.transform = "translateZ(125px)";
-        play.style.transform = "translateZ(150px)";
+        title.style.transform = "translateZ(25px)";
+        description.style.transform = "translateZ(25px)";
+        icon.style.transform = "translateZ(25px)";
+        play.style.transform = "translateZ(75px)";
     });
     container.addEventListener("mouseleave", (e) => {
         card.style.transition = "all 0.7s ease";
