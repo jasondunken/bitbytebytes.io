@@ -3,38 +3,38 @@ const GAMES = [
         title: "Air Defense",
         description: "Defend your battery against aerial assult!",
         icon: "../img/defense.png",
-        file: "air-defense.html",
+        file: "air-defense",
     },
     {
-        title: "Mine Squad Plus",
-        description: "Hunt for hidden mines!",
+        title: "Mine Squad",
+        description: "Farmers need crop fields not minefields!",
         icon: "../img/mine.png",
-        file: "minesquadplus.html",
+        file: "mine-squad-plus",
     },
     {
         title: "Planet Invaders",
         description: "The invasion has begun, save the planet!",
         icon: "../img/invaders.png",
-        file: "planet-invaders.html",
+        file: "planet-invaders",
     },
     {
         title: "Slider",
         description: "Slide your way to insanity!",
         icon: "../img/slider.png",
-        file: "slider.html",
+        file: "slider",
     },
     {
         title: "Jump to Orion",
         description: "Taking it straight to the aliens!",
         icon: "../img/orion.png",
-        file: "jump-to-orion.html",
+        file: "jump-to-orion",
     },
 ];
 
 const body = document.getElementById("games-carousel");
 for (let game of GAMES) {
-    let menuDiv = document.createElement("div");
-    menuDiv.innerHTML = `<div class="container">
+    let gameBox = document.createElement("div");
+    gameBox.innerHTML = `<div class="container">
         <div class="card">
             <div class="icon">
                 <img src="${game.icon}" alt="${game.title}" />
@@ -44,16 +44,32 @@ for (let game of GAMES) {
                 <div>${game.description}</div>
             </div>
             <div class="play">
-                <a href="${game.file}"><button>Play</button></a>
+                <a href="${game.file}.html"><button>Play</button></a>
             </div>
         </div>
     </div>`;
+    body.appendChild(createGameBoxElement(gameBox));
+}
 
-    const container = menuDiv.querySelector(".container");
-    const card = menuDiv.querySelector(".card");
-    const icon = menuDiv.querySelector(".icon");
-    const description = menuDiv.querySelector(".info");
-    const play = menuDiv.querySelector(".play");
+for (let game of GAMES) {
+    let gameBox = document.createElement("div");
+    gameBox.innerHTML = `<div class="container">
+        <div class="card">
+            <div class="info">
+                <h1 class="title">Coming Soon!</h1>
+                <div>Another Retro Redo</div>
+            </div>
+        </div>
+    </div>`;
+    body.appendChild(createGameBoxElement(gameBox));
+}
+
+function createGameBoxElement(element) {
+    const container = element.querySelector(".container");
+    const card = element.querySelector(".card");
+    const icon = element.querySelector(".icon");
+    const description = element.querySelector(".info");
+    const play = element.querySelector(".play");
 
     container.addEventListener("mousemove", (e) => {
         const bb = card.getBoundingClientRect();
@@ -63,16 +79,19 @@ for (let game of GAMES) {
     });
     container.addEventListener("mouseenter", () => {
         card.style.transition = "none";
-        icon.style.transform = "translateZ(75px)";
-        description.style.transform = "translateZ(75px)";
-        play.style.transform = "translateZ(75px)";
+        icon.style.transform = "translateZ(70px)";
+        icon.style.transition = "all 0.7s ease-in";
+        description.style.transform = "translateZ(50px)";
+        description.style.transition = "all 0.5s ease-in";
+        play.style.transform = "translateZ(70px)";
+        play.style.transition = "all 0.7s ease-in";
     });
     container.addEventListener("mouseleave", (e) => {
-        card.style.transition = "all 1.0s ease";
+        card.style.transition = "all 0.7s ease-in";
         card.style.transform = `rotateY(0deg) rotateX(0deg)`;
         icon.style.transform = "translateZ(0px)";
         description.style.transform = "translateZ(0px)";
         play.style.transform = "translateZ(0px)";
     });
-    body.appendChild(menuDiv);
+    return element;
 }
