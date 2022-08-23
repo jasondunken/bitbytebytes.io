@@ -14,7 +14,7 @@ body {
 
 #content {
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto 1fr auto;
     height: 100%;
 }
 
@@ -69,10 +69,6 @@ a:active {
     background-color: cadetblue;
 }
 
-.section-heading {
-    padding-left: 1rem;
-}
-
 #games {
     display: grid;
     grid-template-columns: 1fr;
@@ -82,9 +78,29 @@ a:active {
 #games-carousel {
     display: flex;
     flex-direction: row;
-    overflow-x: hidden;
-    overflow-y: hidden;
     height: 320px;
+    margin: 0 16px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scrollbar-width: 10px;
+    scrollbar-color: cadetblue rgb(73, 72, 32);
+}
+
+#games-carousel::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+#games-carousel::-webkit-scrollbar-track {
+    background-color: rgb(73, 72, 32);
+    border-radius: 10px;
+    width: 10px;
+}
+
+#games-carousel::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: cadetblue;
+    border: 1px solid rgb(73, 72, 32);
 }
 
 /*animated game panels*/
@@ -142,18 +158,19 @@ a:active {
 }
 
 .play button {
-    width: 100%;
-    padding: 1rem 0rem;
-    background: #f54642;
-    border: 2px solid #a22e2c;
-    color: white;
-    cursor: pointer;
+    width: 128px;
+    height: 31px;
+    padding: 2px 8px;
     border-radius: 8px;
+    border: 2px solid rgb(73, 72, 32);
+    color: white;
+    background: green;
+    cursor: pointer;
     font-weight: bolder;
 }
 
 .play button:hover {
-    background: green;
+    background: #f54642;
 }
 
 #footer {
