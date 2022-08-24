@@ -282,15 +282,7 @@ class Terminal {
     CURSORS = ["▀", "▄", "█", "▌", "▐", "░", "▒", "▓"];
     CURSOR = this.CURSORS[6];
 
-    GAMES = [
-        "jump-to-orion",
-        "slider",
-        "air-defense",
-        "mine-squad-plus",
-        "planet-invaders",
-        "bug-dug",
-        "expedition-luna",
-    ];
+    GAMES = ["jump-to-orion", "slider", "air-defense", "mine-squad", "planet-invaders", "bug-dug", "expedition-luna"];
 
     loading = false;
     settings = null;
@@ -419,6 +411,9 @@ class Terminal {
                     case "reset":
                         this.reset(args);
                         break;
+                    case "exit":
+                        this.shutdown();
+                        break;
                     default:
                         this.commandError(command, "command invalid");
                         break;
@@ -456,7 +451,7 @@ class Terminal {
     listGames() {
         this.appendConsole("</br>");
         for (let game of this.GAMES) {
-            this.appendConsole(`--x   ${game}`);
+            this.appendConsole(`rrx   ${game}`);
         }
         this.appendConsole(`---   toad-runner`);
         this.appendConsole(`---   hexbert`);
@@ -520,6 +515,7 @@ class Terminal {
     ngServe() {
         this.appendConsole("launching Angular site...");
         this.mode = this.MODES.SHUTDOWN;
+        this.disablePrompt();
         setTimeout(() => {
             window.location.href = "./ngSite/index.html";
         }, 3000);
@@ -606,6 +602,11 @@ class Terminal {
     shutdown() {
         this.appendConsole("shutting down...");
         this.mode = this.MODES.SHUTDOWN;
+        this.disablePrompt();
+    }
+
+    disablePrompt() {
+        this.prompt.style.display = "none";
     }
 
     formatDate(date) {

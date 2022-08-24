@@ -9,7 +9,7 @@ const GAMES = [
         title: "Mine Squad",
         description: "Farmers need crop fields not minefields!",
         icon: "../img/mine.png",
-        file: "mine-squad-plus",
+        file: "mine-squad",
     },
     {
         title: "Planet Invaders",
@@ -55,9 +55,13 @@ for (let game of GAMES) {
     let gameBox = document.createElement("div");
     gameBox.innerHTML = `<div class="container">
         <div class="card">
+            <div class="icon">
+            </div>
             <div class="info">
                 <h1 class="title">Coming Soon!</h1>
                 <div>Another Retro Redo</div>
+            </div>
+            <div class="play">
             </div>
         </div>
     </div>`;
