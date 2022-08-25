@@ -448,7 +448,7 @@ class Terminal {
     listGames() {
         this.appendConsole("</br>");
         for (let game of this.GAMES) {
-            this.appendConsole(`rrx   ${game}`);
+            this.appendConsole(`r-x   ${game}`);
         }
         this.appendConsole(`---   toad-runner`);
         this.appendConsole(`---   hexbert`);
