@@ -13,9 +13,6 @@ function setup() {
     document.getElementById("toggle-power").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
         this.terminal.shutdown();
-        setTimeout(() => {
-            window.location.href = "./games/games.html";
-        }, 2000);
     });
     document.getElementById("toggle-mode").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
@@ -600,13 +597,11 @@ class Terminal {
     }
 
     shutdown() {
-        this.appendConsole("shutting down...");
         this.mode = this.MODES.SHUTDOWN;
-        this.disablePrompt();
-    }
-
-    disablePrompt() {
-        this.prompt.style.display = "none";
+        this.prompt.innerHTML = "Shutting down...";
+        setTimeout(() => {
+            window.location.href = "./games/games.html";
+        }, 3000);
     }
 
     formatDate(date) {
