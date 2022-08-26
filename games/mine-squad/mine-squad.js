@@ -40,6 +40,7 @@ class MineSquadPlus {
     SQUAD_COST = 1000;
     TILE_SCORE = 10;
     TILE_BONUS = 100;
+    FLAG_PENALTY = 25;
 
     playing = false;
     winner = false;
@@ -424,6 +425,9 @@ class MineSquadPlus {
         for (let i = 0; i < this.TOTAL_TILES; i++) {
             if (this.board[i].hidden === false && this.winner) {
                 this.score += this.TILE_BONUS;
+            }
+            if (this.board[i].flagged) {
+                this.score -= this.FLAG_PENALTY;
             }
             this.board[i].hidden = false;
         }
