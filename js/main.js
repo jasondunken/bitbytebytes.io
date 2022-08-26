@@ -510,11 +510,10 @@ class Terminal {
     }
 
     ngServe() {
-        this.appendConsole("launching Angular site...");
         this.mode = this.MODES.SHUTDOWN;
-        this.disablePrompt();
+        this.prompt.innerHTML = "launching Angular site...";
         setTimeout(() => {
-            window.location.href = "./ngSite/index.html";
+            window.location.href = "./ng-site/index.html";
         }, 3000);
     }
 
