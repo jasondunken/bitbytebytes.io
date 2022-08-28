@@ -103,7 +103,9 @@ class ExpeditionLuna {
         if (this.player.fuelLevel < 0) this.player.fuelLevel = 0;
         this.player.oxygenLevel -= 0.1;
         if (this.player.oxygenLevel < 0) this.player.oxygenLevel = 0;
-        this.player.velocity = this.player.velocity.add(this.gravity);
+        if (!this.player.landed) {
+            this.player.velocity = this.player.velocity.add(this.gravity);
+        }
         this.player.position = this.player.position.add(this.player.velocity);
         if (this.player.position.y >= this.height) {
             this.player.position.y = this.height;
@@ -120,6 +122,7 @@ class ExpeditionLuna {
             );
             if (touchL || touchR) {
                 console.log("touchL: ", touchL, " | touchR: ", touchR);
+                this.player.land();
             }
         }
     }
@@ -247,6 +250,8 @@ class Lander {
     rightRCSOn = false;
     leftRCSOn = false;
 
+    landed = false;
+
     // polygon = [
     //     [-8, -8],
     //     [8, -8],
@@ -289,6 +294,11 @@ class Lander {
 
     setPosition(position) {
         this.position = position;
+    }
+
+    land() {
+        this.landed = true;
+        this.velocity = Vec2.ZEROS();
     }
 }
 
