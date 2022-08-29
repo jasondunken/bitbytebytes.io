@@ -53,13 +53,6 @@ function draw() {
     this.gol.draw(pixels);
     updatePixels();
 
-    if (this.gol.cellScale === GOL.CELL_SCALE.LARGE) {
-        const golContainer = document.getElementById("p5-container");
-        golContainer.style.transform = `scale(${GOL.CELL_SCALE.LARGE + 1})`;
-    } else {
-        const golContainer = document.getElementById("p5-container");
-        golContainer.style.transform = `none`;
-    }
     updateHeaderText();
 }
 
@@ -129,7 +122,7 @@ function updateHeaderText() {
 }
 
 class GOL {
-    static CELL_SCALE = Object.freeze({ SMALL: 1, LARGE: 2 });
+    static CELL_SCALE = Object.freeze({ SMALL: 1, LARGE: 4 });
     cellScale;
 
     DRAW_CALLS_PER_AGE_TICK = 2;
@@ -158,6 +151,16 @@ class GOL {
 
     switchScale(bounds) {
         this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
+        const golContainer = document.getElementById("p5-container");
+        if (this.cellScale === GOL.CELL_SCALE.LARGE) {
+            golContainer.style.transform = `translate(${
+                this.bounds.width / this.cellScale + this.bounds.width / this.cellScale / 2
+            }px, ${this.bounds.height / this.cellScale + this.bounds.height / this.cellScale / 2}px) scale(${
+                this.cellScale
+            })`;
+        } else {
+            golContainer.style.transform = `none`;
+        }
         bounds.width = Math.floor(bounds.width / this.cellScale);
         bounds.height = Math.floor(bounds.height / this.cellScale);
         this.resize(bounds);
@@ -279,10 +282,12 @@ class GOL {
     }
 
     randomCellSpawn(x, y) {
-        let cellIndex = (y * this.bounds.width) / this.cellScale + x;
+        x = Math.floor(x / this.cellScale);
+        y = Math.floor(y / this.cellScale);
+        let cellIndex = y * this.bounds.width + x;
         for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
             for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
-                const index = cellIndex + i + (j * this.bounds.width) / this.cellScale;
+                const index = cellIndex + i + j * this.bounds.width;
                 if (index > 0 && index < this.pixelAge.length) {
                     this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
                 }
