@@ -20,6 +20,7 @@ function setup() {
     });
     document.getElementById("toggle-size").addEventListener("click", ($event) => {
         this.toggleSwitch($event.target);
+        this.switchScaleGOL();
     });
     document.getElementById("toggle-reset").addEventListener("click", ($event) => {
         this.momentarySwitch($event.target);
@@ -52,6 +53,13 @@ function draw() {
     this.gol.draw(pixels);
     updatePixels();
 
+    if (this.gol.cellScale === GOL.CELL_SCALE.LARGE) {
+        const golContainer = document.getElementById("p5-container");
+        golContainer.style.transform = `scale(${GOL.CELL_SCALE.LARGE + 1})`;
+    } else {
+        const golContainer = document.getElementById("p5-container");
+        golContainer.style.transform = `none`;
+    }
     updateHeaderText();
 }
 
@@ -61,6 +69,10 @@ function initializeGOL() {
 
 function setSizeGOL() {
     this.gol.resize(document.getElementById("gol-container").getBoundingClientRect());
+}
+
+function switchScaleGOL() {
+    this.gol.switchScale(document.getElementById("gol-container").getBoundingClientRect());
 }
 
 function initializeBanner() {
@@ -117,6 +129,9 @@ function updateHeaderText() {
 }
 
 class GOL {
+    static CELL_SCALE = Object.freeze({ SMALL: 1, LARGE: 2 });
+    cellScale;
+
     DRAW_CALLS_PER_AGE_TICK = 2;
     INITIAL_CELL_DENSITY = 0.08;
     SPAWN_AREA_SIZE = 11;
@@ -131,6 +146,7 @@ class GOL {
         this.bounds = bounds;
         this.golCanvas = createCanvas(bounds.width, bounds.height);
         this.golCanvas.parent("p5-container");
+        this.cellScale = GOL.CELL_SCALE.SMALL;
         this.restart();
     }
 
@@ -138,6 +154,13 @@ class GOL {
         this.bounds = bounds;
         resizeCanvas(bounds.width, bounds.height);
         this.restart();
+    }
+
+    switchScale(bounds) {
+        this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
+        bounds.width = Math.floor(bounds.width / this.cellScale);
+        bounds.height = Math.floor(bounds.height / this.cellScale);
+        this.resize(bounds);
     }
 
     restart() {
@@ -256,10 +279,10 @@ class GOL {
     }
 
     randomCellSpawn(x, y) {
-        let cellIndex = y * this.bounds.width + x;
+        let cellIndex = (y * this.bounds.width) / this.cellScale + x;
         for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
             for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
-                const index = cellIndex + i + j * this.bounds.width;
+                const index = cellIndex + i + (j * this.bounds.width) / this.cellScale;
                 if (index > 0 && index < this.pixelAge.length) {
                     this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
                 }

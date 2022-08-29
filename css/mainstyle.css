@@ -51,6 +51,7 @@ body {
 
 canvas {
     background-color: antiquewhite;
+    image-rendering: crisp-edges;
 }
 
 .game-of-life {
