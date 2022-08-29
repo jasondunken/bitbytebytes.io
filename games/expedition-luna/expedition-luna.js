@@ -27,13 +27,16 @@ function draw() {
     game.render();
 }
 // end of p5.js functions ------------------------>
-
-const PIXELS_PER_METER = 4;
-
 class ExpeditionLuna {
     PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
         this.start1Player();
     });
+
+    PIXELS_PER_METER = 4;
+    TERRAIN_POINTS = 24;
+    TERRAIN_MAX_HEIGHT = 400;
+    TERRAIN_MIN_HEIGHT = 100;
+    LANDING_AREAS = 4;
 
     gravity = new Vec2(0, 0.02);
     atmosphericDrag = 0.5;
@@ -60,19 +63,16 @@ class ExpeditionLuna {
     }
 
     startGame() {
-        const TERRAIN_POINTS = 24;
-        const TERRAIN_MAX_HEIGHT = 400;
-        const TERRAIN_MIN_HEIGHT = 100;
-        const LANDING_AREAS = 4;
         this.terrain = [];
-        for (let i = 0; i <= TERRAIN_POINTS + LANDING_AREAS; i++) {
+        for (let i = 0; i <= this.TERRAIN_POINTS + this.LANDING_AREAS; i++) {
             this.terrain.push([
-                Math.floor((i * this.width) / TERRAIN_POINTS),
+                Math.floor((i * this.width) / this.TERRAIN_POINTS),
                 this.height -
-                    (Math.floor(Math.random() * (TERRAIN_MAX_HEIGHT - TERRAIN_MIN_HEIGHT)) + TERRAIN_MIN_HEIGHT),
+                    (Math.floor(Math.random() * (this.TERRAIN_MAX_HEIGHT - this.TERRAIN_MIN_HEIGHT)) +
+                        this.TERRAIN_MIN_HEIGHT),
             ]);
-            if (i % (TERRAIN_POINTS / LANDING_AREAS) == 2) {
-                this.terrain.push([Math.floor(((i + 1) * this.width) / TERRAIN_POINTS), this.terrain[i][1]]);
+            if (i % (this.TERRAIN_POINTS / this.LANDING_AREAS) == 2) {
+                this.terrain.push([Math.floor(((i + 1) * this.width) / this.TERRAIN_POINTS), this.terrain[i][1]]);
                 i++;
             }
         }
@@ -80,6 +80,7 @@ class ExpeditionLuna {
     }
 
     update() {
+        console.log("lander.y: ", this.player.position.y);
         if (this.player.fuelLevel > 0) {
             if (keyIsDown(87)) {
                 this.player.velocity.y -= 0.08;
@@ -100,6 +101,9 @@ class ExpeditionLuna {
                 this.addParticles("left");
             } else this.player.leftRCSOn = false;
         }
+        if (this.player.mainThrusterOn) {
+            this.player.landed = false;
+        }
         if (this.player.fuelLevel < 0) this.player.fuelLevel = 0;
         this.player.oxygenLevel -= 0.1;
         if (this.player.oxygenLevel < 0) this.player.oxygenLevel = 0;
@@ -109,7 +113,7 @@ class ExpeditionLuna {
         this.player.position = this.player.position.add(this.player.velocity);
         if (this.player.position.y >= this.height) {
             this.player.position.y = this.height;
-            this.player.velocity.y = 0;
+            this.player.land();
         }
         for (let i = 0; i < this.terrain.length - 1; i++) {
             let touchL = pointOnLine(
@@ -121,21 +125,18 @@ class ExpeditionLuna {
                 [this.terrain[i], this.terrain[i + 1]]
             );
             if (touchL || touchR) {
-                console.log("touchL: ", touchL, " | touchR: ", touchR);
                 this.player.land();
             }
         }
     }
 
+    handleInput() {}
+
     render() {
-        const TERRAIN_POINTS = 24;
-        const TERRAIN_MAX_HEIGHT = 400;
-        const TERRAIN_MIN_HEIGHT = 100;
-        const LANDING_AREAS = 4;
         background("black");
         noFill();
         for (let i = 0; i < this.terrain.length - 1; i++) {
-            if (i % (TERRAIN_POINTS / LANDING_AREAS) == 2) {
+            if (i % (this.TERRAIN_POINTS / this.LANDING_AREAS) == 2) {
                 stroke("green");
                 strokeWeight(3);
                 line(this.terrain[i][0], this.terrain[i][1], this.terrain[i + 1][0], this.terrain[i + 1][1]);
@@ -167,9 +168,9 @@ class ExpeditionLuna {
         text("RP-1 ", 20, 32);
         text("O2 ", 20, 48);
         text("Altitude ", 240, 32);
-        text(((this.height - this.player.position.y) / PIXELS_PER_METER).toFixed(2) + " m", 380, 32);
+        text(((this.height - this.player.position.y) / this.PIXELS_PER_METER).toFixed(2) + " m", 380, 32);
         text("V-Velocity ", 240, 48);
-        text(((this.player.velocity.y / PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 380, 48);
+        text(((this.player.velocity.y / this.PIXELS_PER_METER) * 60).toFixed(2) + " m/s", 380, 48);
 
         stroke("white");
         noFill();
@@ -181,18 +182,6 @@ class ExpeditionLuna {
         rect(70, 21, fuelBar, 10);
         const o2Bar = (this.player.oxygenLevel / this.player.STARTING_OXYGEN) * 100;
         rect(70, 37, o2Bar, 10);
-
-        // for (let i = 0; i < 10; i++) {
-        //     if (i > 0) {
-        //         stroke("white");
-        //         const tickY = (i * this.height) / 10;
-        //         const altitude = (this.height - tickY) / PIXELS_PER_METER;
-        //         line(0, tickY, 10, tickY);
-        //         noStroke();
-        //         textSize(8);
-        //         text(`${altitude.toFixed(1)} m`, 12, tickY + 4);
-        //     }
-        // }
     }
 
     addParticles(thruster) {
@@ -252,13 +241,6 @@ class Lander {
 
     landed = false;
 
-    // polygon = [
-    //     [-8, -8],
-    //     [8, -8],
-    //     [8, 8],
-    //     [-8, 8],
-    // ];
-
     polygon = [
         [-6, 0],
         [-8, -2],
@@ -289,7 +271,7 @@ class Lander {
     spawn(planet) {
         this.fuelLevel = this.STARTING_FUEL;
         this.oxygenLevel = this.STARTING_OXYGEN;
-        this.position = new Vec2(Math.floor(Math.random() * (planet.width - 64)) + 32, 64);
+        this.setPosition(new Vec2(planet.width / 2, 64));
     }
 
     setPosition(position) {
