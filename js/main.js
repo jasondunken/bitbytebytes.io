@@ -4,7 +4,7 @@ let terminal;
 // called by p5 when window is ready
 function setup() {
     // p5.draw calls/second
-    frameRate(120);
+    frameRate(60);
 
     initializeGOL();
     initializeBanner();
@@ -144,25 +144,23 @@ class GOL {
     }
 
     resize(bounds) {
-        this.bounds = bounds;
-        resizeCanvas(bounds.width, bounds.height);
-        this.restart();
-    }
-
-    switchScale(bounds) {
-        this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
+        resizeCanvas(Math.floor(bounds.width / this.cellScale), Math.floor(bounds.height / this.cellScale));
         const golContainer = document.getElementById("p5-container");
         if (this.cellScale === GOL.CELL_SCALE.LARGE) {
             golContainer.style.transform = `translate(${
-                this.bounds.width / this.cellScale + this.bounds.width / this.cellScale / 2
-            }px, ${this.bounds.height / this.cellScale + this.bounds.height / this.cellScale / 2}px) scale(${
-                this.cellScale
-            })`;
+                bounds.width / this.cellScale + bounds.width / this.cellScale / 2
+            }px, ${bounds.height / this.cellScale + bounds.height / this.cellScale / 2}px) scale(${this.cellScale})`;
         } else {
             golContainer.style.transform = `none`;
         }
         bounds.width = Math.floor(bounds.width / this.cellScale);
         bounds.height = Math.floor(bounds.height / this.cellScale);
+        this.bounds = bounds;
+        this.restart();
+    }
+
+    switchScale(bounds) {
+        this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
         this.resize(bounds);
     }
 
