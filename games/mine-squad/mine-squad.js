@@ -168,16 +168,32 @@ class MineSquadPlus {
             this.SCOREBOARD_HEIGHT
         );
 
-        // draws mines left counter
+        // draws hidden tiles counter
         fill("gray");
-        let minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2);
+        let minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2) - 64;
         let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
         rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox, minesLeftBox);
         fill("red");
         if (this.playing) {
-            text("" + this.getNumMinesNotFound(), minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+            text("" + this.getNumHiddenTiles(), minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
         } else {
             text("X", minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+        }
+
+        // draws flags placed counter
+        fill("gray");
+        let flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2);
+        let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
+        rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox, minesLeftBox);
+        fill("red");
+        if (this.playing) {
+            text(
+                "" + this.getNumMinesNotFound(),
+                flagsPlacedBoxX + minesLeftBox / 2,
+                flagsPlacedBoxY + minesLeftBox / 2
+            );
+        } else {
+            text("X", flagsPlacedBoxX + minesLeftBox / 2, flagsPlacedBoxY + minesLeftBox / 2);
         }
 
         // draws bomb squads left
@@ -305,6 +321,14 @@ class MineSquadPlus {
                 return false;
             } else return true;
         }
+    }
+
+    getNumHiddenTiles() {
+        let result = this.TOTAL_TILES;
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
+            if (!this.board[i].hidden) result--;
+        }
+        return result;
     }
 
     getNumMinesNotFound() {
