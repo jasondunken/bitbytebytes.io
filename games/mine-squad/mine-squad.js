@@ -81,6 +81,7 @@ class MineSquadPlus {
         textAlign(CENTER, CENTER);
         textSize(28);
         for (let i = 0; i < this.TOTAL_TILES; i++) {
+            strokeWeight(1);
             const x = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
             const y = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
             const tile = this.board[i];
@@ -88,7 +89,7 @@ class MineSquadPlus {
             if (this.playing) {
                 stroke("black");
                 fill("green");
-                rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+                rect(x, y, this.TILE_HEIGHT - 1, this.TILE_HEIGHT - 1);
                 if (tile.flagged) {
                     stroke("black");
                     strokeWeight(1);
@@ -99,7 +100,6 @@ class MineSquadPlus {
 
             if (this.board[i].hidden === false) {
                 stroke("black");
-                strokeWeight(1);
                 fill("gray");
                 rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
                 if (tile.bomb === Tile.BOMB_TYPE.NONE && tile.value !== 0) {
@@ -149,13 +149,13 @@ class MineSquadPlus {
 
         // draws box around selected tile
         stroke("red");
-        strokeWeight(1);
+        strokeWeight(3);
         noFill();
         rect(
             Math.floor(mouseX / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
             Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
-            this.TILE_HEIGHT - 2,
-            this.TILE_HEIGHT - 2
+            this.TILE_HEIGHT - 1,
+            this.TILE_HEIGHT - 1
         );
 
         // draws dashboard
@@ -163,7 +163,7 @@ class MineSquadPlus {
         fill("black");
         rect(
             0,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + 1,
             this.TILES_PER_ROW * this.TILE_HEIGHT,
             this.SCOREBOARD_HEIGHT
         );
