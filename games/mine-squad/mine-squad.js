@@ -1,11 +1,12 @@
-GAME_WIDTH = 900;
-GAME_HEIGHT = 580;
+GAME_WIDTH = 960;
+GAME_HEIGHT = 540;
 
 game = null;
 
 function preload() {}
 
 function setup() {
+    frameRate(30);
     const canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
     game = new MineSquadPlus(GAME_WIDTH, GAME_HEIGHT, null);
@@ -30,9 +31,10 @@ class MineSquadPlus {
 
     TILES_PER_COLUMN = 16;
     TILES_PER_ROW = 30;
-    SCOREBOARD_HEIGHT = 100;
     TILE_HEIGHT = 30;
     HALF_TILE = Math.floor(this.TILE_HEIGHT / 2);
+
+    BOARD_X_OFFSET = 30;
     BOMB_HEIGHT = this.TILE_HEIGHT * 0.7;
     TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
     MAX_MINES = 99;
@@ -41,6 +43,10 @@ class MineSquadPlus {
     TILE_SCORE = 10;
     TILE_BONUS = 100;
     FLAG_PENALTY = 25;
+
+    tileIndexX = 0;
+    tileIndexY = 0;
+    tile = null;
 
     playing = false;
     winner = false;
@@ -53,6 +59,8 @@ class MineSquadPlus {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
+        // this.BOARD_X_OFFSET = (this.width - this.TILES_PER_ROW * this.TILE_HEIGHT) / 2;
+        this.BOARD_X_OFFSET = 0;
     }
 
     startDemo() {
@@ -76,124 +84,47 @@ class MineSquadPlus {
     update() {}
 
     render() {
-        const minesLeftBox = Math.floor(this.SCOREBOARD_HEIGHT / 2);
+        const SCOREBOARD_HEIGHT = this.height - this.TILES_PER_COLUMN * this.TILE_HEIGHT;
+        const minesLeftBox = Math.floor(SCOREBOARD_HEIGHT / 2);
+
         textSize(this.TILE_HEIGHT);
         textAlign(CENTER, CENTER);
         textSize(28);
-        for (let i = 0; i < this.TOTAL_TILES; i++) {
-            strokeWeight(1);
-            const x = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
-            const y = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
-            const tile = this.board[i];
+        strokeWeight(1);
+        setColor("magenta");
+        // background
+        rect(0, 0, this.width, this.height);
 
-            if (this.playing) {
-                stroke("black");
-                fill("green");
-                rect(x, y, this.TILE_HEIGHT - 1, this.TILE_HEIGHT - 1);
-                if (tile.flagged) {
-                    stroke("black");
-                    strokeWeight(1);
-                    fill("yellow");
-                    ellipse(x + this.HALF_TILE, y + this.HALF_TILE, this.BOMB_HEIGHT, this.BOMB_HEIGHT);
-                }
-            }
-
-            if (this.board[i].hidden === false) {
-                stroke("black");
-                fill("gray");
-                rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
-                if (tile.bomb === Tile.BOMB_TYPE.NONE && tile.value !== 0) {
-                    stroke("black");
-                    fill("black");
-                    if (tile.value === 1) {
-                        setColor("black");
-                    } else if (tile.value === 2) {
-                        setColor("blue");
-                    } else if (tile.value === 3) {
-                        setColor("purple");
-                    } else if (tile.value === 4) {
-                        setColor("orange");
-                    } else if (tile.value === 5) {
-                        setColor("red");
-                    } else if (tile.value === 6) {
-                        setColor("yellow");
-                    } else if (tile.value === 7) {
-                        setColor("magenta");
-                    } else {
-                        setColor("teal");
-                    }
-                    text(tile.value, x + this.HALF_TILE, y + this.TILE_HEIGHT * 0.6);
-                }
-
-                if (tile.bomb != Tile.BOMB_TYPE.NONE) {
-                    noStroke();
-                    fill("red");
-                    if (tile.bomb === Tile.BOMB_TYPE.MINI) fill("blue");
-                    ellipse(x + this.HALF_TILE, y + this.HALF_TILE, this.BOMB_HEIGHT, this.BOMB_HEIGHT);
-                }
-
-                if (!this.playing) {
-                    if (tile.flagged === true) {
-                        if (tile.bomb === Tile.BOMB_TYPE.MINE || tile.bomb === Tile.BOMB_TYPE.MINI) {
-                            stroke("green");
-                        } else {
-                            stroke("red");
-                        }
-                        strokeWeight(5);
-                        line(x, y, x + this.TILE_HEIGHT, y + this.TILE_HEIGHT);
-                        line(x + this.TILE_HEIGHT, y, x, y + this.TILE_HEIGHT);
-                    }
-                }
-            }
-        }
-
-        // draws box around selected tile
-        stroke("red");
-        strokeWeight(3);
-        noFill();
-        rect(
-            Math.floor(mouseX / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
-            Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
-            this.TILE_HEIGHT - 1,
-            this.TILE_HEIGHT - 1
-        );
-
+        setColor("black");
         // draws dashboard
-        stroke("black");
-        fill("black");
-        rect(
-            0,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + 1,
-            this.TILES_PER_ROW * this.TILE_HEIGHT,
-            this.SCOREBOARD_HEIGHT
-        );
+        rect(4, this.TILES_PER_COLUMN * this.TILE_HEIGHT + 4, this.width - 8, SCOREBOARD_HEIGHT - 8);
 
         // draws hidden tiles counter
         fill("gray");
         let minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2) - 64;
         let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
-        rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox, minesLeftBox);
+        rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
         if (this.playing) {
-            text("" + this.getNumHiddenTiles(), minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+            text("" + this.getNumHiddenTiles(), minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
         } else {
-            text("X", minesLeftBoxX + minesLeftBox / 2, minesLeftBoxY + minesLeftBox / 2);
+            text("X", minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
         }
 
         // draws flags placed counter
         fill("gray");
         let flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2);
         let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
-        rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox, minesLeftBox);
+        rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
         if (this.playing) {
             text(
                 "" + this.getNumMinesNotFound(),
-                flagsPlacedBoxX + minesLeftBox / 2,
-                flagsPlacedBoxY + minesLeftBox / 2
+                flagsPlacedBoxX + minesLeftBox,
+                flagsPlacedBoxY + minesLeftBox / 2 + 2
             );
         } else {
-            text("X", flagsPlacedBoxX + minesLeftBox / 2, flagsPlacedBoxY + minesLeftBox / 2);
+            text("X", flagsPlacedBoxX + minesLeftBox, flagsPlacedBoxY + minesLeftBox / 2 + 2);
         }
 
         // draws bomb squads left
@@ -204,7 +135,7 @@ class MineSquadPlus {
             }
             ellipse(
                 this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.SCOREBOARD_HEIGHT / 2,
+                this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2,
                 this.BOMB_HEIGHT,
                 this.BOMB_HEIGHT
             );
@@ -215,7 +146,107 @@ class MineSquadPlus {
         text(
             "" + this.score,
             this.TILE_HEIGHT * 8,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.SCOREBOARD_HEIGHT / 2
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2
+        );
+
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
+            this.tileIndexX = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
+            this.tileIndexY = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
+            this.tile = this.board[i];
+
+            if (this.tile.hidden === false) {
+                setColor("gray");
+                stroke("darkgray");
+                rect(this.BOARD_X_OFFSET + this.tileIndexX, this.tileIndexY, this.TILE_HEIGHT, this.TILE_HEIGHT);
+                if (this.tile.bomb === Tile.BOMB_TYPE.NONE && this.tile.value !== 0) {
+                    if (this.tile.value === 1) {
+                        setColor("black");
+                    } else if (this.tile.value === 2) {
+                        setColor("blue");
+                    } else if (this.tile.value === 3) {
+                        setColor("purple");
+                    } else if (this.tile.value === 4) {
+                        setColor("orange");
+                    } else if (this.tile.value === 5) {
+                        setColor("red");
+                    } else if (this.tile.value === 6) {
+                        setColor("yellow");
+                    } else if (this.tile.value === 7) {
+                        setColor("magenta");
+                    } else if (this.tile.value === 8) {
+                        setColor("teal");
+                    }
+                    text(
+                        this.tile.value,
+                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
+                        this.tileIndexY + this.TILE_HEIGHT * 0.6
+                    );
+                    setColor("black");
+                }
+
+                if (this.tile.bomb != Tile.BOMB_TYPE.NONE) {
+                    setColor("red");
+                    if (this.tile.bomb === Tile.BOMB_TYPE.MINI) setColor("blue");
+                    ellipse(
+                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
+                        this.tileIndexY + this.HALF_TILE,
+                        this.BOMB_HEIGHT,
+                        this.BOMB_HEIGHT
+                    );
+                }
+
+                if (!this.playing) {
+                    if (this.tile.flagged === true) {
+                        if (this.tile.bomb === Tile.BOMB_TYPE.MINE || this.tile.bomb === Tile.BOMB_TYPE.MINI) {
+                            setColor("green");
+                        } else {
+                            setColor("red");
+                        }
+                        strokeWeight(5);
+                        line(
+                            this.BOARD_X_OFFSET + this.tileIndexX,
+                            this.tileIndexY,
+                            this.tileIndexX + this.TILE_HEIGHT,
+                            this.tileIndexY + this.TILE_HEIGHT
+                        );
+                        line(
+                            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
+                            this.tileIndexY,
+                            this.tileIndexX,
+                            this.tileIndexY + this.TILE_HEIGHT
+                        );
+                    }
+                }
+            } else {
+                setColor("green");
+                stroke("black");
+                rect(
+                    this.BOARD_X_OFFSET + this.tileIndexX,
+                    this.tileIndexY,
+                    this.TILE_HEIGHT - 1,
+                    this.TILE_HEIGHT - 1
+                );
+                if (this.tile.flagged) {
+                    setColor("yellow");
+                    ellipse(
+                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
+                        this.tileIndexY + this.HALF_TILE,
+                        this.BOMB_HEIGHT,
+                        this.BOMB_HEIGHT
+                    );
+                }
+            }
+        }
+
+        // draws box around selected tile
+        setColor("red");
+        strokeWeight(3);
+        noFill();
+        rect(
+            Math.floor(mouseX / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
+            Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
+            this.TILE_HEIGHT - 1,
+            this.TILE_HEIGHT - 1
         );
 
         // draw winner
