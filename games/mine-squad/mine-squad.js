@@ -258,6 +258,13 @@ class MineSquadPlus {
                 (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
                 (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT
             );
+        } else if (!this.playing) {
+            fill("white");
+            text(
+                "Game Over!",
+                (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
+                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT
+            );
         }
     }
 
