@@ -60,7 +60,7 @@ class MineSquadPlus {
         this.height = height;
         this.sprites = sprites;
         // this.BOARD_X_OFFSET = (this.width - this.TILES_PER_ROW * this.TILE_HEIGHT) / 2;
-        this.BOARD_X_OFFSET = 0;
+        this.BOARD_X_OFFSET = 30;
     }
 
     startDemo() {
@@ -91,7 +91,7 @@ class MineSquadPlus {
         textAlign(CENTER, CENTER);
         textSize(28);
         strokeWeight(1);
-        setColor("magenta");
+        setColor("darkgray");
         // background
         rect(0, 0, this.width, this.height);
 
@@ -420,7 +420,7 @@ class MineSquadPlus {
     }
 
     handleMouseClick(mouseX, mouseY) {
-        const x = Math.floor(mouseX / this.TILE_HEIGHT);
+        const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
         const y = Math.floor(mouseY / this.TILE_HEIGHT);
         const tileIndex = y * this.TILES_PER_ROW + x;
         const tile = this.board[tileIndex];
