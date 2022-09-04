@@ -35,6 +35,7 @@ class MineSquadPlus {
     HALF_TILE = Math.floor(this.TILE_HEIGHT / 2);
 
     BOARD_X_OFFSET = 30;
+    BOARD_Y_OFFSET = 4;
     BOMB_HEIGHT = this.TILE_HEIGHT * 0.7;
     TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
     MAX_MINES = 99;
@@ -84,7 +85,7 @@ class MineSquadPlus {
     update() {}
 
     render() {
-        const SCOREBOARD_HEIGHT = this.height - this.TILES_PER_COLUMN * this.TILE_HEIGHT;
+        const SCOREBOARD_HEIGHT = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
         const minesLeftBox = Math.floor(SCOREBOARD_HEIGHT / 2);
 
         textSize(this.TILE_HEIGHT);
@@ -97,12 +98,17 @@ class MineSquadPlus {
 
         setColor("black");
         // draws dashboard
-        rect(4, this.TILES_PER_COLUMN * this.TILE_HEIGHT + 4, this.width - 8, SCOREBOARD_HEIGHT - 8);
+        rect(
+            4,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + 4 + this.BOARD_Y_OFFSET,
+            this.width - 8,
+            SCOREBOARD_HEIGHT - 8
+        );
 
         // draws hidden tiles counter
         fill("gray");
         let minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2) - 64;
-        let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
+        let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
         rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
         if (this.playing) {
@@ -114,7 +120,7 @@ class MineSquadPlus {
         // draws flags placed counter
         fill("gray");
         let flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2);
-        let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2;
+        let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
         rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
         if (this.playing) {
@@ -135,7 +141,7 @@ class MineSquadPlus {
             }
             ellipse(
                 this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2,
+                this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + this.BOARD_Y_OFFSET,
                 this.BOMB_HEIGHT,
                 this.BOMB_HEIGHT
             );
@@ -146,7 +152,7 @@ class MineSquadPlus {
         text(
             "" + this.score,
             this.TILE_HEIGHT * 8,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
         );
 
         for (let i = 0; i < this.TOTAL_TILES; i++) {
@@ -157,7 +163,12 @@ class MineSquadPlus {
             if (this.tile.hidden === false) {
                 setColor("gray");
                 stroke("darkgray");
-                rect(this.BOARD_X_OFFSET + this.tileIndexX, this.tileIndexY, this.TILE_HEIGHT, this.TILE_HEIGHT);
+                rect(
+                    this.BOARD_X_OFFSET + this.tileIndexX,
+                    this.tileIndexY + this.BOARD_Y_OFFSET,
+                    this.TILE_HEIGHT,
+                    this.TILE_HEIGHT
+                );
                 if (this.tile.bomb === Tile.BOMB_TYPE.NONE && this.tile.value !== 0) {
                     if (this.tile.value === 1) {
                         setColor("black");
@@ -179,7 +190,7 @@ class MineSquadPlus {
                     text(
                         this.tile.value,
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.TILE_HEIGHT * 0.6
+                        this.tileIndexY + this.TILE_HEIGHT * 0.6 + this.BOARD_Y_OFFSET
                     );
                     setColor("black");
                 }
@@ -189,7 +200,7 @@ class MineSquadPlus {
                     if (this.tile.bomb === Tile.BOMB_TYPE.MINI) setColor("blue");
                     ellipse(
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.HALF_TILE,
+                        this.tileIndexY + this.HALF_TILE + this.BOARD_Y_OFFSET,
                         this.BOMB_HEIGHT,
                         this.BOMB_HEIGHT
                     );
@@ -205,13 +216,13 @@ class MineSquadPlus {
                         strokeWeight(5);
                         line(
                             this.BOARD_X_OFFSET + this.tileIndexX,
-                            this.tileIndexY,
+                            this.tileIndexY + this.BOARD_Y_OFFSET,
                             this.tileIndexX + this.TILE_HEIGHT,
                             this.tileIndexY + this.TILE_HEIGHT
                         );
                         line(
                             this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
-                            this.tileIndexY,
+                            this.tileIndexY + this.BOARD_Y_OFFSET,
                             this.tileIndexX,
                             this.tileIndexY + this.TILE_HEIGHT
                         );
@@ -222,7 +233,7 @@ class MineSquadPlus {
                 stroke("black");
                 rect(
                     this.BOARD_X_OFFSET + this.tileIndexX,
-                    this.tileIndexY,
+                    this.tileIndexY + this.BOARD_Y_OFFSET,
                     this.TILE_HEIGHT - 1,
                     this.TILE_HEIGHT - 1
                 );
@@ -230,7 +241,7 @@ class MineSquadPlus {
                     setColor("yellow");
                     ellipse(
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.HALF_TILE,
+                        this.tileIndexY + this.HALF_TILE + this.BOARD_Y_OFFSET,
                         this.BOMB_HEIGHT,
                         this.BOMB_HEIGHT
                     );
@@ -244,7 +255,7 @@ class MineSquadPlus {
         noFill();
         rect(
             Math.floor(mouseX / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
-            Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1,
+            Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1 + this.BOARD_Y_OFFSET,
             this.TILE_HEIGHT - 1,
             this.TILE_HEIGHT - 1
         );
@@ -256,14 +267,14 @@ class MineSquadPlus {
             text(
                 "You Win!",
                 (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT
+                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
             );
         } else if (!this.playing) {
             fill("white");
             text(
                 "Game Over!",
                 (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT
+                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
             );
         }
     }
