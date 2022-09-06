@@ -99,3 +99,7 @@ function createGameBoxElement(element) {
     });
     return element;
 }
+
+function gotoJournal() {
+    window.location.href = "../journal/index.html";
+}

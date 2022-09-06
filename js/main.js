@@ -419,9 +419,9 @@ class Terminal {
                     case "-m":
                         this.showWelcome();
                         break;
-                    case "ng":
-                    case "-a":
-                        this.ngServe();
+                    case "journal":
+                    case "-j":
+                        this.showJournal();
                         break;
                     case "ifconfig":
                     case "-i":
@@ -535,11 +535,11 @@ class Terminal {
         }
     }
 
-    ngServe() {
+    showJournal() {
         this.mode = this.MODES.SHUTDOWN;
-        this.prompt.innerHTML = "launching Angular site...";
+        this.prompt.innerHTML = "launching Journal...";
         setTimeout(() => {
-            window.location.href = "./ng-site/index.html";
+            window.location.href = "./journal/index.html";
         }, 3000);
     }
 
