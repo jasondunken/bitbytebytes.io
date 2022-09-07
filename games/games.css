@@ -6,7 +6,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: "Poppins", sans-serif;
+    font-family: sans-serif;
     width: 100vw;
     height: 100vh;
     background-color: cadetblue;
@@ -38,7 +38,6 @@ body {
 }
 
 #header-controls {
-    font-size: smaller;
     width: 100%;
     display: flex;
     flex-direction: row;
