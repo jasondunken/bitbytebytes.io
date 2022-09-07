@@ -3,20 +3,8 @@
     src: url("font/Elfboyclassic.ttf");
 }
 @font-face {
-    font-family: "8801";
-    src: url("font/8801.ttf");
-}
-@font-face {
-    font-family: "AppleII";
-    src: url("font/AppleII.ttf");
-}
-@font-face {
     font-family: "GNUUniform";
     src: url("font/GnuUnifontFull.ttf");
-}
-@font-face {
-    font-family: "UbuntuCondensed";
-    src: url("font/UbuntuCondensed.ttf");
 }
 
 * {
