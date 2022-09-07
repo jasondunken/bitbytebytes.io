@@ -2,31 +2,31 @@ const GAMES = [
     {
         title: "Air Defense",
         description: "Defend your battery against aerial assult!",
-        icon: "../img/defense.png",
+        icon: "../img/game_icons/defense.png",
         file: "air-defense",
     },
     {
         title: "Mine Squad",
         description: "Farmers need crop fields not minefields!",
-        icon: "../img/mine.png",
+        icon: "../img/game_icons/mine.png",
         file: "mine-squad",
     },
     {
         title: "Planet Invaders",
         description: "The invasion has begun, save the planet!",
-        icon: "../img/invaders.png",
+        icon: "../img/game_icons/invaders.png",
         file: "planet-invaders",
     },
     {
         title: "Slider",
         description: "Slide your way to insanity!",
-        icon: "../img/slider.png",
+        icon: "../img/game_icons/slider.png",
         file: "slider",
     },
     {
         title: "Jump to Orion",
         description: "Taking it straight to the aliens!",
-        icon: "../img/orion.png",
+        icon: "../img/game_icons/orion.png",
         file: "jump-to-orion",
     },
 ];
