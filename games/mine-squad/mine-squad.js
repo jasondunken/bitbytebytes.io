@@ -442,31 +442,25 @@ class MineSquadPlus {
         const y = Math.floor(mouseY / this.TILE_HEIGHT);
         const tileIndex = y * this.TILES_PER_ROW + x;
         const tile = this.board[tileIndex];
-        if (this.playing && tile) {
-            if (keyIsDown(CONTROL)) {
-                if (tile.hidden) {
-                    tile.flagged = true;
+        if (this.playing && tile && tile.hidden) {
+            if (tile.flagged) {
+                tile.flagged = false;
+            } else if (keyIsDown(CONTROL)) {
+                tile.flagged = true;
+            } else if (keyIsDown(SHIFT)) {
+                if (this.squadsLeft > 0 && this.score > this.SQUAD_COST) {
+                    this.bombSquad(tileIndex);
                 }
             } else {
-                if (tile.flagged) {
-                    tile.flagged = false;
+                if (tile.bomb === Tile.BOMB_TYPE.MINI) {
+                    this.board[tileIndex].hidden = false;
+                    this.minesUncovered++;
+                    this.blastRadius(tileIndex);
+                } else if (tile.bomb === Tile.BOMB_TYPE.MINE) {
+                    this.gameOver();
                 } else {
-                    if (keyIsDown(SHIFT)) {
-                        if (this.squadsLeft > 0 && this.score > this.SQUAD_COST) {
-                            this.bombSquad(tileIndex);
-                        }
-                    } else if (tile.bomb === Tile.BOMB_TYPE.MINI) {
-                        this.board[tileIndex].hidden = false;
-                        this.minesUncovered++;
-                        this.blastRadius(tileIndex);
-                    } else if (tile.bomb === Tile.BOMB_TYPE.MINE) {
-                        this.gameOver();
-                    } else {
-                        if (tile.hidden === true) {
-                            this.score += tile.value > 0 ? tile.value * 10 : 5;
-                            this.unhide(tileIndex, []);
-                        }
-                    }
+                    this.score += tile.value > 0 ? tile.value * 10 : 5;
+                    this.unhide(tileIndex, []);
                 }
             }
             if (this.playing) {
