@@ -191,7 +191,6 @@ canvas {
     font-weight: 700;
     position: absolute;
     overflow-y: hidden;
-    word-wrap: normal;
     background-color: rgba(0, 0, 0, 0);
     border: none;
     outline: none;
