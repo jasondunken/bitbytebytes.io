@@ -6,6 +6,12 @@ game = null;
 function preload() {}
 
 function setup() {
+    // disable context menu
+    document.body.addEventListener("contextmenu", function (evt) {
+        evt.preventDefault();
+        return false;
+    });
+
     frameRate(30);
     const canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
@@ -19,7 +25,7 @@ function draw() {
 }
 
 function mousePressed(event) {
-    if (this.game) {
+    if (this.game && event.button === 0) {
         this.game.handleMouseClick(mouseX, mouseY);
     }
 }
