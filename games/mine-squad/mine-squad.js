@@ -45,6 +45,7 @@ class MineSquadPlus {
     BOMB_HEIGHT = this.TILE_HEIGHT * 0.7;
     TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
     MAX_MINES = 99;
+    STARTING_SQUADS = 1;
     MAX_SQUADS = 3;
     SQUAD_COST = 1000;
     TILE_SCORE = 10;
@@ -60,13 +61,13 @@ class MineSquadPlus {
     board = [];
     score = 0;
     time = 0;
-    squadsLeft = 0;
+    squadCount = 0;
+    flaggedTiles = 0;
     minesUncovered = 0;
     constructor(width, height, sprites) {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
-        // this.BOARD_X_OFFSET = (this.width - this.TILES_PER_ROW * this.TILE_HEIGHT) / 2;
         this.BOARD_X_OFFSET = 30;
     }
 
@@ -81,7 +82,8 @@ class MineSquadPlus {
     startGame() {
         this.time = 0;
         this.score = 0;
-        this.squadsLeft = this.MAX_SQUADS;
+        this.squadCount = this.STARTING_SQUADS;
+        this.flaggedTiles = 0;
         this.minesUncovered = 0;
         this.board = this.initializeBoard();
         this.playing = true;
@@ -131,7 +133,7 @@ class MineSquadPlus {
         fill("red");
         if (this.playing) {
             text(
-                "" + this.getNumMinesNotFound(),
+                "" + this.MAX_MINES - this.flaggedTiles,
                 flagsPlacedBoxX + minesLeftBox,
                 flagsPlacedBoxY + minesLeftBox / 2 + 2
             );
@@ -141,8 +143,8 @@ class MineSquadPlus {
 
         // draws bomb squads left
         fill("magenta");
-        for (let i = 0; i < this.squadsLeft; i++) {
-            if (i === this.squadsLeft - 1 && this.score > this.SQUAD_COST) {
+        for (let i = 0; i < this.MAX_SQUADS; i++) {
+            if (i + 1 > this.MAX_SQUADS - this.squadCount) {
                 fill("green");
             }
             ellipse(
@@ -161,6 +163,7 @@ class MineSquadPlus {
             this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
         );
 
+        // draw board
         for (let i = 0; i < this.TOTAL_TILES; i++) {
             this.tileIndexX = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
             this.tileIndexY = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
@@ -169,13 +172,14 @@ class MineSquadPlus {
             if (this.tile.hidden === false) {
                 setColor("gray");
                 stroke("darkgray");
+                strokeWeight(1);
                 rect(
                     this.BOARD_X_OFFSET + this.tileIndexX,
                     this.tileIndexY + this.BOARD_Y_OFFSET,
                     this.TILE_HEIGHT,
                     this.TILE_HEIGHT
                 );
-                if (this.tile.bomb === Tile.BOMB_TYPE.NONE && this.tile.value !== 0) {
+                if (!this.tile.bomb && this.tile.value !== 0) {
                     if (this.tile.value === 1) {
                         setColor("black");
                     } else if (this.tile.value === 2) {
@@ -201,9 +205,8 @@ class MineSquadPlus {
                     setColor("black");
                 }
 
-                if (this.tile.bomb != Tile.BOMB_TYPE.NONE) {
+                if (this.tile.bomb) {
                     setColor("red");
-                    if (this.tile.bomb === Tile.BOMB_TYPE.MINI) setColor("blue");
                     ellipse(
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
                         this.tileIndexY + this.HALF_TILE + this.BOARD_Y_OFFSET,
@@ -214,23 +217,22 @@ class MineSquadPlus {
 
                 if (!this.playing) {
                     if (this.tile.flagged === true) {
-                        if (this.tile.bomb === Tile.BOMB_TYPE.MINE || this.tile.bomb === Tile.BOMB_TYPE.MINI) {
-                            setColor("green");
-                        } else {
-                            setColor("red");
-                        }
+                        setColor("red");
                         strokeWeight(5);
+                        if (this.tile.bomb) {
+                            setColor("green");
+                        }
                         line(
                             this.BOARD_X_OFFSET + this.tileIndexX,
                             this.tileIndexY + this.BOARD_Y_OFFSET,
-                            this.tileIndexX + this.TILE_HEIGHT,
-                            this.tileIndexY + this.TILE_HEIGHT
+                            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
+                            this.tileIndexY + this.BOARD_Y_OFFSET + this.TILE_HEIGHT
                         );
                         line(
                             this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
                             this.tileIndexY + this.BOARD_Y_OFFSET,
-                            this.tileIndexX,
-                            this.tileIndexY + this.TILE_HEIGHT
+                            this.tileIndexX + this.TILE_HEIGHT,
+                            this.tileIndexY + this.TILE_HEIGHT + this.BOARD_Y_OFFSET
                         );
                     }
                 }
@@ -303,12 +305,8 @@ class MineSquadPlus {
         let placedMines = 0;
         while (placedMines < this.MAX_MINES) {
             const tileIndex = Math.floor(Math.random() * this.TOTAL_TILES);
-            if (newBoard[tileIndex].bomb === Tile.BOMB_TYPE.NONE) {
-                if (Math.random() * 100 < 10) {
-                    newBoard[tileIndex].bomb = Tile.BOMB_TYPE.MINI;
-                } else {
-                    newBoard[tileIndex].bomb = Tile.BOMB_TYPE.MINE;
-                }
+            if (!newBoard[tileIndex].bomb) {
+                newBoard[tileIndex].bomb = true;
                 placedMines++;
             }
         }
@@ -324,7 +322,7 @@ class MineSquadPlus {
         let value = 0;
         const neighbors = this.getNeighbors(tileIndex);
         for (let i = 0; i < neighbors.length; i++) {
-            if (newBoard[neighbors[i]].bomb != Tile.BOMB_TYPE.NONE) {
+            if (newBoard[neighbors[i]].bomb) {
                 value++;
             }
         }
@@ -390,21 +388,10 @@ class MineSquadPlus {
         return result;
     }
 
-    getNumMinesNotFound() {
-        let result = 0;
-        for (let i = 0; i < this.TOTAL_TILES; i++) {
-            const tile = this.board[i];
-            if (tile.flagged || (tile.bomb != Tile.BOMB_TYPE.NONE && !tile.hidden)) {
-                result++;
-            }
-        }
-        return this.MAX_MINES - result;
-    }
-
     unhide(tile, checked) {
         if (this.board[tile].flagged === false) {
             this.board[tile].hidden = false;
-            this.score += this.TILE_SCORE;
+            this.score += this.board[tile].value > 0 ? this.board[tile].value * 10 : 5;
         }
         // if tile.value is zero, uncover all the tiles around it
         // if one of the ones uncovered is a zero uncover all the ones around it and so on
@@ -419,7 +406,9 @@ class MineSquadPlus {
         }
     }
 
-    blastRadius(tileIndex) {
+    defuseRadius(tileIndex) {
+        this.board[tileIndex].hidden = false;
+        this.minesUncovered++;
         let damage = this.getNeighbors(tileIndex);
         damage.push(tileIndex + 2);
         damage.push(tileIndex - 2);
@@ -428,7 +417,7 @@ class MineSquadPlus {
         for (let i = 0; i < damage.length; i++) {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
                 this.board[damage[i]].hidden = false;
-                if (this.board[i].bomb === Tile.BOMB_TYPE.MINE || this.board[i].bomb === Tile.BOMB_TYPE.MINI) {
+                if (this.board[i].bomb) {
                     this.minesUncovered++;
                 }
             }
@@ -436,15 +425,8 @@ class MineSquadPlus {
     }
 
     bombSquad(tileIndex) {
-        if (this.board[tileIndex].bomb != Tile.BOMB_TYPE.MINE) {
-            this.squadsLeft = this.squadsLeft - 1;
-            this.board[tileIndex].hidden = false;
-            this.minesUncovered++;
-            this.blastRadius(tileIndex);
-            this.score -= this.SQUAD_COST;
-        } else {
-            this.gameOver();
-        }
+        this.squadCount--;
+        this.defuseRadius(tileIndex);
     }
 
     handleMouseClick(mouseX, mouseY) {
@@ -456,22 +438,21 @@ class MineSquadPlus {
         const tile = this.board[tileIndex];
         if (this.playing && tile && tile.hidden) {
             if (tile.flagged) {
+                this.flaggedTiles--;
                 tile.flagged = false;
             } else if (keyIsDown(CONTROL)) {
-                tile.flagged = true;
+                if (this.flaggedTiles < this.MAX_MINES) {
+                    this.flaggedTiles++;
+                    tile.flagged = true;
+                }
             } else if (keyIsDown(SHIFT)) {
-                if (this.squadsLeft > 0 && this.score > this.SQUAD_COST) {
+                if (this.squadCount > 0) {
                     this.bombSquad(tileIndex);
                 }
             } else {
-                if (tile.bomb === Tile.BOMB_TYPE.MINI) {
-                    this.board[tileIndex].hidden = false;
-                    this.minesUncovered++;
-                    this.blastRadius(tileIndex);
-                } else if (tile.bomb === Tile.BOMB_TYPE.MINE) {
+                if (tile.bomb) {
                     this.gameOver();
                 } else {
-                    this.score += tile.value > 0 ? tile.value * 10 : 5;
                     this.unhide(tileIndex, []);
                 }
             }
@@ -487,7 +468,7 @@ class MineSquadPlus {
     checkForWin() {
         let win = true;
         this.board.forEach((tile) => {
-            if (tile.bomb === Tile.BOMB_TYPE.NONE && tile.hidden === true) win = false;
+            if (tile.bomb && tile.hidden === true) win = false;
         });
 
         if (win) {
@@ -503,23 +484,23 @@ class MineSquadPlus {
 
     calculateScore() {
         for (let i = 0; i < this.TOTAL_TILES; i++) {
-            if (this.board[i].hidden === false && this.winner) {
+            const tile = this.board[i];
+            if (tile.hidden === false && this.winner) {
                 this.score += this.TILE_BONUS;
             }
-            if (this.board[i].flagged) {
+            if (tile.flagged) {
                 this.score -= this.FLAG_PENALTY;
             }
-            this.board[i].hidden = false;
+            tile.hidden = false;
         }
-        this.score += this.squadsLeft * this.squadsLeft * this.SQUAD_COST;
+        this.score += this.squadCount * this.squadCount * this.SQUAD_COST;
     }
 }
 
 class Tile {
-    static BOMB_TYPE = { NONE: 0, MINE: 1, MINI: 2 };
     constructor() {
         this.hidden = true;
-        this.bomb = Tile.BOMB_TYPE.NONE;
+        this.bomb = false;
         this.flagged = false;
         this.value = 0;
     }

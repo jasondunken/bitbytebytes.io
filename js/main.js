@@ -4,7 +4,7 @@ let terminal;
 // called by p5 when window is ready
 function setup() {
     // p5.draw calls/second
-    frameRate(60);
+    frameRate(30);
 
     initializeGOL();
     initializeBanner();
@@ -138,6 +138,8 @@ class GOL {
     constructor(bounds) {
         this.bounds = bounds;
         this.golCanvas = createCanvas(bounds.width, bounds.height);
+        console.log("canvas: ", this.golCanvas.canvas.getContext("2d"));
+        console.log("canvas.attributes: ", this.golCanvas.canvas.getContext("2d").getContextAttributes());
         this.golCanvas.parent("p5-container");
         this.cellScale = GOL.CELL_SCALE.SMALL;
         this.restart();
