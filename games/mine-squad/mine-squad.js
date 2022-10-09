@@ -468,7 +468,7 @@ class MineSquadPlus {
     checkForWin() {
         let win = true;
         this.board.forEach((tile) => {
-            if (tile.bomb && tile.hidden === true) win = false;
+            if (!tile.bomb && tile.hidden === true) win = false;
         });
 
         if (win) {
