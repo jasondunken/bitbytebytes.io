@@ -387,7 +387,7 @@ class MineSquadPlus {
     getNumHiddenTiles() {
         let result = this.TOTAL_TILES;
         for (let i = 0; i < this.TOTAL_TILES; i++) {
-            if (!this.board[i].hidden) result--;
+            if (!this.board[i].hidden && !this.board[i].bomb) result--;
         }
         return result;
     }
