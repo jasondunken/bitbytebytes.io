@@ -46,10 +46,12 @@ class MineSquadPlus {
     TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
     MAX_MINES = 99;
     STARTING_SQUADS = 1;
+    FIRST_SQUAD_AWARD = 2500;
+    SECOND_SQUAD_AWARD = 7500;
     MAX_SQUADS = 3;
-    SQUAD_COST = 1000;
     TILE_SCORE = 10;
     TILE_BONUS = 100;
+    SQUAD_BONUS = 1000;
     FLAG_PENALTY = 25;
 
     tileIndexX = 0;
@@ -62,6 +64,7 @@ class MineSquadPlus {
     score = 0;
     time = 0;
     squadCount = 0;
+    squadAward = 0;
     flaggedTiles = 0;
     minesUncovered = 0;
     constructor(width, height, sprites) {
@@ -83,6 +86,7 @@ class MineSquadPlus {
         this.time = 0;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
+        this.squadAward = 0;
         this.flaggedTiles = 0;
         this.minesUncovered = 0;
         this.board = this.initializeBoard();
@@ -463,6 +467,14 @@ class MineSquadPlus {
         } else if (!this.playing) {
             this.start1Player();
         }
+        if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
+            this.squadAward = this.FIRST_SQUAD_AWARD;
+            this.squadCount++;
+        }
+        if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
+            this.squadAward = this.SECOND_SQUAD_AWARD;
+            this.squadCount++;
+        }
     }
 
     checkForWin() {
@@ -493,7 +505,7 @@ class MineSquadPlus {
             }
             tile.hidden = false;
         }
-        this.score += this.squadCount * this.squadCount * this.SQUAD_COST;
+        this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
     }
 }
 
