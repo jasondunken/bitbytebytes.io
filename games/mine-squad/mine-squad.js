@@ -505,7 +505,9 @@ class MineSquadPlus {
             }
             tile.hidden = false;
         }
-        this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
+        if (this.winner) {
+            this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
+        }
     }
 }
 
