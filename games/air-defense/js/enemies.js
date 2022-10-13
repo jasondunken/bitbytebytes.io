@@ -60,7 +60,9 @@ class EnemyAircraft extends GameObject {
 
 class Bomb extends GameObject {
     MAX_HEALTH = 5;
-    FALLING_SPEED = 3;
+    MAX_FALLING_SPEED = 3;
+    Y_GRAVITY = 0.1;
+    Y_VELOCITY = 0;
     DAMAGE = 100;
     DIAMETER = 5;
 
@@ -73,7 +75,9 @@ class Bomb extends GameObject {
 
     update() {
         this.position.x += this.direction.x;
-        this.position.y += this.FALLING_SPEED;
+        this.Y_VELOCITY += this.Y_GRAVITY;
+        if (this.Y_VELOCITY > this.MAX_FALLING_SPEED) this.Y_VELOCITY = this.MAX_FALLING_SPEED;
+        this.position.y += this.Y_VELOCITY;
     }
 
     takeDamage(amount) {
