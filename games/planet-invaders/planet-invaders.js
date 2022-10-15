@@ -88,6 +88,10 @@ class PlanetInvaders {
                     return gameObj.type === "shot";
                 });
 
+                this.aliens = Array.from(this.level.gameObjects).filter((gameObj) => {
+                    return gameObj.type === "alien";
+                });
+
                 let moveDown = false;
                 this.level.gameObjects.forEach((gameObj) => {
                     gameObj.update();
@@ -117,6 +121,18 @@ class PlanetInvaders {
                     });
                 }
 
+                if (frameCount % 120 === 0) {
+                    for (let i = 0; i < 3; i++) {
+                        if (Math.random() >= 0.5) {
+                            const alienIndex = Math.floor(Math.random() * this.aliens.length);
+                            const alien = this.aliens[alienIndex];
+                            this.level.gameObjects.add(
+                                new Shot(new Vec2(alien.position.x, alien.position.y), Vec2.DOWN)
+                            );
+                        }
+                    }
+                }
+
                 if (this.level.alienCount <= 0) {
                     this.currentLevel = this.levels[(this.levels.indexOf(this.currentLevel) + 1) % this.levels.length];
                     this.loadLevel(this.currentLevel);
@@ -128,6 +144,9 @@ class PlanetInvaders {
                         this.score += 1000;
                         shot.remove = true;
                         this.level.bonus.active = false;
+                    }
+                    if (this.shotCollision(shot, this.player)) {
+                        this.gameOver = true;
                     }
                 });
                 if (
@@ -197,6 +216,8 @@ class PlanetInvaders {
     }
 
     shotCollision(shot, gameObj) {
+        if (shot.direction.y > 0 && gameObj.type === "alien") return;
+        if (shot.direction.y < 0 && gameObj.type === "player") return;
         return (
             shot.position.x > gameObj.position.x - gameObj.size / 2 &&
             shot.position.x < gameObj.position.x + gameObj.size / 2 &&
