@@ -67,6 +67,8 @@ class MineSquadPlus {
     squadAward = 0;
     flaggedTiles = 0;
     minesUncovered = 0;
+
+    mouseClicks = [];
     constructor(width, height, sprites) {
         this.width = width;
         this.height = height;
@@ -92,6 +94,8 @@ class MineSquadPlus {
         this.board = this.initializeBoard();
         this.playing = true;
         this.winner = false;
+
+        this.mouseClicks = [];
     }
 
     update() {}
@@ -278,20 +282,35 @@ class MineSquadPlus {
 
         // draw winner
         textSize(64);
-        if (this.winner) {
-            fill("white");
-            text(
-                "You Win!",
-                (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
-            );
-        } else if (!this.playing) {
-            fill("white");
-            text(
-                "Game Over!",
-                (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
-            );
+        if (!this.playing) {
+            stroke("orange");
+            strokeWeight(2);
+            for (let i = 0; i < this.mouseClicks.length - 1; i++) {
+                line(
+                    this.mouseClicks[i][0],
+                    this.mouseClicks[i][1],
+                    this.mouseClicks[i + 1][0],
+                    this.mouseClicks[i + 1][1]
+                );
+            }
+
+            stroke("white");
+            strokeWeight(1);
+            if (this.winner) {
+                fill("green");
+                text(
+                    "You Win!",
+                    (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
+                    (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
+                );
+            } else {
+                fill("red");
+                text(
+                    "Game Over!",
+                    (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
+                    (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
+                );
+            }
         }
     }
 
@@ -438,6 +457,7 @@ class MineSquadPlus {
         const y = Math.floor(mouseY / this.TILE_HEIGHT);
         if (x < 0 || x > this.TILES_PER_ROW - 1) return;
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
+        if (this.playing) this.mouseClicks.push([mouseX, mouseY]);
         const tileIndex = y * this.TILES_PER_ROW + x;
         const tile = this.board[tileIndex];
         if (this.playing && tile && tile.hidden) {
