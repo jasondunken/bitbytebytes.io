@@ -295,6 +295,7 @@ class MineSquadPlus {
             }
 
             stroke("green");
+            noFill();
             strokeWeight(3);
             const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
             let x = Math.floor(lastClick[0] / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1;
