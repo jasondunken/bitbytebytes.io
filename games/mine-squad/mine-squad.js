@@ -294,6 +294,13 @@ class MineSquadPlus {
                 );
             }
 
+            stroke("green");
+            strokeWeight(3);
+            const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
+            let x = Math.floor(lastClick[0] / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1;
+            let y = Math.floor(lastClick[1] / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1 + this.BOARD_Y_OFFSET;
+            rect(x - 1, y - 1, this.TILE_HEIGHT, this.TILE_HEIGHT);
+
             stroke("white");
             strokeWeight(1);
             if (this.winner) {
