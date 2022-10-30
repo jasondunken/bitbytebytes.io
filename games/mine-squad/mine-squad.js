@@ -276,7 +276,7 @@ class MineSquadPlus {
             setColor("red");
             strokeWeight(3);
             noFill();
-            rect(x - 1, y - 1, this.TILE_HEIGHT, this.TILE_HEIGHT);
+            rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
         // draw winner
@@ -298,7 +298,7 @@ class MineSquadPlus {
             strokeWeight(3);
             const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
             const [x, y] = this.mousePositionToTileScreenLocation(lastClick);
-            rect(x - 1, y - 1, this.TILE_HEIGHT, this.TILE_HEIGHT);
+            rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
 
             stroke("white");
             strokeWeight(1);
