@@ -266,8 +266,7 @@ class MineSquadPlus {
         }
 
         // draws box around selected tile
-        let x = Math.floor(mouseX / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1;
-        let y = Math.floor(mouseY / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1 + this.BOARD_Y_OFFSET;
+        const [x, y] = this.mousePositionToTileScreenLocation([mouseX, mouseY]);
         if (
             x >= this.BOARD_X_OFFSET &&
             x < this.TILES_PER_ROW * this.TILE_HEIGHT + this.BOARD_X_OFFSET &&
@@ -277,7 +276,7 @@ class MineSquadPlus {
             setColor("red");
             strokeWeight(3);
             noFill();
-            rect(x, y, this.TILE_HEIGHT - 1, this.TILE_HEIGHT - 1);
+            rect(x - 1, y - 1, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
         // draw winner
@@ -298,8 +297,7 @@ class MineSquadPlus {
             noFill();
             strokeWeight(3);
             const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
-            let x = Math.floor(lastClick[0] / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1;
-            let y = Math.floor(lastClick[1] / this.TILE_HEIGHT) * this.TILE_HEIGHT + 1 + this.BOARD_Y_OFFSET;
+            const [x, y] = this.mousePositionToTileScreenLocation(lastClick);
             rect(x - 1, y - 1, this.TILE_HEIGHT, this.TILE_HEIGHT);
 
             stroke("white");
@@ -462,7 +460,7 @@ class MineSquadPlus {
 
     handleMouseClick(mouseX, mouseY) {
         const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
-        const y = Math.floor(mouseY / this.TILE_HEIGHT);
+        const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
         if (x < 0 || x > this.TILES_PER_ROW - 1) return;
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
         if (this.playing) this.mouseClicks.push([mouseX, mouseY]);
@@ -536,6 +534,12 @@ class MineSquadPlus {
         if (this.winner) {
             this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
         }
+    }
+
+    mousePositionToTileScreenLocation(position) {
+        let x = Math.floor(position[0] / this.TILE_HEIGHT) * this.TILE_HEIGHT;
+        let y = Math.floor(position[1] / this.TILE_HEIGHT) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET;
+        return [x, y];
     }
 }
 
