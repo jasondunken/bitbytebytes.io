@@ -518,6 +518,17 @@ class MineSquadPlus {
     gameOver() {
         this.calculateScore();
         this.playing = false;
+
+        let gameScores = localStorage.getItem("minesquad");
+        if (gameScores) {
+            gameScores = JSON.parse(gameScores);
+        } else {
+            gameScores = {};
+        }
+        const scoreDate = Date.now();
+        gameScores[scoreDate] = { score: this.score, winner: this.winner };
+        localStorage.setItem("minesquad", JSON.stringify(gameScores));
+        console.log("gameScores: ", gameScores);
     }
 
     calculateScore() {
