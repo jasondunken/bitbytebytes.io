@@ -518,17 +518,7 @@ class MineSquadPlus {
     gameOver() {
         this.calculateScore();
         this.playing = false;
-
-        let gameScores = localStorage.getItem("minesquad");
-        if (gameScores) {
-            gameScores = JSON.parse(gameScores);
-        } else {
-            gameScores = {};
-        }
-        const scoreDate = Date.now();
-        gameScores[scoreDate] = { score: this.score, winner: this.winner };
-        localStorage.setItem("minesquad", JSON.stringify(gameScores));
-        console.log("gameScores: ", gameScores);
+        this.updateHighScores();
     }
 
     calculateScore() {
@@ -545,6 +535,33 @@ class MineSquadPlus {
         if (this.winner) {
             this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
         }
+    }
+
+    updateHighScores() {
+        let gameScores = localStorage.getItem("minesquad");
+        if (gameScores) {
+            gameScores = JSON.parse(gameScores);
+        } else {
+            gameScores = {};
+        }
+
+        let scores = Object.keys(gameScores);
+        while (scores.length >= 10) {
+            let lowestScoreKey = scores[0];
+            let lowestScore = gameScores[lowestScoreKey];
+            for (let i = 1; i < scores.length; i++) {
+                if (gameScores[scores[i]].score < lowestScore.score) {
+                    lowestScoreKey = scores[i];
+                    lowestScore = gameScores[lowestScoreKey];
+                }
+            }
+            delete gameScores[lowestScoreKey];
+            scores = Object.keys(gameScores);
+        }
+        const scoreDate = Date.now();
+        gameScores[scoreDate] = { score: this.score, winner: this.winner };
+        localStorage.setItem("minesquad", JSON.stringify(gameScores));
+        console.log("gameScores: ", gameScores);
     }
 
     mousePositionToTileScreenLocation(position) {
