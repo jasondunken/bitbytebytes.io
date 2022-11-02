@@ -460,7 +460,7 @@ class MineSquadPlus {
 
     handleMouseClick(mouseX, mouseY) {
         const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
-        const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
+        const y = Math.floor(mouseY / this.TILE_HEIGHT);
         if (x < 0 || x > this.TILES_PER_ROW - 1) return;
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
         if (this.playing) this.mouseClicks.push([mouseX, mouseY]);
