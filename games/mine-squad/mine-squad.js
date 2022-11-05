@@ -279,6 +279,15 @@ class MineSquadPlus {
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
+        // draw crosshair
+        setColor("red");
+        noFill();
+        strokeWeight(1);
+        ellipse(mouseX, mouseY, 10, 10);
+        setColor("black");
+        line(mouseX - 10, mouseY, mouseX + 10, mouseY);
+        line(mouseX, mouseY - 10, mouseX, mouseY + 10);
+
         // draw winner
         textSize(64);
         if (!this.playing) {

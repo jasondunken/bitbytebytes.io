@@ -9,7 +9,7 @@ body {
 }
 
 canvas {
-    cursor: crosshair;
+    cursor: url("blank_cursor.png"), auto;
 }
 
 .buttons {
