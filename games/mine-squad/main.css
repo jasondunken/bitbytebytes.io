@@ -8,6 +8,10 @@ body {
     align-content: center;
 }
 
+canvas {
+    cursor: crosshair;
+}
+
 .buttons {
     width: 960px;
 }
