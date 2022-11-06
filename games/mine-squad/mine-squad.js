@@ -155,6 +155,9 @@ class MineSquadPlus {
             if (i + 1 > this.MAX_SQUADS - this.squadCount) {
                 fill("green");
             }
+            if (keyIsDown(SHIFT) && i === this.MAX_SQUADS - this.squadCount && frameCount % 30 > 15) {
+                noFill();
+            }
             ellipse(
                 this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
                 this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + this.BOARD_Y_OFFSET,
@@ -283,7 +286,9 @@ class MineSquadPlus {
         setColor("red");
         noFill();
         strokeWeight(1);
-        ellipse(mouseX, mouseY, 10, 10);
+        let crosshairDiameter = 10;
+        if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
+        ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
         setColor("black");
         line(mouseX - 10, mouseY, mouseX + 10, mouseY);
         line(mouseX, mouseY - 10, mouseX, mouseY + 10);
