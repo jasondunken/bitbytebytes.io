@@ -53,6 +53,7 @@ class MineSquadPlus {
     TILE_BONUS = 100;
     SQUAD_BONUS = 1000;
     FLAG_PENALTY = 25;
+    DEFUSE_BONUS = 250;
 
     tileIndexX = 0;
     tileIndexY = 0;
@@ -451,7 +452,10 @@ class MineSquadPlus {
 
     defuseRadius(tileIndex) {
         this.board[tileIndex].hidden = false;
-        this.minesUncovered++;
+        if (this.board[tileIndex].bomb) {
+            this.score += this.DEFUSE_BONUS;
+            this.minesUncovered++;
+        }
         let damage = this.getNeighbors(tileIndex);
         damage.push(tileIndex + 2);
         damage.push(tileIndex - 2);
@@ -460,7 +464,8 @@ class MineSquadPlus {
         for (let i = 0; i < damage.length; i++) {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
                 this.board[damage[i]].hidden = false;
-                if (this.board[i].bomb) {
+                if (this.board[damage[i]].bomb) {
+                    this.score += this.DEFUSE_BONUS;
                     this.minesUncovered++;
                 }
             }
