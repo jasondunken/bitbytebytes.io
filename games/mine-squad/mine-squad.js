@@ -55,6 +55,8 @@ class MineSquadPlus {
     FLAG_PENALTY = 25;
     DEFUSE_BONUS = 250;
 
+    MAX_NUM_HIGHSCORES = 10;
+
     tileIndexX = 0;
     tileIndexY = 0;
     tile = null;
@@ -151,7 +153,7 @@ class MineSquadPlus {
         }
 
         // draws bomb squads left
-        fill("magenta");
+        fill("gray");
         for (let i = 0; i < this.MAX_SQUADS; i++) {
             if (i + 1 > this.MAX_SQUADS - this.squadCount) {
                 fill("green");
@@ -171,7 +173,7 @@ class MineSquadPlus {
         fill("white");
         text(
             "" + this.score,
-            this.TILE_HEIGHT * 8,
+            this.width / 2,
             this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
         );
 
@@ -565,8 +567,8 @@ class MineSquadPlus {
         }
 
         let scores = Object.keys(gameScores);
-        while (scores.length >= 10) {
-            let lowestScoreKey = scores[0];
+        let lowestScoreKey = scores[0];
+        if (scores.length > this.MAX_NUM_HIGHSCORES) {
             let lowestScore = gameScores[lowestScoreKey];
             for (let i = 1; i < scores.length; i++) {
                 if (gameScores[scores[i]].score < lowestScore.score) {
@@ -574,12 +576,13 @@ class MineSquadPlus {
                     lowestScore = gameScores[lowestScoreKey];
                 }
             }
-            delete gameScores[lowestScoreKey];
-            scores = Object.keys(gameScores);
         }
-        const scoreDate = Date.now();
-        gameScores[scoreDate] = { score: this.score, winner: this.winner };
-        localStorage.setItem("minesquad", JSON.stringify(gameScores));
+        if (this.score > gameScores[lowestScoreKey].score) {
+            delete gameScores[lowestScoreKey];
+            const scoreDate = Date.now();
+            gameScores[scoreDate] = { score: this.score, winner: this.winner };
+            localStorage.setItem("minesquad", JSON.stringify(gameScores));
+        }
         console.log("gameScores: ", gameScores);
     }
 
