@@ -156,10 +156,14 @@ class MineSquadPlus {
         fill("gray");
         for (let i = 0; i < this.MAX_SQUADS; i++) {
             if (i + 1 > this.MAX_SQUADS - this.squadCount) {
-                fill("green");
+                fill("SpringGreen");
             }
-            if (keyIsDown(SHIFT) && i === this.MAX_SQUADS - this.squadCount && frameCount % 30 > 15) {
-                noFill();
+            if (i === this.MAX_SQUADS - this.squadCount) {
+                if (keyIsDown(SHIFT) && frameCount % 30 > 15) {
+                    fill("Green");
+                } else if (!keyIsDown(SHIFT) && frameCount % 60 > 30) {
+                    fill("Green");
+                }
             }
             ellipse(
                 this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
