@@ -51,7 +51,7 @@ class MineSquadPlus {
     MAX_SQUADS = 3;
     TILE_SCORE = 10;
     TILE_BONUS = 100;
-    SQUAD_BONUS = 1000;
+    SQUAD_BONUS = 10000;
     DEFUSE_BONUS = 1000;
     FLAG_PENALTY = 25;
 
@@ -469,12 +469,14 @@ class MineSquadPlus {
         damage.push(tileIndex - this.TILES_PER_ROW * 2);
         for (let i = 0; i < damage.length; i++) {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
-                this.board[damage[i]].hidden = false;
-                this.score += this.board[damage[i]].value * this.TILE_BONUS;
-                if (this.board[damage[i]].bomb) {
-                    this.score += this.DEFUSE_BONUS;
-                    this.minesUncovered++;
+                if (this.board[damage[i]].hidden) {
+                    this.score += this.board[damage[i]].value * this.TILE_BONUS;
+                    if (this.board[damage[i]].bomb) {
+                        this.score += this.DEFUSE_BONUS;
+                        this.minesUncovered++;
+                    }
                 }
+                this.board[damage[i]].hidden = false;
             }
         }
     }
@@ -559,7 +561,7 @@ class MineSquadPlus {
             tile.hidden = false;
         }
         if (this.winner) {
-            this.score += this.squadCount * this.squadCount * this.SQUAD_BONUS;
+            this.score += this.squadCount * this.SQUAD_BONUS;
         }
     }
 
