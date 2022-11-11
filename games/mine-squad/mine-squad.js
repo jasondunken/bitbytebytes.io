@@ -52,8 +52,8 @@ class MineSquadPlus {
     TILE_SCORE = 10;
     TILE_BONUS = 100;
     SQUAD_BONUS = 1000;
+    DEFUSE_BONUS = 1000;
     FLAG_PENALTY = 25;
-    DEFUSE_BONUS = 250;
 
     MAX_NUM_HIGHSCORES = 10;
 
@@ -470,6 +470,7 @@ class MineSquadPlus {
         for (let i = 0; i < damage.length; i++) {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
                 this.board[damage[i]].hidden = false;
+                this.score += this.board[damage[i]].value * this.TILE_BONUS;
                 if (this.board[damage[i]].bomb) {
                     this.score += this.DEFUSE_BONUS;
                     this.minesUncovered++;
