@@ -56,6 +56,8 @@ class MineSquadPlus {
     FLAG_PENALTY = 25;
 
     MAX_NUM_HIGHSCORES = 10;
+    highScores = {};
+    showHighScores = false;
 
     tileIndexX = 0;
     tileIndexY = 0;
@@ -99,6 +101,7 @@ class MineSquadPlus {
         this.winner = false;
 
         this.mouseClicks = [];
+        this.showHighScores = false;
     }
 
     update() {}
@@ -289,17 +292,6 @@ class MineSquadPlus {
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
-        // draw crosshair
-        setColor("red");
-        noFill();
-        strokeWeight(1);
-        let crosshairDiameter = 10;
-        if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
-        ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
-        setColor("black");
-        line(mouseX - 10, mouseY, mouseX + 10, mouseY);
-        line(mouseX, mouseY - 10, mouseX, mouseY + 10);
-
         // draw winner
         textSize(64);
         if (!this.playing) {
@@ -339,6 +331,33 @@ class MineSquadPlus {
                 );
             }
         }
+
+        // draw highscores
+        if (this.showHighScores) {
+            stroke("black");
+            strokeWeight(3);
+            fill("gray");
+            rect(this.width / 2 - 200, 50, 400, 400);
+            noStroke();
+            fill("black");
+            textSize(24);
+            const highScores = Object.keys(this.highScores);
+            highScores.forEach((score, i) => {
+                text(new Date(+score).toLocaleDateString(), this.width / 2 - 130, 130 + i * 32);
+                text(this.highScores[score].score, this.width / 2 + 150, 130 + i * 32);
+            });
+        }
+
+        // draw crosshair
+        setColor("red");
+        noFill();
+        strokeWeight(1);
+        let crosshairDiameter = 10;
+        if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
+        ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
+        setColor("black");
+        line(mouseX - 10, mouseY, mouseX + 10, mouseY);
+        line(mouseX, mouseY - 10, mouseX, mouseY + 10);
     }
 
     initializeBoard() {
@@ -547,6 +566,7 @@ class MineSquadPlus {
         this.calculateScore();
         this.playing = false;
         this.updateHighScores();
+        this.showHighScores = true;
     }
 
     calculateScore() {
@@ -590,7 +610,7 @@ class MineSquadPlus {
             gameScores[scoreDate] = { score: this.score, winner: this.winner };
             localStorage.setItem("minesquad", JSON.stringify(gameScores));
         }
-        console.log("gameScores: ", gameScores);
+        this.highScores = gameScores;
     }
 
     mousePositionToTileScreenLocation(position) {
