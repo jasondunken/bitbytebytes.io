@@ -292,8 +292,7 @@ class MineSquadPlus {
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
-        // draw winner
-        textSize(64);
+        // draw mouse path & last tile
         if (!this.playing) {
             stroke("orange");
             strokeWeight(2);
@@ -312,33 +311,23 @@ class MineSquadPlus {
             const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
             const [x, y] = this.mousePositionToTileScreenLocation(lastClick);
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
-
-            stroke("white");
-            strokeWeight(1);
-            if (this.winner) {
-                fill("green");
-                text(
-                    "You Win!",
-                    (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                    (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
-                );
-            } else {
-                fill("red");
-                text(
-                    "Game Over!",
-                    (this.TILES_PER_ROW / 2) * this.TILE_HEIGHT,
-                    (this.TILES_PER_COLUMN / 2) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET
-                );
-            }
         }
 
-        // draw highscores
+        // draw win/lose & highscores
         if (this.showHighScores) {
             stroke("black");
             strokeWeight(3);
             fill("gray");
             rect(this.width / 2 - 200, 50, 400, 400);
             noStroke();
+            textSize(32);
+            if (this.winner) {
+                fill("green");
+                text("You Win!", this.width / 2, 80);
+            } else {
+                fill("red");
+                text("Game Over!", this.width / 2, 80);
+            }
             fill("black");
             textSize(24);
             const highScores = Object.keys(this.highScores);
@@ -593,6 +582,9 @@ class MineSquadPlus {
             gameScores = {};
         }
 
+        const scoreDate = Date.now();
+        gameScores[scoreDate] = { score: this.score, winner: this.winner };
+
         let scores = Object.keys(gameScores);
         let lowestScoreKey = scores[0];
         if (scores.length > this.MAX_NUM_HIGHSCORES) {
@@ -603,13 +595,10 @@ class MineSquadPlus {
                     lowestScore = gameScores[lowestScoreKey];
                 }
             }
-        }
-        if (this.score > gameScores[lowestScoreKey].score) {
             delete gameScores[lowestScoreKey];
-            const scoreDate = Date.now();
-            gameScores[scoreDate] = { score: this.score, winner: this.winner };
-            localStorage.setItem("minesquad", JSON.stringify(gameScores));
         }
+
+        localStorage.setItem("minesquad", JSON.stringify(gameScores));
         this.highScores = gameScores;
     }
 
