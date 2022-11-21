@@ -58,6 +58,7 @@ class MineSquadPlus {
     MAX_NUM_HIGHSCORES = 10;
     highScores = {};
     showHighScores = false;
+    stats = {};
 
     tileIndexX = 0;
     tileIndexY = 0;
@@ -329,6 +330,8 @@ class MineSquadPlus {
                 text("Game Over!", this.width / 2, 80);
             }
             fill("black");
+            textSize(16);
+            text(`wins ${this.stats.wins} losses ${this.stats.losses}`, this.width / 2, 105);
             textSize(24);
             const highScores = Object.keys(this.highScores);
             highScores.forEach((score, i) => {
@@ -575,6 +578,21 @@ class MineSquadPlus {
     }
 
     updateHighScores() {
+        let gameStats = localStorage.getItem("minesquad.stats");
+        if (gameStats) {
+            gameStats = JSON.parse(gameStats);
+        } else {
+            gameStats = { wins: 0, losses: 0 };
+        }
+
+        if (this.winner) {
+            gameStats.wins++;
+        } else {
+            gameStats.losses++;
+        }
+        localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
+        this.stats = gameStats;
+
         let gameScores = localStorage.getItem("minesquad");
         if (gameScores) {
             gameScores = JSON.parse(gameScores);
