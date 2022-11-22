@@ -52,7 +52,7 @@ class MineSquadPlus {
     TILE_SCORE = 10;
     TILE_BONUS = 100;
     SQUAD_BONUS = 10000;
-    DEFUSE_BONUS = 1000;
+    DEFUSE_BONUS = 2000;
     FLAG_PENALTY = 25;
 
     MAX_NUM_HIGHSCORES = 10;
