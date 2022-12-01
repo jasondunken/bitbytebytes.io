@@ -1,4 +1,16 @@
 class Barrier {
+    BLOCK_SIZE = 4;
+    BLOCK_MAP = [
+        [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+
+    blocks = new Set();
+
     constructor(size, position, sprite) {
         this.size = size;
         this.pos = position;
