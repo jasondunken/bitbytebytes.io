@@ -22,4 +22,8 @@ class Barrier {
     render() {
         image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
     }
+
+    getBlocks() {
+        return this.blocks;
+    }
 }
