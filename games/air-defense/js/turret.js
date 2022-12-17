@@ -129,11 +129,11 @@ class Turret {
             this.CORE_SIZE
         );
 
-        for (let i = 0; i < this.MAX_AMMO / 500; i++) {
-            this.ammoStockpile.add(
-                new AmmoCrate({ x: Math.random() * this.game.width, y: 400 - 32 }, this.sprites["ammo-crate-500"])
-            );
-        }
+        // for (let i = 0; i < this.MAX_AMMO / 500; i++) {
+        //     this.ammoStockpile.add(
+        //         new AmmoCrate({ x: Math.random() * this.game.width, y: 400 - 32 }, this.sprites["ammo-crate-500"])
+        //     );
+        // }
     }
 }
 
