@@ -27,3 +27,10 @@ class Barrier {
         return this.blocks;
     }
 }
+
+class BarrierBlock {
+    constructor(blockSize, position) {
+        this.blockSize = blockSize;
+        this.position = position;
+    }
+}
