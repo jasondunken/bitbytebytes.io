@@ -5,3 +5,4 @@
 -   Find the mines!
 -   Start with one squad get more as you score points!
 -   Defuse mines with your squads!
+-   Bonus points for defusing mines!
