@@ -5,4 +5,4 @@
 -   Defend the skies!
 -   Shoot down planes, bombs, and paratroopers!
 -   Try not to run out of ammunition!
--   Don't let the supplies bet destroyed!
+-   Don't let your supplies bet destroyed!
