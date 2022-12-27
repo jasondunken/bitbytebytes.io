@@ -4,7 +4,9 @@ You'll find it here (but not yet) => [:mage:](http://www.bitbytebytes.io)
 
 ## Amazing Features!
 
--   :genie: Conway's Game of Life in the header, click and drag to be mesmerized!
--   :mermaid: Retro console styling with functional controls!
--   :elf: A working retro Terminal, featuring BBBDOS!
+-   :genie: Conway's Game of Life in the header!
+-   :mermaid: Retro console styling with working controls!
+-   :alien: Rad 80s GUI mode!
+-   :elf: Working retro Terminal, featuring BBBDOS!
+-   :space_invader: Free to play retro games!
 -   :lotus_position: Hidden bonuses! :grinning:
