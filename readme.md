@@ -9,4 +9,4 @@ You'll find it here (but not yet) => [:mage:](http://www.bitbytebytes.io)
 -   :alien: Rad 80s GUI mode!
 -   :elf: Working retro Terminal, featuring BBBDOS!
 -   :space_invader: Free to play retro games!
--   :lotus_position: Hidden bonuses! :grinning:
+-   :lotus_position: Hidden surprises! :grinning:
