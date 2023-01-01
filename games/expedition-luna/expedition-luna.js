@@ -32,6 +32,14 @@ class ExpeditionLuna {
         this.start1Player();
     });
 
+    GAME_STATE = {
+        STARTING: "STARTING",
+        DEMO: "DEMO",
+        PLAYING: "PLAYING",
+        GAME_OVER: "GAME_OVER",
+    };
+    currentState = this.GAME_STATE.STARTING;
+
     PIXELS_PER_METER = 4;
     TERRAIN_POINTS = 24;
     TERRAIN_MAX_HEIGHT = 400;
@@ -53,11 +61,13 @@ class ExpeditionLuna {
     }
 
     startDemo() {
+        this.currentState = this.GAME_STATE.DEMO;
         this.player = new DemoLander();
         this.startGame();
     }
 
     start1Player() {
+        this.currentState = this.GAME_STATE.PLAYING;
         this.player = new Lander();
         this.startGame();
     }
@@ -82,24 +92,7 @@ class ExpeditionLuna {
     update() {
         console.log("lander.y: ", this.player.position.y);
         if (this.player.fuelLevel > 0) {
-            if (keyIsDown(87)) {
-                this.player.velocity.y -= 0.08;
-                this.player.fuelLevel -= 0.2;
-                this.player.mainThrusterOn = true;
-                this.addParticles("main");
-            } else this.player.mainThrusterOn = false;
-            if (keyIsDown(65)) {
-                this.player.velocity.x -= 0.01;
-                this.player.fuelLevel -= 0.1;
-                this.player.rightRCSOn = true;
-                this.addParticles("right");
-            } else this.player.rightRCSOn = false;
-            if (keyIsDown(68)) {
-                this.player.velocity.x += 0.01;
-                this.player.fuelLevel -= 0.1;
-                this.player.leftRCSOn = true;
-                this.addParticles("left");
-            } else this.player.leftRCSOn = false;
+            this.handleInput();
         }
         if (this.player.mainThrusterOn) {
             this.player.landed = false;
@@ -130,7 +123,26 @@ class ExpeditionLuna {
         }
     }
 
-    handleInput() {}
+    handleInput() {
+        if (keyIsDown(87)) {
+            this.player.velocity.y -= 0.08;
+            this.player.fuelLevel -= 0.2;
+            this.player.mainThrusterOn = true;
+            this.addParticles("main");
+        } else this.player.mainThrusterOn = false;
+        if (keyIsDown(65)) {
+            this.player.velocity.x -= 0.01;
+            this.player.fuelLevel -= 0.1;
+            this.player.rightRCSOn = true;
+            this.addParticles("right");
+        } else this.player.rightRCSOn = false;
+        if (keyIsDown(68)) {
+            this.player.velocity.x += 0.01;
+            this.player.fuelLevel -= 0.1;
+            this.player.leftRCSOn = true;
+            this.addParticles("left");
+        } else this.player.leftRCSOn = false;
+    }
 
     render() {
         background("black");
