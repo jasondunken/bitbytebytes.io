@@ -46,6 +46,8 @@ class ExpeditionLuna {
     TERRAIN_MIN_HEIGHT = 100;
     LANDING_AREAS = 4;
 
+    OXYGEN_DEPLETION_RATE = 0.1;
+
     gravity = new Vec2(0, 0.02);
     atmosphericDrag = 0.5;
     surfaceFriction = 5;
@@ -90,41 +92,29 @@ class ExpeditionLuna {
     }
 
     update() {
-        console.log("lander.y: ", this.player.position.y);
+        this.consumeOxygen();
+        this.consumeFuel();
+
         if (this.player.fuelLevel > 0) {
             this.handleInput();
         }
-        if (this.player.mainThrusterOn) {
-            this.player.landed = false;
-        }
-        if (this.player.fuelLevel < 0) this.player.fuelLevel = 0;
-        this.player.oxygenLevel -= 0.1;
+
+        this.checkTerrain();
+        this.applyPhysics();
+    }
+
+    consumeOxygen() {
+        this.player.oxygenLevel -= this.OXYGEN_DEPLETION_RATE;
         if (this.player.oxygenLevel < 0) this.player.oxygenLevel = 0;
-        if (!this.player.landed) {
-            this.player.velocity = this.player.velocity.add(this.gravity);
-        }
-        this.player.position = this.player.position.add(this.player.velocity);
-        if (this.player.position.y >= this.height) {
-            this.player.position.y = this.height;
-            this.player.land();
-        }
-        for (let i = 0; i < this.terrain.length - 1; i++) {
-            let touchL = pointOnLine(
-                [this.player.position.x - 8, this.player.position.y + 8],
-                [this.terrain[i], this.terrain[i + 1]]
-            );
-            let touchR = pointOnLine(
-                [this.player.position.x + 8, this.player.position.y + 8],
-                [this.terrain[i], this.terrain[i + 1]]
-            );
-            if (touchL || touchR) {
-                this.player.land();
-            }
-        }
+    }
+
+    consumeFuel() {
+        if (this.player.fuelLevel < 0) this.player.fuelLevel = 0;
     }
 
     handleInput() {
         if (keyIsDown(87)) {
+            this.player.landed = false;
             this.player.velocity.y -= 0.08;
             this.player.fuelLevel -= 0.2;
             this.player.mainThrusterOn = true;
@@ -142,6 +132,33 @@ class ExpeditionLuna {
             this.player.leftRCSOn = true;
             this.addParticles("left");
         } else this.player.leftRCSOn = false;
+    }
+
+    checkTerrain() {
+        for (let i = 0; i < this.terrain.length - 1; i++) {
+            let touchL = pointOnLine(
+                [this.player.position.x - 8, this.player.position.y + 8],
+                [this.terrain[i], this.terrain[i + 1]]
+            );
+            let touchR = pointOnLine(
+                [this.player.position.x + 8, this.player.position.y + 8],
+                [this.terrain[i], this.terrain[i + 1]]
+            );
+            if (touchL || touchR) {
+                this.player.land();
+            }
+        }
+        if (this.player.position.y >= this.height) {
+            this.player.position.y = this.height;
+            this.player.land();
+        }
+    }
+
+    applyPhysics() {
+        if (!this.player.landed) {
+            this.player.velocity = this.player.velocity.add(this.gravity);
+        }
+        this.player.position = this.player.position.add(this.player.velocity);
     }
 
     render() {
