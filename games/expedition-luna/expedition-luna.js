@@ -126,7 +126,9 @@ class ExpeditionLuna {
                 [this.terrain[i], this.terrain[i + 1]]
             );
             if (touchL || touchR) {
-                this.player.land();
+                this.player.velocity.y + Math.abs(this.player.velocity.x) > this.player.MAX_LANDING_VELOCITY
+                    ? this.player.crash()
+                    : this.player.land();
             }
         }
         if (this.player.position.y >= this.height) {
@@ -172,15 +174,27 @@ class ExpeditionLuna {
         rect(70, 21, 100, 10);
         rect(70, 37, 100, 10);
 
-        fill("white");
+        noStroke();
+        if (this.player.fuelLevel < this.player.STARTING_FUEL * 0.5 && frameCount % 45 < 15) {
+            fill("gray");
+        } else {
+            fill("white");
+        }
         const fuelBar = (this.player.fuelLevel / this.player.STARTING_FUEL) * 100;
         rect(70, 21, fuelBar, 10);
+
+        if (this.player.oxygenLevel < this.player.STARTING_OXYGEN * 0.3 && frameCount % 45 < 15) {
+            fill("gray");
+        } else {
+            fill("white");
+        }
         const o2Bar = (this.player.oxygenLevel / this.player.STARTING_OXYGEN) * 100;
         rect(70, 37, o2Bar, 10);
     }
 }
 
 class Lander {
+    MAX_LANDING_VELOCITY = 0.5; // m/s
     STARTING_FUEL = 100;
     STARTING_OXYGEN = 1000;
     fuelLevel = 0;
@@ -300,8 +314,14 @@ class Lander {
     }
 
     land() {
+        this.shutdownThrusters();
         this.landed = true;
         this.velocity = Vec2.ZEROS();
+    }
+
+    crash() {
+        this.land();
+        console.log("CRASH!!!");
     }
 
     addParticles(thruster) {
