@@ -3,12 +3,15 @@ class EnemyAircraft extends GameObject {
     MOVE_SPEED = 5.5;
     MAX_BOMBS = 2;
 
-    DROP_RANGE = 100;
-    BOMB_RELOAD_TIME = 20;
+    DROP_RANGE = 200;
+    BOMB_RELOAD_TIME = 25;
+    MAX_BOMB_DROP_DELAY = 180;
 
     health;
     bombs;
+    bombsAway = false;
     cooldownTimer = 0;
+    bombDropDelay = 0;
 
     constructor(position, spriteL, spriteR) {
         super("bomber", position);
@@ -17,6 +20,7 @@ class EnemyAircraft extends GameObject {
         this.health = this.MAX_HEALTH;
         this.bombs = this.MAX_BOMBS;
         this.cooldownTimer = this.BOMB_RELOAD_TIME;
+        this.bombDropDelay = Math.floor(Math.random() * (this.MAX_BOMB_DROP_DELAY + 1)); //
     }
 
     update() {
@@ -42,7 +46,10 @@ class EnemyAircraft extends GameObject {
     }
 
     dropBomb() {
-        if (this.cooldownTimer <= 0 && this.bombs > 0) {
+        if (!this.bombsAway) {
+            this.bombDropDelay--;
+            if (this.bombDropDelay <= 0) this.bombsAway = true;
+        } else if (this.cooldownTimer <= 0 && this.bombs > 0) {
             this.cooldownTimer = this.BOMB_RELOAD_TIME;
             this.bombs--;
             return true;

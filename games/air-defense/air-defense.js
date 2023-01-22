@@ -89,7 +89,6 @@ class AirDefense {
     }
 
     update() {
-        // console.log("gameObjects.size: ", this.gameObjects.size);
         this.turret.update();
 
         const bullets = Array.from(this.gameObjects).filter((element) => {
