@@ -158,13 +158,16 @@ class AirDefense {
                         block.takeDamage(gameObj.DAMAGE);
                         if (block.dead) {
                             this.turret.blocks.delete(block);
-                        }
-                        this.gameObjects.add(new Explosion(gameObj.position));
-                        if (block.dead) {
                             this.gameObjects.add(new Explosion(block.position));
                         }
                     }
                 });
+                if (gameObj.position.y >= this.height - this.GROUND_HEIGHT * 1.5) {
+                    gameObj.dead = true;
+                }
+                if (gameObj.dead) {
+                    this.gameObjects.add(new Explosion(gameObj.position));
+                }
             }
 
             if (gameObj.type === "airborne" && this.isOverTarget(gameObj)) {
