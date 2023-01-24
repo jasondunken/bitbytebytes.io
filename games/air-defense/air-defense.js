@@ -95,6 +95,10 @@ class AirDefense {
             return element.type === "bullet";
         });
 
+        const bombs = Array.from(this.gameObjects).filter((element) => {
+            return element.type === "bomb";
+        });
+
         for (let gameObj of this.gameObjects) {
             gameObj.update();
 
@@ -186,8 +190,19 @@ class AirDefense {
                 }
             }
 
-            if (gameObj.type === "paratrooper" && gameObj.position.y >= this.height - this.GROUND_HEIGHT - 8) {
-                gameObj.grounded = true;
+            if (gameObj.type === "paratrooper") {
+                if (gameObj.position.y >= this.height - this.GROUND_HEIGHT - 8) {
+                    gameObj.grounded = true;
+                }
+                if (gameObj.grounded) {
+                    for (let bomb of bombs) {
+                        if (this.isBombCollision(gameObj, bomb)) {
+                            bomb.dead = true;
+                            gameObj.dead = true;
+                            this.gameObjects.add(new Explosion(bomb.position));
+                        }
+                    }
+                }
             }
         }
 
@@ -249,6 +264,13 @@ class AirDefense {
             dist(gameObj.position.x, gameObj.position.y, bullet.position.x, bullet.position.y) <=
             16 + bullet.BULLET_DIAMETER
         ) {
+            return true;
+        }
+        return false;
+    }
+
+    isBombCollision(gameObj, bomb) {
+        if (dist(gameObj.position.x, gameObj.position.y, bomb.position.x, bomb.position.y) <= 8 + bomb.DIAMETER) {
             return true;
         }
         return false;
