@@ -6,3 +6,4 @@
 -   Shoot down planes, bombs, and paratroopers!
 -   Try not to run out of ammunition!
 -   Don't let your supplies get destroyed!
+-   Endless waves!
