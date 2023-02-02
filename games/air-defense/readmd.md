@@ -7,3 +7,4 @@
 -   Try not to run out of ammunition!
 -   Don't let your supplies get destroyed!
 -   Endless waves!
+-   Protect the battery!
