@@ -26,7 +26,9 @@ function preload() {
     turretBlocks["generator"] = loadImage("./air-defense/img/generator.png");
     turretBlocks["ammo-crate-500"] = loadImage("./air-defense/img/ammo_crate_500.png");
 
-    game = new AirDefense(WIDTH, HEIGHT, sprites, turretBlocks);
+    let font = loadFont("./bug-dug/font/PressStart2P.ttf");
+
+    game = new AirDefense(WIDTH, HEIGHT, sprites, turretBlocks, font);
 }
 
 function setup() {
@@ -51,16 +53,18 @@ class AirDefense {
     width = 0;
     height = 0;
     sprites = [];
+    font = null;
 
     gameState = GameState.DEMO;
     gameObjects = [];
     score = 0;
 
-    constructor(width, height, sprites, turretBlocks) {
+    constructor(width, height, sprites, turretBlocks, font) {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
         this.turretBlocks = turretBlocks;
+        this.font = font;
     }
 
     initGame() {}
@@ -248,15 +252,16 @@ class AirDefense {
         );
 
         // UI --------------------------------------------------------------------
+        textFont(this.font);
         setColor("white");
         noStroke();
         textSize(16);
-        text(this.turret.ammo, WIDTH - 55, 20);
+        text(this.turret.ammo, WIDTH - textWidth("" + this.turret.ammo) - 10, 30);
 
         setColor("white");
         noStroke();
         textSize(16);
-        text(this.score, 10, 20);
+        text(this.score, 10, 30);
     }
 
     isBulletCollision(gameObj, bullet) {
