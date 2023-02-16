@@ -319,25 +319,26 @@ class MineSquadPlus {
             stroke("black");
             strokeWeight(3);
             fill("gray");
-            rect(this.width / 2 - 200, 50, 400, 400);
+            rect(this.width / 2 - 200, 30, 400, 425);
             noStroke();
             textSize(32);
             if (this.winner) {
                 fill("green");
-                text("You Win!", this.width / 2, 80);
+                text("You Win!", this.width / 2, 60);
             } else {
                 fill("red");
-                text("Game Over!", this.width / 2, 80);
+                text("Game Over!", this.width / 2, 60);
             }
             fill("black");
             textSize(16);
-            text(`wins ${this.stats.wins} losses ${this.stats.losses}`, this.width / 2, 105);
+            text(`wins ${this.stats.wins} losses ${this.stats.losses}`, this.width / 2, 85);
             textSize(24);
             const highScores = Object.keys(this.highScores);
             highScores.forEach((score, i) => {
-                text(new Date(+score).toLocaleDateString(), this.width / 2 - 130, 130 + i * 32);
-                text(this.highScores[score].score, this.width / 2 + 150, 130 + i * 32);
+                text(new Date(+score).toLocaleDateString(), this.width / 2 - 130, 110 + i * 32);
+                text(this.highScores[score].score, this.width / 2 + 150, 110 + i * 32);
             });
+            if (frameCount % 40 > 20) text("Click to restart", this.width / 2, 430);
         }
 
         // draw crosshair
