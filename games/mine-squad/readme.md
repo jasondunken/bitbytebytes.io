@@ -6,3 +6,5 @@
 -   Start with one squad, get re-enforcements as you score points!
 -   Defuse mines with your squads!
 -   Bonus points for defusing mines!
+
+![Mine Squad Game](mine-squad.png)
