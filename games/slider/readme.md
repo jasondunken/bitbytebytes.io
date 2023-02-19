@@ -9,3 +9,5 @@
 -   No points to score!
 -   Not even a timer!
 -   Try to stay sane!
+
+![Slider](slider.png)
