@@ -6,3 +6,5 @@
 -   Random terrain!
 -   Rescue stranded astronauts!
 -   Gather resources!
+
+![Expedition Luna](expedition-luna.png)
