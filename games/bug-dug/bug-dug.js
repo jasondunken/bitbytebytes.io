@@ -179,6 +179,14 @@ class BugDug {
                 }
             }
         }
+
+        //draw UI
+        // p5 text font
+        textFont(this.font);
+        fill("blue");
+        noStroke();
+        textSize(16);
+        text("Level " + (this.currentLevel + 1), 20, 30);
     }
 
     loadLevel() {
