@@ -37,6 +37,9 @@ class BugDug {
         this.start1Player();
     });
 
+    STARTING_LIVES = 3;
+    lives = 0;
+
     level = null;
     backgroundLayer = null;
     foregroundLayer = null;
@@ -73,6 +76,7 @@ class BugDug {
 
     startGame() {
         this.currentLevel = 0;
+        this.lives = this.STARTING_LIVES;
         this.gameOver = false;
         this.score = 0;
 
@@ -181,12 +185,22 @@ class BugDug {
         }
 
         //draw UI
+        stroke("brown");
+        strokeWeight(8);
+        fill("gray");
+        rect(10, 10, this.width - 20, 96);
         // p5 text font
         textFont(this.font);
         fill("blue");
         noStroke();
         textSize(16);
-        text("Level " + (this.currentLevel + 1), 20, 30);
+        text("Level " + (this.currentLevel + 1), 24, 40);
+        if (this.player.hasKey) {
+            image(this.blockSprites["white-key"], this.width - 80, 54, 32, 32, 0, 0, 16, 16);
+        }
+        for (let i = 0; i < this.lives; i++) {
+            image(this.playerSprites["idle"], this.width - 44 - 32 * i, 20, 24, 24, 0, 0, 32, 32);
+        }
     }
 
     loadLevel() {
