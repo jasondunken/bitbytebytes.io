@@ -13,7 +13,7 @@ class LevelArchitect {
     backgroundLayer = [];
     foregroundLayer = [];
 
-    items = [];
+    items = null;
     enemies = [];
 
     constructor(screenWidth, screenHeight, levelConfig, blockSprites, enemySprites) {
@@ -25,7 +25,7 @@ class LevelArchitect {
         this.skyColor = levelConfig.SKY_COLOR;
         this.backgroundLayer = [];
         this.foregroundLayer = [];
-        this.items = [];
+        this.items = new Set();
 
         this.gravity = levelConfig.gravity;
         this.surfaceHeight = levelConfig.surfaceHeight;
@@ -134,14 +134,14 @@ class LevelArchitect {
                         x: blockAbove.position.x + Chest.SIZE / 2,
                         y: blockAbove.position.y + Chest.SIZE,
                     };
-                    this.items.push(new Chest(chestPosition, blockSprites["chest"], items[i % items.length]));
+                    this.items.add(new Chest(chestPosition, blockSprites["chest"], items[i % items.length]));
                 }
                 if (j !== chestIndex) {
                     const coinPosition = {
                         x: blockAbove.position.x + Item.SIZE / 2,
                         y: blockAbove.position.y + Item.SIZE,
                     };
-                    this.items.push(new Item(coinPosition, blockSprites["coin-gold"]));
+                    this.items.add(new Item(coinPosition, blockSprites["coin-gold"]));
                 }
 
                 let block = this.blocks[xIndex + j][firstPlatform + i * platformSpacing];
@@ -171,6 +171,23 @@ class LevelArchitect {
             "exit",
             blockSprites["door-locked"]
         );
+    }
+
+    getGameObjects() {
+        const gameObjects = new Set();
+        this.blocks.forEach((column) => {
+            column.forEach((block) => {
+                gameObjects.add(block);
+            });
+        });
+        this.enemies.forEach((enemy) => {
+            gameObjects.add(enemy);
+        });
+        this.items.forEach((item) => {
+            gameObjects.add(item);
+        });
+
+        return gameObjects;
     }
 
     static getColor(blockType) {

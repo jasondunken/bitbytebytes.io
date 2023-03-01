@@ -47,6 +47,9 @@ class BugDug {
 
     player = null;
     currentLevel = 0;
+    score = 0;
+
+    gameObjects = null;
 
     constructor(width, height, blockSprites, playerSprites, enemySprites, font) {
         this.width = width;
@@ -75,25 +78,24 @@ class BugDug {
     }
 
     startGame() {
-        this.currentLevel = 0;
-        this.lives = this.STARTING_LIVES;
         this.gameOver = false;
         this.score = 0;
+        this.currentLevel = 0;
+        this.lives = this.STARTING_LIVES;
 
         this.loadLevel();
     }
 
     update() {
         this.player.update(this.level);
-        for (let enemy of this.level.enemies) {
-            enemy.update(this.level);
-        }
-
         this.gameObjects.forEach((gameObj) => {
-            gameObj.update();
-            if (gameObj.destroyed) {
-                clearForegroundAround(getGridIndex(gameObj.position, this.level.BLOCK_SIZE), this.foregroundLayer);
+            if (gameObj.type === "block") {
+                gameObj.update();
+                if (gameObj.destroyed) {
+                    clearForegroundAround(getGridIndex(gameObj.position, this.level.BLOCK_SIZE), this.foregroundLayer);
+                }
             }
+            if (gameObj.type === "enemy") gameObj.update(this.level);
         });
     }
 
@@ -204,7 +206,6 @@ class BugDug {
     }
 
     loadLevel() {
-        this.gameObjects = new Set();
         this.level = new LevelArchitect(
             this.width,
             this.height,
@@ -212,11 +213,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
-        this.level.blocks.forEach((column) => {
-            column.forEach((block) => {
-                this.gameObjects.add(block);
-            });
-        });
+        this.gameObjects = this.level.getGameObjects();
 
         this.backgroundLayer = this.level.backgroundLayer;
         this.foregroundLayer = this.level.foregroundLayer;
@@ -225,7 +222,6 @@ class BugDug {
 
         this.mineBlockAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
 
-        // console.log("gameObjects: ", this.gameObjects);
-        // console.log("items: ", this.level.items);
+        console.log("gameObjects: ", this.gameObjects);
     }
 }

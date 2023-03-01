@@ -55,7 +55,8 @@ class Key extends GameObject {
 }
 
 class Door extends GameObject {
-    constructor((position, sprite)){
-        
+    constructor(position, sprite) {
+        super("door", position);
+        this.sprite = sprite;
     }
 }
