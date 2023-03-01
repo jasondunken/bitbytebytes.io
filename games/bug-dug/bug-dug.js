@@ -43,7 +43,7 @@ class BugDug {
     level = null;
     backgroundLayer = null;
     foregroundLayer = null;
-    damageAnimation = null;
+    mineBlockAnimation = null;
 
     player = null;
     currentLevel = 0;
@@ -120,10 +120,10 @@ class BugDug {
             if (gameObj.type === "block") {
                 if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
                     let damageSpriteIndex = Math.floor(
-                        map(gameObj.health, 0, gameObj.MAX_HEALTH, this.damageAnimation.keyFrames.length - 1, 0)
+                        map(gameObj.health, 0, gameObj.MAX_HEALTH, this.mineBlockAnimation.keyFrames.length - 1, 0)
                     );
                     image(
-                        this.damageAnimation.keyFrames[damageSpriteIndex],
+                        this.mineBlockAnimation.keyFrames[damageSpriteIndex],
                         gameObj.position.x,
                         gameObj.position.y,
                         gameObj.width,
@@ -170,19 +170,19 @@ class BugDug {
         }
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         if (this.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.foregroundLayer[i][j],
+        //                 i * this.level.BLOCK_SIZE,
+        //                 j * this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
 
         //draw UI
         stroke("brown");
@@ -223,9 +223,9 @@ class BugDug {
 
         this.player.setPosition(this.level.playerSpawn);
 
-        this.damageAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
+        this.mineBlockAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
 
-        console.log("gameObjects: ", this.gameObjects);
-        console.log("items: ", this.level.items);
+        // console.log("gameObjects: ", this.gameObjects);
+        // console.log("items: ", this.level.items);
     }
 }

@@ -39,3 +39,23 @@ class Chest extends GameObject {
         }
     }
 }
+
+class Coin extends GameObject {
+    constructor(position, sprite) {
+        super("coin", position);
+        this.sprite = sprite;
+    }
+}
+
+class Key extends GameObject {
+    constructor(position, sprite) {
+        super("key", position);
+        this.sprite = sprite;
+    }
+}
+
+class Door extends GameObject {
+    constructor((position, sprite)){
+        
+    }
+}
