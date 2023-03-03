@@ -20,8 +20,12 @@ function setup() {
 }
 
 function draw() {
-    //game.update();
+    game.update();
     game.render();
+}
+
+function keyPressed(event) {
+    if (this.game) this.game.keyPressed(event);
 }
 
 function mousePressed(event) {
@@ -106,6 +110,12 @@ class MineSquadPlus {
     }
 
     update() {}
+
+    keyPressed(key) {
+        if (!this.playing && key.code === "Space") {
+            this.showHighScores = !this.showHighScores;
+        }
+    }
 
     render() {
         const SCOREBOARD_HEIGHT = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
