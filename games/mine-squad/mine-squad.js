@@ -508,6 +508,10 @@ class MineSquadPlus {
         this.defuseRadius(tileIndex);
     }
 
+    detonate(x, y) {
+        console.log("boom!" + x + "|" + y);
+    }
+
     handleMouseClick(mouseX, mouseY) {
         const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
         const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
@@ -531,6 +535,8 @@ class MineSquadPlus {
                 }
             } else {
                 if (tile.bomb) {
+                    tile.hidden = false;
+                    this.detonate(mouseX, mouseY);
                     this.gameOver();
                 } else {
                     this.unhide(tileIndex, []);
@@ -581,7 +587,7 @@ class MineSquadPlus {
             if (tile.flagged) {
                 this.score -= this.FLAG_PENALTY;
             }
-            tile.hidden = false;
+            //tile.hidden = false;
         }
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
