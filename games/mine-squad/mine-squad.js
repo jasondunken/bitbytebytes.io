@@ -79,6 +79,16 @@ class MineSquadPlus {
     minesUncovered = 0;
 
     mouseClicks = [];
+
+    GAME_STATE = Object.freeze({
+        STARTING: "STARTING",
+        HELP: "HELP",
+        PLAYING: "PLAYING",
+        ENDING: "ENDING",
+        GAME_OVER: "GAME_OVER",
+    });
+    currentState = this.GAME_STATE.STARTING;
+
     constructor(width, height, sprites) {
         this.width = width;
         this.height = height;
@@ -107,6 +117,7 @@ class MineSquadPlus {
 
         this.mouseClicks = [];
         this.showHighScores = false;
+        this.currentState = this.GAME_STATE.PLAYING;
     }
 
     update() {}
@@ -115,6 +126,15 @@ class MineSquadPlus {
         if (!this.playing && key.code === "Space") {
             this.showHighScores = !this.showHighScores;
         }
+        if (key.code == "Tab") {
+            key.preventDefault();
+            this.showHelp();
+        }
+    }
+
+    showHelp() {
+        this.currentState = this.GAME_STATE.HELP;
+        console.log("no help menu yet!");
     }
 
     render() {
