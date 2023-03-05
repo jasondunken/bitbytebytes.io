@@ -105,7 +105,8 @@ class MineSquadPlus {
     }
 
     startGame() {
-        this.time = 0;
+        this.startTime = Date.now();
+        this.elapsedTime = 0;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
@@ -120,7 +121,11 @@ class MineSquadPlus {
         this.currentState = this.GAME_STATE.PLAYING;
     }
 
-    update() {}
+    update() {
+        if (this.currentState == this.GAME_STATE.PLAYING) {
+            this.elapsedTime = Date.now() - this.startTime;
+        }
+    }
 
     keyPressed(key) {
         if (!this.playing && key.code === "Space") {
@@ -134,7 +139,18 @@ class MineSquadPlus {
 
     showHelp() {
         this.currentState = this.GAME_STATE.HELP;
-        console.log("no help menu yet!");
+    }
+
+    getElapsedTime() {
+        return this.elapsedTime;
+    }
+
+    getElapsedTimeString() {
+        const elapsedSeconds = (this.elapsedTime % 60000) / 1000;
+        let secondsStr = ("" + elapsedSeconds).split(".")[0];
+        if (elapsedSeconds < 10) secondsStr = "0" + secondsStr;
+        const minutes = (this.elapsedTime - (this.elapsedTime % 60000)) / 60000;
+        return minutes + ":" + secondsStr;
     }
 
     render() {
@@ -212,6 +228,14 @@ class MineSquadPlus {
         text(
             "" + this.score,
             this.width / 2,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
+        );
+
+        // draws timer
+        fill("white");
+        text(
+            this.getElapsedTimeString(),
+            this.width * 0.75,
             this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
         );
 
@@ -594,6 +618,7 @@ class MineSquadPlus {
     gameOver() {
         this.calculateScore();
         this.playing = false;
+        this.currentState = this.GAME_STATE.GAME_OVER;
         this.updateHighScores();
         this.showHighScores = true;
     }
