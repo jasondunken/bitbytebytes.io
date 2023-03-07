@@ -132,6 +132,12 @@ class MineSquadPlus {
         for (let effect of this.visualEffects) {
             effect.update();
         }
+        for (let i = this.visualEffects.length - 1; i >= 0; i--) {
+            const vEffect = this.visualEffects[i];
+            if (vEffect.done) {
+                this.visualEffects.splice(i, 1);
+            }
+        }
     }
 
     keyPressed(key) {
