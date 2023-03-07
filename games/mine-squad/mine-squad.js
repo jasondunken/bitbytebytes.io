@@ -80,6 +80,8 @@ class MineSquadPlus {
 
     mouseClicks = [];
 
+    visualEffects = [];
+
     GAME_STATE = Object.freeze({
         STARTING: "STARTING",
         HELP: "HELP",
@@ -124,6 +126,11 @@ class MineSquadPlus {
     update() {
         if (this.currentState == this.GAME_STATE.PLAYING) {
             this.elapsedTime = Date.now() - this.startTime;
+        }
+
+        // update visual effects
+        for (let effect of this.visualEffects) {
+            effect.update();
         }
     }
 
@@ -347,6 +354,11 @@ class MineSquadPlus {
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
 
+        // draw visual effects
+        for (let effect of this.visualEffects) {
+            effect.render();
+        }
+
         // draw mouse path & last tile
         if (!this.playing) {
             stroke("orange");
@@ -507,7 +519,13 @@ class MineSquadPlus {
     unhide(tile, checked) {
         if (this.board[tile].flagged === false) {
             this.board[tile].hidden = false;
-            this.score += this.board[tile].value > 0 ? this.board[tile].value * 10 : 5;
+            const tileValue = this.board[tile].value > 0 ? this.board[tile].value * 10 : 5;
+            this.score += tileValue;
+            const position = new Vec3(
+                (tile % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
+                Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
+            );
+            this.visualEffects.push(new ScoreEffect(position, tileValue));
         }
         // if tile.value is zero, uncover all the tiles around it
         // if one of the ones uncovered is a zero uncover all the ones around it and so on
