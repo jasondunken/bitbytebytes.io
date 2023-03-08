@@ -11,10 +11,10 @@ class VisualEffect {
 
 class ScoreEffect extends VisualEffect {
     opacity = 255;
-    constructor(position, score) {
+    constructor(position, score, value) {
         super(position);
         this.score = score;
-        this.color = color(255, 0, 0);
+        this.color = color(valueToColor(value));
     }
 
     update() {

@@ -269,23 +269,7 @@ class MineSquadPlus {
                     this.TILE_HEIGHT
                 );
                 if (!this.tile.bomb && this.tile.value !== 0) {
-                    if (this.tile.value === 1) {
-                        setColor("black");
-                    } else if (this.tile.value === 2) {
-                        setColor("blue");
-                    } else if (this.tile.value === 3) {
-                        setColor("purple");
-                    } else if (this.tile.value === 4) {
-                        setColor("orange");
-                    } else if (this.tile.value === 5) {
-                        setColor("red");
-                    } else if (this.tile.value === 6) {
-                        setColor("yellow");
-                    } else if (this.tile.value === 7) {
-                        setColor("magenta");
-                    } else if (this.tile.value === 8) {
-                        setColor("teal");
-                    }
+                    setColor(valueToColor(this.tile.value));
                     text(
                         this.tile.value,
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
@@ -525,13 +509,14 @@ class MineSquadPlus {
     unhide(tile, checked) {
         if (this.board[tile].flagged === false) {
             this.board[tile].hidden = false;
-            const tileValue = this.board[tile].value > 0 ? this.board[tile].value * 10 : 5;
-            this.score += tileValue;
+            const tileValue = this.board[tile].value;
+            const tileScore = tileValue > 0 ? this.board[tile].value * 10 : 5;
+            this.score += tileScore;
             const position = new Vec3(
                 (tile % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
                 Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
             );
-            this.visualEffects.push(new ScoreEffect(position, tileValue));
+            if (tileValue > 0) this.visualEffects.push(new ScoreEffect(position, tileScore, tileValue));
         }
         // if tile.value is zero, uncover all the tiles around it
         // if one of the ones uncovered is a zero uncover all the ones around it and so on
