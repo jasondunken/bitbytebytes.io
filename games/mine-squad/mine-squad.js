@@ -68,7 +68,6 @@ class MineSquadPlus {
     tileIndexY = 0;
     tile = null;
 
-    playing = false;
     winner = false;
     board = [];
     score = 0;
@@ -115,7 +114,6 @@ class MineSquadPlus {
         this.flaggedTiles = 0;
         this.minesUncovered = 0;
         this.board = this.initializeBoard();
-        this.playing = true;
         this.winner = false;
 
         this.mouseClicks = [];
@@ -141,7 +139,7 @@ class MineSquadPlus {
     }
 
     keyPressed(key) {
-        if (!this.playing && key.code === "Space") {
+        if (this.currentState == this.GAME_STATE.GAME_OVER && key.code === "Space") {
             this.showHighScores = !this.showHighScores;
         }
         if (key.code == "Tab") {
@@ -193,7 +191,7 @@ class MineSquadPlus {
         let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
         rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
-        if (this.playing) {
+        if (this.currentState == this.GAME_STATE.PLAYING) {
             text("" + this.getNumHiddenTiles(), minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
         } else {
             text("X", minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
@@ -205,7 +203,7 @@ class MineSquadPlus {
         let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
         rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox * 2, minesLeftBox);
         fill("red");
-        if (this.playing) {
+        if (this.currentState == this.GAME_STATE.PLAYING) {
             text(
                 "" + this.MAX_MINES - this.flaggedTiles,
                 flagsPlacedBoxX + minesLeftBox,
@@ -288,7 +286,8 @@ class MineSquadPlus {
                     );
                 }
 
-                if (!this.playing) {
+                // when game over mark flags correct/incorrect
+                if (this.currentState == this.GAME_STATE.GAME_OVER) {
                     if (this.tile.flagged === true) {
                         setColor("red");
                         strokeWeight(5);
@@ -349,8 +348,8 @@ class MineSquadPlus {
             effect.render();
         }
 
-        // draw mouse path & last tile
-        if (!this.playing) {
+        // when game over draw mouse path & last tile
+        if (this.current == this.GAME_STATE.GAME_OVER) {
             stroke("orange");
             strokeWeight(2);
             for (let i = 0; i < this.mouseClicks.length - 1; i++) {
@@ -570,10 +569,10 @@ class MineSquadPlus {
         const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
         if (x < 0 || x > this.TILES_PER_ROW - 1) return;
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
-        if (this.playing) this.mouseClicks.push([mouseX, mouseY]);
+        if (this.currentState == this.GAME_STATE.PLAYING) this.mouseClicks.push([mouseX, mouseY]);
         const tileIndex = y * this.TILES_PER_ROW + x;
         const tile = this.board[tileIndex];
-        if (this.playing && tile && tile.hidden) {
+        if (this.currentState == this.GAME_STATE.PLAYING && tile && tile.hidden) {
             if (tile.flagged) {
                 this.flaggedTiles--;
                 tile.flagged = false;
@@ -596,10 +595,10 @@ class MineSquadPlus {
                 }
             }
 
-            if (this.playing) {
+            if (this.currentState == this.GAME_STATE.PLAYING) {
                 this.checkForWin();
             }
-        } else if (!this.playing) {
+        } else if (this.currentState == this.GAME_STATE.GAME_OVER) {
             this.start1Player();
         }
         if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
@@ -626,7 +625,6 @@ class MineSquadPlus {
 
     gameOver() {
         this.calculateScore();
-        this.playing = false;
         this.currentState = this.GAME_STATE.GAME_OVER;
         this.updateHighScores();
         this.showHighScores = true;
