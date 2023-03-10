@@ -106,7 +106,7 @@ class MineSquadPlus {
     }
 
     startGame() {
-        this.startTime = Date.now();
+        this.lastTime = Date.now();
         this.elapsedTime = 0;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
@@ -122,9 +122,11 @@ class MineSquadPlus {
     }
 
     update() {
+        const nowTime = Date.now();
         if (this.currentState == this.GAME_STATE.PLAYING) {
-            this.elapsedTime = Date.now() - this.startTime;
+            this.elapsedTime += nowTime - this.lastTime;
         }
+        this.lastTime = nowTime;
 
         for (let effect of this.visualEffects) {
             effect.update();
