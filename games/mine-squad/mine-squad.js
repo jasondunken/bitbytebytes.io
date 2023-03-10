@@ -126,7 +126,6 @@ class MineSquadPlus {
             this.elapsedTime = Date.now() - this.startTime;
         }
 
-        // update visual effects
         for (let effect of this.visualEffects) {
             effect.update();
         }
@@ -144,12 +143,20 @@ class MineSquadPlus {
         }
         if (key.code == "Tab") {
             key.preventDefault();
-            this.showHelp();
+            if (this.currentState == this.GAME_STATE.PLAYING) {
+                this.showHelp();
+            } else if (this.currentState == this.GAME_STATE.HELP) {
+                this.hideHelp();
+            }
         }
     }
 
     showHelp() {
         this.currentState = this.GAME_STATE.HELP;
+    }
+
+    hideHelp() {
+        this.currentState = this.GAME_STATE.PLAYING;
     }
 
     getElapsedTime() {
@@ -346,6 +353,13 @@ class MineSquadPlus {
         // draw visual effects
         for (let effect of this.visualEffects) {
             effect.render();
+        }
+
+        if (this.currentState == this.GAME_STATE.HELP) {
+            stroke("black");
+            strokeWeight(3);
+            fill("gray");
+            rect(this.width / 2 - 200, 30, 400, 425);
         }
 
         // when game over draw mouse path & last tile
