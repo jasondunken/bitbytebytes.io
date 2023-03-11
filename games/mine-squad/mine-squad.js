@@ -75,7 +75,6 @@ class MineSquadPlus {
     squadCount = 0;
     squadAward = 0;
     flaggedTiles = 0;
-    minesUncovered = 0;
 
     mouseClicks = [];
 
@@ -112,7 +111,6 @@ class MineSquadPlus {
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
         this.flaggedTiles = 0;
-        this.minesUncovered = 0;
         this.board = this.initializeBoard();
         this.winner = false;
 
@@ -550,7 +548,6 @@ class MineSquadPlus {
         this.board[tileIndex].hidden = false;
         if (this.board[tileIndex].bomb) {
             this.score += this.DEFUSE_BONUS;
-            this.minesUncovered++;
         }
         let damage = this.getNeighbors(tileIndex);
         damage.push(tileIndex + 2);
@@ -563,7 +560,6 @@ class MineSquadPlus {
                     this.score += this.board[damage[i]].value * this.TILE_BONUS;
                     if (this.board[damage[i]].bomb) {
                         this.score += this.DEFUSE_BONUS;
-                        this.minesUncovered++;
                     }
                 }
                 this.board[damage[i]].hidden = false;
