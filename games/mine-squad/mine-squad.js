@@ -574,6 +574,7 @@ class MineSquadPlus {
 
     detonate(x, y) {
         console.log("boom!" + x + "|" + y);
+        this.visualEffects.push(new Explosion(new Vec3(x, y)));
     }
 
     handleMouseClick(mouseX, mouseY) {
