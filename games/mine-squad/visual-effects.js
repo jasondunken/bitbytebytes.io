@@ -46,20 +46,18 @@ class Explosion extends VisualEffect {
     constructor(position) {
         super(position);
         for (let i = 0; i < this.DENSITY; i++) {
-            const life = Math.floor((Math.random() * this.MAX_LIFE) / 2 + this.MAX_LIFE / 2);
-            const speed = Math.floor(Math.random() * 2 + 2);
-            const size = 4;
-            const gray = Math.floor(Math.random() * 256);
-            const pColor = color(`rgba(255, ${gray}, ${gray}, 255)`);
+            const b = Math.floor(Math.random() * 256);
             this.explosion.add({
                 position: {
                     x: Math.random() * this.CONCENTRATION * 2 - this.CONCENTRATION + position.x,
                     y: Math.random() * this.CONCENTRATION * 2 - this.CONCENTRATION + position.y,
                 },
-                life,
-                speed,
-                size,
-                color: pColor,
+                life: Math.floor((Math.random() * this.MAX_LIFE) / 2 + this.MAX_LIFE / 2),
+                speed: Math.floor(Math.random() * 4 + 4),
+                size: 4,
+                brightness: b,
+                color: this.setBrightnessAlpha(b, 255),
+                alpha: Math.floor(Math.random() * 56 + 200),
             });
         }
     }
@@ -69,8 +67,17 @@ class Explosion extends VisualEffect {
             particle.size += particle.speed;
             particle.life -= 1;
             if (particle.life <= 0) this.explosion.delete(particle);
+            else {
+                particle.alpha = particle.alpha -= particle.speed * 5;
+                if (particle.alpha < 0) particle.alpha = 0;
+                particle.color = this.setBrightnessAlpha(particle.brightness, particle.alpha);
+            }
         }
         if (this.explosion.size < 1) this.done = true;
+    }
+
+    setBrightnessAlpha(b, a) {
+        return color(`rgba(255, ${b}, ${b}, ${a})`);
     }
 
     render() {
