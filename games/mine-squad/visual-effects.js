@@ -70,6 +70,7 @@ class Explosion extends VisualEffect {
             particle.life -= 1;
             if (particle.life <= 0) this.explosion.delete(particle);
         }
+        if (this.explosion.size < 1) this.done = true;
     }
 
     render() {

@@ -137,6 +137,10 @@ class MineSquadPlus {
                 this.visualEffects.splice(i, 1);
             }
         }
+
+        if (this.currentState == this.GAME_STATE.ENDING && this.visualEffects.length < 1) {
+            this.gameOver();
+        }
     }
 
     keyPressed(key) {
@@ -386,7 +390,7 @@ class MineSquadPlus {
         }
 
         // draw win/lose & highscores
-        if (this.showHighScores) {
+        if (this.currentState == this.GAME_STATE.GAME_OVER && this.showHighScores) {
             stroke("black");
             strokeWeight(3);
             fill("gray");
@@ -603,7 +607,7 @@ class MineSquadPlus {
                 if (tile.bomb) {
                     tile.hidden = false;
                     this.detonate(mouseX, mouseY);
-                    this.gameOver();
+                    this.currentState = this.GAME_STATE.ENDING;
                 } else {
                     this.unhide(tileIndex, []);
                 }
