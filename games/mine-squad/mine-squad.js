@@ -115,6 +115,8 @@ class MineSquadPlus {
         this.winner = false;
 
         this.mouseClicks = [];
+        this.visualEffects = [];
+
         this.showHighScores = false;
         this.currentState = this.GAME_STATE.PLAYING;
     }
@@ -573,7 +575,6 @@ class MineSquadPlus {
     }
 
     detonate(x, y) {
-        console.log("boom!" + x + "|" + y);
         this.visualEffects.push(new Explosion(new Vec3(x, y)));
     }
 
