@@ -93,7 +93,6 @@ class MineSquadPlus {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
-        this.BOARD_X_OFFSET = 30;
     }
 
     startDemo() {
@@ -361,11 +360,15 @@ class MineSquadPlus {
             effect.render();
         }
 
+        // draw help panel
         if (this.currentState == this.GAME_STATE.HELP) {
             stroke("black");
             strokeWeight(3);
             fill("gray");
             rect(this.width / 2 - 200, 30, 400, 425);
+            noStroke();
+            fill("black");
+            text("Hold shift to use bomb squad!", this.width / 2, 70);
         }
 
         // when game over draw mouse path & last tile
