@@ -117,12 +117,12 @@ class MineSquadPlus {
         this.visualEffects = [];
 
         this.showHighScores = false;
-        this.currentState = this.GAME_STATE.PLAYING;
+        this.currentState = this.GAME_STATE.STARTING;
     }
 
     update() {
         const nowTime = Date.now();
-        if (this.currentState == this.GAME_STATE.PLAYING) {
+        if (this.currentState == this.GAME_STATE.STARING || this.currentState == this.GAME_STATE.PLAYING) {
             this.elapsedTime += nowTime - this.lastTime;
         }
         this.lastTime = nowTime;
@@ -590,9 +590,16 @@ class MineSquadPlus {
         const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
         if (x < 0 || x > this.TILES_PER_ROW - 1) return;
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
-        if (this.currentState == this.GAME_STATE.PLAYING) this.mouseClicks.push([mouseX, mouseY]);
         const tileIndex = y * this.TILES_PER_ROW + x;
-        const tile = this.board[tileIndex];
+        let tile = this.board[tileIndex];
+        if (this.currentState == this.GAME_STATE.STARTING) {
+            while (tile.bomb) {
+                this.board = this.initializeBoard();
+                tile = this.board[tileIndex];
+            }
+            this.currentState = this.GAME_STATE.PLAYING;
+        }
+        if (this.currentState == this.GAME_STATE.PLAYING) this.mouseClicks.push([mouseX, mouseY]);
         if (this.currentState == this.GAME_STATE.PLAYING && tile && tile.hidden) {
             if (tile.flagged) {
                 this.flaggedTiles--;
