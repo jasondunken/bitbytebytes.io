@@ -226,6 +226,9 @@ class MineSquadPlus {
         }
 
         // draws bomb squads left
+        fill("white");
+        noStroke();
+        text("SQUADS", 72, this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET);
         fill("gray");
         for (let i = 0; i < this.MAX_SQUADS; i++) {
             if (i + 1 > this.MAX_SQUADS - this.squadCount) {
@@ -239,7 +242,7 @@ class MineSquadPlus {
                 }
             }
             ellipse(
-                this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2),
+                this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2) + 120,
                 this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + this.BOARD_Y_OFFSET,
                 this.BOMB_HEIGHT,
                 this.BOMB_HEIGHT
