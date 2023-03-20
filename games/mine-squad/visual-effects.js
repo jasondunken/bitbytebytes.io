@@ -9,6 +9,30 @@ class VisualEffect {
     render() {}
 }
 
+class BonusEffect extends VisualEffect {
+    vSpeed = Math.floor(Math.random() * 3 + 2);
+    constructor(position, score) {
+        super(position);
+        this.score = score;
+        this.color = color("red");
+    }
+
+    update() {
+        this.position.x += Math.random() * 4 - 2;
+        this.position.y -= this.vSpeed;
+        if (this.position.y < -64) this.done = true;
+    }
+
+    render() {
+        strokeWeight(2);
+        stroke("white");
+        fill(this.color);
+        textStyle(BOLD);
+        text(this.score, this.position.x, this.position.y);
+        textStyle(NORMAL);
+    }
+}
+
 class ScoreEffect extends VisualEffect {
     opacity = 255;
     vSpeed = Math.floor(Math.random() * 3 + 2);

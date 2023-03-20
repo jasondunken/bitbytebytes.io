@@ -538,7 +538,9 @@ class MineSquadPlus {
                 (tile % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
                 Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
             );
-            if (tileValue > 0) this.visualEffects.push(new ScoreEffect(position, tileScore, tileValue));
+            if (tileValue > 0) {
+                this.visualEffects.push(new ScoreEffect(position, tileScore, tileValue));
+            }
         }
         // if tile.value is zero, uncover all the tiles around it
         // if one of the ones uncovered is a zero uncover all the ones around it and so on
@@ -566,13 +568,21 @@ class MineSquadPlus {
 
         for (let i = 0; i < damage.length; i++) {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
-                if (this.board[damage[i]].hidden) {
-                    this.score += this.board[damage[i]].value * this.TILE_BONUS;
-                    if (this.board[damage[i]].bomb) {
+                const tile = this.board[damage[i]];
+                if (tile.hidden) {
+                    this.score += tile.value * this.TILE_BONUS;
+                    if (tile.bomb) {
+                        const position = new Vec3(
+                            (damage[i] % this.TILES_PER_ROW) * this.TILE_HEIGHT +
+                                this.BOARD_X_OFFSET +
+                                this.TILE_HEIGHT / 2,
+                            Math.floor(damage[i] / this.TILES_PER_ROW) * this.TILE_HEIGHT
+                        );
+                        this.visualEffects.push(new BonusEffect(position, this.DEFUSE_BONUS));
                         this.score += this.DEFUSE_BONUS;
                     }
                 }
-                this.board[damage[i]].hidden = false;
+                tile.hidden = false;
             }
         }
     }
@@ -735,7 +745,9 @@ class Tile {
 }
 
 class Bomb {
-    constructor() {}
+    constructor() {
+        this.defused = false;
+    }
 }
 
 class Flag {
