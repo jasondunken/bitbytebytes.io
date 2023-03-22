@@ -78,7 +78,7 @@ class MineSquadPlus {
 
     mouseClicks = [];
 
-    visualEffects = [];
+    visualEffects = new Set();
 
     GAME_STATE = Object.freeze({
         STARTING: "STARTING",
@@ -114,7 +114,7 @@ class MineSquadPlus {
         this.winner = false;
 
         this.mouseClicks = [];
-        this.visualEffects = [];
+        this.visualEffects = new Set();
 
         this.showHighScores = false;
         this.currentState = this.GAME_STATE.STARTING;
@@ -127,17 +127,12 @@ class MineSquadPlus {
         }
         this.lastTime = nowTime;
 
-        for (let effect of this.visualEffects) {
+        this.visualEffects.forEach((effect) => {
             effect.update();
-        }
-        for (let i = this.visualEffects.length - 1; i >= 0; i--) {
-            const vEffect = this.visualEffects[i];
-            if (vEffect.done) {
-                this.visualEffects.splice(i, 1);
-            }
-        }
+            if (effect.done) this.visualEffects.delete(effect);
+        });
 
-        if (this.currentState == this.GAME_STATE.ENDING && this.visualEffects.length < 1) {
+        if (this.currentState == this.GAME_STATE.ENDING && this.visualEffects.size < 1) {
             this.gameOver();
         }
     }
@@ -359,9 +354,9 @@ class MineSquadPlus {
         }
 
         // draw visual effects
-        for (let effect of this.visualEffects) {
+        this.visualEffects.forEach((effect) => {
             effect.render();
-        }
+        });
 
         // draw help panel
         if (this.currentState == this.GAME_STATE.HELP) {
@@ -542,7 +537,7 @@ class MineSquadPlus {
                 Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
             );
             if (tileValue > 0) {
-                this.visualEffects.push(new ScoreEffect(position, tileScore, tileValue));
+                this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
             }
         }
         // if tile.value is zero, uncover all the tiles around it
@@ -581,7 +576,7 @@ class MineSquadPlus {
                                 this.TILE_HEIGHT / 2,
                             Math.floor(damage[i] / this.TILES_PER_ROW) * this.TILE_HEIGHT
                         );
-                        this.visualEffects.push(new BonusEffect(position, this.DEFUSE_BONUS));
+                        this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
                         this.score += this.DEFUSE_BONUS;
                     }
                 }
@@ -596,7 +591,7 @@ class MineSquadPlus {
     }
 
     detonate(x, y) {
-        this.visualEffects.push(new Explosion(new Vec3(x, y)));
+        this.visualEffects.add(new Explosion(new Vec3(x, y)));
     }
 
     handleMouseClick(mouseX, mouseY) {
