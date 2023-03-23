@@ -411,9 +411,13 @@ class MineSquadPlus {
             textSize(24);
             const highScores = Object.keys(this.highScores);
             highScores.forEach((score, i) => {
+                if (this.highScores[score].score == this.score && frameCount % 60 > 30) {
+                    fill("red");
+                } else fill("black");
                 text(new Date(+score).toLocaleDateString(), this.width / 2 - 130, 110 + i * 32);
                 text(this.highScores[score].score, this.width / 2 + 150, 110 + i * 32);
             });
+            fill("black");
             if (frameCount % 40 > 20) text("Click to restart", this.width / 2, 430);
         }
 
