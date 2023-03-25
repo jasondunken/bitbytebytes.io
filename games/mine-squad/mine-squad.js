@@ -368,7 +368,7 @@ class MineSquadPlus {
         }
 
         // when game over draw mouse path & last tile
-        if (this.current == this.GAME_STATE.GAME_OVER) {
+        if (this.currentState == this.GAME_STATE.GAME_OVER) {
             stroke("orange");
             strokeWeight(2);
             for (let i = 0; i < this.mouseClicks.length - 1; i++) {
