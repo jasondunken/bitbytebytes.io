@@ -11,6 +11,7 @@ class HighScorePanel {
 
     updateHighScores(score, winner) {
         this.score = score;
+        this.winner = winner;
         let gameStats = localStorage.getItem("minesquad.stats");
         if (gameStats) {
             gameStats = JSON.parse(gameStats);
