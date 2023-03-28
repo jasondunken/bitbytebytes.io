@@ -9,7 +9,7 @@ class HighScorePanel {
         this.height = height;
     }
 
-    updateHighScores(score, winner) {
+    updateHighScores(score, winner, time) {
         this.score = score;
         this.winner = winner;
         let gameStats = localStorage.getItem("minesquad.stats");
@@ -35,7 +35,7 @@ class HighScorePanel {
         }
 
         const scoreDate = Date.now();
-        gameScores[scoreDate] = { score: score, winner: winner };
+        gameScores[scoreDate] = { score: score, winner: winner, time: time };
 
         let scores = Object.keys(gameScores);
         let lowestScoreKey = scores[0];

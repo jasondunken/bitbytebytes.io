@@ -639,7 +639,7 @@ class MineSquadPlus {
     gameOver() {
         this.calculateScore();
         this.currentState = this.GAME_STATE.GAME_OVER;
-        this.highScorePanel.updateHighScores(this.score, this.winner);
+        this.highScorePanel.updateHighScores(this.score, this.winner, this.getElapsedTime());
         this.showHighScores = true;
     }
 
