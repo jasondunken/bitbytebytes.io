@@ -50,8 +50,8 @@ class MineSquadPlus {
     TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
     MAX_MINES = 99;
     STARTING_SQUADS = 1;
-    FIRST_SQUAD_AWARD = 2500;
-    SECOND_SQUAD_AWARD = 7500;
+    FIRST_SQUAD_AWARD = 7500;
+    SECOND_SQUAD_AWARD = 20000;
     MAX_SQUADS = 3;
     TILE_SCORE = 10;
     TILE_BONUS = 100;
@@ -380,7 +380,7 @@ class MineSquadPlus {
                 );
             }
 
-            stroke("green");
+            stroke("magenta");
             noFill();
             strokeWeight(3);
             const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
