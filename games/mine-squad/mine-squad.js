@@ -638,6 +638,7 @@ class MineSquadPlus {
 
     gameOver() {
         this.calculateScore();
+        if (this.winner) this.createFireworks();
         this.currentState = this.GAME_STATE.GAME_OVER;
         this.highScorePanel.updateHighScores(this.score, this.winner, this.getElapsedTimeString());
         this.showHighScores = true;
@@ -656,6 +657,20 @@ class MineSquadPlus {
         }
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
+        }
+    }
+
+    createFireworks() {
+        const numFireworks = Math.floor(this.score / 10000);
+        for (let i = 0; i < numFireworks; i++) {
+            this.visualEffects.add(
+                new Firework(
+                    new Vec2(
+                        this.width / 4 + (Math.random() * this.width) / 2,
+                        this.height / 4 + (Math.random() * this.height) / 2
+                    )
+                )
+            );
         }
     }
 
