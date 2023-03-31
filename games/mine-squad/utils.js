@@ -23,9 +23,13 @@ function valueToColor(value) {
     }
 }
 
-class Vec3 {
+class Vec2 {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+    }
+
+    add(vector) {
+        return new Vec2((this.x += vector.x), (this.y += vector.y));
     }
 }

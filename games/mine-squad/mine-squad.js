@@ -508,7 +508,7 @@ class MineSquadPlus {
             const tileValue = this.board[tile].value;
             const tileScore = tileValue > 0 ? this.board[tile].value * 10 : 5;
             this.score += tileScore;
-            const position = new Vec3(
+            const position = new Vec2(
                 (tile % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
                 Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
             );
@@ -546,7 +546,7 @@ class MineSquadPlus {
                 if (tile.hidden) {
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
-                        const position = new Vec3(
+                        const position = new Vec2(
                             (damage[i] % this.TILES_PER_ROW) * this.TILE_HEIGHT +
                                 this.BOARD_X_OFFSET +
                                 this.TILE_HEIGHT / 2,
@@ -567,7 +567,7 @@ class MineSquadPlus {
     }
 
     detonate(x, y) {
-        this.visualEffects.add(new Explosion(new Vec3(x, y)));
+        this.visualEffects.add(new Explosion(new Vec2(x, y)));
     }
 
     handleMouseClick(mouseX, mouseY) {

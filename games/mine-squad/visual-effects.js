@@ -113,3 +113,46 @@ class Explosion extends VisualEffect {
         }
     }
 }
+
+class Firework extends VisualEffect {
+    NUM_PARTICLES = 20;
+    F_LIFE = 30;
+    EXPANSION_TIME = 20;
+
+    particles = new Set();
+
+    constructor(position) {
+        super(position);
+        this.life = this.F_LIFE;
+        this.expansionTime = this.EXPANSION_TIME;
+        for (let i = 0; i < this.NUM_PARTICLES; i++) {
+            const angle = (i * 2 * PI) / this.NUM_PARTICLES;
+            this.particles.add({
+                position: position,
+                direction: new Vec2(Math.cos(angle) * 10, Math.sin(angle) * 10),
+                //direction: new Vec2(1, 0),
+                size: 8,
+                color: "blue",
+            });
+        }
+        console.log("particles: ", this.particles);
+    }
+
+    update() {
+        this.expansionTime--;
+        this.particles.forEach((particle) => {
+            if (this.expansionTime > 0) particle.position = particle.position.add(particle.direction);
+            else particle.position = particle.position.add(new Vec2(0, 5));
+        });
+        this.life--;
+        if (this.life <= 0) this.done = true;
+    }
+
+    render() {
+        noStroke();
+        this.particles.forEach((particle) => {
+            fill(particle.color);
+            ellipse(particle.position.x, particle.position.y, particle.size, particle.size);
+        });
+    }
+}
