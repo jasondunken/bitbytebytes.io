@@ -89,8 +89,17 @@ class MineSquadPlus {
     constructor(width, height, sprites) {
         this.width = width;
         this.height = height;
+        this.scoreboardHeight = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
+        this.minesLeftBox = Math.floor(this.scoreboardHeight / 2);
+        this.minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (this.minesLeftBox + this.minesLeftBox / 2) - 64;
+        this.minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
+        this.flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (this.minesLeftBox + this.minesLeftBox / 2);
+        this.flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
         this.sprites = sprites;
-        this.highScorePanel = new HighScorePanel(this.width, this.height);
+
+        textSize(this.TILE_HEIGHT);
+        textAlign(CENTER, CENTER);
+        textSize(28);
     }
 
     startDemo() {
@@ -103,25 +112,23 @@ class MineSquadPlus {
 
     startGame() {
         this.lastTime = Date.now();
-        this.elapsedTime = 0;
+        this.gameTime = 0;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
         this.flaggedTiles = 0;
         this.board = this.initializeBoard();
         this.winner = false;
-
         this.mouseClicks = [];
         this.visualEffects = new Set();
 
-        this.showHighScores = false;
         this.currentState = this.GAME_STATE.STARTING;
     }
 
     update() {
         const nowTime = Date.now();
-        if (this.currentState == this.GAME_STATE.STARING || this.currentState == this.GAME_STATE.PLAYING) {
-            this.elapsedTime += nowTime - this.lastTime;
+        if (this.currentState === this.GAME_STATE.PLAYING) {
+            this.gameTime += nowTime - this.lastTime;
         }
         this.lastTime = nowTime;
 
@@ -130,98 +137,124 @@ class MineSquadPlus {
             if (effect.done) this.visualEffects.delete(effect);
         });
 
-        if (this.currentState == this.GAME_STATE.ENDING && this.visualEffects.size < 1) {
+        if (this.currentState === this.GAME_STATE.ENDING && this.visualEffects.size < 1) {
             this.gameOver();
         }
     }
 
     keyPressed(key) {
-        if (this.currentState == this.GAME_STATE.GAME_OVER && key.code === "Space") {
-            this.showHighScores = !this.showHighScores;
+        if (key.code === "Space") {
+            if (this.currentState === this.GAME_STATE.GAME_OVER && this.highScorePanel) {
+                this.highScorePanel.isShowing() ? this.highScorePanel.hide() : this.highScorePanel.show();
+            }
         }
-        if (key.code == "Tab") {
+        if (key.code === "Tab") {
             key.preventDefault();
-            if (this.currentState == this.GAME_STATE.PLAYING) {
-                this.showHelp();
-            } else if (this.currentState == this.GAME_STATE.HELP) {
-                this.hideHelp();
+            if (this.currentState != this.GAME_STATE.HELP) {
+                this.prevState = this.currentState;
+                this.currentState = this.GAME_STATE.HELP;
+            } else if (this.currentState === this.GAME_STATE.HELP) {
+                if (this.prevState) this.currentState = this.prevState;
             }
         }
     }
 
-    showHelp() {
-        this.currentState = this.GAME_STATE.HELP;
-    }
-
-    hideHelp() {
-        this.currentState = this.GAME_STATE.PLAYING;
-    }
-
     getElapsedTime() {
-        return this.elapsedTime;
+        return this.gameTime;
     }
 
     getElapsedTimeString() {
-        const elapsedSeconds = (this.elapsedTime % 60000) / 1000;
+        const elapsedSeconds = (this.gameTime % 60000) / 1000;
         let secondsStr = ("" + elapsedSeconds).split(".")[0];
         if (elapsedSeconds < 10) secondsStr = "0" + secondsStr;
-        const minutes = (this.elapsedTime - (this.elapsedTime % 60000)) / 60000;
+        const minutes = (this.gameTime - (this.gameTime % 60000)) / 60000;
         return minutes + ":" + secondsStr;
     }
 
     render() {
-        const SCOREBOARD_HEIGHT = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
-        const minesLeftBox = Math.floor(SCOREBOARD_HEIGHT / 2);
+        this.drawBackground();
+        this.drawDashboard();
+        this.drawBoard();
+        this.drawCursor();
 
-        textSize(this.TILE_HEIGHT);
-        textAlign(CENTER, CENTER);
-        textSize(28);
-        strokeWeight(1);
+        this.visualEffects.forEach((effect) => {
+            effect.render();
+        });
+
+        if (this.currentState === this.GAME_STATE.GAME_OVER) {
+            this.showMousePath();
+            if (this.highScorePanel && this.highScorePanel.isShowing()) {
+                this.highScorePanel.draw();
+            }
+        }
+
+        if (this.currentState === this.GAME_STATE.HELP) {
+            this.drawHelp();
+        }
+
+        this.drawCrosshair();
+    }
+
+    drawBackground() {
         setColor("darkgray");
-        // background
         rect(0, 0, this.width, this.height);
+    }
 
+    drawDashboard() {
         setColor("black");
-        // draws dashboard
+        strokeWeight(1);
         rect(
             4,
             this.TILES_PER_COLUMN * this.TILE_HEIGHT + 4 + this.BOARD_Y_OFFSET,
             this.width - 8,
-            SCOREBOARD_HEIGHT - 8
+            this.scoreboardHeight - 8
         );
+        this.drawHiddenTiles();
+        this.drawFlagsPlaced();
+        this.drawSquads();
+        this.drawScore();
+        this.drawTimer();
+    }
 
-        // draws hidden tiles counter
+    drawHiddenTiles() {
+        noStroke();
         fill("gray");
-        let minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2) - 64;
-        let minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
-        rect(minesLeftBoxX, minesLeftBoxY, minesLeftBox * 2, minesLeftBox);
+        rect(this.minesLeftBoxX, this.minesLeftBoxY, this.minesLeftBox * 2, this.minesLeftBox);
         fill("red");
-        if (this.currentState == this.GAME_STATE.PLAYING) {
-            text("" + this.getNumHiddenTiles(), minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
-        } else {
-            text("X", minesLeftBoxX + minesLeftBox, minesLeftBoxY + minesLeftBox / 2 + 2);
-        }
-
-        // draws flags placed counter
-        fill("gray");
-        let flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (minesLeftBox + minesLeftBox / 2);
-        let flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + minesLeftBox / 2 + this.BOARD_Y_OFFSET;
-        rect(flagsPlacedBoxX, flagsPlacedBoxY, minesLeftBox * 2, minesLeftBox);
-        fill("red");
-        if (this.currentState == this.GAME_STATE.PLAYING) {
+        if (this.currentState != this.GAME_STATE.GAME_OVER) {
             text(
-                "" + this.MAX_MINES - this.flaggedTiles,
-                flagsPlacedBoxX + minesLeftBox,
-                flagsPlacedBoxY + minesLeftBox / 2 + 2
+                "" + this.getNumHiddenTiles(),
+                this.minesLeftBoxX + this.minesLeftBox,
+                this.minesLeftBoxY + this.minesLeftBox / 2 + 2
             );
         } else {
-            text("X", flagsPlacedBoxX + minesLeftBox, flagsPlacedBoxY + minesLeftBox / 2 + 2);
+            text("X", this.minesLeftBoxX + this.minesLeftBox, this.minesLeftBoxY + this.minesLeftBox / 2 + 2);
         }
+    }
 
-        // draws bomb squads left
+    drawFlagsPlaced() {
+        fill("gray");
+        rect(this.flagsPlacedBoxX, this.flagsPlacedBoxY, this.minesLeftBox * 2, this.minesLeftBox);
+        fill("red");
+        if (this.currentState != this.GAME_STATE.GAME_OVER) {
+            text(
+                "" + this.MAX_MINES - this.flaggedTiles,
+                this.flagsPlacedBoxX + this.minesLeftBox,
+                this.flagsPlacedBoxY + this.minesLeftBox / 2 + 2
+            );
+        } else {
+            text("X", this.flagsPlacedBoxX + this.minesLeftBox, this.flagsPlacedBoxY + this.minesLeftBox / 2 + 2);
+        }
+    }
+
+    drawSquads() {
         fill("white");
         noStroke();
-        text("SQUADS", 72, this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET);
+        text(
+            "SQUADS",
+            72,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
+        );
         fill("gray");
         for (let i = 0; i < this.MAX_SQUADS; i++) {
             if (i + 1 > this.MAX_SQUADS - this.squadCount) {
@@ -236,29 +269,32 @@ class MineSquadPlus {
             }
             ellipse(
                 this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2) + 120,
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + this.BOARD_Y_OFFSET,
+                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET,
                 this.BOMB_HEIGHT,
                 this.BOMB_HEIGHT
             );
         }
+    }
 
-        // draws score
+    drawScore() {
         fill("white");
         text(
             "" + this.score,
             this.width / 2,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
         );
+    }
 
-        // draws timer
+    drawTimer() {
         fill("white");
         text(
             this.getElapsedTimeString(),
             this.width * 0.75,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + SCOREBOARD_HEIGHT / 2 + 2 + this.BOARD_Y_OFFSET
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
         );
+    }
 
-        // draw board
+    drawBoard() {
         for (let i = 0; i < this.TOTAL_TILES; i++) {
             this.tileIndexX = (i % this.TILES_PER_ROW) * this.TILE_HEIGHT;
             this.tileIndexY = Math.floor(i / this.TILES_PER_ROW) * this.TILE_HEIGHT;
@@ -293,29 +329,6 @@ class MineSquadPlus {
                         this.BOMB_HEIGHT
                     );
                 }
-
-                // when game over mark flags correct/incorrect
-                if (this.currentState == this.GAME_STATE.GAME_OVER) {
-                    if (this.tile.flagged === true) {
-                        setColor("red");
-                        strokeWeight(5);
-                        if (this.tile.bomb) {
-                            setColor("green");
-                        }
-                        line(
-                            this.BOARD_X_OFFSET + this.tileIndexX,
-                            this.tileIndexY + this.BOARD_Y_OFFSET,
-                            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
-                            this.tileIndexY + this.BOARD_Y_OFFSET + this.TILE_HEIGHT
-                        );
-                        line(
-                            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
-                            this.tileIndexY + this.BOARD_Y_OFFSET,
-                            this.tileIndexX + this.TILE_HEIGHT,
-                            this.tileIndexY + this.TILE_HEIGHT + this.BOARD_Y_OFFSET
-                        );
-                    }
-                }
             } else {
                 setColor("green");
                 stroke("black");
@@ -335,10 +348,39 @@ class MineSquadPlus {
                     );
                 }
             }
-        }
 
-        // draws box around selected tile
-        const [x, y] = this.mousePositionToTileScreenLocation([mouseX, mouseY - this.BOARD_Y_OFFSET]);
+            // when game over mark flags correct/incorrect
+            if (this.currentState == this.GAME_STATE.GAME_OVER) {
+                if (this.tile.flagged === true) {
+                    this.scoreFlag(this.tile.isBomb);
+                }
+            }
+        }
+    }
+
+    scoreFlag(isBomb) {
+        strokeWeight(5);
+        isBomb ? setColor("green") : setColor("red");
+        line(
+            this.BOARD_X_OFFSET + this.tileIndexX,
+            this.tileIndexY + this.BOARD_Y_OFFSET,
+            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
+            this.tileIndexY + this.BOARD_Y_OFFSET + this.TILE_HEIGHT
+        );
+        line(
+            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
+            this.tileIndexY + this.BOARD_Y_OFFSET,
+            this.tileIndexX + this.TILE_HEIGHT,
+            this.tileIndexY + this.TILE_HEIGHT + this.BOARD_Y_OFFSET
+        );
+    }
+
+    drawCursor() {
+        const [x, y] = mousePositionToTileScreenLocation(
+            [mouseX, mouseY - this.BOARD_Y_OFFSET],
+            this.TILE_HEIGHT,
+            this.BOARD_Y_OFFSET
+        );
         if (
             x >= this.BOARD_X_OFFSET &&
             x < this.TILES_PER_ROW * this.TILE_HEIGHT + this.BOARD_X_OFFSET &&
@@ -350,50 +392,39 @@ class MineSquadPlus {
             noFill();
             rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
+    }
 
-        // draw visual effects
-        this.visualEffects.forEach((effect) => {
-            effect.render();
-        });
-
-        // draw help panel
-        if (this.currentState == this.GAME_STATE.HELP) {
-            stroke("black");
-            strokeWeight(3);
-            fill("gray");
-            rect(this.width / 2 - 200, 30, 400, 425);
-            noStroke();
-            fill("black");
-            text("Hold shift to use bomb squad!", this.width / 2, 70);
+    showMousePath() {
+        stroke("orange");
+        strokeWeight(2);
+        for (let i = 0; i < this.mouseClicks.length - 1; i++) {
+            line(
+                this.mouseClicks[i][0],
+                this.mouseClicks[i][1],
+                this.mouseClicks[i + 1][0],
+                this.mouseClicks[i + 1][1]
+            );
         }
 
-        // when game over draw mouse path & last tile
-        if (this.currentState == this.GAME_STATE.GAME_OVER) {
-            stroke("orange");
-            strokeWeight(2);
-            for (let i = 0; i < this.mouseClicks.length - 1; i++) {
-                line(
-                    this.mouseClicks[i][0],
-                    this.mouseClicks[i][1],
-                    this.mouseClicks[i + 1][0],
-                    this.mouseClicks[i + 1][1]
-                );
-            }
+        stroke("magenta");
+        noFill();
+        strokeWeight(3);
+        const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
+        const [x, y] = mousePositionToTileScreenLocation(lastClick, this.TILE_HEIGHT, this.BOARD_Y_OFFSET);
+        rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+    }
 
-            stroke("magenta");
-            noFill();
-            strokeWeight(3);
-            const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
-            const [x, y] = this.mousePositionToTileScreenLocation(lastClick);
-            rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
-        }
+    drawHelp() {
+        stroke("black");
+        strokeWeight(3);
+        fill("gray");
+        rect(this.width / 2 - 200, 30, 400, 425);
+        noStroke();
+        fill("black");
+        text("Hold shift to use bomb squad!", this.width / 2, 70);
+    }
 
-        // draw win/lose & highscores
-        if (this.currentState == this.GAME_STATE.GAME_OVER && this.showHighScores) {
-            this.highScorePanel.render(this.winner);
-        }
-
-        // draw crosshair
+    drawCrosshair() {
         setColor("red");
         noFill();
         strokeWeight(1);
@@ -502,7 +533,7 @@ class MineSquadPlus {
         return result;
     }
 
-    unhide(tile, checked) {
+    uncover(tile, checked) {
         if (this.board[tile].flagged === false) {
             this.board[tile].hidden = false;
             const tileValue = this.board[tile].value;
@@ -524,12 +555,12 @@ class MineSquadPlus {
             // a list of the valid neighbors
             let neighbors = this.getNeighbors(tile);
             for (const n in neighbors) {
-                this.unhide(neighbors[n], checked);
+                this.uncover(neighbors[n], checked);
             }
         }
     }
 
-    defuseRadius(tileIndex) {
+    defuseWithinRadius(tileIndex) {
         this.board[tileIndex].hidden = false;
         if (this.board[tileIndex].bomb) {
             this.score += this.DEFUSE_BONUS;
@@ -561,12 +592,12 @@ class MineSquadPlus {
         }
     }
 
-    bombSquad(tileIndex) {
+    useBombSquad(tileIndex) {
         this.squadCount--;
-        this.defuseRadius(tileIndex);
+        this.defuseWithinRadius(tileIndex);
     }
 
-    detonate(x, y) {
+    detonateBomb(x, y) {
         this.visualEffects.add(new Explosion(new Vec2(x, y)));
     }
 
@@ -577,50 +608,55 @@ class MineSquadPlus {
         if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
         const tileIndex = y * this.TILES_PER_ROW + x;
         let tile = this.board[tileIndex];
-        if (this.currentState == this.GAME_STATE.STARTING) {
+        if (this.currentState === this.GAME_STATE.STARTING) {
             while (tile.bomb) {
                 this.board = this.initializeBoard();
                 tile = this.board[tileIndex];
             }
             this.currentState = this.GAME_STATE.PLAYING;
         }
-        if (this.currentState == this.GAME_STATE.PLAYING) this.mouseClicks.push([mouseX, mouseY]);
-        if (this.currentState == this.GAME_STATE.PLAYING && tile && tile.hidden) {
-            if (tile.flagged) {
-                this.flaggedTiles--;
-                tile.flagged = false;
-            } else if (keyIsDown(CONTROL)) {
-                if (this.flaggedTiles < this.MAX_MINES) {
-                    this.flaggedTiles++;
-                    tile.flagged = true;
-                }
-            } else if (keyIsDown(SHIFT)) {
-                if (this.squadCount > 0) {
-                    this.bombSquad(tileIndex);
-                }
-            } else {
-                if (tile.bomb) {
-                    tile.hidden = false;
-                    this.detonate(mouseX, mouseY);
-                    this.currentState = this.GAME_STATE.ENDING;
+        if (this.currentState === this.GAME_STATE.PLAYING) {
+            this.mouseClicks.push([mouseX, mouseY]);
+            if (tile && tile.hidden) {
+                if (tile.flagged) {
+                    this.flaggedTiles--;
+                    tile.flagged = false;
+                } else if (keyIsDown(CONTROL)) {
+                    if (this.flaggedTiles < this.MAX_MINES) {
+                        this.flaggedTiles++;
+                        tile.flagged = true;
+                    }
+                } else if (keyIsDown(SHIFT)) {
+                    if (this.squadCount > 0) {
+                        this.useBombSquad(tileIndex);
+                    }
                 } else {
-                    this.unhide(tileIndex, []);
+                    if (tile.bomb) {
+                        tile.hidden = false;
+                        this.detonateBomb(mouseX, mouseY);
+                        this.endGame();
+                    } else {
+                        this.uncover(tileIndex, []);
+                    }
                 }
-            }
 
-            if (this.currentState == this.GAME_STATE.PLAYING) {
-                this.checkForWin();
+                if (this.currentState === this.GAME_STATE.PLAYING) {
+                    this.checkForWin();
+                }
+            } else if (this.currentState === this.GAME_STATE.GAME_OVER) {
+                this.start1Player();
             }
-        } else if (this.currentState == this.GAME_STATE.GAME_OVER) {
-            this.start1Player();
+            if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
+                this.squadAward = this.FIRST_SQUAD_AWARD;
+                this.squadCount++;
+            }
+            if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
+                this.squadAward = this.SECOND_SQUAD_AWARD;
+                this.squadCount++;
+            }
         }
-        if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
-            this.squadAward = this.FIRST_SQUAD_AWARD;
-            this.squadCount++;
-        }
-        if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
-            this.squadAward = this.SECOND_SQUAD_AWARD;
-            this.squadCount++;
+        if (this.currentState === this.GAME_STATE.GAME_OVER) {
+            this.startGame();
         }
     }
 
@@ -632,16 +668,26 @@ class MineSquadPlus {
 
         if (win) {
             this.winner = true;
-            this.gameOver();
+            this.endGame();
         }
     }
 
-    gameOver() {
+    endGame() {
         this.calculateScore();
         if (this.winner) this.createFireworks();
+        this.currentState = this.GAME_STATE.ENDING;
+    }
+
+    gameOver() {
         this.currentState = this.GAME_STATE.GAME_OVER;
-        this.highScorePanel.updateHighScores(this.score, this.winner, this.getElapsedTimeString());
-        this.showHighScores = true;
+        this.highScorePanel = new HighScorePanel(
+            this.width,
+            this.height,
+            this.score,
+            this.winner,
+            this.getElapsedTimeString()
+        );
+        this.highScorePanel.show();
     }
 
     calculateScore() {
@@ -672,12 +718,6 @@ class MineSquadPlus {
                 )
             );
         }
-    }
-
-    mousePositionToTileScreenLocation(position) {
-        let x = Math.floor(position[0] / this.TILE_HEIGHT) * this.TILE_HEIGHT;
-        let y = Math.floor(position[1] / this.TILE_HEIGHT) * this.TILE_HEIGHT + this.BOARD_Y_OFFSET;
-        return [x, y];
     }
 }
 

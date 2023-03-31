@@ -1,15 +1,14 @@
 class HighScorePanel {
+    display = false;
+
     MAX_NUM_HIGHSCORES = 10;
     highScores = {};
     showHighScores = false;
     stats = {};
 
-    constructor(width, height) {
+    constructor(width, height, score, winner, time) {
         this.width = width;
         this.height = height;
-    }
-
-    updateHighScores(score, winner, time) {
         this.score = score;
         this.winner = winner;
         let gameStats = localStorage.getItem("minesquad.stats");
@@ -54,7 +53,19 @@ class HighScorePanel {
         this.highScores = gameScores;
     }
 
-    render() {
+    isShowing() {
+        return this.display;
+    }
+
+    show() {
+        this.display = true;
+    }
+
+    hide() {
+        this.display = false;
+    }
+
+    draw() {
         stroke("black");
         strokeWeight(3);
         fill("gray");

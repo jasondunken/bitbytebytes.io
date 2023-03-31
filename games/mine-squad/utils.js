@@ -33,3 +33,9 @@ class Vec2 {
         return new Vec2((this.x += vector.x), (this.y += vector.y));
     }
 }
+
+function mousePositionToTileScreenLocation(position, height, offset) {
+    let x = Math.floor(position[0] / height) * height;
+    let y = Math.floor(position[1] / height) * height + offset;
+    return [x, y];
+}
