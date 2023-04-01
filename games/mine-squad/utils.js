@@ -34,8 +34,8 @@ class Vec2 {
     }
 }
 
-function mousePositionToTileScreenLocation(position, height, offset) {
-    let x = Math.floor(position[0] / height) * height;
-    let y = Math.floor(position[1] / height) * height + offset;
+function mousePositionToTileScreenLocation(position, tileSize, offset) {
+    let x = Math.floor(position[0] / tileSize) * tileSize;
+    let y = Math.floor(position[1] / tileSize) * tileSize + offset;
     return [x, y];
 }

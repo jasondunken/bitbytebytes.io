@@ -142,6 +142,65 @@ class MineSquadPlus {
         }
     }
 
+    handleMouseClick(mouseX, mouseY) {
+        const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
+        const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
+        if (x < 0 || x > this.TILES_PER_ROW - 1) return;
+        if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
+        const tileIndex = y * this.TILES_PER_ROW + x;
+        let tile = this.board[tileIndex];
+        if (this.currentState === this.GAME_STATE.STARTING) {
+            while (tile.bomb) {
+                this.board = this.initializeBoard();
+                tile = this.board[tileIndex];
+            }
+            this.currentState = this.GAME_STATE.PLAYING;
+        }
+        if (this.currentState === this.GAME_STATE.PLAYING) {
+            this.mouseClicks.push([mouseX, mouseY]);
+            if (tile && tile.hidden) {
+                if (tile.flagged) {
+                    this.flaggedTiles--;
+                    tile.flagged = false;
+                } else if (keyIsDown(CONTROL)) {
+                    if (this.flaggedTiles < this.MAX_MINES) {
+                        this.flaggedTiles++;
+                        tile.flagged = true;
+                    }
+                } else if (keyIsDown(SHIFT)) {
+                    if (this.squadCount > 0) {
+                        this.useBombSquad(tileIndex);
+                    }
+                } else {
+                    if (tile.bomb) {
+                        tile.hidden = false;
+                        this.detonateBomb(mouseX, mouseY);
+                        this.endGame();
+                    } else {
+                        this.uncover(tileIndex, []);
+                    }
+                }
+
+                if (this.currentState === this.GAME_STATE.PLAYING) {
+                    this.checkForWin();
+                }
+            } else if (this.currentState === this.GAME_STATE.GAME_OVER) {
+                this.start1Player();
+            }
+            if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
+                this.squadAward = this.FIRST_SQUAD_AWARD;
+                this.squadCount++;
+            }
+            if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
+                this.squadAward = this.SECOND_SQUAD_AWARD;
+                this.squadCount++;
+            }
+        }
+        if (this.currentState === this.GAME_STATE.GAME_OVER) {
+            this.startGame();
+        }
+    }
+
     keyPressed(key) {
         if (key.code === "Space") {
             if (this.currentState === this.GAME_STATE.GAME_OVER && this.highScorePanel) {
@@ -409,7 +468,8 @@ class MineSquadPlus {
         stroke("magenta");
         noFill();
         strokeWeight(3);
-        const lastClick = this.mouseClicks[this.mouseClicks.length - 1];
+        let lastClick = this.mouseClicks[this.mouseClicks.length - 1];
+        lastClick = [lastClick[0], lastClick[1] - this.BOARD_Y_OFFSET];
         const [x, y] = mousePositionToTileScreenLocation(lastClick, this.TILE_HEIGHT, this.BOARD_Y_OFFSET);
         rect(x, y, this.TILE_HEIGHT, this.TILE_HEIGHT);
     }
@@ -599,65 +659,6 @@ class MineSquadPlus {
 
     detonateBomb(x, y) {
         this.visualEffects.add(new Explosion(new Vec2(x, y)));
-    }
-
-    handleMouseClick(mouseX, mouseY) {
-        const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
-        const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
-        if (x < 0 || x > this.TILES_PER_ROW - 1) return;
-        if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
-        const tileIndex = y * this.TILES_PER_ROW + x;
-        let tile = this.board[tileIndex];
-        if (this.currentState === this.GAME_STATE.STARTING) {
-            while (tile.bomb) {
-                this.board = this.initializeBoard();
-                tile = this.board[tileIndex];
-            }
-            this.currentState = this.GAME_STATE.PLAYING;
-        }
-        if (this.currentState === this.GAME_STATE.PLAYING) {
-            this.mouseClicks.push([mouseX, mouseY]);
-            if (tile && tile.hidden) {
-                if (tile.flagged) {
-                    this.flaggedTiles--;
-                    tile.flagged = false;
-                } else if (keyIsDown(CONTROL)) {
-                    if (this.flaggedTiles < this.MAX_MINES) {
-                        this.flaggedTiles++;
-                        tile.flagged = true;
-                    }
-                } else if (keyIsDown(SHIFT)) {
-                    if (this.squadCount > 0) {
-                        this.useBombSquad(tileIndex);
-                    }
-                } else {
-                    if (tile.bomb) {
-                        tile.hidden = false;
-                        this.detonateBomb(mouseX, mouseY);
-                        this.endGame();
-                    } else {
-                        this.uncover(tileIndex, []);
-                    }
-                }
-
-                if (this.currentState === this.GAME_STATE.PLAYING) {
-                    this.checkForWin();
-                }
-            } else if (this.currentState === this.GAME_STATE.GAME_OVER) {
-                this.start1Player();
-            }
-            if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
-                this.squadAward = this.FIRST_SQUAD_AWARD;
-                this.squadCount++;
-            }
-            if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
-                this.squadAward = this.SECOND_SQUAD_AWARD;
-                this.squadCount++;
-            }
-        }
-        if (this.currentState === this.GAME_STATE.GAME_OVER) {
-            this.startGame();
-        }
     }
 
     checkForWin() {
