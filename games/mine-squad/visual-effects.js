@@ -115,37 +115,52 @@ class Explosion extends VisualEffect {
 }
 
 class Firework extends VisualEffect {
-    NUM_PARTICLES = 20;
-    F_LIFE = 30;
-    EXPANSION_TIME = 20;
-
-    particles = new Set();
-
-    constructor(position) {
+    constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay) {
         super(position);
-        this.life = this.F_LIFE;
-        this.expansionTime = this.EXPANSION_TIME;
-        for (let i = 0; i < this.NUM_PARTICLES; i++) {
-            const angle = (i * 2 * PI) / this.NUM_PARTICLES;
+        numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
+        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 30);
+        expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 20);
+        volleys ? (this.volleys = volleys) : (this.volleys = 3);
+        volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 25);
+        startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
+        this.particles = new Set();
+        console.log("construct: ", { ...this });
+    }
+
+    update() {
+        if (this.startDelay > 0) this.startDelay--;
+        if (this.startDelay <= 0 && this.volleys > 0) {
+            this.fireVolley();
+            this.volleys--;
+            if (this.volleys > 0) this.startDelay = this.volleyRate;
+        }
+        this.particles.forEach((particle) => {
+            if (this.expansionTime > 0) {
+                particle.expansionTime--;
+                particle.position = particle.position.add(particle.direction);
+            } else particle.position = particle.position.add(new Vec2(0, 5));
+            particle.volleyTime--;
+            if (particle.volleyTime <= 0) {
+                this.particles.delete(particle);
+            }
+        });
+        if (this.particles.size <= 0 && this.volleys <= 0) this.done = true;
+    }
+
+    fireVolley() {
+        console.log("numParticles: ", this.numParticles);
+        for (let i = 0; i < this.numParticles; i++) {
+            const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
-                position: position,
+                position: this.position,
                 direction: new Vec2(Math.cos(angle) * 10, Math.sin(angle) * 10),
-                //direction: new Vec2(1, 0),
+                volleyTime: this.volleyTime,
+                expansionTime: this.expansionTime,
                 size: 8,
                 color: "blue",
             });
         }
-        console.log("particles: ", this.particles);
-    }
-
-    update() {
-        this.expansionTime--;
-        this.particles.forEach((particle) => {
-            if (this.expansionTime > 0) particle.position = particle.position.add(particle.direction);
-            else particle.position = particle.position.add(new Vec2(0, 5));
-        });
-        this.life--;
-        if (this.life <= 0) this.done = true;
+        console.log("firework: ", { ...this.particles });
     }
 
     render() {

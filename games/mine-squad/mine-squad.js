@@ -150,7 +150,7 @@ class MineSquadPlus {
         const tileIndex = y * this.TILES_PER_ROW + x;
         let tile = this.board[tileIndex];
         if (this.currentState === this.GAME_STATE.STARTING) {
-            while (tile.bomb) {
+            while (tile.value != 0) {
                 this.board = this.initializeBoard();
                 tile = this.board[tileIndex];
             }
@@ -176,6 +176,7 @@ class MineSquadPlus {
                         tile.hidden = false;
                         this.detonateBomb(mouseX, mouseY);
                         this.endGame();
+                        return;
                     } else {
                         this.uncover(tileIndex, []);
                     }
@@ -674,9 +675,10 @@ class MineSquadPlus {
     }
 
     endGame() {
+        this.currentState = this.GAME_STATE.ENDING;
+        this.winner = true;
         this.calculateScore();
         if (this.winner) this.createFireworks();
-        this.currentState = this.GAME_STATE.ENDING;
     }
 
     gameOver() {
@@ -700,7 +702,6 @@ class MineSquadPlus {
             if (tile.flagged) {
                 this.score -= this.FLAG_PENALTY;
             }
-            //tile.hidden = false;
         }
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
