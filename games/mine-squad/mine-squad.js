@@ -676,7 +676,6 @@ class MineSquadPlus {
 
     endGame() {
         this.currentState = this.GAME_STATE.ENDING;
-        this.winner = true;
         this.calculateScore();
         if (this.winner) this.createFireworks();
     }
