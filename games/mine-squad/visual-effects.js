@@ -124,7 +124,6 @@ class Firework extends VisualEffect {
         volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 25);
         startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
         this.particles = new Set();
-        console.log("construct: ", { ...this });
     }
 
     update() {
@@ -148,7 +147,6 @@ class Firework extends VisualEffect {
     }
 
     fireVolley() {
-        console.log("numParticles: ", this.numParticles);
         const volleyPosition = new Vec2(
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
@@ -164,7 +162,6 @@ class Firework extends VisualEffect {
                 color: "blue",
             });
         }
-        console.log("firework: ", { ...this.particles });
     }
 
     render() {
