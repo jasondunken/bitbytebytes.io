@@ -149,10 +149,14 @@ class Firework extends VisualEffect {
 
     fireVolley() {
         console.log("numParticles: ", this.numParticles);
+        const volleyPosition = new Vec2(
+            this.position.x + Math.random() * 64 - 32,
+            this.position.y + Math.random() * 64 - 32
+        );
         for (let i = 0; i < this.numParticles; i++) {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
-                position: this.position,
+                position: volleyPosition,
                 direction: new Vec2(Math.cos(angle) * 10, Math.sin(angle) * 10),
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
