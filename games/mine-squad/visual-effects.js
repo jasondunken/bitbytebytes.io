@@ -115,6 +115,21 @@ class Explosion extends VisualEffect {
 }
 
 class Firework extends VisualEffect {
+    fireworkColors = [
+        "lightsalmon",
+        "teal",
+        "yellowgreen",
+        "antiquewhite",
+        "cornflowerblue",
+        "dimgrey",
+        "deeppink",
+        "lavenderblush",
+        "mediumturquoise",
+        "midnightblue",
+        "chocolate",
+        "coral",
+    ];
+
     constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay) {
         super(position);
         numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
@@ -151,6 +166,7 @@ class Firework extends VisualEffect {
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
         );
+        const color = this.fireworkColors[Math.floor(Math.random() * this.fireworkColors.length)];
         for (let i = 0; i < this.numParticles; i++) {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
@@ -159,7 +175,7 @@ class Firework extends VisualEffect {
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
                 size: 8,
-                color: "blue",
+                color: color,
             });
         }
     }
