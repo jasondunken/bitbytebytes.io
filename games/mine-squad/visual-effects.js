@@ -133,12 +133,13 @@ class Firework extends VisualEffect {
     constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay) {
         super(position);
         numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
-        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 30);
-        expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 20);
+        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 40);
+        expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 25);
         volleys ? (this.volleys = volleys) : (this.volleys = 3);
         volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 25);
         startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
         this.particles = new Set();
+        this.expansionSpeed = 5;
     }
 
     update() {
@@ -149,10 +150,10 @@ class Firework extends VisualEffect {
             if (this.volleys > 0) this.startDelay = this.volleyRate;
         }
         this.particles.forEach((particle) => {
-            if (this.expansionTime > 0) {
+            if (particle.expansionTime > 0) {
                 particle.expansionTime--;
                 particle.position = particle.position.add(particle.direction);
-            } else particle.position = particle.position.add(new Vec2(0, 5));
+            } else particle.position = particle.position.add(new Vec2(0, 0.5));
             particle.volleyTime--;
             if (particle.volleyTime <= 0) {
                 this.particles.delete(particle);
@@ -171,7 +172,7 @@ class Firework extends VisualEffect {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
                 position: volleyPosition,
-                direction: new Vec2(Math.cos(angle) * 10, Math.sin(angle) * 10),
+                direction: new Vec2(Math.cos(angle) * this.expansionSpeed, Math.sin(angle) * this.expansionSpeed),
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
                 size: 8,
