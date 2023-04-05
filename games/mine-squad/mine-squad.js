@@ -122,9 +122,6 @@ class MineSquadPlus {
         this.mouseClicks = [];
         this.visualEffects = new Set();
 
-        // TEST
-        this.visualEffects.add(new Firework(new Vec2(this.width / 2, this.height / 2)));
-
         this.currentState = this.GAME_STATE.STARTING;
     }
 
