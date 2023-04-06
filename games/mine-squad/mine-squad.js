@@ -150,7 +150,7 @@ class MineSquadPlus {
         const tileIndex = y * this.TILES_PER_ROW + x;
         let tile = this.board[tileIndex];
         if (this.currentState === this.GAME_STATE.STARTING) {
-            while (tile.value != 0) {
+            while (tile.value != 0 || tile.bomb) {
                 this.board = this.initializeBoard();
                 tile = this.board[tileIndex];
             }
