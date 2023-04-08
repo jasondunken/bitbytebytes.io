@@ -123,8 +123,6 @@ class MineSquadPlus {
         this.visualEffects = new Set();
 
         this.currentState = this.GAME_STATE.STARTING;
-
-        this.visualEffects.add(new Firework(new Vec2(this.width / 2, this.height / 2)));
     }
 
     update() {
