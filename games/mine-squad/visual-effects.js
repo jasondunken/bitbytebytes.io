@@ -153,7 +153,12 @@ class Firework extends VisualEffect {
             if (particle.expansionTime > 0) {
                 particle.expansionTime--;
                 particle.position = particle.position.add(particle.direction);
-            } else particle.position = particle.position.add(new Vec2(0, 0.5));
+            } else {
+                particle.color.setAlpha(particle.alpha);
+                particle.alpha -= 10;
+                if (particle.alpha <= 0) particle.alpha = 0;
+                particle.position = particle.position.add(new Vec2(0, 0.5));
+            }
             particle.volleyTime--;
             if (particle.volleyTime <= 0) {
                 this.particles.delete(particle);
@@ -167,7 +172,7 @@ class Firework extends VisualEffect {
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
         );
-        const color = this.fireworkColors[Math.floor(Math.random() * this.fireworkColors.length)];
+        const pColor = color(this.fireworkColors[Math.floor(Math.random() * this.fireworkColors.length)]);
         for (let i = 0; i < this.numParticles; i++) {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
@@ -176,7 +181,8 @@ class Firework extends VisualEffect {
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
                 size: 8,
-                color: color,
+                color: pColor,
+                alpha: 255,
             });
         }
     }
