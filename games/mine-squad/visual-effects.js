@@ -133,10 +133,10 @@ class Firework extends VisualEffect {
     constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay) {
         super(position);
         numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
-        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 40);
+        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 50);
         expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 25);
-        volleys ? (this.volleys = volleys) : (this.volleys = 3);
-        volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 25);
+        volleys ? (this.volleys = volleys) : (this.volleys = 4);
+        volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 20);
         startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
         this.particles = new Set();
         this.expansionSpeed = 5;
