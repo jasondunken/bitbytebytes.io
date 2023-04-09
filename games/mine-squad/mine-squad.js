@@ -381,13 +381,7 @@ class MineSquadPlus {
                 }
 
                 if (this.tile.bomb) {
-                    setColor("red");
-                    ellipse(
-                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.HALF_TILE + this.BOARD_Y_OFFSET,
-                        this.BOMB_HEIGHT,
-                        this.BOMB_HEIGHT
-                    );
+                    this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
                 }
             } else {
                 setColor("green");
@@ -409,13 +403,25 @@ class MineSquadPlus {
                 }
             }
 
-            // when game over mark flags correct/incorrect
+            // when game over mark flags correct/incorrect, show bombs
             if (this.currentState == this.GAME_STATE.GAME_OVER) {
                 if (this.tile.flagged === true) {
                     this.scoreFlag(this.tile.isBomb);
+                } else if (this.tile.bomb) {
+                    this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
                 }
             }
         }
+    }
+
+    drawBomb(tileIndex) {
+        setColor("red");
+        ellipse(
+            this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
+            tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
+            this.BOMB_HEIGHT,
+            this.BOMB_HEIGHT
+        );
     }
 
     scoreFlag(isBomb) {
