@@ -393,13 +393,7 @@ class MineSquadPlus {
                     this.TILE_HEIGHT - 1
                 );
                 if (this.tile.flagged) {
-                    setColor("yellow");
-                    ellipse(
-                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.HALF_TILE + this.BOARD_Y_OFFSET,
-                        this.BOMB_HEIGHT,
-                        this.BOMB_HEIGHT
-                    );
+                    this.drawFlag(new Vec2(this.tileIndexX, this.tileIndexY));
                 }
             }
 
@@ -412,6 +406,16 @@ class MineSquadPlus {
                 }
             }
         }
+    }
+
+    drawFlag(tileIndex) {
+        setColor("yellow");
+        ellipse(
+            this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
+            tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
+            this.BOMB_HEIGHT,
+            this.BOMB_HEIGHT
+        );
     }
 
     drawBomb(tileIndex) {
