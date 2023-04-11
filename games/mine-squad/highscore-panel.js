@@ -11,20 +11,8 @@ class HighScorePanel {
         this.height = height;
         this.score = score;
         this.winner = winner;
-        let gameStats = localStorage.getItem("minesquad.stats");
-        if (gameStats) {
-            gameStats = JSON.parse(gameStats);
-        } else {
-            gameStats = { wins: 0, losses: 0 };
-        }
 
-        if (winner) {
-            gameStats.wins++;
-        } else {
-            gameStats.losses++;
-        }
-        localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
-        this.stats = gameStats;
+        this.getGameStats(winner);
 
         let gameScores = localStorage.getItem("minesquad");
         if (gameScores) {
@@ -51,6 +39,31 @@ class HighScorePanel {
 
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
         this.highScores = gameScores;
+    }
+
+    getGameStats(winner) {
+        let gameStats = localStorage.getItem("minesquad.stats");
+        if (gameStats) {
+            gameStats = JSON.parse(gameStats);
+        } else {
+            gameStats = { wins: 0, losses: 0 };
+        }
+
+        if (winner) {
+            gameStats.wins++;
+        } else {
+            gameStats.losses++;
+        }
+
+        if (gameStats.wins <= 0) {
+            gameStats.winRate = 0;
+        } else if (gameStats.losses <= 0) {
+            gameStats.winRate = 100;
+        } else {
+            gameStats.winRate = ((gameStats.wins / gameStats.losses) * 100).toFixed(2);
+        }
+        localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
+        this.stats = gameStats;
     }
 
     isShowing() {
@@ -81,7 +94,11 @@ class HighScorePanel {
         }
         fill("black");
         textSize(16);
-        text(`wins ${this.stats.wins} losses ${this.stats.losses}`, this.width / 2, 85);
+        text(
+            `wins ${this.stats.wins} - losses ${this.stats.losses} - win rate ${this.stats.winRate}%`,
+            this.width / 2,
+            85
+        );
         textSize(24);
         const highScores = Object.keys(this.highScores);
         highScores.forEach((score, i) => {
