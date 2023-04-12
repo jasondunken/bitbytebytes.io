@@ -60,7 +60,7 @@ class HighScorePanel {
         } else if (gameStats.losses <= 0) {
             gameStats.winRate = 100;
         } else {
-            gameStats.winRate = ((gameStats.wins / gameStats.losses) * 100).toFixed(2);
+            gameStats.winRate = ((gameStats.wins / (gameStats.wins + gameStats.losses)) * 100).toFixed(2);
         }
         localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
         this.stats = gameStats;
