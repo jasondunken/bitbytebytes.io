@@ -205,7 +205,7 @@ class MineSquadPlus {
     keyPressed(key) {
         if (key.code === "Space") {
             if (this.currentState === this.GAME_STATE.GAME_OVER && this.highScorePanel) {
-                this.highScorePanel.isShowing() ? this.highScorePanel.hide() : this.highScorePanel.show();
+                this.highScorePanel.isShowing() ? this.highScorePanel.hidePanel() : this.highScorePanel.showPanel();
             }
         }
         if (key.code === "Tab") {
@@ -699,7 +699,7 @@ class MineSquadPlus {
             this.winner,
             this.getElapsedTimeString()
         );
-        this.highScorePanel.show();
+        this.highScorePanel.showPanel();
     }
 
     calculateScore() {

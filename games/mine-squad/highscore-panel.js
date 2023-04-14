@@ -1,10 +1,8 @@
 class HighScorePanel {
-    display = false;
-
-    MAX_NUM_HIGHSCORES = 10;
-    highScores = {};
-    showHighScores = false;
+    MAX_NUM_HIGH_SCORES = 10;
     stats = {};
+    highScores = {};
+    show = false;
 
     constructor(width, height, score, winner, time) {
         this.width = width;
@@ -12,15 +10,13 @@ class HighScorePanel {
         this.score = score;
         this.winner = winner;
 
-        this.getGameStats(winner);
-        this.getHighScores(score, time);
+        this.stats = this.getGameStats(winner);
+        this.highScores = this.getHighScores(score, time);
     }
 
     getHighScores(score, winner, time) {
-        let gameScores = localStorage.getItem("minesquad");
-        if (gameScores) {
-            gameScores = JSON.parse(gameScores);
-        } else {
+        let gameScores = this.getLocalStorageItemAsObj("minesquad");
+        if (!gameScores) {
             gameScores = {};
         }
 
@@ -29,7 +25,7 @@ class HighScorePanel {
 
         let scores = Object.keys(gameScores);
         let lowestScoreKey = scores[0];
-        if (scores.length > this.MAX_NUM_HIGHSCORES) {
+        if (scores.length > this.MAX_NUM_HIGH_SCORES) {
             let lowestScore = gameScores[lowestScoreKey];
             for (let i = 1; i < scores.length; i++) {
                 if (gameScores[scores[i]].score < lowestScore.score) {
@@ -41,14 +37,12 @@ class HighScorePanel {
         }
 
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
-        this.highScores = gameScores;
+        return gameScores;
     }
 
     getGameStats(winner) {
-        let gameStats = localStorage.getItem("minesquad.stats");
-        if (gameStats) {
-            gameStats = JSON.parse(gameStats);
-        } else {
+        let gameStats = this.getLocalStorageItemAsObj("minesquad.stats");
+        if (!gameStats) {
             gameStats = { wins: 0, losses: 0 };
         }
 
@@ -66,19 +60,28 @@ class HighScorePanel {
             gameStats.winRate = ((gameStats.wins / (gameStats.wins + gameStats.losses)) * 100).toFixed(2);
         }
         localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
-        this.stats = gameStats;
+        return gameStats;
+    }
+
+    getLocalStorageItemAsObj(item) {
+        const itemJson = localStorage.getItem(item);
+        if (itemJson) {
+            return JSON.parse(itemJson);
+        } else {
+            return undefined;
+        }
     }
 
     isShowing() {
-        return this.display;
+        return this.show;
     }
 
-    show() {
-        this.display = true;
+    showPanel() {
+        this.show = true;
     }
 
-    hide() {
-        this.display = false;
+    hidePanel() {
+        this.show = false;
     }
 
     draw() {
