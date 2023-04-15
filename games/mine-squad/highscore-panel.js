@@ -51,16 +51,20 @@ class HighScorePanel {
         } else {
             gameStats.losses++;
         }
-
-        if (gameStats.wins <= 0) {
-            gameStats.winRate = 0;
-        } else if (gameStats.losses <= 0) {
-            gameStats.winRate = 100;
-        } else {
-            gameStats.winRate = ((gameStats.wins / (gameStats.wins + gameStats.losses)) * 100).toFixed(2);
-        }
         localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
         return gameStats;
+    }
+
+    getWinRate() {
+        if (this.stats) {
+            if (this.stats.wins <= 0) {
+                return 0;
+            } else if (this.stats.losses <= 0) {
+                return 100;
+            } else {
+                return ((this.stats.wins / (this.stats.wins + this.stats.losses)) * 100).toFixed(2);
+            }
+        } else return 0;
     }
 
     getLocalStorageItemAsObj(item) {
@@ -101,7 +105,7 @@ class HighScorePanel {
         fill("black");
         textSize(16);
         text(
-            `wins ${this.stats.wins} - losses ${this.stats.losses} - win rate ${this.stats.winRate}%`,
+            `wins ${this.stats.wins} - losses ${this.stats.losses} - win rate ${this.getWinRate()}%`,
             this.width / 2,
             85
         );
