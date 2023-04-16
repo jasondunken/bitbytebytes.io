@@ -35,7 +35,6 @@ class HighScorePanel {
             }
             delete gameScores[lowestScoreKey];
         }
-
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
         return gameScores;
     }
