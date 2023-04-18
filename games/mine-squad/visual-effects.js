@@ -33,6 +33,31 @@ class BonusEffect extends VisualEffect {
     }
 }
 
+class BonusSquadEffect extends VisualEffect {
+    size = 32;
+    MAX_SIZE = 64;
+
+    color = "red";
+
+    constructor(position) {
+        super(position);
+    }
+
+    update() {
+        this.size += 5;
+        if (this.size >= this.MAX_SIZE) {
+            this.done = true;
+        }
+    }
+
+    render() {
+        stroke(this.color);
+        strokeWeight(3);
+        noFill();
+        ellipse(this.position.x, this.position.y, this.size, this.size);
+    }
+}
+
 class ScoreEffect extends VisualEffect {
     opacity = 255;
     vSpeed = Math.floor(Math.random() * 3 + 2);

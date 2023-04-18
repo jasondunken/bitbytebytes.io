@@ -123,6 +123,13 @@ class MineSquadPlus {
         this.visualEffects = new Set();
 
         this.currentState = this.GAME_STATE.STARTING;
+
+        const position = new Vec2(
+            this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.squadCount) * (this.TILE_HEIGHT * 2) + 120,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
+        );
+
+        this.visualEffects.add(new BonusSquadEffect(position));
     }
 
     update() {
@@ -190,11 +197,11 @@ class MineSquadPlus {
             }
             if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
                 this.squadAward = this.FIRST_SQUAD_AWARD;
-                this.squadCount++;
+                this.addSquad();
             }
             if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
                 this.squadAward = this.SECOND_SQUAD_AWARD;
-                this.squadCount++;
+                this.addSquad();
             }
         }
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
@@ -631,6 +638,19 @@ class MineSquadPlus {
         }
     }
 
+    addSquad() {
+        if (this.squadCount < this.MAX_SQUADS) {
+            this.squadCount++;
+
+            const position = new Vec2(
+                this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.squadCount) * (this.TILE_HEIGHT * 2) + 120,
+                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
+            );
+
+            this.visualEffects.add(new BonusSquadEffect(position));
+        }
+    }
+
     defuseWithinRadius(tileIndex) {
         this.board[tileIndex].hidden = false;
         if (this.board[tileIndex].bomb) {
@@ -646,6 +666,7 @@ class MineSquadPlus {
             if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
                 const tile = this.board[damage[i]];
                 if (tile.hidden) {
+                    tile.hidden = false;
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
                         const position = new Vec2(
@@ -658,7 +679,6 @@ class MineSquadPlus {
                         this.score += this.DEFUSE_BONUS;
                     }
                 }
-                tile.hidden = false;
             }
         }
     }
