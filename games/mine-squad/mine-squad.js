@@ -123,13 +123,6 @@ class MineSquadPlus {
         this.visualEffects = new Set();
 
         this.currentState = this.GAME_STATE.STARTING;
-
-        const position = new Vec2(
-            this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.squadCount) * (this.TILE_HEIGHT * 2) + 120,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
-        );
-
-        this.visualEffects.add(new BonusSquadEffect(position));
     }
 
     update() {
