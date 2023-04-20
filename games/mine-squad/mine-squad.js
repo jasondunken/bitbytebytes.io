@@ -3,7 +3,11 @@ GAME_HEIGHT = 540;
 
 game = null;
 
-function preload() {}
+function preload() {
+    let sprites = {};
+    sprites["bomb"] = loadImage("./mine-squad/bomb.png");
+    MineSquadPlus.sprites = sprites;
+}
 
 function setup() {
     // disable context menu
@@ -38,6 +42,8 @@ class MineSquadPlus {
     PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
         this.start1Player();
     });
+
+    static sprites;
 
     TILES_PER_COLUMN = 16;
     TILES_PER_ROW = 30;
@@ -420,12 +426,19 @@ class MineSquadPlus {
 
     drawBomb(tileIndex) {
         setColor("red");
-        ellipse(
-            this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
-            tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
-            this.BOMB_HEIGHT,
-            this.BOMB_HEIGHT
+        image(
+            MineSquadPlus.sprites["bomb"],
+            this.BOARD_X_OFFSET + tileIndex.x + 2,
+            tileIndex.y + this.BOARD_Y_OFFSET + 2,
+            this.TILE_HEIGHT - 4,
+            this.TILE_HEIGHT - 4
         );
+        // ellipse(
+        //     this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
+        //     tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
+        //     this.BOMB_HEIGHT,
+        //     this.BOMB_HEIGHT
+        // );
     }
 
     scoreFlag(isBomb) {
