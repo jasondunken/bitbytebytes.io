@@ -1,7 +1,7 @@
 class HighScorePanel {
     MAX_NUM_HIGH_SCORES = 10;
     stats = {};
-    highScores = {};
+    highScores = [];
     show = false;
 
     constructor(width, height, score, winner, time) {
@@ -17,24 +17,22 @@ class HighScorePanel {
     getHighScores(score, winner, time) {
         let gameScores = this.getLocalStorageItemAsObj("minesquad");
         if (!gameScores) {
-            gameScores = {};
+            gameScores = [];
         }
 
         const scoreDate = Date.now();
-        gameScores[scoreDate] = { score: score, winner: winner, time: time };
+        gameScores.push({ scoreDate, score: score, winner: winner, time: time });
 
-        let scores = Object.keys(gameScores);
-        let lowestScoreKey = scores[0];
-        if (scores.length > this.MAX_NUM_HIGH_SCORES) {
-            let lowestScore = gameScores[lowestScoreKey];
-            for (let i = 1; i < scores.length; i++) {
-                if (gameScores[scores[i]].score < lowestScore.score) {
-                    lowestScoreKey = scores[i];
-                    lowestScore = gameScores[lowestScoreKey];
+        if (gameScores.length > this.MAX_NUM_HIGH_SCORES) {
+            let lowestScore = gameScores[0];
+            for (let i = 1; i < gameScores.length; i++) {
+                if (gameScores[i].score < lowestScore.score) {
+                    lowestScore = gameScores[i];
                 }
             }
-            delete gameScores[lowestScoreKey];
+            gameScores.splice(gameScores.indexOf(lowestScore), 1);
         }
+        gameScores = gameScores.sort((a, b) => b.score - a.score);
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
         return gameScores;
     }
@@ -109,13 +107,12 @@ class HighScorePanel {
             85
         );
         textSize(24);
-        const highScores = Object.keys(this.highScores);
-        highScores.forEach((score, i) => {
-            if (this.highScores[score].score == this.score && frameCount % 60 > 30) {
+        this.highScores.forEach((score, i) => {
+            if (score.score == this.score && frameCount % 60 > 30) {
                 fill("red");
             } else fill("black");
-            text(new Date(+score).toLocaleDateString(), this.width / 2 - 130, 110 + i * 32);
-            text(this.highScores[score].score, this.width / 2 + 150, 110 + i * 32);
+            text(new Date(+score.scoreDate).toLocaleDateString(), this.width / 2 - 130, 110 + i * 32);
+            text(score.score, this.width / 2 + 150, 110 + i * 32);
         });
         fill("black");
         if (frameCount % 40 > 20) text("Click to restart", this.width / 2, 430);
