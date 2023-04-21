@@ -1,12 +1,15 @@
 class HighScorePanel {
-    MAX_NUM_HIGH_SCORES = 10;
+    WIDTH = 400;
+    HEIGHT = 425;
+    position = new Vec2(0, 0);
+    MAX_SCORES = 10;
     stats = {};
     highScores = [];
     show = false;
 
     constructor(width, height, score, winner, time) {
-        this.width = width;
-        this.height = height;
+        this.position.x = width / 2 - this.WIDTH / 2;
+        this.position.y = height / 2 - this.HEIGHT / 2;
         this.score = score;
         this.winner = winner;
 
@@ -23,7 +26,7 @@ class HighScorePanel {
         const scoreDate = Date.now();
         gameScores.push({ scoreDate, score: score, winner: winner, time: time });
 
-        if (gameScores.length > this.MAX_NUM_HIGH_SCORES) {
+        if (gameScores.length > this.MAX_SCORES) {
             let lowestScore = gameScores[0];
             for (let i = 1; i < gameScores.length; i++) {
                 if (gameScores[i].score < lowestScore.score) {
@@ -89,32 +92,46 @@ class HighScorePanel {
         stroke("black");
         strokeWeight(3);
         fill("gray");
-        rect(this.width / 2 - 200, 30, 400, 425);
+        rect(this.position.x, this.position.y, this.WIDTH, this.HEIGHT);
+
         noStroke();
         textSize(32);
+        textAlign(CENTER);
         if (this.winner) {
             fill("green");
-            text("You Win!", this.width / 2, 60);
+            text("You Win!", this.position.x + this.WIDTH / 2, 60);
         } else {
             fill("red");
-            text("Game Over!", this.width / 2, 60);
+            text("Game Over!", this.position.x + this.WIDTH / 2, 60);
         }
+
         fill("black");
         textSize(16);
         text(
             `wins ${this.stats.wins} - losses ${this.stats.losses} - win rate ${this.getWinRate()}%`,
-            this.width / 2,
-            85
+            this.position.x + this.WIDTH / 2,
+            100
         );
-        textSize(24);
+
+        textSize(18);
         this.highScores.forEach((score, i) => {
-            if (score.score == this.score && frameCount % 60 > 30) {
-                fill("red");
-            } else fill("black");
-            text(new Date(+score.scoreDate).toLocaleDateString(), this.width / 2 - 130, 110 + i * 32);
-            text(score.score, this.width / 2 + 150, 110 + i * 32);
+            if (i < this.MAX_SCORES) {
+                if (score.score == this.score && frameCount % 60 > 30) {
+                    fill("red");
+                } else fill("black");
+                textAlign(LEFT);
+                text(new Date(+score.scoreDate).toLocaleDateString(), this.position.x + 32, 135 + i * 24);
+                textAlign(RIGHT);
+                text(score.score, this.position.x + this.WIDTH - 32, 135 + i * 24);
+            }
         });
+
         fill("black");
-        if (frameCount % 40 > 20) text("Click to restart", this.width / 2, 430);
+        textAlign(CENTER);
+        if (frameCount % 120 > 60) {
+            text("Click to restart", this.position.x + this.WIDTH / 2, 430);
+        } else {
+            text("Space to hide high scores", this.position.x + this.WIDTH / 2, 430);
+        }
     }
 }

@@ -287,6 +287,8 @@ class MineSquadPlus {
         fill("gray");
         rect(this.minesLeftBoxX, this.minesLeftBoxY, this.minesLeftBox * 2, this.minesLeftBox);
         fill("red");
+        textAlign(CENTER);
+        textSize(24);
         if (this.currentState != this.GAME_STATE.GAME_OVER) {
             text(
                 "" + this.getNumHiddenTiles(),
@@ -302,6 +304,8 @@ class MineSquadPlus {
         fill("gray");
         rect(this.flagsPlacedBoxX, this.flagsPlacedBoxY, this.minesLeftBox * 2, this.minesLeftBox);
         fill("red");
+        textAlign(CENTER);
+        textSize(24);
         if (this.currentState != this.GAME_STATE.GAME_OVER) {
             text(
                 "" + this.MAX_MINES - this.flaggedTiles,
@@ -316,6 +320,8 @@ class MineSquadPlus {
     drawSquads() {
         fill("white");
         noStroke();
+        textAlign(CENTER);
+        textSize(24);
         text(
             "SQUADS",
             72,
@@ -378,6 +384,8 @@ class MineSquadPlus {
                 );
                 if (!this.tile.bomb && this.tile.value !== 0) {
                     setColor(valueToColor(this.tile.value));
+                    textAlign(CENTER);
+                    textSize(24);
                     text(
                         this.tile.value,
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
@@ -392,6 +400,7 @@ class MineSquadPlus {
             } else {
                 setColor("green");
                 stroke("black");
+                strokeWeight(1);
                 rect(
                     this.BOARD_X_OFFSET + this.tileIndexX,
                     this.tileIndexY + this.BOARD_Y_OFFSET,
@@ -406,7 +415,7 @@ class MineSquadPlus {
             // when game over mark flags correct/incorrect, show bombs
             if (this.currentState == this.GAME_STATE.GAME_OVER) {
                 if (this.tile.flagged === true) {
-                    this.scoreFlag(this.tile.isBomb);
+                    this.scoreFlag(this.tile.bomb);
                 } else if (this.tile.bomb) {
                     this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
                 }
@@ -416,6 +425,7 @@ class MineSquadPlus {
 
     drawFlag(tileIndex) {
         setColor("yellow");
+        strokeWeight(1);
         ellipse(
             this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
             tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
@@ -433,12 +443,6 @@ class MineSquadPlus {
             this.TILE_HEIGHT - 4,
             this.TILE_HEIGHT - 4
         );
-        // ellipse(
-        //     this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
-        //     tileIndex.y + this.HALF_TILE + this.BOARD_Y_OFFSET,
-        //     this.BOMB_HEIGHT,
-        //     this.BOMB_HEIGHT
-        // );
     }
 
     scoreFlag(isBomb) {
@@ -720,7 +724,7 @@ class MineSquadPlus {
         this.currentState = this.GAME_STATE.GAME_OVER;
         this.highScorePanel = new HighScorePanel(
             this.width,
-            this.height,
+            this.height - this.scoreboardHeight + this.BOARD_Y_OFFSET,
             this.score,
             this.winner,
             this.getElapsedTimeString()
