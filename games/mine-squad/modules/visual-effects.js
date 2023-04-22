@@ -1,4 +1,4 @@
-import { valueToColor } from "./utils.js";
+import { valueToColor, Vec2 } from "./utils.js";
 
 class VisualEffect {
     done = false;
