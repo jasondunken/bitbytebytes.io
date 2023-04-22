@@ -9,7 +9,7 @@ body {
 }
 
 canvas {
-    cursor: url("blank_cursor.png"), auto;
+    cursor: url("../img/blank_cursor.png"), auto;
 }
 
 .buttons {

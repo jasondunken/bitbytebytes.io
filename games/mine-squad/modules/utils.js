@@ -39,3 +39,5 @@ function mousePositionToTileScreenLocation(position, tileSize, offset) {
     let y = Math.floor(position[1] / tileSize) * tileSize + offset;
     return [x, y];
 }
+
+export { setColor, Vec2, mousePositionToTileScreenLocation, valueToColor };

@@ -1,3 +1,5 @@
+import { Vec2 } from "./utils.js";
+
 class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
@@ -135,3 +137,5 @@ class HighScorePanel {
         }
     }
 }
+
+export { HighScorePanel };

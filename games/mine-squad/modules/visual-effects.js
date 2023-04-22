@@ -1,3 +1,5 @@
+import { valueToColor } from "./utils.js";
+
 class VisualEffect {
     done = false;
 
@@ -222,3 +224,5 @@ class Firework extends VisualEffect {
         });
     }
 }
+
+export { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect };

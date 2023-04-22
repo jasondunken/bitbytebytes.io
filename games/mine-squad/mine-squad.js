@@ -1,11 +1,21 @@
-GAME_WIDTH = 960;
-GAME_HEIGHT = 540;
+import { HighScorePanel } from "./modules/highscore-panel.js";
+import { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect } from "./modules/visual-effects.js";
+import { setColor, Vec2, mousePositionToTileScreenLocation, valueToColor } from "./modules/utils.js";
 
-game = null;
+const GAME_WIDTH = 960;
+const GAME_HEIGHT = 540;
+
+let game = null;
+
+window.preload = preload;
+window.setup = setup;
+window.draw = draw;
+window.keyPressed = keyPressed;
+window.mousePressed = mousePressed;
 
 function preload() {
     let sprites = {};
-    sprites["bomb"] = loadImage("./mine-squad/bomb.png");
+    sprites["bomb"] = loadImage("./mine-squad/img/bomb.png");
     MineSquadPlus.sprites = sprites;
 }
 
@@ -29,12 +39,12 @@ function draw() {
 }
 
 function keyPressed(event) {
-    if (this.game) this.game.keyPressed(event);
+    if (game) game.keyPressed(event);
 }
 
 function mousePressed(event) {
-    if (this.game && event.button === 0) {
-        this.game.handleMouseClick(mouseX, mouseY);
+    if (game && event.button === 0) {
+        game.handleMouseClick(mouseX, mouseY);
     }
 }
 
@@ -71,6 +81,8 @@ class MineSquadPlus {
     tileIndexY = 0;
     tile = null;
 
+    level = 1;
+
     winner = false;
     board = [];
     score = 0;
@@ -86,6 +98,7 @@ class MineSquadPlus {
     GAME_STATE = Object.freeze({
         STARTING: "STARTING",
         HELP: "HELP",
+        LEVEL_STARTING: "LEVEL_STARTING",
         PLAYING: "PLAYING",
         ENDING: "ENDING",
         GAME_OVER: "GAME_OVER",
@@ -119,6 +132,7 @@ class MineSquadPlus {
     startGame() {
         this.lastTime = Date.now();
         this.gameTime = 0;
+        this.level = 1;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
@@ -415,7 +429,7 @@ class MineSquadPlus {
             // when game over mark flags correct/incorrect, show bombs
             if (this.currentState == this.GAME_STATE.GAME_OVER) {
                 if (this.tile.flagged === true) {
-                    this.scoreFlag(this.tile.bomb);
+                    this.markFlag(this.tile.bomb);
                 } else if (this.tile.bomb) {
                     this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
                 }
@@ -445,7 +459,7 @@ class MineSquadPlus {
         );
     }
 
-    scoreFlag(isBomb) {
+    markFlag(isBomb) {
         strokeWeight(5);
         isBomb ? setColor("green") : setColor("red");
         line(
