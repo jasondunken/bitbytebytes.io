@@ -1,3 +1,16 @@
+import { Player, DemoPlayer } from "./modules/player.js";
+import { Alien } from "./modules/alien.js";
+import { Item } from "./modules/item.js";
+import { Rocket } from "./modules/rocket.js";
+import { Explosion } from "./modules/explosion.js";
+import { KeyframesAnimation } from "./modules/animation.js";
+
+window.preload = preload;
+window.setup = setup;
+window.draw = draw;
+window.keyPressed = keyPressed;
+window.mousePressed = mousePressed;
+
 const GAME_WIDTH = 600;
 const GAME_HEIGHT = 400;
 
@@ -8,7 +21,7 @@ function preload() {
     let scenery = [
         {
             name: "background_1",
-            img: loadImage("./jump-to-orion/img/space.png"),
+            img: loadImage("./jump-to-orion/res/img/space.png"),
             xScroll: 0,
             xScrollSpeed: -1,
             show: true,
@@ -16,7 +29,7 @@ function preload() {
         },
         {
             name: "background_2",
-            img: loadImage("./jump-to-orion/img/planets.png"),
+            img: loadImage("./jump-to-orion/res/img/planets.png"),
             xScroll: GAME_WIDTH,
             xScrollSpeed: -2,
             show: false,
@@ -24,7 +37,7 @@ function preload() {
         },
         {
             name: "foreground_1",
-            img: loadImage("./jump-to-orion/img/debris.png"),
+            img: loadImage("./jump-to-orion/res/img/debris.png"),
             xScroll: GAME_WIDTH,
             xScrollSpeed: -5,
             show: false,
@@ -33,26 +46,26 @@ function preload() {
     ];
 
     let sprites = {};
-    sprites["player"] = loadImage("./jump-to-orion/img/sprite1.png");
-    sprites["rocket"] = loadImage("./jump-to-orion/img/rocket.png");
-    sprites["alien"] = loadImage("./jump-to-orion/img/alien.png");
-    sprites["alien-spriteSheet"] = loadImage("./jump-to-orion/img/alienStrip.png");
-    sprites["alienRocket"] = loadImage("./jump-to-orion/img/rocket-alien.png");
-    sprites["healthSML"] = loadImage("./jump-to-orion/img/healthSMLImage.png");
-    sprites["healthMED"] = loadImage("./jump-to-orion/img/healthMEDImage.png");
-    sprites["healthLRG"] = loadImage("./jump-to-orion/img/healthLRGImage.png");
-    sprites["ammo"] = loadImage("./jump-to-orion/img/ammoImage.png");
-    sprites["shield"] = loadImage("./jump-to-orion/img/shieldImage.png");
-    sprites["health_ui"] = loadImage("./jump-to-orion/img/healthImage_ui.png");
-    sprites["ammo_ui"] = loadImage("./jump-to-orion/img/ammoImage_ui.png");
-    sprites["shield_ui"] = loadImage("./jump-to-orion/img/shieldImage_ui.png");
-    sprites["explosion_0"] = loadImage("./jump-to-orion/img/explosion_0.png");
-    sprites["explosion_1"] = loadImage("./jump-to-orion/img/explosion_1.png");
-    sprites["explosion_2"] = loadImage("./jump-to-orion/img/explosion_2.png");
-    sprites["explosion_3"] = loadImage("./jump-to-orion/img/explosion_3.png");
-    sprites["explosion_4"] = loadImage("./jump-to-orion/img/explosion_4.png");
+    sprites["player"] = loadImage("./jump-to-orion/res/img/sprite1.png");
+    sprites["rocket"] = loadImage("./jump-to-orion/res/img/rocket.png");
+    sprites["alien"] = loadImage("./jump-to-orion/res/img/alien.png");
+    sprites["alien-spriteSheet"] = loadImage("./jump-to-orion/res/img/alienStrip.png");
+    sprites["alienRocket"] = loadImage("./jump-to-orion/res/img/rocket-alien.png");
+    sprites["healthSML"] = loadImage("./jump-to-orion/res/img/healthSMLImage.png");
+    sprites["healthMED"] = loadImage("./jump-to-orion/res/img/healthMEDImage.png");
+    sprites["healthLRG"] = loadImage("./jump-to-orion/res/img/healthLRGImage.png");
+    sprites["ammo"] = loadImage("./jump-to-orion/res/img/ammoImage.png");
+    sprites["shield"] = loadImage("./jump-to-orion/res/img/shieldImage.png");
+    sprites["health_ui"] = loadImage("./jump-to-orion/res/img/healthImage_ui.png");
+    sprites["ammo_ui"] = loadImage("./jump-to-orion/res/img/ammoImage_ui.png");
+    sprites["shield_ui"] = loadImage("./jump-to-orion/res/img/shieldImage_ui.png");
+    sprites["explosion_0"] = loadImage("./jump-to-orion/res/img/explosion_0.png");
+    sprites["explosion_1"] = loadImage("./jump-to-orion/res/img/explosion_1.png");
+    sprites["explosion_2"] = loadImage("./jump-to-orion/res/img/explosion_2.png");
+    sprites["explosion_3"] = loadImage("./jump-to-orion/res/img/explosion_3.png");
+    sprites["explosion_4"] = loadImage("./jump-to-orion/res/img/explosion_4.png");
 
-    let font = loadFont("./jump-to-orion/font/PressStart2P.ttf");
+    let font = loadFont("./jump-to-orion/res/font/PressStart2P.ttf");
 
     game = new JumpToOrion(GAME_WIDTH, GAME_HEIGHT, scenery, sprites, font);
 }
@@ -77,6 +90,11 @@ function draw() {
 
 function mousePressed() {
     game.mousePressed({ x: mouseX, y: mouseY });
+}
+
+function keyPressed() {
+    // will be used for help/pause menus
+    return;
 }
 // p5.js functions end -------------------->
 
@@ -110,9 +128,9 @@ class JumpToOrion {
         this.sprites = sprites;
         this.font = font;
         this.titleMusic = new Audio();
-        this.titleMusic.src = "./jump-to-orion/snd/Juhani Junkala-Title Screen.wav";
+        this.titleMusic.src = "./jump-to-orion/res/snd/Juhani Junkala-Title Screen.wav";
         this.bgMusic = new Audio();
-        this.bgMusic.src = "./jump-to-orion/snd/Juhani Junkala-Level 1.wav";
+        this.bgMusic.src = "./jump-to-orion/res/snd/Juhani Junkala-Level 1.wav";
         this.bgMusic.loop = true;
     }
 
@@ -127,19 +145,19 @@ class JumpToOrion {
                             case "healthLRG":
                                 this.player.addHealth(gameObj.value);
                                 const healthSound = new Audio();
-                                healthSound.src = "./jump-to-orion/snd/health_1.wav";
+                                healthSound.src = "./jump-to-orion/res/snd/health_1.wav";
                                 healthSound.play();
                                 break;
                             case "ammo":
                                 this.player.addAmmo(gameObj.value);
                                 const reloadSound = new Audio();
-                                reloadSound.src = "./jump-to-orion/snd/reload.wav";
+                                reloadSound.src = "./jump-to-orion/res/snd/reload.wav";
                                 reloadSound.play();
                                 break;
                             case "shield":
                                 this.player.addShield(gameObj.value);
                                 const shieldChargeSound = new Audio();
-                                shieldChargeSound.src = "./jump-to-orion/snd/got_it.wav";
+                                shieldChargeSound.src = "./jump-to-orion/res/snd/got_it.wav";
                                 shieldChargeSound.play();
                                 break;
                         }
@@ -194,7 +212,7 @@ class JumpToOrion {
                         y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
                     });
                     const explosion = new Audio();
-                    explosion.src = "./jump-to-orion/snd/deep_boom.wav";
+                    explosion.src = "./jump-to-orion/res/snd/deep_boom.wav";
                     // Audio.volume = [0, 1]
                     explosion.volume = 1;
                     explosion.play();
@@ -265,7 +283,7 @@ class JumpToOrion {
                     gameObj.remove = true;
                     this.addExplosion({ x: gameObj.currentPos.x, y: gameObj.currentPos.y });
                     const explosion = new Audio();
-                    explosion.src = "./jump-to-orion/snd/deep_boom.wav";
+                    explosion.src = "./jump-to-orion/res/snd/deep_boom.wav";
                     explosion.play();
                 }
             }

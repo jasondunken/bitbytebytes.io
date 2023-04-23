@@ -1,3 +1,5 @@
+import { GameObject } from "./gameObject.js";
+
 class Rocket extends GameObject {
     constructor(initialPos, speed, size, imageRocket) {
         super("rocket", initialPos, speed, size);
@@ -18,3 +20,5 @@ class Rocket extends GameObject {
         image(this.imageRocket, this.corners.a.x, this.corners.a.y, this.size, this.size);
     }
 }
+
+export { Rocket };

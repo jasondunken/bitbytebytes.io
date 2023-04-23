@@ -1,3 +1,6 @@
+import { GameObject } from "./gameObject.js";
+import { SpriteStripAnimation } from "./animation.js";
+
 class Alien extends GameObject {
     imageAlien;
 
@@ -22,3 +25,5 @@ class Alien extends GameObject {
         image(this.animation.currentFrame, this.corners.a.x, this.corners.a.y, this.size, this.size);
     }
 }
+
+export { Alien };

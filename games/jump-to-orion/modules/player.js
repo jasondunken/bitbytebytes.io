@@ -1,3 +1,5 @@
+import { GameObject } from "./gameObject.js";
+
 class Player extends GameObject {
     imagePlayer;
 
@@ -26,7 +28,7 @@ class Player extends GameObject {
         super("player", initialPos, speed, size);
         this.imagePlayer = imagePlayer;
         this.smokeEmitter = new SmokeEmitter(this.STARTING_HEALTH / 2);
-        this.shieldSound.src = "./jump-to-orion/snd/shield_loop.wav";
+        this.shieldSound.src = "./jump-to-orion/res/snd/shield_loop.wav";
         this.shieldSound.loop = true;
     }
 
@@ -129,7 +131,7 @@ class Player extends GameObject {
             this.ammo--;
             this.fireReady = this.loadSpeed;
             const fire = new Audio();
-            fire.src = "./jump-to-orion/snd/explodemini.wav";
+            fire.src = "./jump-to-orion/res/snd/explodemini.wav";
             fire.play();
             return true;
         }
@@ -269,19 +271,19 @@ class DemoPlayer extends Player {
                 if (this.targetLocked.id === "ammo") {
                     this.addAmmo(this.targetLocked.value);
                     const reloadSound = new Audio();
-                    reloadSound.src = "./jump-to-orion/snd/reload.wav";
+                    reloadSound.src = "./jump-to-orion/res/snd/reload.wav";
                     reloadSound.play();
                 }
                 if (this.targetLocked.id === "shield") {
                     this.addShield(this.targetLocked.value);
                     const shieldChargeSound = new Audio();
-                    shieldChargeSound.src = "./jump-to-orion/snd/got_it.wav";
+                    shieldChargeSound.src = "./jump-to-orion/res/snd/got_it.wav";
                     shieldChargeSound.play();
                 }
                 if (this.targetLocked.id === "health") {
                     this.addHealth(this.targetLocked.value);
                     const healthSound = new Audio();
-                    healthSound.src = "./jump-to-orion/snd/health_1.wav";
+                    healthSound.src = "./jump-to-orion/res/snd/health_1.wav";
                     healthSound.play();
                 }
             } else {
@@ -376,3 +378,5 @@ class SmokeEmitter {
         }
     }
 }
+
+export { Player, DemoPlayer };

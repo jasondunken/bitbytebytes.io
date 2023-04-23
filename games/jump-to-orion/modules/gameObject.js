@@ -44,3 +44,5 @@ class GameObject {
         };
     }
 }
+
+export { GameObject };

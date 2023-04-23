@@ -39,3 +39,5 @@ class SpriteStripAnimation {
         return keyFrames;
     }
 }
+
+export { KeyframesAnimation, SpriteStripAnimation };

@@ -1,3 +1,5 @@
+import { GameObject } from "./gameObject.js";
+
 class Item extends GameObject {
     value;
     image;
@@ -27,3 +29,5 @@ class Item extends GameObject {
         image(this.itemImage, this.corners.a.x, this.corners.a.y, this.size, this.size);
     }
 }
+
+export { Item };

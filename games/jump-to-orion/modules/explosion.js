@@ -1,3 +1,5 @@
+import { GameObject } from "./gameObject.js";
+
 class Explosion extends GameObject {
     animation;
     life = 0;
@@ -22,3 +24,5 @@ class Explosion extends GameObject {
         image(frame, this.corners.a.x, this.corners.a.y, this.size, this.size);
     }
 }
+
+export { Explosion };
