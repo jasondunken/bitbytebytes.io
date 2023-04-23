@@ -7,4 +7,4 @@
 -   Collect resources!
 -   How long can you last?
 
-![Jump to Orion](jump-to-orion.png)
+![Jump to Orion](res/img/jump-to-orion.png)
