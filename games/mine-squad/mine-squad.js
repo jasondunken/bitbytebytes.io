@@ -2,20 +2,20 @@ import { HighScorePanel } from "./modules/highscore-panel.js";
 import { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect } from "./modules/visual-effects.js";
 import { setColor, Vec2, mousePositionToTileScreenLocation, valueToColor } from "./modules/utils.js";
 
-const GAME_WIDTH = 960;
-const GAME_HEIGHT = 540;
-
-let game = null;
-
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 window.keyPressed = keyPressed;
 window.mousePressed = mousePressed;
 
+const GAME_WIDTH = 960;
+const GAME_HEIGHT = 540;
+
+let game = null;
+
 function preload() {
     let sprites = {};
-    sprites["bomb"] = loadImage("./mine-squad/img/bomb.png");
+    sprites["bomb"] = loadImage("./mine-squad/res/img/bomb.png");
     MineSquadPlus.sprites = sprites;
 }
 

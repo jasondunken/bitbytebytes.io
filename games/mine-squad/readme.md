@@ -7,4 +7,4 @@
 -   Defuse mines with your squads!
 -   Bonus points for defusing mines!
 
-![Mine Squad Game](mine-squad.png)
+![Mine Squad Game](res/img/mine-squad.png)
