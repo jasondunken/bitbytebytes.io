@@ -132,36 +132,44 @@ class GOL {
     RESTART_DELAY = 10;
     restartTime = 0;
 
-    golCanvas = null;
     pixelAge;
 
     constructor(bounds) {
-        this.bounds = bounds;
-        this.golCanvas = createCanvas(bounds.width, bounds.height);
-        this.golCanvas.parent("p5-container");
         this.cellScale = GOL.CELL_SCALE.SMALL;
+        this.bounds = this.scaleBounds(bounds);
+        const golCanvas = createCanvas(this.bounds.width, this.bounds.height);
+        golCanvas.parent("p5-container");
         this.restart();
     }
 
     resize(bounds) {
-        resizeCanvas(Math.floor(bounds.width / this.cellScale), Math.floor(bounds.height / this.cellScale));
+        this.bounds = this.scaleBounds(bounds);
+        resizeCanvas(this.bounds.width, this.bounds.height);
         const golContainer = document.getElementById("p5-container");
         if (this.cellScale === GOL.CELL_SCALE.LARGE) {
-            golContainer.style.transform = `translate(${
-                bounds.width / this.cellScale + bounds.width / this.cellScale / 2
-            }px, ${bounds.height / this.cellScale + bounds.height / this.cellScale / 2}px) scale(${this.cellScale})`;
+            golContainer.style.transform = `
+                translate(${(this.bounds.width * this.cellScale) / 2 - this.bounds.width / 2}px, ${
+                (this.bounds.height * this.cellScale) / 2 - this.bounds.height / 2 + 5
+            }px) scale(${this.cellScale})`;
         } else {
             golContainer.style.transform = `none`;
         }
-        bounds.width = Math.floor(bounds.width / this.cellScale);
-        bounds.height = Math.floor(bounds.height / this.cellScale);
-        this.bounds = bounds;
         this.restart();
     }
 
     switchScale(bounds) {
         this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
         this.resize(bounds);
+    }
+
+    scaleBounds(bounds) {
+        const scaledBounds = {
+            width,
+            height,
+        };
+        scaledBounds.width = Math.floor(bounds.width / this.cellScale);
+        scaledBounds.height = Math.floor(bounds.height / this.cellScale);
+        return scaledBounds;
     }
 
     restart() {
@@ -280,12 +288,15 @@ class GOL {
     }
 
     randomCellSpawn(x, y) {
+        console.log("bounds: ", this.bounds);
+        console.log("mouse: ", x, "|", y);
         x = Math.floor(x / this.cellScale);
         y = Math.floor(y / this.cellScale);
+        console.log("index: ", x, "|", y);
         let cellIndex = y * this.bounds.width + x;
         for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
             for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
-                const index = cellIndex + i + j * this.bounds.width;
+                const index = cellIndex + i * this.bounds.width + j;
                 if (index > 0 && index < this.pixelAge.length) {
                     this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
                 }

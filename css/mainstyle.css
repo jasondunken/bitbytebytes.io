@@ -37,16 +37,16 @@ body {
     margin-top: -10px;
 }
 
-canvas {
-    background-color: antiquewhite;
-    image-rendering: pixelated;
-}
-
 .game-of-life {
     position: absolute;
     top: 0;
     left: 0;
     z-index: -1;
+}
+
+canvas {
+    background-color: antiquewhite;
+    image-rendering: pixelated;
 }
 
 .main {
