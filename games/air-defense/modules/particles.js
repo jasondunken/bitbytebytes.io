@@ -1,10 +1,13 @@
+import { GameObject } from "./game-object.js";
+import { setColor } from "./utils.js";
+
 class Explosion extends GameObject {
     duration = 30;
     MAX_RADIUS = 25;
     constructor(position) {
         super("explosion", position);
         const sound = new Audio();
-        sound.src = "./air-defense/snd/explosion_1.wav";
+        sound.src = "./air-defense/res/snd/explosion_1.wav";
         sound.play();
     }
 
@@ -115,3 +118,5 @@ class Particle {
         point(this.pos.x, this.pos.y);
     }
 }
+
+export { Explosion, Splatter, ParticleEmitter };

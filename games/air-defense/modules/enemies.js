@@ -1,3 +1,7 @@
+import { GameObject } from "./game-object.js";
+import { Animation } from "./animation.js";
+import { setColor } from "./utils.js";
+
 class EnemyAircraft extends GameObject {
     MAX_HEALTH = 10;
     MOVE_SPEED = 5.5;
@@ -241,3 +245,5 @@ class Paratrooper extends GameObject {
         this.currentAnimation = this.animations.get("parachuting");
     }
 }
+
+export { EnemyAircraft, Bomb, AirborneTransport, Paratrooper };

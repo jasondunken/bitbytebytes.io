@@ -1,32 +1,41 @@
+import { Turret } from "./modules/turret.js";
+import { EnemyAircraft, AirborneTransport, Paratrooper, Bomb } from "./modules/enemies.js";
+import { Explosion, Splatter } from "./modules/particles.js";
+import { setColor } from "./modules/utils.js";
+
+window.preload = preload;
+window.setup = setup;
+window.draw = draw;
+
 let WIDTH = 600;
 let HEIGHT = 400;
 
 let game = null;
 
-const GameState = {
+const GAME_STATE = Object.freeze({
     HIGH_SCORE: 0,
     DEMO: 1,
     PLAY: 2,
-};
+});
 
 function preload() {
     const sprites = [];
     const turretBlocks = [];
-    sprites["paratrooper"] = loadImage("./air-defense/img/paratrooper.png");
-    sprites["background"] = loadImage("./air-defense/img/background.png");
-    sprites["foreground"] = loadImage("./air-defense/img/foreground.png");
-    sprites["blue_1_1_L"] = loadImage("./air-defense/img/blue_1_1_L.png");
-    sprites["blue_1_2_L"] = loadImage("./air-defense/img/blue_1_2_L.png");
-    sprites["blue_1_1_R"] = loadImage("./air-defense/img/blue_1_1_R.png");
-    sprites["blue_1_2_R"] = loadImage("./air-defense/img/blue_1_2_R.png");
-    sprites["airborne_left"] = loadImage("./air-defense/img/airborne_left.png");
-    sprites["airborne_right"] = loadImage("./air-defense/img/airborne_right.png");
-    turretBlocks["red-block"] = loadImage("./air-defense/img/redblock.png");
-    turretBlocks["green-block"] = loadImage("./air-defense/img/greenblock.png");
-    turretBlocks["generator"] = loadImage("./air-defense/img/generator.png");
-    turretBlocks["ammo-crate-500"] = loadImage("./air-defense/img/ammo_crate_500.png");
+    sprites["paratrooper"] = loadImage("./air-defense/res/img/paratrooper.png");
+    sprites["background"] = loadImage("./air-defense/res/img/background.png");
+    sprites["foreground"] = loadImage("./air-defense/res/img/foreground.png");
+    sprites["blue_1_1_L"] = loadImage("./air-defense/res/img/blue_1_1_L.png");
+    sprites["blue_1_2_L"] = loadImage("./air-defense/res/img/blue_1_2_L.png");
+    sprites["blue_1_1_R"] = loadImage("./air-defense/res/img/blue_1_1_R.png");
+    sprites["blue_1_2_R"] = loadImage("./air-defense/res/img/blue_1_2_R.png");
+    sprites["airborne_left"] = loadImage("./air-defense/res/img/airborne_left.png");
+    sprites["airborne_right"] = loadImage("./air-defense/res/img/airborne_right.png");
+    turretBlocks["red-block"] = loadImage("./air-defense/res/img/redblock.png");
+    turretBlocks["green-block"] = loadImage("./air-defense/res/img/greenblock.png");
+    turretBlocks["generator"] = loadImage("./air-defense/res/img/generator.png");
+    turretBlocks["ammo-crate-500"] = loadImage("./air-defense/res/img/ammo_crate_500.png");
 
-    let font = loadFont("./bug-dug/font/PressStart2P.ttf");
+    let font = loadFont("./air-defense/res/font/PressStart2P.ttf");
 
     game = new AirDefense(WIDTH, HEIGHT, sprites, turretBlocks, font);
 }
@@ -55,7 +64,7 @@ class AirDefense {
     sprites = [];
     font = null;
 
-    gameState = GameState.DEMO;
+    gameState = GAME_STATE.DEMO;
     gameObjects = [];
     score = 0;
 
@@ -76,14 +85,14 @@ class AirDefense {
             { x: this.width / 2, y: this.height - this.GROUND_HEIGHT },
             this.turretBlocks
         );
-        this.gameState = GameState.DEMO;
+        this.gameState = GAME_STATE.DEMO;
         this.startGame();
     }
 
     start1Player() {
         this.inDemo = false;
         this.turret = new Turret(this, { x: this.width / 2, y: this.height - this.GROUND_HEIGHT }, this.turretBlocks);
-        this.gameState = GameState.PLAY;
+        this.gameState = GAME_STATE.PLAY;
         this.startGame();
     }
 
@@ -310,15 +319,4 @@ class AirDefense {
             gameObj.position.y < -32
         );
     }
-}
-
-class GameObject {
-    constructor(type, position) {
-        this.type = type;
-        this.position = position;
-        this.dead = false;
-    }
-
-    update() {}
-    render() {}
 }

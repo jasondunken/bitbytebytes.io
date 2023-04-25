@@ -1,3 +1,7 @@
+import { GameObject } from "./game-object.js";
+import { Animation } from "./animation.js";
+import { setColor } from "./utils.js";
+
 class Turret {
     MAX_AMMO = 10000;
     HALF_BASE_WIDTH = 50;
@@ -66,7 +70,7 @@ class Turret {
             this.reloadTimer = this.RELOAD_TIME;
             this.ammo--;
             const sound = new Audio();
-            sound.src = "./air-defense/snd/fire_1.wav";
+            sound.src = "./air-defense/res/snd/fire_1.wav";
             sound.play();
             this.game.gameObjects.add(
                 new Bullet(
@@ -241,3 +245,5 @@ class Core extends GameObject {
         image(this.animation.currentFrame, this.position.x, this.position.y, this.width, this.height);
     }
 }
+
+export { Turret, AmmoCrate };
