@@ -9,4 +9,4 @@
 -   Endless waves!
 -   Protect the battery!
 
-![Air Defense](air-defense.png)
+![Air Defense](res/img/air-defense.png)
