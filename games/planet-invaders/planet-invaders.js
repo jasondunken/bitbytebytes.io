@@ -1,3 +1,11 @@
+import { LevelLoader } from "./modules/levelLoader.js";
+import { Player, DemoPlayer, Shot } from "./modules/player.js";
+import { WORLD } from "./modules/levels.js";
+import { Vec2 } from "./modules/utils.js";
+
+window.setup = setup;
+window.draw = draw;
+
 const GAME_WIDTH = 512; // 32 x 16px
 const GAME_HEIGHT = 400; // 25 x 16px
 

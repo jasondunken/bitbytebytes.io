@@ -26,3 +26,5 @@ class Bonus {
         }
     }
 }
+
+export { Bonus };

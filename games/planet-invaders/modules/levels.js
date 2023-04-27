@@ -29,10 +29,10 @@ const WORLD = {
             ],
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
-                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                spriteSheetPath: "./planet-invaders/res/img/sprite_sheet_2.png",
                 color: "0x00ff00ff",
             },
-            backgroundImage: "./planet-invaders/img/bg.png",
+            backgroundImage: "./planet-invaders/res/img/bg.png",
         },
 
         level_2: {
@@ -53,10 +53,10 @@ const WORLD = {
             ],
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
-                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                spriteSheetPath: "./planet-invaders/res/img/sprite_sheet_2.png",
                 color: "0x00ffffff",
             },
-            backgroundImage: "./planet-invaders/img/bg.png",
+            backgroundImage: "./planet-invaders/res/img/bg.png",
         },
 
         level_3: {
@@ -77,10 +77,10 @@ const WORLD = {
             ],
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
-                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                spriteSheetPath: "./planet-invaders/res/img/sprite_sheet_2.png",
                 color: "0xffff00ff",
             },
-            backgroundImage: "./planet-invaders/img/bg.png",
+            backgroundImage: "./planet-invaders/res/img/bg.png",
         },
         level_4: {
             map: [
@@ -100,10 +100,10 @@ const WORLD = {
             ],
             spriteSheetData: {
                 names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
-                spriteSheetPath: "./planet-invaders/img/sprite_sheet_2.png",
+                spriteSheetPath: "./planet-invaders/res/img/sprite_sheet_2.png",
                 color: "0xff0000ff",
             },
-            backgroundImage: "./planet-invaders/img/bg_2.png",
+            backgroundImage: "./planet-invaders/res/img/bg_2.png",
         },
         level_5: {
             map: [
@@ -123,10 +123,12 @@ const WORLD = {
             ],
             spriteSheetData: {
                 names: ["ship", "alien_1", "alien_2", "alien_3", "alien_4", "bonus", "barrier"],
-                spriteSheetPath: "./planet-invaders/img/sprite_sheet_3.png",
+                spriteSheetPath: "./planet-invaders/res/img/sprite_sheet_3.png",
                 color: "0xffffffff",
             },
-            backgroundImage: "./planet-invaders/img/bg_3.png",
+            backgroundImage: "./planet-invaders/res/img/bg_3.png",
         },
     },
 };
+
+export { WORLD };

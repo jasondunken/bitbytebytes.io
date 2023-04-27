@@ -1,3 +1,9 @@
+import { WORLD } from "./levels.js";
+import { Alien } from "./alien.js";
+import { Bonus } from "./bonus.js";
+import { Vec2 } from "./utils.js";
+import { SpriteLoader } from "./spriteLoader.js";
+
 class LevelLoader {
     async initializeLevel(level, player, display) {
         const levelData = WORLD.LEVELS[level];
@@ -46,3 +52,5 @@ class LevelLoader {
         };
     }
 }
+
+export { LevelLoader };

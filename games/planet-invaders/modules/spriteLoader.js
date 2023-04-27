@@ -56,3 +56,5 @@ class SpriteLoader {
         });
     }
 }
+
+export { SpriteLoader };

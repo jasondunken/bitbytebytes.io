@@ -1,3 +1,6 @@
+import { WORLD } from "./levels.js";
+import { Vec2 } from "./utils.js";
+
 class GameObject {
     constructor(type, position, size) {
         this.type = type ? type : "none";
@@ -109,3 +112,5 @@ class Shot extends GameObject {
         line(this.position.x, this.position.y, this.position.x, this.position.y + this.size);
     }
 }
+
+export { GameObject, Player, DemoPlayer, Shot };

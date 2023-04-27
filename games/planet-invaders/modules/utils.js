@@ -25,3 +25,5 @@ class Vec2 {
         this.y *= value;
     }
 }
+
+export { Vec2 };

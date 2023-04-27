@@ -1,3 +1,6 @@
+import { GameObject } from "./player.js";
+import { WORLD } from "./levels.js";
+
 class Alien extends GameObject {
     delta = 0;
     yRange = 2;
@@ -27,3 +30,5 @@ class Alien extends GameObject {
         }
     }
 }
+
+export { Alien };

@@ -8,4 +8,4 @@
 -   You only have one life!
 -   High-scores coming soon!
 
-![Planet Invaders](planet-invaders.png)
+![Planet Invaders](res/img/planet-invaders.png)

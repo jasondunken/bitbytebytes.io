@@ -34,3 +34,5 @@ class BarrierBlock {
         this.position = position;
     }
 }
+
+export { Barrier };
