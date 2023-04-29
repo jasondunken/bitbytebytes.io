@@ -288,11 +288,8 @@ class GOL {
     }
 
     randomCellSpawn(x, y) {
-        console.log("bounds: ", this.bounds);
-        console.log("mouse: ", x, "|", y);
         x = Math.floor(x / this.cellScale);
         y = Math.floor(y / this.cellScale);
-        console.log("index: ", x, "|", y);
         let cellIndex = y * this.bounds.width + x;
         for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
             for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
