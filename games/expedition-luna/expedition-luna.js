@@ -1,3 +1,9 @@
+import { pointOnLine, Vec2 } from "./modules/utils.js";
+
+window.preload = preload;
+window.setup = setup;
+window.draw = draw;
+
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 768;
 
@@ -5,7 +11,7 @@ let game = null;
 
 // p5.js functions ------------------------>
 function preload() {
-    let font = loadFont("./expedition-luna/font/PressStart2P.ttf");
+    let font = loadFont("./expedition-luna/res/font/PressStart2P.ttf");
     game = new ExpeditionLuna(GAME_WIDTH, GAME_HEIGHT, font);
 }
 

@@ -37,3 +37,5 @@ class Vec2 {
         return new Vec2(0, 0);
     }
 }
+
+export { pointOnLine, dist, Vec2 };
