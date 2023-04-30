@@ -1,3 +1,6 @@
+import { GameObject } from "./gameObject.js";
+import { LevelArchitect } from "./levelArchitect.js";
+
 class Block extends GameObject {
     solid = true;
     sprite;
@@ -64,3 +67,5 @@ class Block extends GameObject {
         }
     }
 }
+
+export { Block };

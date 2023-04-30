@@ -1,3 +1,6 @@
+import { GameObject } from "./gameObject.js";
+import { Animation } from "./animation.js";
+
 class Item extends GameObject {
     static SIZE = 16;
     collected = false;
@@ -60,3 +63,5 @@ class Door extends GameObject {
         this.sprite = sprite;
     }
 }
+
+export { Item, Chest, Coin, Key, Door };

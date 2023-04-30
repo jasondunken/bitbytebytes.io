@@ -1,3 +1,6 @@
+import { GameObject } from "./gameObject.js";
+import { Vec2 } from "./utils.js";
+
 class Particle {
     constructor(position, velocity, size, life) {
         this.position = position;
@@ -80,3 +83,5 @@ class ParticleEmitter extends GameObject {
         });
     }
 }
+
+export { ParticleEmitter };

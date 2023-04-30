@@ -31,3 +31,5 @@ class Animation {
         return keyFrames;
     }
 }
+
+export { Animation };

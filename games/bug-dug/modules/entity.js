@@ -1,3 +1,6 @@
+import { GameObject } from "./gameObject.js";
+import { Vec2, getAdjacentBlocks } from "./utils.js";
+
 class Entity extends GameObject {
     width = 32;
     height = 32;
@@ -118,3 +121,5 @@ class Entity extends GameObject {
         }
     }
 }
+
+export { Entity };

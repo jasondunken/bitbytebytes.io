@@ -1,3 +1,8 @@
+import { Entity } from "./entity.js";
+import { Animation } from "./animation.js";
+import { ParticleEmitter } from "./particle.js";
+import { Vec2, getBlockAtPosition } from "./utils.js";
+
 class Player extends Entity {
     static STATE = Object.freeze({
         IDLE: "idle",
@@ -108,10 +113,10 @@ class Player extends Entity {
 
     static loadSpriteSheets() {
         let spriteSheets = {};
-        spriteSheets["idle"] = loadImage("./bug-dug/img/animations/big_mushroom_idle.png");
-        spriteSheets["walk-left"] = loadImage("./bug-dug/img/animations/big_mushroom_walk_left.png");
-        spriteSheets["walk-right"] = loadImage("./bug-dug/img/animations/big_mushroom_walk_right.png");
-        spriteSheets["mining"] = loadImage("./bug-dug/img/animations/big_mushroom_idle.png");
+        spriteSheets["idle"] = loadImage("./bug-dug/res/img/animations/big_mushroom_idle.png");
+        spriteSheets["walk-left"] = loadImage("./bug-dug/res/img/animations/big_mushroom_walk_left.png");
+        spriteSheets["walk-right"] = loadImage("./bug-dug/res/img/animations/big_mushroom_walk_right.png");
+        spriteSheets["mining"] = loadImage("./bug-dug/res/img/animations/big_mushroom_idle.png");
         return spriteSheets;
     }
 }
@@ -121,3 +126,5 @@ class DemoPlayer extends Player {
         super(spriteSheets);
     }
 }
+
+export { Player, DemoPlayer };

@@ -1,3 +1,16 @@
+import { Player, DemoPlayer } from "./modules/player.js";
+import { Enemy } from "./modules/enemies.js";
+import { LEVELS } from "./modules/levels.js";
+import { LevelArchitect } from "./modules/levelArchitect.js";
+import { Animation } from "./modules/animation.js";
+import { clearForegroundAround, getGridIndex, getBlockAbove } from "./modules/utils.js";
+
+window.preload = preload;
+window.setup = setup;
+window.draw = draw;
+// window.keyPressed = keyPressed;
+// window.mousePressed = mousePressed;
+
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 768;
 
@@ -9,7 +22,7 @@ function preload() {
     let playerSprites = Player.loadSpriteSheets();
     let enemySprites = Enemy.loadSpriteSheets();
 
-    let font = loadFont("./bug-dug/font/PressStart2P.ttf");
+    let font = loadFont("./bug-dug/res/font/PressStart2P.ttf");
 
     game = new BugDug(GAME_WIDTH, GAME_HEIGHT, blockSprites, playerSprites, enemySprites, font);
 }
@@ -209,7 +222,7 @@ class BugDug {
         this.level = new LevelArchitect(
             this.width,
             this.height,
-            levels[this.currentLevel],
+            LEVELS[this.currentLevel],
             this.blockSprites,
             this.enemySprites
         );

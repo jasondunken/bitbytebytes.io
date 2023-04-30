@@ -1,4 +1,4 @@
-const levels = [
+export const LEVELS = [
     {
         playerSpawn: { x: 50, y: 100 },
         numEnemies: 3,

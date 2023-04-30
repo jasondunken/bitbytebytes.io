@@ -28,3 +28,5 @@ class GameObject {
         this.updateCollider();
     }
 }
+
+export { GameObject };

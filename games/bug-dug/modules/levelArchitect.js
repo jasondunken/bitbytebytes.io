@@ -1,3 +1,8 @@
+import { Vec2 } from "./utils.js";
+import { Block } from "./blocks.js";
+import { Chest, Item, Coin, Key, Door } from "./item.js";
+import { Enemy } from "./enemies.js";
+
 class LevelArchitect {
     BLOCK_SIZE = 32;
     blocks = [];
@@ -215,40 +220,42 @@ class LevelArchitect {
 
     static loadSprites() {
         let sprites = {};
-        sprites["grass_3"] = loadImage("./bug-dug/img/block_grass_3.png");
-        sprites["dirt_3_0"] = loadImage("./bug-dug/img/block_dirt_3_0.png");
-        sprites["dirt_3_1"] = loadImage("./bug-dug/img/block_dirt_3_1.png");
-        sprites["dirt_3_2"] = loadImage("./bug-dug/img/block_dirt_3_2.png");
-        sprites["dirt"] = loadImage("./bug-dug/img/block_dirt.png");
-        sprites["clay"] = loadImage("./bug-dug/img/block_clay.png");
-        sprites["sand"] = loadImage("./bug-dug/img/block_sand.png");
-        sprites["stone"] = loadImage("./bug-dug/img/block_stone.png");
-        sprites["bedrock"] = loadImage("./bug-dug/img/block_bedrock.png");
-        sprites["nether"] = loadImage("./bug-dug/img/block_nether.png");
-        sprites["cave_floor_1"] = loadImage("./bug-dug/img/cave_floor_1.png");
-        sprites["cave_floor_2"] = loadImage("./bug-dug/img/cave_floor_2.png");
-        sprites["cave_floor_3"] = loadImage("./bug-dug/img/cave_floor_3.png");
-        sprites["cave_floor_4"] = loadImage("./bug-dug/img/cave_floor_4.png");
-        sprites["cave_floor_5"] = loadImage("./bug-dug/img/cave_floor_5.png");
-        sprites["cave_floor_6"] = loadImage("./bug-dug/img/cave_floor_6.png");
-        sprites["cave_wall"] = loadImage("./bug-dug/img/cave_wall.png");
-        sprites["cave_wall_L"] = loadImage("./bug-dug/img/cave_wall_L.png");
-        sprites["cave_wall_R"] = loadImage("./bug-dug/img/cave_wall_R.png");
-        sprites["cave_wall_top_1"] = loadImage("./bug-dug/img/cave_wall_top_1.png");
-        sprites["cave_wall_top_2"] = loadImage("./bug-dug/img/cave_wall_top_2.png");
-        sprites["cave_wall_top_3"] = loadImage("./bug-dug/img/cave_wall_top_3.png");
-        sprites["cave_wall_top_4"] = loadImage("./bug-dug/img/cave_wall_top_4.png");
-        sprites["cave_wall_top_5"] = loadImage("./bug-dug/img/cave_wall_top_5.png");
-        sprites["cave_wall_top_6"] = loadImage("./bug-dug/img/cave_wall_top_6.png");
-        sprites["background-wall"] = loadImage("./bug-dug/img/background_wall.png");
-        sprites["background-ladder"] = loadImage("./bug-dug/img/background_ladder.png");
-        sprites["chest"] = loadImage("./bug-dug/img/chest.png");
-        sprites["chest_sm"] = loadImage("./bug-dug/img/chest_sm.png");
-        sprites["door"] = loadImage("./bug-dug/img/door.png");
-        sprites["door-locked"] = loadImage("./bug-dug/img/door_locked.png");
-        sprites["white-key"] = loadImage("./bug-dug/img/animations/White_Key.png");
-        sprites["coin-gold"] = loadImage("./bug-dug/img/animations/coin_gold.png");
-        sprites["block-damage"] = loadImage("./bug-dug/img/animations/block_damage.png");
+        sprites["grass_3"] = loadImage("./bug-dug/res/img/block_grass_3.png");
+        sprites["dirt_3_0"] = loadImage("./bug-dug/res/img/block_dirt_3_0.png");
+        sprites["dirt_3_1"] = loadImage("./bug-dug/res/img/block_dirt_3_1.png");
+        sprites["dirt_3_2"] = loadImage("./bug-dug/res/img/block_dirt_3_2.png");
+        sprites["dirt"] = loadImage("./bug-dug/res/img/block_dirt.png");
+        sprites["clay"] = loadImage("./bug-dug/res/img/block_clay.png");
+        sprites["sand"] = loadImage("./bug-dug/res/img/block_sand.png");
+        sprites["stone"] = loadImage("./bug-dug/res/img/block_stone.png");
+        sprites["bedrock"] = loadImage("./bug-dug/res/img/block_bedrock.png");
+        sprites["nether"] = loadImage("./bug-dug/res/img/block_nether.png");
+        sprites["cave_floor_1"] = loadImage("./bug-dug/res/img/cave_floor_1.png");
+        sprites["cave_floor_2"] = loadImage("./bug-dug/res/img/cave_floor_2.png");
+        sprites["cave_floor_3"] = loadImage("./bug-dug/res/img/cave_floor_3.png");
+        sprites["cave_floor_4"] = loadImage("./bug-dug/res/img/cave_floor_4.png");
+        sprites["cave_floor_5"] = loadImage("./bug-dug/res/img/cave_floor_5.png");
+        sprites["cave_floor_6"] = loadImage("./bug-dug/res/img/cave_floor_6.png");
+        sprites["cave_wall"] = loadImage("./bug-dug/res/img/cave_wall.png");
+        sprites["cave_wall_L"] = loadImage("./bug-dug/res/img/cave_wall_L.png");
+        sprites["cave_wall_R"] = loadImage("./bug-dug/res/img/cave_wall_R.png");
+        sprites["cave_wall_top_1"] = loadImage("./bug-dug/res/img/cave_wall_top_1.png");
+        sprites["cave_wall_top_2"] = loadImage("./bug-dug/res/img/cave_wall_top_2.png");
+        sprites["cave_wall_top_3"] = loadImage("./bug-dug/res/img/cave_wall_top_3.png");
+        sprites["cave_wall_top_4"] = loadImage("./bug-dug/res/img/cave_wall_top_4.png");
+        sprites["cave_wall_top_5"] = loadImage("./bug-dug/res/img/cave_wall_top_5.png");
+        sprites["cave_wall_top_6"] = loadImage("./bug-dug/res/img/cave_wall_top_6.png");
+        sprites["background-wall"] = loadImage("./bug-dug/res/img/background_wall.png");
+        sprites["background-ladder"] = loadImage("./bug-dug/res/img/background_ladder.png");
+        sprites["chest"] = loadImage("./bug-dug/res/img/chest.png");
+        sprites["chest_sm"] = loadImage("./bug-dug/res/img/chest_sm.png");
+        sprites["door"] = loadImage("./bug-dug/res/img/door.png");
+        sprites["door-locked"] = loadImage("./bug-dug/res/img/door_locked.png");
+        sprites["white-key"] = loadImage("./bug-dug/res/img/animations/White_Key.png");
+        sprites["coin-gold"] = loadImage("./bug-dug/res/img/animations/coin_gold.png");
+        sprites["block-damage"] = loadImage("./bug-dug/res/img/animations/block_damage.png");
         return sprites;
     }
 }
+
+export { LevelArchitect };
