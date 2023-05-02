@@ -40,4 +40,11 @@ function mousePositionToTileScreenLocation(position, tileSize, offset) {
     return [x, y];
 }
 
-export { setColor, Vec2, mousePositionToTileScreenLocation, valueToColor };
+function tileIndexToTileCenter(tileIndex, tileHeight, tilesPerRow, xOffset) {
+    return new Vec2(
+        (tileIndex % tilesPerRow) * tileHeight + xOffset + tileHeight / 2,
+        Math.floor(tileIndex / tilesPerRow) * tileHeight
+    );
+}
+
+export { setColor, valueToColor, Vec2, mousePositionToTileScreenLocation, tileIndexToTileCenter };

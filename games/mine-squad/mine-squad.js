@@ -1,6 +1,12 @@
 import { HighScorePanel } from "./modules/highscore-panel.js";
 import { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect } from "./modules/visual-effects.js";
-import { setColor, Vec2, mousePositionToTileScreenLocation, valueToColor } from "./modules/utils.js";
+import {
+    setColor,
+    Vec2,
+    mousePositionToTileScreenLocation,
+    valueToColor,
+    tileIndexToTileCenter,
+} from "./modules/utils.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -677,9 +683,15 @@ class MineSquadPlus {
 
     defuseWithinRadius(tileIndex) {
         this.board[tileIndex].hidden = false;
+        const position = tileIndexToTileCenter(tileIndex, this.TILE_HEIGHT, this.TILES_PER_ROW, this.BOARD_X_OFFSET);
         if (this.board[tileIndex].bomb) {
+            this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
             this.score += this.DEFUSE_BONUS;
+        } else if (this.board[tileIndex].value > 0) {
+            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS));
+            this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
         }
+
         const damage = this.getNeighbors(tileIndex);
         damage.push(tileIndex + 2);
         damage.push(tileIndex - 2);
@@ -693,12 +705,18 @@ class MineSquadPlus {
                     tile.hidden = false;
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
-                        const position = new Vec2(
-                            (damage[i] % this.TILES_PER_ROW) * this.TILE_HEIGHT +
-                                this.BOARD_X_OFFSET +
-                                this.TILE_HEIGHT / 2,
-                            Math.floor(damage[i] / this.TILES_PER_ROW) * this.TILE_HEIGHT
+                        const position = tileIndexToTileCenter(
+                            damage[i],
+                            this.TILE_HEIGHT,
+                            this.TILES_PER_ROW,
+                            this.BOARD_X_OFFSET
                         );
+                        // const position = new Vec2(
+                        //     (damage[i] % this.TILES_PER_ROW) * this.TILE_HEIGHT +
+                        //         this.BOARD_X_OFFSET +
+                        //         this.TILE_HEIGHT / 2,
+                        //     Math.floor(damage[i] / this.TILES_PER_ROW) * this.TILE_HEIGHT
+                        // );
                         this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
                         this.score += this.DEFUSE_BONUS;
                     }
