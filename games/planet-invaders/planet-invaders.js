@@ -1,8 +1,7 @@
-import { LevelLoader } from "./modules/levelLoader.js";
-import { Player, DemoPlayer, Shot } from "./modules/player.js";
-import { WORLD } from "./modules/levels.js";
-import { Vec2 } from "./modules/utils.js";
+import { Level } from "./modules/level.js";
+import { Scoreboard } from "./modules/scoreboard.js";
 
+window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 
@@ -10,6 +9,10 @@ const GAME_WIDTH = 512; // 32 x 16px
 const GAME_HEIGHT = 400; // 25 x 16px
 
 let game = null;
+
+function preload() {
+    SpriteLoader.loadSprites();
+}
 
 function setup() {
     let canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
@@ -22,7 +25,6 @@ function setup() {
 
 function initGame() {
     game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT);
-    game.startDemo();
 }
 
 function draw() {
@@ -36,201 +38,85 @@ class PlanetInvaders {
         this.start1Player();
     });
     SCOREBOARD_HEIGHT = 48;
-    display = null;
 
     START_DELAY = 60;
+    DEMO_RESTART_DELAY = 1800;
 
     STARTING_LIVES = 3;
     DEMO_STARTING_LIVES = 1;
-    isDemo = true;
 
-    currentLives = 0;
+    GAME_STATE = Object.freeze({
+        STARTING: "STARTING",
+        HELP: "HELP",
+        LEVEL_STARTING: "LEVEL_STARTING",
+        PLAYING: "PLAYING",
+        ENDING: "ENDING",
+        GAME_OVER: "GAME_OVER",
+    });
+    currentState = this.GAME_STATE.GAME_OVER;
+
+    gameOverTime = 0;
+
+    lives = 0;
     score = 0;
-    gameOver = true;
-
-    levels = Object.keys(WORLD.LEVELS);
-    currentLevel = this.levels[0];
-    levelLoader = new LevelLoader();
-    level = null;
-    levelTime = 0;
-
-    player = null;
-    aliens = null;
-    shots = null;
 
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.display = { width, height, scoreboardHeight: this.SCOREBOARD_HEIGHT };
+        this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
+        this.level = new Level(width, height);
+        this.startDemo();
     }
 
     startDemo() {
         this.isDemo = true;
-        this.player = new DemoPlayer(this);
-        this.currentLives = this.DEMO_STARTING_LIVES;
+        this.lives = this.DEMO_STARTING_LIVES;
         this.startGame();
     }
 
     start1Player() {
         this.isDemo = false;
-        this.player = new Player(this);
-        this.currentLives = this.STARTING_LIVES;
+        this.lives = this.STARTING_LIVES;
         this.startGame();
     }
 
     startGame() {
+        this.currentState = this.GAME_STATE.STARTING;
         this.score = 0;
-        this.gameOver = false;
-        this.loadLevel(this.currentLevel);
+        this.level.start();
+        this.currentState = this.GAME_STATE.PLAYING;
+    }
+
+    endGame() {
+        this.gameOverTime = 0;
+        this.currentState = this.GAME_STATE.GAME_OVER;
     }
 
     update() {
-        if (this.level) {
-            if (!this.gameOver) {
-                this.levelTime++;
-                if (this.levelTime < this.START_DELAY) return;
-
-                this.player.update();
-
-                this.shots = Array.from(this.level.gameObjects).filter((gameObj) => {
-                    return gameObj.type === "shot";
-                });
-
-                this.aliens = Array.from(this.level.gameObjects).filter((gameObj) => {
-                    return gameObj.type === "alien";
-                });
-
-                let moveDown = false;
-                this.level.gameObjects.forEach((gameObj) => {
-                    gameObj.update();
-                    if (this.outOfBounds(gameObj) || gameObj.remove) {
-                        this.level.gameObjects.delete(gameObj);
-                    }
-                    if (gameObj.type != "shot") {
-                        this.shots.forEach((shot) => {
-                            if (this.shotCollision(shot, gameObj)) {
-                                this.score += 10;
-                                this.level.alienCount--;
-                                shot.remove = true;
-                                gameObj.remove = true;
-                            }
-                        });
-                    }
-                    if (gameObj.type === "alien") {
-                        if (gameObj.position.x < gameObj.size / 2 || gameObj.position.x > this.width - gameObj.size / 2)
-                            moveDown = true;
-                    }
-                });
-                if (moveDown) {
-                    this.level.gameObjects.forEach((gameObj) => {
-                        if (gameObj.type === "alien") {
-                            gameObj.moveDown();
-                        }
-                    });
-                }
-
-                if (frameCount % 120 === 0) {
-                    for (let i = 0; i < 3; i++) {
-                        if (Math.random() >= 0.5) {
-                            const alienIndex = Math.floor(Math.random() * this.aliens.length);
-                            const alien = this.aliens[alienIndex];
-                            this.level.gameObjects.add(
-                                new Shot(new Vec2(alien.position.x, alien.position.y), Vec2.DOWN)
-                            );
-                        }
-                    }
-                }
-
-                if (this.level.alienCount <= 0) {
-                    this.currentLevel = this.levels[(this.levels.indexOf(this.currentLevel) + 1) % this.levels.length];
-                    this.loadLevel(this.currentLevel);
-                }
-
-                this.level.bonus.update();
-                this.shots.forEach((shot) => {
-                    if (this.shotCollision(shot, this.level.bonus)) {
-                        this.score += 1000;
-                        shot.remove = true;
-                        this.level.bonus.active = false;
-                    }
-                    if (this.shotCollision(shot, this.player)) {
-                        this.gameOver = true;
-                    }
-                });
-                if (
-                    (this.level.bonus.position.x < this.level.bonus.size) & -2 ||
-                    this.level.bonus.position.x > this.width + this.level.bonus.size * 2
-                ) {
-                    this.level.bonus.active = false;
-                }
-                if (frameCount % this.level.bonus.interval === 0) {
-                    this.level.bonus.reset(
-                        Math.random() > 0.5 ? -this.level.bonus.size : this.width + this.level.bonus.size
-                    );
-                }
-            } else {
-                // game over update
+        if (this.currentState === this.GAME_STATE.GAME_OVER) {
+            this.gameOverTime++;
+            if (this.gameOverTime >= this.DEMO_RESTART_DELAY) {
+                this.startDemo();
             }
+        }
+
+        if (this.currentState === this.GAME_STATE.PLAYING) {
+            this.level.update();
+            if (this.lives <= 0) this.endGame();
         }
     }
 
     render() {
-        if (this.level) {
-            background(this.level.backgroundImage);
+        this.level.render();
+        this.scoreboard.render(this.score, this.lives);
 
-            this.level.gameObjects.forEach((gameObj) => {
-                gameObj.render();
-            });
-            this.player.render();
-            this.level.bonus.render();
-
-            if (this.gameOver) {
-                stroke("white");
-                strokeWeight(4);
-                fill("blue");
-                textSize(32);
-                textAlign(CENTER);
-                text(`GAME OVER`, width / 2, height / 2);
-            }
-
-            // RENDER UI
+        if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");
-            strokeWeight(2);
+            strokeWeight(4);
             fill("blue");
-            textSize(18);
-            textAlign(LEFT);
-            text(`SCORE ${this.score}`, 24, 22);
-
-            for (let i = 0; i < this.currentLives; i++) {
-                image(this.player.sprite, width - 48 - i * 32, 0, 32, 32);
-            }
+            textSize(32);
+            textAlign(CENTER);
+            text(`GAME OVER`, this.width / 2, this.height / 2);
         }
-    }
-
-    async loadLevel(level) {
-        this.level = await this.levelLoader.initializeLevel(level, this.player, this.display);
-        this.levelTime = 0;
-    }
-
-    outOfBounds(gameObj) {
-        if (
-            gameObj.position.x < 0 - gameObj.size ||
-            gameObj.position.y < 0 - gameObj.size ||
-            gameObj.position.x > this.width + gameObj.size ||
-            gameObj.position.y > this.height + gameObj.size
-        )
-            return true;
-        return false;
-    }
-
-    shotCollision(shot, gameObj) {
-        if (shot.direction.y > 0 && gameObj.type === "alien") return;
-        if (shot.direction.y < 0 && gameObj.type === "player") return;
-        return (
-            shot.position.x > gameObj.position.x - gameObj.size / 2 &&
-            shot.position.x < gameObj.position.x + gameObj.size / 2 &&
-            shot.position.y > gameObj.position.y - gameObj.size / 2 &&
-            shot.position.y < gameObj.position.y + gameObj.size / 2
-        );
     }
 }
