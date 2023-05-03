@@ -1,10 +1,9 @@
-import { WORLD } from "./levels.js";
-import { Vec2 } from "./utils.js";
+import { Vec2 } from "./vec2d.js";
 
 class GameObject {
     constructor(type, position, size) {
         this.type = type ? type : "none";
-        this.position = position ? position : new P5.Vector(0, 0);
+        this.position = position ? position : new Vec2(0, 0);
         this.size = size ? size : 1;
         this.remove = false;
     }
@@ -16,8 +15,8 @@ class Player extends GameObject {
     weaponReady = true;
 
     constructor(world) {
-        super("player", Vec2.ZERO, WORLD.METADATA.PLAYER_SIZE);
-        this.moveSpeed = WORLD.METADATA.PLAYER_SPEED;
+        super("player", Vec2.ZERO, world.PLAYER_SIZE);
+        this.moveSpeed = world.PLAYER_SPEED;
         this.world = world;
     }
 
@@ -66,7 +65,6 @@ class Player extends GameObject {
 class DemoPlayer extends Player {
     constructor(world) {
         super(world);
-        this.moveSpeed = WORLD.METADATA.PLAYER_SPEED;
     }
 
     update() {

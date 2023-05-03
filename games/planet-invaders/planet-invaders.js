@@ -1,4 +1,4 @@
-import { Level } from "./modules/level.js";
+import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
 
 window.preload = preload;
@@ -11,7 +11,9 @@ const GAME_HEIGHT = 400; // 25 x 16px
 let game = null;
 
 function preload() {
-    SpriteLoader.loadSprites();
+    World.loadResources();
+    let font = loadFont("./planet-invaders/res/font/PressStart2P.ttf");
+    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
 }
 
 function setup() {
@@ -24,7 +26,7 @@ function setup() {
 }
 
 function initGame() {
-    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT);
+    game.startDemo();
 }
 
 function draw() {
@@ -57,34 +59,24 @@ class PlanetInvaders {
 
     gameOverTime = 0;
 
-    lives = 0;
-    score = 0;
+    world = null;
 
-    constructor(width, height) {
+    constructor(width, height, font) {
         this.width = width;
         this.height = height;
+        //textFont(font);
         this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
-        this.level = new Level(width, height);
-        this.startDemo();
+        this.world = new World(width, height);
     }
 
     startDemo() {
-        this.isDemo = true;
-        this.lives = this.DEMO_STARTING_LIVES;
-        this.startGame();
+        this.currentState = this.GAME_STATE.STARTING;
+        this.world.start(this.DEMO_STARTING_LIVES, true);
     }
 
     start1Player() {
-        this.isDemo = false;
-        this.lives = this.STARTING_LIVES;
-        this.startGame();
-    }
-
-    startGame() {
         this.currentState = this.GAME_STATE.STARTING;
-        this.score = 0;
-        this.level.start();
-        this.currentState = this.GAME_STATE.PLAYING;
+        this.world.start(this.STARTING_LIVES.false);
     }
 
     endGame() {
@@ -101,14 +93,14 @@ class PlanetInvaders {
         }
 
         if (this.currentState === this.GAME_STATE.PLAYING) {
-            this.level.update();
-            if (this.lives <= 0) this.endGame();
+            this.world.update();
+            if (this.world.lives <= 0) this.endGame();
         }
     }
 
     render() {
-        this.level.render();
-        this.scoreboard.render(this.score, this.lives);
+        this.world.render();
+        this.scoreboard.render(this.world.score, this.world.wave, this.world.lives);
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");

@@ -1,12 +1,11 @@
 import { GameObject } from "./player.js";
-import { WORLD } from "./levels.js";
 
 class Alien extends GameObject {
     delta = 0;
     yRange = 2;
-    constructor(position, sprite) {
-        super("alien", position, WORLD.METADATA.ALIEN_SIZE);
-        this.moveSpeed = WORLD.METADATA.ALIEN_SPEED;
+    constructor(world, position, sprite) {
+        super("alien", position, world.ALIEN_SIZE);
+        this.moveSpeed = world.ALIEN_SPEED;
         this.sprite = sprite;
         this.delta = Math.random() * 2 * PI;
         this.yRange = Math.random() * this.yRange + this.yRange;
