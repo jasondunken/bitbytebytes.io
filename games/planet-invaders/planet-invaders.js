@@ -20,6 +20,8 @@ function setup() {
     let canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
 
+    textFont(game.font);
+
     frameRate(60);
     noSmooth();
     initGame();
@@ -64,7 +66,7 @@ class PlanetInvaders {
     constructor(width, height, font) {
         this.width = width;
         this.height = height;
-        //textFont(font);
+        this.font = font;
         this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
         this.world = new World(width, height);
     }
@@ -102,12 +104,17 @@ class PlanetInvaders {
         this.world.render();
         this.scoreboard.render(this.world.score, this.world.wave, this.world.lives);
 
+        textAlign(CENTER);
+        textSize(24);
+        stroke("red");
+        text("Planet Invaders", this.width / 2, this.height / 2);
+
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");
             strokeWeight(4);
             fill("blue");
-            textSize(32);
             textAlign(CENTER);
+            textSize(32);
             text(`GAME OVER`, this.width / 2, this.height / 2);
         }
     }
