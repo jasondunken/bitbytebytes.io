@@ -41,6 +41,8 @@ class BonusSquadEffect extends VisualEffect {
 
     color = "red";
 
+    repetitions = 4;
+
     constructor(position) {
         super(position);
     }
@@ -48,7 +50,12 @@ class BonusSquadEffect extends VisualEffect {
     update() {
         this.size += 5;
         if (this.size >= this.MAX_SIZE) {
-            this.done = true;
+            this.repetitions--;
+            if (this.repetitions > 0) {
+                this.size = 32;
+            } else {
+                this.done = true;
+            }
         }
     }
 

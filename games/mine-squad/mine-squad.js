@@ -692,31 +692,25 @@ class MineSquadPlus {
             this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
         }
 
-        const damage = this.getNeighbors(tileIndex);
-        damage.push(tileIndex + 2);
-        damage.push(tileIndex - 2);
-        damage.push(tileIndex + this.TILES_PER_ROW * 2);
-        damage.push(tileIndex - this.TILES_PER_ROW * 2);
+        const defuseArea = this.getNeighbors(tileIndex);
+        defuseArea.push(tileIndex + 2);
+        defuseArea.push(tileIndex - 2);
+        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
+        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
-        for (let i = 0; i < damage.length; i++) {
-            if (damage[i] > 0 && damage[i] < this.TOTAL_TILES) {
-                const tile = this.board[damage[i]];
+        for (let i = 0; i < defuseArea.length; i++) {
+            if (defuseArea[i] > 0 && defuseArea[i] < this.TOTAL_TILES) {
+                const tile = this.board[defuseArea[i]];
                 if (tile.hidden) {
                     tile.hidden = false;
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
                         const position = tileIndexToTileCenter(
-                            damage[i],
+                            defuseArea[i],
                             this.TILE_HEIGHT,
                             this.TILES_PER_ROW,
                             this.BOARD_X_OFFSET
                         );
-                        // const position = new Vec2(
-                        //     (damage[i] % this.TILES_PER_ROW) * this.TILE_HEIGHT +
-                        //         this.BOARD_X_OFFSET +
-                        //         this.TILE_HEIGHT / 2,
-                        //     Math.floor(damage[i] / this.TILES_PER_ROW) * this.TILE_HEIGHT
-                        // );
                         this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
                         this.score += this.DEFUSE_BONUS;
                     }
