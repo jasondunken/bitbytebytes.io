@@ -688,7 +688,7 @@ class MineSquadPlus {
             this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
             this.score += this.DEFUSE_BONUS;
         } else if (this.board[tileIndex].value > 0) {
-            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS));
+            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS, "blue"));
             this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
         }
 

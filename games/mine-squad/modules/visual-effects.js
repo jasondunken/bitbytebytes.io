@@ -13,10 +13,10 @@ class VisualEffect {
 
 class BonusEffect extends VisualEffect {
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score) {
+    constructor(position, score, color) {
         super(position);
         this.score = score;
-        this.color = color("red");
+        this.color = color ? color : "red";
     }
 
     update() {
@@ -43,7 +43,7 @@ class BonusSquadEffect extends VisualEffect {
 
     repetitions = 4;
 
-    constructor(position) {
+    constructor(position, color) {
         super(position);
     }
 
