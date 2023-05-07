@@ -11,6 +11,35 @@ class VisualEffect {
     render() {}
 }
 
+class ScoreEffect extends VisualEffect {
+    opacity = 255;
+    vSpeed = Math.floor(Math.random() * 3 + 2);
+    constructor(position, score, value) {
+        super(position);
+        this.score = score;
+        this.color = color(valueToColor(value));
+        this.outlineColor = color("white");
+    }
+
+    update() {
+        this.position.x += Math.random() * 4 - 2;
+        this.position.y -= this.vSpeed;
+        this.opacity -= 5;
+        this.color.setAlpha(this.opacity);
+        this.outlineColor.setAlpha(this.opacity);
+        if (this.opacity <= 0) this.done = true;
+    }
+
+    render() {
+        strokeWeight(2);
+        stroke(this.outlineColor);
+        fill(this.color);
+        textStyle(BOLD);
+        text(this.score, this.position.x, this.position.y);
+        textStyle(NORMAL);
+    }
+}
+
 class BonusEffect extends VisualEffect {
     vSpeed = Math.floor(Math.random() * 3 + 2);
     constructor(position, score, color) {
@@ -43,7 +72,7 @@ class BonusSquadEffect extends VisualEffect {
 
     repetitions = 4;
 
-    constructor(position, color) {
+    constructor(position) {
         super(position);
     }
 
@@ -64,35 +93,6 @@ class BonusSquadEffect extends VisualEffect {
         strokeWeight(3);
         noFill();
         ellipse(this.position.x, this.position.y, this.size, this.size);
-    }
-}
-
-class ScoreEffect extends VisualEffect {
-    opacity = 255;
-    vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score, value) {
-        super(position);
-        this.score = score;
-        this.color = color(valueToColor(value));
-        this.outlineColor = color("white");
-    }
-
-    update() {
-        this.position.x += Math.random() * 4 - 2;
-        this.position.y -= this.vSpeed;
-        this.opacity -= 5;
-        this.color.setAlpha(this.opacity);
-        this.outlineColor.setAlpha(this.opacity);
-        if (this.opacity <= 0) this.done = true;
-    }
-
-    render() {
-        strokeWeight(2);
-        stroke(this.outlineColor);
-        fill(this.color);
-        textStyle(BOLD);
-        text(this.score, this.position.x, this.position.y);
-        textStyle(NORMAL);
     }
 }
 
