@@ -588,19 +588,19 @@ class MineSquadPlus {
                 if (i === 0 && j === 0) continue;
                 if (i === -1) {
                     const index = tileIndex - this.TILES_PER_ROW + j;
-                    if (this.isNeighbor(tileIndex, index)) {
+                    if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
                 }
                 if (i === 0) {
                     const index = tileIndex + j;
-                    if (this.isNeighbor(tileIndex, index)) {
+                    if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
                 }
                 if (i === 1) {
                     const index = tileIndex + this.TILES_PER_ROW + j;
-                    if (this.isNeighbor(tileIndex, index)) {
+                    if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
                 }
@@ -609,21 +609,15 @@ class MineSquadPlus {
         return neighbors;
     }
 
-    isNeighbor(tile, neighbor) {
-        if (neighbor < 0 || neighbor > this.TOTAL_TILES - 1) {
-            return false;
-        } else {
-            return this.isWithin(tile, neighbor, 1);
-        }
-    }
-
-    isWithin(tile1, tile2, tilesApart) {
+    // checks that the neighbor isn't across an edge
+    isValidNeighbor(tile1, tile2) {
+        if (tile2 < 0 || tile2 >= this.TOTAL_TILES) return false;
         const tile1X = Math.floor(tile1 % this.TILES_PER_ROW);
         const tile2X = Math.floor(tile2 % this.TILES_PER_ROW);
         const distanceApart = Math.abs(tile1X - tile2X);
-        if (distanceApart > tilesApart) {
-            return false;
-        } else return true;
+        if (distanceApart < this.TILES_PER_ROW - 2) {
+            return true;
+        } else return false;
     }
 
     getTile(board, index) {
@@ -694,10 +688,8 @@ class MineSquadPlus {
         }
 
         const defuseArea = this.getNeighbors(tileIndex);
-        this.isWithin(tileIndex, tileIndex + 2, 2) ? defuseArea.push(tileIndex + 2) : undefined;
-        this.isWithin(tileIndex, tileIndex - 2, 2) ? defuseArea.push(tileIndex - 2) : undefined;
-        //defuseArea.push(tileIndex + 2);
-        //defuseArea.push(tileIndex - 2);
+        this.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
+        this.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
