@@ -171,10 +171,8 @@ class MineSquadPlus {
     handleMouseClick(mouseX, mouseY) {
         const x = Math.floor((mouseX - this.BOARD_X_OFFSET) / this.TILE_HEIGHT);
         const y = Math.floor((mouseY - this.BOARD_Y_OFFSET) / this.TILE_HEIGHT);
-        if (x < 0 || x > this.TILES_PER_ROW - 1) return;
-        if (y < 0 || y > this.TILES_PER_COLUMN - 1) return;
         const tileIndex = y * this.TILES_PER_ROW + x;
-        let tile = this.board[tileIndex];
+        let tile = this.getTile(this.board, tileIndex);
         if (this.currentState === this.GAME_STATE.STARTING) {
             while (tile.value != 0 || tile.bomb) {
                 this.board = this.initializeBoard();
@@ -575,62 +573,30 @@ class MineSquadPlus {
         let value = 0;
         const neighbors = this.getNeighbors(tileIndex);
         for (let i = 0; i < neighbors.length; i++) {
-            if (newBoard[neighbors[i]].bomb) {
+            const tile = this.getTile(newBoard, neighbors[i]);
+            if (tile != null && tile.bomb) {
                 value++;
             }
         }
         return value;
     }
 
-    getNeighbors(tile) {
+    getNeighbors(tileIndex) {
         let neighbors = [];
-        let topLeft = tile - this.TILES_PER_ROW - 1;
-        let topCenter = tile - this.TILES_PER_ROW;
-        let topRight = tile - this.TILES_PER_ROW + 1;
-        let midLeft = tile - 1;
-        let midRight = tile + 1;
-        let btmLeft = tile + this.TILES_PER_ROW - 1;
-        let btmCenter = tile + this.TILES_PER_ROW;
-        let btmRight = tile + this.TILES_PER_ROW + 1;
-
-        if (this.getNeighbor(tile, topLeft)) {
-            neighbors.push(topLeft);
-        }
-        if (this.getNeighbor(tile, topCenter)) {
-            neighbors.push(topCenter);
-        }
-        if (this.getNeighbor(tile, topRight)) {
-            neighbors.push(topRight);
-        }
-        if (this.getNeighbor(tile, midLeft)) {
-            neighbors.push(midLeft);
-        }
-        if (this.getNeighbor(tile, midRight)) {
-            neighbors.push(midRight);
-        }
-        if (this.getNeighbor(tile, btmLeft)) {
-            neighbors.push(btmLeft);
-        }
-        if (this.getNeighbor(tile, btmCenter)) {
-            neighbors.push(btmCenter);
-        }
-        if (this.getNeighbor(tile, btmRight)) {
-            neighbors.push(btmRight);
-        }
+        neighbors.push(tileIndex - this.TILES_PER_ROW - 1);
+        neighbors.push(tileIndex - this.TILES_PER_ROW);
+        neighbors.push(tileIndex - this.TILES_PER_ROW + 1);
+        neighbors.push(tileIndex - 1);
+        neighbors.push(tileIndex + 1);
+        neighbors.push(tileIndex + this.TILES_PER_ROW - 1);
+        neighbors.push(tileIndex + this.TILES_PER_ROW);
+        neighbors.push(tileIndex + this.TILES_PER_ROW + 1);
         return neighbors;
     }
 
-    getNeighbor(tile, neighbor) {
-        const tileX = Math.floor(tile % this.TILES_PER_ROW);
-        const neighborX = Math.floor(neighbor % this.TILES_PER_ROW);
-        const distanceApart = Math.abs(tileX - neighborX);
-        if (neighbor < 0 || neighbor > this.TOTAL_TILES - 1) {
-            return false;
-        } else {
-            if (distanceApart > 1) {
-                return false;
-            } else return true;
-        }
+    getTile(board, index) {
+        if (index < 0 || index >= board.length) return null;
+        return board[index];
     }
 
     getNumHiddenTiles() {
@@ -641,29 +607,32 @@ class MineSquadPlus {
         return result;
     }
 
-    uncover(tile, checked) {
-        if (this.board[tile].flagged === false) {
-            this.board[tile].hidden = false;
-            const tileValue = this.board[tile].value;
-            const tileScore = tileValue > 0 ? this.board[tile].value * 10 : 5;
-            this.score += tileScore;
-            const position = new Vec2(
-                (tile % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
-                Math.floor(tile / this.TILES_PER_ROW) * this.TILE_HEIGHT
-            );
-            if (tileValue > 0) {
-                this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
+    uncover(tileIndex, checkedTiles) {
+        const tile = this.getTile(this.board, tileIndex);
+        if (tile) {
+            if (tile.flagged === false) {
+                tile.hidden = false;
+                const tileValue = tile.value;
+                const tileScore = tileValue > 0 ? this.board[tileIndex].value * 10 : 5;
+                this.score += tileScore;
+                const position = new Vec2(
+                    (tileIndex % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
+                    Math.floor(tileIndex / this.TILES_PER_ROW) * this.TILE_HEIGHT
+                );
+                if (tileValue > 0) {
+                    this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
+                }
             }
-        }
-        // if tile.value is zero, uncover all the tiles around it
-        // if one of the ones uncovered is a zero uncover all the ones around it and so on
-        // checked is a blank list to track zeros already checked
-        if (this.board[tile].value === 0 && !checked.includes(tile)) {
-            checked.push(tile);
-            // a list of the valid neighbors
-            let neighbors = this.getNeighbors(tile);
-            for (const n in neighbors) {
-                this.uncover(neighbors[n], checked);
+            // if tile.value is zero, uncover all the tiles around it
+            // if one of the ones uncovered is a zero uncover all the ones around it and so on
+            // checked is a blank list to track zeros already checked
+            if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
+                checkedTiles.push(tileIndex);
+                // a list of the valid neighbors
+                let neighbors = this.getNeighbors(tileIndex);
+                for (let i = 0; i < neighbors.length; i++) {
+                    this.uncover(neighbors[i], checkedTiles);
+                }
             }
         }
     }
@@ -698,10 +667,11 @@ class MineSquadPlus {
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
+        console.log("defuseArea: ", defuseArea);
         for (let i = 0; i < defuseArea.length; i++) {
-            if (defuseArea[i] > 0 && defuseArea[i] < this.TOTAL_TILES) {
-                const tile = this.board[defuseArea[i]];
-                if (tile.hidden) {
+            if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
+                const tile = this.getTile(this.board, defuseArea[i]);
+                if (tile && tile.hidden) {
                     tile.hidden = false;
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
