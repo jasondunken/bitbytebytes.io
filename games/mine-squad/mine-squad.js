@@ -667,7 +667,6 @@ class MineSquadPlus {
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
-        console.log("defuseArea: ", defuseArea);
         for (let i = 0; i < defuseArea.length; i++) {
             if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
                 const tile = this.getTile(this.board, defuseArea[i]);
