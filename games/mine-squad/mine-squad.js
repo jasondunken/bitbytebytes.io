@@ -583,14 +583,6 @@ class MineSquadPlus {
 
     getNeighbors(tileIndex) {
         let neighbors = [];
-        // neighbors.push(tileIndex - this.TILES_PER_ROW - 1);
-        // neighbors.push(tileIndex - this.TILES_PER_ROW);
-        // neighbors.push(tileIndex - this.TILES_PER_ROW + 1);
-        // neighbors.push(tileIndex - 1);
-        // neighbors.push(tileIndex + 1);
-        // neighbors.push(tileIndex + this.TILES_PER_ROW - 1);
-        // neighbors.push(tileIndex + this.TILES_PER_ROW);
-        // neighbors.push(tileIndex + this.TILES_PER_ROW + 1);
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
                 if (i === 0 && j === 0) continue;
@@ -618,16 +610,20 @@ class MineSquadPlus {
     }
 
     isNeighbor(tile, neighbor) {
-        const tileX = Math.floor(tile % this.TILES_PER_ROW);
-        const neighborX = Math.floor(neighbor % this.TILES_PER_ROW);
-        const distanceApart = Math.abs(tileX - neighborX);
         if (neighbor < 0 || neighbor > this.TOTAL_TILES - 1) {
             return false;
         } else {
-            if (distanceApart > 1) {
-                return false;
-            } else return true;
+            return this.isWithin(tile, neighbor, 1);
         }
+    }
+
+    isWithin(tile1, tile2, tilesApart) {
+        const tile1X = Math.floor(tile1 % this.TILES_PER_ROW);
+        const tile2X = Math.floor(tile2 % this.TILES_PER_ROW);
+        const distanceApart = Math.abs(tile1X - tile2X);
+        if (distanceApart > tilesApart) {
+            return false;
+        } else return true;
     }
 
     getTile(board, index) {
@@ -698,8 +694,10 @@ class MineSquadPlus {
         }
 
         const defuseArea = this.getNeighbors(tileIndex);
-        defuseArea.push(tileIndex + 2);
-        defuseArea.push(tileIndex - 2);
+        this.isWithin(tileIndex, tileIndex + 2, 2) ? defuseArea.push(tileIndex + 2) : undefined;
+        this.isWithin(tileIndex, tileIndex - 2, 2) ? defuseArea.push(tileIndex - 2) : undefined;
+        //defuseArea.push(tileIndex + 2);
+        //defuseArea.push(tileIndex - 2);
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
