@@ -34,12 +34,21 @@ class Vec2 {
     }
 }
 
-function mousePositionToTileScreenLocation(position, tileSize, offset) {
-    let x = Math.floor(position[0] / tileSize) * tileSize;
-    let y = Math.floor(position[1] / tileSize) * tileSize + offset;
-    return [x, y];
+// returns the top-left of nearest tile to pointer
+function mousePositionToTileScreenLocation(mouseX, mouseY, tileSize) {
+    let x = Math.floor(mouseX / tileSize) * tileSize;
+    let y = Math.floor(mouseY / tileSize) * tileSize;
+    return new Vec2(x, y);
 }
 
+// returns the array index for the tile mouse is over
+function mousePositionToTileIndex(mouseX, mouseY, tileSize, xOffset, yOffset, rowLengthInTiles) {
+    let xIndex = Math.floor((mouseX - xOffset) / tileSize);
+    let yIndex = Math.floor((mouseY - yOffset) / tileSize);
+    return xIndex + yIndex * rowLengthInTiles;
+}
+
+// returns the screen position of the center of the tile at the given array index
 function tileIndexToTileCenter(tileIndex, tileHeight, tilesPerRow, xOffset) {
     return new Vec2(
         (tileIndex % tilesPerRow) * tileHeight + xOffset + tileHeight / 2,
@@ -47,4 +56,11 @@ function tileIndexToTileCenter(tileIndex, tileHeight, tilesPerRow, xOffset) {
     );
 }
 
-export { setColor, valueToColor, Vec2, mousePositionToTileScreenLocation, tileIndexToTileCenter };
+export {
+    setColor,
+    valueToColor,
+    Vec2,
+    mousePositionToTileScreenLocation,
+    mousePositionToTileIndex,
+    tileIndexToTileCenter,
+};
