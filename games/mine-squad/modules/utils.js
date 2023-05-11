@@ -33,27 +33,25 @@ class Vec2 {
         return new Vec2((this.x += vector.x), (this.y += vector.y));
     }
 }
-
-// returns the top-left of nearest tile to pointer
-function mousePositionToTileScreenLocation(mouseX, mouseY, tileSize) {
-    let x = Math.floor(mouseX / tileSize) * tileSize;
-    let y = Math.floor(mouseY / tileSize) * tileSize;
-    return new Vec2(x, y);
-}
-
 // returns the array index for the tile mouse is over
-function mousePositionToTileIndex(mouseX, mouseY, tileSize, xOffset, yOffset, rowLengthInTiles) {
-    let xIndex = Math.floor((mouseX - xOffset) / tileSize);
-    let yIndex = Math.floor((mouseY - yOffset) / tileSize);
-    return xIndex + yIndex * rowLengthInTiles;
+function mousePositionToTileIndex(coords, tileSize, tilesPerRow, xOffset, yOffset) {
+    const xIndex = Math.floor((coords.x - xOffset) / tileSize);
+    const yIndex = Math.floor((coords.y - yOffset) / tileSize);
+    return xIndex + yIndex * tilesPerRow;
 }
 
 // returns the screen position of the center of the tile at the given array index
-function tileIndexToTileCenter(tileIndex, tileHeight, tilesPerRow, xOffset) {
+function tileIndexToTileCenter(tileIndex, tileSize, tilesPerRow, xOffset, yOffset) {
     return new Vec2(
-        (tileIndex % tilesPerRow) * tileHeight + xOffset + tileHeight / 2,
-        Math.floor(tileIndex / tilesPerRow) * tileHeight
+        (tileIndex % tilesPerRow) * tileSize + xOffset + tileSize / 2,
+        Math.floor(tileIndex / tilesPerRow) * tileSize + yOffset + tileSize / 2
     );
+}
+
+// returns the center coords of tile under pointer
+function mousePositionToTileCenter(coords, tileSize, tilesPerRow, xOffset, yOffset) {
+    const tileIndex = this.mousePositionToTileIndex(coords, tileSize, tilesPerRow, xOffset, yOffset);
+    return this.tileIndexToTileCenter(tileIndex, tileSize, tilesPerRow, xOffset, yOffset);
 }
 
 function getElapsedTimeString(gameTime) {
@@ -68,8 +66,8 @@ export {
     setColor,
     valueToColor,
     Vec2,
-    mousePositionToTileScreenLocation,
     mousePositionToTileIndex,
     tileIndexToTileCenter,
+    mousePositionToTileCenter,
     getElapsedTimeString,
 };

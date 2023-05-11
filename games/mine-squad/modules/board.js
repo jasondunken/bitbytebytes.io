@@ -1,6 +1,7 @@
 import { BoardBuilder } from "./board-builder.js";
 import * as utils from "./utils.js";
 import { GAME_STATE } from "./game-state.js";
+import { ScoreEffect, BonusEffect } from "./visual-effects.js";
 
 class Board {
     TILES_PER_COLUMN = 16;
@@ -21,13 +22,46 @@ class Board {
         maxMines: this.MAX_MINES,
     };
 
-    constructor(sprites) {
+    constructor(mineSquad, sprites) {
+        this.mineSquad = mineSquad;
         this.sprites = sprites;
         this.boardBuilder = new BoardBuilder(this.config);
+        this.bounds = {
+            top: this.BOARD_Y_OFFSET,
+            right: this.BOARD_X_OFFSET + this.TILES_PER_ROW * this.TILE_HEIGHT,
+            bottom: this.BOARD_Y_OFFSET + this.TILES_PER_COLUMN * this.TILE_HEIGHT,
+            left: this.BOARD_X_OFFSET,
+        };
     }
 
     generateBoard(numMines) {
         this.board = this.boardBuilder.generateBoard(numMines);
+    }
+
+    isOnBoard(coords) {
+        if (
+            coords.x > this.bounds.left &&
+            coords.x < this.bounds.right &&
+            coords.y > this.bounds.top &&
+            coords.y < this.bounds.bottom
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    getIndex(coords) {
+        return utils.mousePositionToTileIndex(
+            coords,
+            this.TILE_HEIGHT,
+            this.TILES_PER_ROW,
+            this.BOARD_X_OFFSET,
+            this.BOARD_Y_OFFSET
+        );
+    }
+
+    getTile(index) {
+        return this.board[index];
     }
 
     getUiData() {
@@ -56,68 +90,83 @@ class Board {
 
     update() {}
 
+    isWinner() {
+        let winner = true;
+        this.board.forEach((tile) => {
+            if (!tile.bomb && tile.hidden === true) winner = false;
+        });
+        return winner;
+    }
+
     uncover(tileIndex, checkedTiles) {
-        const tile = this.getTile(this.board, tileIndex);
-        if (tile) {
-            if (tile.flagged === false) {
-                tile.hidden = false;
-                const tileValue = tile.value;
-                const tileScore = tileValue > 0 ? this.board[tileIndex].value * 10 : 5;
-                this.score += tileScore;
-                const position = new Vec2(
-                    (tileIndex % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
-                    Math.floor(tileIndex / this.TILES_PER_ROW) * this.TILE_HEIGHT
-                );
-                if (tileValue > 0) {
-                    this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
-                }
+        const tile = this.getTile(tileIndex);
+        if (tile.flagged === false) {
+            tile.hidden = false;
+            const tileScore = tile.value * 10;
+            this.score += tileScore;
+            const position = utils.tileIndexToTileCenter(
+                tileIndex,
+                this.TILE_HEIGHT,
+                this.TILES_PER_ROW,
+                this.BOARD_X_OFFSET,
+                this.BOARD_Y_OFFSET
+            );
+            if (tile.value > 0) {
+                this.mineSquad.visualEffects.add(new ScoreEffect(position, tileScore, tile.value));
             }
-            // if tile.value is zero, uncover all the tiles around it
-            // if one of the ones uncovered is a zero uncover all the ones around it and so on
-            // checked is a blank list to track zeros already checked
-            if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
-                checkedTiles.push(tileIndex);
-                // a list of the valid neighbors
-                let neighbors = this.getNeighbors(tileIndex);
-                for (let i = 0; i < neighbors.length; i++) {
-                    this.uncover(neighbors[i], checkedTiles);
-                }
+        }
+        // if tile.value is zero, uncover all the tiles around it
+        // if one of the ones uncovered is a zero uncover all the ones around it and so on
+        // checked is a blank list to track zeros already checked
+        if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
+            checkedTiles.push(tileIndex);
+            // a list of the valid neighbors
+            let neighbors = this.boardBuilder.getNeighbors(tileIndex);
+            for (let i = 0; i < neighbors.length; i++) {
+                this.uncover(neighbors[i], checkedTiles);
             }
         }
     }
 
     defuseWithinRadius(tileIndex) {
-        this.board[tileIndex].hidden = false;
-        const position = tileIndexToTileCenter(tileIndex, this.TILE_HEIGHT, this.TILES_PER_ROW, this.BOARD_X_OFFSET);
-        if (this.board[tileIndex].bomb) {
-            this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
+        const tile = this.getTile(tileIndex);
+        tile.hidden = false;
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.BOARD_X_OFFSET,
+            this.TILE_HEIGHT,
+            this.TILES_PER_ROW
+        );
+        if (tile.bomb) {
+            this.mineSquad.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
             this.score += this.DEFUSE_BONUS;
-        } else if (this.board[tileIndex].value > 0) {
-            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS, "blue"));
-            this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
+        } else if (tile.value > 0) {
+            this.mineSquad.visualEffects.add(new BonusEffect(position, tile.value * this.DEFUSE_BONUS, "blue"));
+            this.score += tile.value * this.DEFUSE_BONUS;
         }
 
-        const defuseArea = this.getNeighbors(tileIndex);
-        this.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
-        this.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
+        const defuseArea = this.boardBuilder.getNeighbors(tileIndex);
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
         for (let i = 0; i < defuseArea.length; i++) {
             if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
-                const tile = this.getTile(this.board, defuseArea[i]);
+                const tile = this.getTile(defuseArea[i]);
                 if (tile && tile.hidden) {
                     tile.hidden = false;
                     this.score += tile.value * this.TILE_BONUS;
                     if (tile.bomb) {
-                        const position = tileIndexToTileCenter(
+                        const position = utils.tileIndexToTileCenter(
                             defuseArea[i],
                             this.TILE_HEIGHT,
                             this.TILES_PER_ROW,
-                            this.BOARD_X_OFFSET
+                            this.BOARD_X_OFFSET,
+                            this.BOARD_Y_OFFSET
                         );
-                        this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
-                        this.score += this.DEFUSE_BONUS;
+                        this.mineSquad.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
+                        this.score += this.mineSquad.DEFUSE_BONUS;
                     }
                 }
             }
@@ -185,7 +234,7 @@ class Board {
                     this.TILE_HEIGHT - 1
                 );
                 if (this.tile.flagged) {
-                    this.drawFlag(new Vec2(this.tileIndexX, this.tileIndexY));
+                    this.drawFlag(new utils.Vec2(this.tileIndexX, this.tileIndexY));
                 }
             }
 
@@ -240,17 +289,24 @@ class Board {
     }
 
     drawCursor() {
-        const tile = utils.mousePositionToTileScreenLocation(mouseX, mouseY, this.TILE_HEIGHT);
-        if (
-            tile.x >= this.BOARD_X_OFFSET &&
-            tile.x < this.config.tilesPerRow * this.TILE_HEIGHT + this.BOARD_X_OFFSET &&
-            tile.y >= 0 &&
-            tile.y < this.TILES_PER_COLUMN * this.TILE_HEIGHT
-        ) {
+        const coords = new utils.Vec2(mouseX, mouseY);
+        if (this.isOnBoard(coords)) {
+            const tileCenter = utils.mousePositionToTileCenter(
+                coords,
+                this.TILE_HEIGHT,
+                this.TILES_PER_ROW,
+                this.BOARD_X_OFFSET,
+                this.BOARD_Y_OFFSET
+            );
             utils.setColor("red");
-            strokeWeight(3);
+            strokeWeight(1);
             noFill();
-            rect(tile.x, tile.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+            rect(
+                tileCenter.x - this.TILE_HEIGHT / 2,
+                tileCenter.y - this.TILE_HEIGHT / 2,
+                this.TILE_HEIGHT,
+                this.TILE_HEIGHT
+            );
         }
     }
 

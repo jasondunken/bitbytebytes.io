@@ -63,7 +63,7 @@ class BoardBuilder {
                     }
                 }
                 if (i === 1) {
-                    const index = tileIndex + this.tilePerRow + j;
+                    const index = tileIndex + this.tilesPerRow + j;
                     if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
@@ -81,18 +81,18 @@ class BoardBuilder {
         const distanceApart = Math.abs(tile1X - tile2X);
         if (distanceApart < this.tilesPerRow - 2) {
             return true;
-        } else return false;
+        }
+        return false;
     }
 
     getTile(board, index) {
-        if (index < 0 || index >= board.length) return null;
         return board[index];
     }
 }
 
 class Tile {
     constructor() {
-        this.hidden = false;
+        this.hidden = true;
         this.bomb = false;
         this.flagged = false;
         this.value = 0;
