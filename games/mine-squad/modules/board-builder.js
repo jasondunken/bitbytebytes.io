@@ -92,7 +92,7 @@ class BoardBuilder {
 
 class Tile {
     constructor() {
-        this.hidden = true;
+        this.hidden = false;
         this.bomb = false;
         this.flagged = false;
         this.value = 0;

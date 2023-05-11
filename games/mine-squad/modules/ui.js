@@ -1,3 +1,5 @@
+import * as utils from "./utils.js";
+
 class UI {
     constructor(width, height, boardHeight) {
         this.width = width;
@@ -9,6 +11,11 @@ class UI {
         this.flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (this.minesLeftBox + this.minesLeftBox / 2);
         this.flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
     }
+
+    update(gameData) {
+        //console.log("gameData: ", gameData);
+    }
+
     drawDashboard() {
         setColor("black");
         strokeWeight(1);
@@ -120,13 +127,13 @@ class UI {
     }
 
     drawCrosshair() {
-        setColor("red");
+        utils.setColor("red");
         noFill();
         strokeWeight(1);
         let crosshairDiameter = 10;
         if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
         ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
-        setColor("black");
+        utils.setColor("black");
         line(mouseX - 10, mouseY, mouseX + 10, mouseY);
         line(mouseX, mouseY - 10, mouseX, mouseY + 10);
     }

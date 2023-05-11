@@ -56,6 +56,14 @@ function tileIndexToTileCenter(tileIndex, tileHeight, tilesPerRow, xOffset) {
     );
 }
 
+function getElapsedTimeString(gameTime) {
+    const elapsedSeconds = (gameTime % 60000) / 1000;
+    let secondsStr = ("" + elapsedSeconds).split(".")[0];
+    if (elapsedSeconds < 10) secondsStr = "0" + secondsStr;
+    const minutes = (gameTime - (gameTime % 60000)) / 60000;
+    return minutes + ":" + secondsStr;
+}
+
 export {
     setColor,
     valueToColor,
@@ -63,4 +71,5 @@ export {
     mousePositionToTileScreenLocation,
     mousePositionToTileIndex,
     tileIndexToTileCenter,
+    getElapsedTimeString,
 };

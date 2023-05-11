@@ -1,19 +1,27 @@
 import { BoardBuilder } from "./board-builder.js";
+import * as utils from "./utils.js";
+import { GAME_STATE } from "./game-state.js";
 
 class Board {
+    TILES_PER_COLUMN = 16;
+    TILES_PER_ROW = 30;
+    TILE_HEIGHT = 30;
+    HALF_TILE = Math.floor(this.TILE_HEIGHT / 2);
+
+    BOARD_X_OFFSET = 30;
+    BOARD_Y_OFFSET = 4;
+    BOMB_HEIGHT = this.TILE_HEIGHT * 0.7;
+    TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
+
+    MAX_MINES = 99;
+
     config = {
-        TILES_PER_COLUMN: 16,
-        TILES_PER_ROW: 30,
-        TILE_HEIGHT: 30,
-        HALF_TILE: Math.floor(TILE_HEIGHT / 2),
-        BOARD_X_OFFSET: 30,
-        BOARD_Y_OFFSET: 4,
-        BOMB_HEIGHT: TILE_HEIGHT * 0.7,
-        TOTAL_TILES: TILES_PER_COLUMN * TILES_PER_ROW,
+        totalTiles: this.TOTAL_TILES,
+        tilesPerRow: this.TILES_PER_ROW,
+        maxMines: this.MAX_MINES,
     };
 
-    constructor(maxMines, sprites) {
-        this.maxMines = maxMines;
+    constructor(sprites) {
         this.sprites = sprites;
         this.boardBuilder = new BoardBuilder(this.config);
     }
@@ -22,53 +30,159 @@ class Board {
         this.board = this.boardBuilder.generateBoard(numMines);
     }
 
+    getUiData() {
+        let tiles = 0;
+        let hidden = 0;
+        let mines = 0;
+        let flags = 0;
+        let totalTileValue = 0;
+        this.board.forEach((tile) => {
+            tiles++;
+            tile.hidden ? hidden++ : hidden;
+            tile.bomb ? mines++ : mines;
+            tile.flagged ? flags++ : flags;
+            totalTileValue += tile.value;
+        });
+        return { tiles, hidden, mines, flags, totalTileValue };
+    }
+
+    getFlagCount() {
+        let count = 0;
+        this.board.forEach((tile) => {
+            if (tile.flagged) count++;
+        });
+        return count;
+    }
+
     update() {}
+
+    uncover(tileIndex, checkedTiles) {
+        const tile = this.getTile(this.board, tileIndex);
+        if (tile) {
+            if (tile.flagged === false) {
+                tile.hidden = false;
+                const tileValue = tile.value;
+                const tileScore = tileValue > 0 ? this.board[tileIndex].value * 10 : 5;
+                this.score += tileScore;
+                const position = new Vec2(
+                    (tileIndex % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
+                    Math.floor(tileIndex / this.TILES_PER_ROW) * this.TILE_HEIGHT
+                );
+                if (tileValue > 0) {
+                    this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
+                }
+            }
+            // if tile.value is zero, uncover all the tiles around it
+            // if one of the ones uncovered is a zero uncover all the ones around it and so on
+            // checked is a blank list to track zeros already checked
+            if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
+                checkedTiles.push(tileIndex);
+                // a list of the valid neighbors
+                let neighbors = this.getNeighbors(tileIndex);
+                for (let i = 0; i < neighbors.length; i++) {
+                    this.uncover(neighbors[i], checkedTiles);
+                }
+            }
+        }
+    }
+
+    defuseWithinRadius(tileIndex) {
+        this.board[tileIndex].hidden = false;
+        const position = tileIndexToTileCenter(tileIndex, this.TILE_HEIGHT, this.TILES_PER_ROW, this.BOARD_X_OFFSET);
+        if (this.board[tileIndex].bomb) {
+            this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
+            this.score += this.DEFUSE_BONUS;
+        } else if (this.board[tileIndex].value > 0) {
+            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS, "blue"));
+            this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
+        }
+
+        const defuseArea = this.getNeighbors(tileIndex);
+        this.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
+        this.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
+        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
+        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
+
+        for (let i = 0; i < defuseArea.length; i++) {
+            if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
+                const tile = this.getTile(this.board, defuseArea[i]);
+                if (tile && tile.hidden) {
+                    tile.hidden = false;
+                    this.score += tile.value * this.TILE_BONUS;
+                    if (tile.bomb) {
+                        const position = tileIndexToTileCenter(
+                            defuseArea[i],
+                            this.TILE_HEIGHT,
+                            this.TILES_PER_ROW,
+                            this.BOARD_X_OFFSET
+                        );
+                        this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
+                        this.score += this.DEFUSE_BONUS;
+                    }
+                }
+            }
+        }
+    }
+
+    calculateScore(tileBonus, flagPenalty) {
+        let score = 0;
+        for (let i = 0; i < this.totalTiles; i++) {
+            const tile = this.board[i];
+            if (tile.hidden === false && this.winner) {
+                score += tileBonus;
+            }
+            if (tile.flagged) {
+                score -= flagPenalty;
+            }
+        }
+        return score;
+    }
 
     draw() {
         this.drawBoard();
-        //this.drawCursor();
+        this.drawCursor();
     }
 
-    drawBoard() {
-        for (let i = 0; i < this.config.totalTiles; i++) {
-            this.tileIndexX = (i % this.config.tilesPerRow) * this.config.tileHeight;
-            this.tileIndexY = Math.floor(i / this.config.tilesPerRow) * this.config.tileHeight;
+    drawBoard(gameState) {
+        for (let i = 0; i < this.TOTAL_TILES; i++) {
+            this.tileIndexX = (i % this.config.tilesPerRow) * this.TILE_HEIGHT;
+            this.tileIndexY = Math.floor(i / this.config.tilesPerRow) * this.TILE_HEIGHT;
             this.tile = this.board[i];
 
             if (this.tile.hidden === false) {
-                setColor("gray");
+                utils.setColor("gray");
                 stroke("darkgray");
                 strokeWeight(1);
                 rect(
                     this.BOARD_X_OFFSET + this.tileIndexX,
                     this.tileIndexY + this.BOARD_Y_OFFSET,
-                    this.config.tileHeight,
-                    this.config.tileHeight
+                    this.TILE_HEIGHT,
+                    this.TILE_HEIGHT
                 );
                 if (!this.tile.bomb && this.tile.value !== 0) {
-                    setColor(valueToColor(this.tile.value));
+                    utils.setColor(utils.valueToColor(this.tile.value));
                     textAlign(CENTER);
                     textSize(24);
                     text(
                         this.tile.value,
                         this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.config.tileHeight * 0.6 + this.BOARD_Y_OFFSET
+                        this.tileIndexY + this.TILE_HEIGHT * 0.6 + this.BOARD_Y_OFFSET
                     );
-                    setColor("black");
+                    utils.setColor("black");
                 }
 
                 if (this.tile.bomb) {
-                    this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
+                    this.drawBomb(new utils.Vec2(this.tileIndexX, this.tileIndexY));
                 }
             } else {
-                setColor("green");
+                utils.setColor("green");
                 stroke("black");
                 strokeWeight(1);
                 rect(
                     this.BOARD_X_OFFSET + this.tileIndexX,
                     this.tileIndexY + this.BOARD_Y_OFFSET,
-                    this.config.tileHeight - 1,
-                    this.config.tileHeight - 1
+                    this.TILE_HEIGHT - 1,
+                    this.TILE_HEIGHT - 1
                 );
                 if (this.tile.flagged) {
                     this.drawFlag(new Vec2(this.tileIndexX, this.tileIndexY));
@@ -76,7 +190,7 @@ class Board {
             }
 
             // when game over mark flags correct/incorrect, show bombs
-            if (this.currentState == this.GAME_STATE.GAME_OVER) {
+            if (gameState === GAME_STATE.GAME_OVER) {
                 if (this.tile.flagged === true) {
                     this.markFlag(this.tile.bomb);
                 } else if (this.tile.bomb) {
@@ -87,7 +201,7 @@ class Board {
     }
 
     drawFlag(tileIndex) {
-        setColor("yellow");
+        utils.setColor("yellow");
         strokeWeight(1);
         ellipse(
             this.BOARD_X_OFFSET + tileIndex.x + this.HALF_TILE,
@@ -98,13 +212,13 @@ class Board {
     }
 
     drawBomb(tileIndex) {
-        setColor("red");
+        utils.setColor("red");
         image(
-            MineSquadPlus.sprites["bomb"],
+            this.sprites["bomb"],
             this.BOARD_X_OFFSET + tileIndex.x + 2,
             tileIndex.y + this.BOARD_Y_OFFSET + 2,
-            this.config.tileHeight - 4,
-            this.config.tileHeight - 4
+            this.TILE_HEIGHT - 4,
+            this.TILE_HEIGHT - 4
         );
     }
 
@@ -114,51 +228,46 @@ class Board {
         line(
             this.BOARD_X_OFFSET + this.tileIndexX,
             this.tileIndexY + this.BOARD_Y_OFFSET,
-            this.BOARD_X_OFFSET + this.tileIndexX + this.config.tileHeight,
-            this.tileIndexY + this.BOARD_Y_OFFSET + this.config.tileHeight
+            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
+            this.tileIndexY + this.BOARD_Y_OFFSET + this.TILE_HEIGHT
         );
         line(
-            this.BOARD_X_OFFSET + this.tileIndexX + this.config.tileHeight,
+            this.BOARD_X_OFFSET + this.tileIndexX + this.TILE_HEIGHT,
             this.tileIndexY + this.BOARD_Y_OFFSET,
-            this.tileIndexX + this.config.tileHeight,
-            this.tileIndexY + this.config.tileHeight + this.BOARD_Y_OFFSET
+            this.tileIndexX + this.TILE_HEIGHT,
+            this.tileIndexY + this.TILE_HEIGHT + this.BOARD_Y_OFFSET
         );
     }
 
     drawCursor() {
-        const tile = mousePositionToTileScreenLocation(mouseX, mouseY, this.config.tileHeight);
+        const tile = utils.mousePositionToTileScreenLocation(mouseX, mouseY, this.TILE_HEIGHT);
         if (
             tile.x >= this.BOARD_X_OFFSET &&
-            tile.x < this.config.tilesPerRow * this.config.tileHeight + this.BOARD_X_OFFSET &&
+            tile.x < this.config.tilesPerRow * this.TILE_HEIGHT + this.BOARD_X_OFFSET &&
             tile.y >= 0 &&
-            tile.y < this.TILES_PER_COLUMN * this.config.tileHeight
+            tile.y < this.TILES_PER_COLUMN * this.TILE_HEIGHT
         ) {
-            setColor("red");
+            utils.setColor("red");
             strokeWeight(3);
             noFill();
-            rect(tile.x, tile.y, this.config.tileHeight, this.config.tileHeight);
+            rect(tile.x, tile.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
         }
     }
 
-    showMousePath() {
+    showMousePath(mouseClicks) {
         stroke("orange");
         strokeWeight(2);
-        for (let i = 0; i < this.mouseClicks.length - 1; i++) {
-            line(
-                this.mouseClicks[i][0],
-                this.mouseClicks[i][1],
-                this.mouseClicks[i + 1][0],
-                this.mouseClicks[i + 1][1]
-            );
+        for (let i = 0; i < mouseClicks.length - 1; i++) {
+            line(mouseClicks[i][0], mouseClicks[i][1], mouseClicks[i + 1][0], mouseClicks[i + 1][1]);
         }
 
         stroke("magenta");
         noFill();
         strokeWeight(3);
-        let lastClick = this.mouseClicks[this.mouseClicks.length - 1];
-        lastClick = [lastClick[0], lastClick[1] - this.BOARD_Y_OFFSET];
-        const [x, y] = mousePositionToTileScreenLocation(lastClick, this.config.tileHeight, this.BOARD_Y_OFFSET);
-        rect(x, y, this.config.tileHeight, this.config.tileHeight);
+        let lastClick = mouseClicks[mouseClicks.length - 1];
+        lastClick = [lastClick[0], lastClick[1] - BOARD_Y_OFFSET];
+        const [x, y] = mousePositionToTileScreenLocation(lastClick, TILE_HEIGHT, BOARD_Y_OFFSET);
+        rect(x, y, TILE_HEIGHT, TILE_HEIGHT);
     }
 }
 

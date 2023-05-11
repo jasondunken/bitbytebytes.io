@@ -1,0 +1,10 @@
+const GAME_STATE = Object.freeze({
+    STARTING: "STARTING",
+    HELP: "HELP",
+    LEVEL_STARTING: "LEVEL_STARTING",
+    PLAYING: "PLAYING",
+    ENDING: "ENDING",
+    GAME_OVER: "GAME_OVER",
+});
+
+export { GAME_STATE };

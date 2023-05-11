@@ -1,3 +1,6 @@
+import { GAME_STATE } from "./modules/game-state.js";
+import { Board } from "./modules/board.js";
+import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
 import { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect } from "./modules/visual-effects.js";
 import {
@@ -8,9 +11,6 @@ import {
     valueToColor,
     tileIndexToTileCenter,
 } from "./modules/utils.js";
-
-import { Board } from "./modules/board.js";
-import { UI } from "./modules/ui.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -31,8 +31,8 @@ function preload() {
 
 function setup() {
     // disable context menu
-    document.body.addEventListener("contextmenu", function (evt) {
-        evt.preventDefault();
+    document.body.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
         return false;
     });
 
@@ -49,7 +49,7 @@ function draw() {
 }
 
 function keyPressed(event) {
-    if (game) game.keyPressed(event);
+    if (game) game.handleKeyPress(event);
 }
 
 function mousePressed(event) {
@@ -80,36 +80,27 @@ class MineSquad {
 
     level = 1;
 
-    winner = false;
-    board = [];
     score = 0;
     time = 0;
     squadCount = 0;
     squadAward = 0;
-    flaggedTiles = 0;
 
     mouseClicks = [];
 
     visualEffects = new Set();
 
-    GAME_STATE = Object.freeze({
-        STARTING: "STARTING",
-        HELP: "HELP",
-        LEVEL_STARTING: "LEVEL_STARTING",
-        PLAYING: "PLAYING",
-        ENDING: "ENDING",
-        GAME_OVER: "GAME_OVER",
-    });
-    currentState = this.GAME_STATE.STARTING;
+    currentState = GAME_STATE.STARTING;
 
     constructor(screenWidth, screenHeight, sprites) {
+        this.width = screenWidth;
+        this.height = screenHeight;
         this.sprites = sprites;
 
         textSize(this.TILE_HEIGHT);
         textAlign(CENTER, CENTER);
         textSize(28);
 
-        this.board = new Board(this.MAX_MINES, MineSquad.sprites);
+        this.board = new Board(MineSquad.sprites);
         this.ui = new UI(screenWidth, screenHeight, this.board.height);
     }
 
@@ -129,20 +120,18 @@ class MineSquad {
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
-        this.flaggedTiles = 0;
 
         this.board.generateBoard(this.MAX_MINES);
-        console.log(this.board);
 
         this.mouseClicks = [];
         this.visualEffects = new Set();
 
-        this.currentState = this.GAME_STATE.STARTING;
+        this.currentState = GAME_STATE.STARTING;
     }
 
     update() {
         const nowTime = Date.now();
-        if (this.currentState === this.GAME_STATE.PLAYING) {
+        if (this.currentState === GAME_STATE.PLAYING) {
             this.gameTime += nowTime - this.lastTime;
         }
         this.lastTime = nowTime;
@@ -152,34 +141,30 @@ class MineSquad {
             if (effect.done) this.visualEffects.delete(effect);
         });
 
-        if (this.currentState === this.GAME_STATE.ENDING && this.visualEffects.size < 1) {
+        if (this.currentState === GAME_STATE.ENDING && this.visualEffects.size < 1) {
             this.gameOver();
         }
 
-        //console.log(`mX: ${mouseX} | mY: ${mouseY}`);
+        this.ui.update({
+            level: this.level,
+            score: this.score,
+            squads: this.squadCount,
+            time: this.gameTime,
+            ...this.board.getUiData(),
+        });
     }
 
     handleMouseClick(mouseX, mouseY) {
-        const mousePos = clickToBoardCoords(mouseX, mouseY);
-        const tileIndex = mousePositionToTileIndex(
-            mouseX,
-            mouseY,
-            this.TILE_HEIGHT,
-            this.BOARD_X_OFFSET,
-            this.BOARD_Y_OFFSET,
-            this.TILES_PER_ROW
-        );
-        console.log("tileIndexTest: ", tileIndex);
-        let tile = this.getTile(this.board, tileIndex);
-        if (this.currentState === this.GAME_STATE.STARTING) {
+        let tile = this.board.getTile(tileIndex);
+        if (this.currentState === GAME_STATE.STARTING) {
             while (tile.value != 0 || tile.bomb) {
                 this.board.generateBoard(this.MAX_MINES);
                 tile = this.board[tileIndex];
             }
-            this.currentState = this.GAME_STATE.PLAYING;
+            this.currentState = GAME_STATE.PLAYING;
         }
-        if (this.currentState === this.GAME_STATE.PLAYING) {
-            this.mouseClicks.push([mouseX, mouseY]);
+        if (this.currentState === GAME_STATE.PLAYING) {
+            if (tile) this.mouseClicks.push([mouseX, mouseY]);
             if (tile && tile.hidden) {
                 if (tile.flagged) {
                     this.flaggedTiles--;
@@ -203,12 +188,7 @@ class MineSquad {
                         this.uncover(tileIndex, []);
                     }
                 }
-
-                if (this.currentState === this.GAME_STATE.PLAYING) {
-                    this.checkForWin();
-                }
-            } else if (this.currentState === this.GAME_STATE.GAME_OVER) {
-                this.start1Player();
+                this.checkForWin();
             }
             if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
                 this.squadAward = this.FIRST_SQUAD_AWARD;
@@ -224,33 +204,21 @@ class MineSquad {
         }
     }
 
-    keyPressed(key) {
+    handleKeyPress(key) {
         if (key.code === "Space") {
-            if (this.currentState === this.GAME_STATE.GAME_OVER && this.highScorePanel) {
+            if (this.currentState === GAME_STATE.GAME_OVER && this.highScorePanel) {
                 this.highScorePanel.isShowing() ? this.highScorePanel.hidePanel() : this.highScorePanel.showPanel();
             }
         }
         if (key.code === "Tab") {
             key.preventDefault();
-            if (this.currentState != this.GAME_STATE.HELP) {
+            if (this.currentState != GAME_STATE.HELP) {
                 this.prevState = this.currentState;
-                this.currentState = this.GAME_STATE.HELP;
-            } else if (this.currentState === this.GAME_STATE.HELP) {
+                this.currentState = GAME_STATE.HELP;
+            } else if (this.currentState === GAME_STATE.HELP) {
                 if (this.prevState) this.currentState = this.prevState;
             }
         }
-    }
-
-    getElapsedTime() {
-        return this.gameTime;
-    }
-
-    getElapsedTimeString() {
-        const elapsedSeconds = (this.gameTime % 60000) / 1000;
-        let secondsStr = ("" + elapsedSeconds).split(".")[0];
-        if (elapsedSeconds < 10) secondsStr = "0" + secondsStr;
-        const minutes = (this.gameTime - (this.gameTime % 60000)) / 60000;
-        return minutes + ":" + secondsStr;
     }
 
     render() {
@@ -258,61 +226,23 @@ class MineSquad {
         rect(0, 0, this.width, this.height);
 
         //this.ui.draw();
-        this.board.draw();
+        this.board.draw(this.currentState);
 
         this.visualEffects.forEach((effect) => {
             effect.render();
         });
 
-        if (this.currentState === this.GAME_STATE.GAME_OVER) {
-            this.board.showMousePath();
+        if (this.currentState === GAME_STATE.GAME_OVER) {
+            this.board.showMousePath(this.mouseClicks);
             if (this.highScorePanel && this.highScorePanel.isShowing()) {
                 this.highScorePanel.draw();
             }
         }
 
-        if (this.currentState === this.GAME_STATE.HELP) {
+        if (this.currentState === GAME_STATE.HELP) {
             this.ui.showHelp();
         }
-        //this.ui.drawCrosshair();
-    }
-
-    getNumHiddenTiles() {
-        let result = this.TOTAL_TILES;
-        for (let i = 0; i < this.TOTAL_TILES; i++) {
-            if (!this.board[i].hidden && !this.board[i].bomb) result--;
-        }
-        return result;
-    }
-
-    uncover(tileIndex, checkedTiles) {
-        const tile = this.getTile(this.board, tileIndex);
-        if (tile) {
-            if (tile.flagged === false) {
-                tile.hidden = false;
-                const tileValue = tile.value;
-                const tileScore = tileValue > 0 ? this.board[tileIndex].value * 10 : 5;
-                this.score += tileScore;
-                const position = new Vec2(
-                    (tileIndex % this.TILES_PER_ROW) * this.TILE_HEIGHT + this.BOARD_X_OFFSET + this.TILE_HEIGHT / 2,
-                    Math.floor(tileIndex / this.TILES_PER_ROW) * this.TILE_HEIGHT
-                );
-                if (tileValue > 0) {
-                    this.visualEffects.add(new ScoreEffect(position, tileScore, tileValue));
-                }
-            }
-            // if tile.value is zero, uncover all the tiles around it
-            // if one of the ones uncovered is a zero uncover all the ones around it and so on
-            // checked is a blank list to track zeros already checked
-            if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
-                checkedTiles.push(tileIndex);
-                // a list of the valid neighbors
-                let neighbors = this.getNeighbors(tileIndex);
-                for (let i = 0; i < neighbors.length; i++) {
-                    this.uncover(neighbors[i], checkedTiles);
-                }
-            }
-        }
+        this.ui.drawCrosshair();
     }
 
     addSquad() {
@@ -328,47 +258,9 @@ class MineSquad {
         }
     }
 
-    defuseWithinRadius(tileIndex) {
-        this.board[tileIndex].hidden = false;
-        const position = tileIndexToTileCenter(tileIndex, this.TILE_HEIGHT, this.TILES_PER_ROW, this.BOARD_X_OFFSET);
-        if (this.board[tileIndex].bomb) {
-            this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
-            this.score += this.DEFUSE_BONUS;
-        } else if (this.board[tileIndex].value > 0) {
-            this.visualEffects.add(new BonusEffect(position, this.board[tileIndex].value * this.DEFUSE_BONUS, "blue"));
-            this.score += this.board[tileIndex].value * this.DEFUSE_BONUS;
-        }
-
-        const defuseArea = this.getNeighbors(tileIndex);
-        this.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
-        this.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
-        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
-        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
-
-        for (let i = 0; i < defuseArea.length; i++) {
-            if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
-                const tile = this.getTile(this.board, defuseArea[i]);
-                if (tile && tile.hidden) {
-                    tile.hidden = false;
-                    this.score += tile.value * this.TILE_BONUS;
-                    if (tile.bomb) {
-                        const position = tileIndexToTileCenter(
-                            defuseArea[i],
-                            this.TILE_HEIGHT,
-                            this.TILES_PER_ROW,
-                            this.BOARD_X_OFFSET
-                        );
-                        this.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
-                        this.score += this.DEFUSE_BONUS;
-                    }
-                }
-            }
-        }
-    }
-
     useBombSquad(tileIndex) {
         this.squadCount--;
-        this.defuseWithinRadius(tileIndex);
+        this.board.defuseWithinRadius(tileIndex);
     }
 
     detonateBomb(x, y) {
@@ -408,15 +300,7 @@ class MineSquad {
     }
 
     calculateScore() {
-        for (let i = 0; i < this.TOTAL_TILES; i++) {
-            const tile = this.board[i];
-            if (tile.hidden === false && this.winner) {
-                this.score += this.TILE_BONUS;
-            }
-            if (tile.flagged) {
-                this.score -= this.FLAG_PENALTY;
-            }
-        }
+        this.score += this.board.calculateScore();
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
         }
