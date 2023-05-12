@@ -24,6 +24,7 @@ class UI {
 
     update(gameData) {
         this.gameData = gameData;
+        console.log(gameData);
     }
 
     drawDashboard() {
