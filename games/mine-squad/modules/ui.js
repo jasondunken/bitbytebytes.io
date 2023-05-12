@@ -1,7 +1,9 @@
 import * as utils from "./utils.js";
+import { BonusSquadEffect } from "./visual-effects.js";
 
 class UI {
-    constructor(width, height, boardHeight) {
+    constructor(mineSquad, width, height, boardHeight) {
+        this.mineSquad = mineSquad;
         this.width = width;
         this.height = height;
         this.scoreboardHeight = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
@@ -12,8 +14,16 @@ class UI {
         this.flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
     }
 
+    addSquad() {
+        const position = new Vec2(
+            this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.gameData.squadCount) * (this.TILE_HEIGHT * 2) + 120,
+            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
+        );
+        this.mineSquad.visualEffects.add(new BonusSquadEffect(position));
+    }
+
     update(gameData) {
-        //console.log("gameData: ", gameData);
+        this.gameData = gameData;
     }
 
     drawDashboard() {

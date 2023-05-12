@@ -1,3 +1,5 @@
+import { Vec2d } from "./math.js";
+
 function setColor(newColor) {
     fill(newColor);
     stroke(newColor);
@@ -23,35 +25,39 @@ function valueToColor(value) {
     }
 }
 
-class Vec2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    add(vector) {
-        return new Vec2((this.x += vector.x), (this.y += vector.y));
-    }
-}
-// returns the array index for the tile mouse is over
-function mousePositionToTileIndex(coords, tileSize, tilesPerRow, xOffset, yOffset) {
-    const xIndex = Math.floor((coords.x - xOffset) / tileSize);
-    const yIndex = Math.floor((coords.y - yOffset) / tileSize);
-    return xIndex + yIndex * tilesPerRow;
+// returns the array index of tile under coords
+function screenPositionToTileIndex(coords, config) {
+    const xIndex = Math.floor((coords.x - config.xOffset) / config.tileSize);
+    const yIndex = Math.floor((coords.y - config.yOffset) / config.tileSize);
+    return xIndex + yIndex * config.tilesPerRow;
 }
 
 // returns the screen position of the center of the tile at the given array index
-function tileIndexToTileCenter(tileIndex, tileSize, tilesPerRow, xOffset, yOffset) {
-    return new Vec2(
-        (tileIndex % tilesPerRow) * tileSize + xOffset + tileSize / 2,
-        Math.floor(tileIndex / tilesPerRow) * tileSize + yOffset + tileSize / 2
+function tileIndexToTileCenter(tileIndex, config) {
+    return new Vec2d(
+        (tileIndex % config.tilesPerRow) * config.tileSize + config.xOffset + config.tileSize / 2,
+        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize + config.yOffset + config.tileSize / 2
     );
 }
 
-// returns the center coords of tile under pointer
-function mousePositionToTileCenter(coords, tileSize, tilesPerRow, xOffset, yOffset) {
-    const tileIndex = this.mousePositionToTileIndex(coords, tileSize, tilesPerRow, xOffset, yOffset);
-    return this.tileIndexToTileCenter(tileIndex, tileSize, tilesPerRow, xOffset, yOffset);
+// returns the screen position of the top-left of the tile at the given array index
+function tileIndexToTileTopLeft(tileIndex, config) {
+    return new Vec2d(
+        (tileIndex % config.tilesPerRow) * config.tileSize + config.xOffset,
+        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize + config.yOffset
+    );
+}
+
+// returns the screen position of the center of the tile under coords
+function screenPositionToTileCenter(coords, config) {
+    const tileIndex = this.screenPositionToTileIndex(coords, config);
+    return this.tileIndexToTileCenter(tileIndex, config);
+}
+
+// returns the screen position of the top-left of the tile under coords
+function screenPositionToTileTopLeft(coords, config) {
+    const tileIndex = this.screenPositionToTileIndex(coords, config);
+    return this.tileIndexToTileTopLeft(tileIndex, config);
 }
 
 function getElapsedTimeString(gameTime) {
@@ -65,9 +71,10 @@ function getElapsedTimeString(gameTime) {
 export {
     setColor,
     valueToColor,
-    Vec2,
-    mousePositionToTileIndex,
+    screenPositionToTileIndex,
     tileIndexToTileCenter,
-    mousePositionToTileCenter,
+    tileIndexToTileTopLeft,
+    screenPositionToTileCenter,
+    screenPositionToTileTopLeft,
     getElapsedTimeString,
 };

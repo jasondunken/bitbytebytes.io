@@ -34,7 +34,11 @@ class World {
         World.resources.sprites = await SpriteLoader.loadSprites(World.spriteMetadata);
     }
 
-    gameObjects = new Set();
+    gameObjects = {
+        player: null,
+        aliens: null,
+        visualEffects: null,
+    };
 
     constructor(width, height) {
         this.width = width;
@@ -63,13 +67,15 @@ class World {
 
     render() {
         background(World.resources.backgrounds[2]);
-        image(
-            World.resources.sprites["alien_1"],
-            this.width / 2,
-            this.height / 2,
-            this.ALIEN_SIZE * 2,
-            this.ALIEN_SIZE * 2
-        );
+        if (World.resources.sprites["alien_1"]) {
+            image(
+                World.resources.sprites["alien_1"],
+                this.width / 2,
+                this.height / 2,
+                this.ALIEN_SIZE * 2,
+                this.ALIEN_SIZE * 2
+            );
+        }
 
         this.gameObjects.forEach((gameObj) => {
             gameObj.render();

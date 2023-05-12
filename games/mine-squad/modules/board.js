@@ -1,7 +1,8 @@
 import { BoardBuilder } from "./board-builder.js";
 import * as utils from "./utils.js";
+import { Vec2d } from "./math.js";
 import { GAME_STATE } from "./game-state.js";
-import { ScoreEffect, BonusEffect } from "./visual-effects.js";
+import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
 
 class Board {
     TILES_PER_COLUMN = 16;
@@ -32,9 +33,17 @@ class Board {
             bottom: this.BOARD_Y_OFFSET + this.TILES_PER_COLUMN * this.TILE_HEIGHT,
             left: this.BOARD_X_OFFSET,
         };
+        this.boardConfig = {
+            tileSize: this.TILE_HEIGHT,
+            tilesPerRow: this.TILES_PER_ROW,
+            xOffset: this.BOARD_X_OFFSET,
+            yOffset: this.BOARD_Y_OFFSET,
+        };
     }
 
     generateBoard(numMines) {
+        this.completed = false;
+        this.winner = false;
         this.board = this.boardBuilder.generateBoard(numMines);
     }
 
@@ -51,13 +60,7 @@ class Board {
     }
 
     getIndex(coords) {
-        return utils.mousePositionToTileIndex(
-            coords,
-            this.TILE_HEIGHT,
-            this.TILES_PER_ROW,
-            this.BOARD_X_OFFSET,
-            this.BOARD_Y_OFFSET
-        );
+        return utils.screenPositionToTileIndex(coords, this.boardConfig);
     }
 
     getTile(index) {
@@ -90,12 +93,25 @@ class Board {
 
     update() {}
 
-    isWinner() {
-        let winner = true;
+    checkTile(tile, tileIndex) {
+        if (tile.bomb?.live) {
+            tile.hidden = false;
+            const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
+            this.mineSquad.visualEffects.add(new Explosion(position));
+            this.completed = true;
+            this.winner = false;
+            return;
+        }
+        this.uncover(tileIndex, []);
+        this.checkForWin();
+    }
+
+    checkForWin() {
+        let isWinner = true;
         this.board.forEach((tile) => {
-            if (!tile.bomb && tile.hidden === true) winner = false;
+            if (tile.hidden && !tile.bomb) isWinner = false;
         });
-        return winner;
+        this.winner = isWinner;
     }
 
     uncover(tileIndex, checkedTiles) {
@@ -104,13 +120,7 @@ class Board {
             tile.hidden = false;
             const tileScore = tile.value * 10;
             this.score += tileScore;
-            const position = utils.tileIndexToTileCenter(
-                tileIndex,
-                this.TILE_HEIGHT,
-                this.TILES_PER_ROW,
-                this.BOARD_X_OFFSET,
-                this.BOARD_Y_OFFSET
-            );
+            const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
             if (tile.value > 0) {
                 this.mineSquad.visualEffects.add(new ScoreEffect(position, tileScore, tile.value));
             }
@@ -128,21 +138,18 @@ class Board {
         }
     }
 
-    defuseWithinRadius(tileIndex) {
-        const tile = this.getTile(tileIndex);
+    defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        const position = utils.tileIndexToTileCenter(
-            tileIndex,
-            this.BOARD_X_OFFSET,
-            this.TILE_HEIGHT,
-            this.TILES_PER_ROW
-        );
+        const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
         if (tile.bomb) {
-            this.mineSquad.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
-            this.score += this.DEFUSE_BONUS;
+            tile.bomb.live = false;
+            this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green"));
+            this.score += this.mineSquad.DEFUSE_BONUS;
         } else if (tile.value > 0) {
-            this.mineSquad.visualEffects.add(new BonusEffect(position, tile.value * this.DEFUSE_BONUS, "blue"));
-            this.score += tile.value * this.DEFUSE_BONUS;
+            this.mineSquad.visualEffects.add(
+                new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue")
+            );
+            this.score += tile.value * this.mineSquad.DEFUSE_BONUS;
         }
 
         const defuseArea = this.boardBuilder.getNeighbors(tileIndex);
@@ -154,18 +161,13 @@ class Board {
         for (let i = 0; i < defuseArea.length; i++) {
             if (defuseArea[i] >= 0 && defuseArea[i] < this.TOTAL_TILES) {
                 const tile = this.getTile(defuseArea[i]);
-                if (tile && tile.hidden) {
+                if ((tile && tile.hidden) || true) {
                     tile.hidden = false;
-                    this.score += tile.value * this.TILE_BONUS;
+                    this.score += tile.value * this.mineSquad.TILE_BONUS;
                     if (tile.bomb) {
-                        const position = utils.tileIndexToTileCenter(
-                            defuseArea[i],
-                            this.TILE_HEIGHT,
-                            this.TILES_PER_ROW,
-                            this.BOARD_X_OFFSET,
-                            this.BOARD_Y_OFFSET
-                        );
-                        this.mineSquad.visualEffects.add(new BonusEffect(position, this.DEFUSE_BONUS));
+                        tile.bomb.live = false;
+                        const position = utils.tileIndexToTileCenter(defuseArea[i], this.boardConfig);
+                        this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS));
                         this.score += this.mineSquad.DEFUSE_BONUS;
                     }
                 }
@@ -194,56 +196,41 @@ class Board {
 
     drawBoard(gameState) {
         for (let i = 0; i < this.TOTAL_TILES; i++) {
-            this.tileIndexX = (i % this.config.tilesPerRow) * this.TILE_HEIGHT;
-            this.tileIndexY = Math.floor(i / this.config.tilesPerRow) * this.TILE_HEIGHT;
-            this.tile = this.board[i];
+            const tile = this.board[i];
+            const position = utils.tileIndexToTileTopLeft(i, this.boardConfig);
 
-            if (this.tile.hidden === false) {
+            if (tile.hidden === false) {
                 utils.setColor("gray");
                 stroke("darkgray");
                 strokeWeight(1);
-                rect(
-                    this.BOARD_X_OFFSET + this.tileIndexX,
-                    this.tileIndexY + this.BOARD_Y_OFFSET,
-                    this.TILE_HEIGHT,
-                    this.TILE_HEIGHT
-                );
-                if (!this.tile.bomb && this.tile.value !== 0) {
-                    utils.setColor(utils.valueToColor(this.tile.value));
+                rect(position.x, position.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+                if (!tile.bomb && tile.value !== 0) {
+                    utils.setColor(utils.valueToColor(tile.value));
                     textAlign(CENTER);
                     textSize(24);
-                    text(
-                        this.tile.value,
-                        this.BOARD_X_OFFSET + this.tileIndexX + this.HALF_TILE,
-                        this.tileIndexY + this.TILE_HEIGHT * 0.6 + this.BOARD_Y_OFFSET
-                    );
+                    text(tile.value, position.x + this.HALF_TILE, position.y + this.TILE_HEIGHT * 0.6);
                     utils.setColor("black");
                 }
 
-                if (this.tile.bomb) {
-                    this.drawBomb(new utils.Vec2(this.tileIndexX, this.tileIndexY));
+                if (tile.bomb) {
+                    this.drawBomb(tile.bomb, position);
                 }
             } else {
                 utils.setColor("green");
                 stroke("black");
                 strokeWeight(1);
-                rect(
-                    this.BOARD_X_OFFSET + this.tileIndexX,
-                    this.tileIndexY + this.BOARD_Y_OFFSET,
-                    this.TILE_HEIGHT - 1,
-                    this.TILE_HEIGHT - 1
-                );
-                if (this.tile.flagged) {
-                    this.drawFlag(new utils.Vec2(this.tileIndexX, this.tileIndexY));
+                rect(position.x, position.y, this.TILE_HEIGHT - 1, this.TILE_HEIGHT - 1);
+                if (tile.flagged) {
+                    this.drawFlag(new Vec2d(this.tileIndexX, this.tileIndexY));
                 }
             }
 
             // when game over mark flags correct/incorrect, show bombs
             if (gameState === GAME_STATE.GAME_OVER) {
-                if (this.tile.flagged === true) {
-                    this.markFlag(this.tile.bomb);
+                if (tile.flagged === true) {
+                    this.markFlag(tile.bomb);
                 } else if (this.tile.bomb) {
-                    this.drawBomb(new Vec2(this.tileIndexX, this.tileIndexY));
+                    this.drawBomb(new Vec2d(this.tileIndexX, this.tileIndexY));
                 }
             }
         }
@@ -260,15 +247,9 @@ class Board {
         );
     }
 
-    drawBomb(tileIndex) {
-        utils.setColor("red");
-        image(
-            this.sprites["bomb"],
-            this.BOARD_X_OFFSET + tileIndex.x + 2,
-            tileIndex.y + this.BOARD_Y_OFFSET + 2,
-            this.TILE_HEIGHT - 4,
-            this.TILE_HEIGHT - 4
-        );
+    drawBomb(bomb, position) {
+        const sprite = bomb.live ? this.sprites["bomb"] : this.sprites["bomb_defused"];
+        image(sprite, position.x + 2, position.y + 2, this.TILE_HEIGHT - 4, this.TILE_HEIGHT - 4);
     }
 
     markFlag(isBomb) {
@@ -289,41 +270,34 @@ class Board {
     }
 
     drawCursor() {
-        const coords = new utils.Vec2(mouseX, mouseY);
+        const coords = new Vec2d(mouseX, mouseY);
         if (this.isOnBoard(coords)) {
-            const tileCenter = utils.mousePositionToTileCenter(
-                coords,
-                this.TILE_HEIGHT,
-                this.TILES_PER_ROW,
-                this.BOARD_X_OFFSET,
-                this.BOARD_Y_OFFSET
-            );
-            utils.setColor("red");
-            strokeWeight(1);
+            const tileCenter = utils.screenPositionToTileCenter(coords, this.boardConfig);
+            utils.setColor("yellow");
+            strokeWeight(4);
             noFill();
             rect(
-                tileCenter.x - this.TILE_HEIGHT / 2,
-                tileCenter.y - this.TILE_HEIGHT / 2,
-                this.TILE_HEIGHT,
-                this.TILE_HEIGHT
+                tileCenter.x - this.TILE_HEIGHT / 2 - 1,
+                tileCenter.y - this.TILE_HEIGHT / 2 - 1,
+                this.TILE_HEIGHT + 2,
+                this.TILE_HEIGHT + 2
             );
         }
     }
 
-    showMousePath(mouseClicks) {
+    drawMousePath(mouseClickCoords) {
         stroke("orange");
         strokeWeight(2);
-        for (let i = 0; i < mouseClicks.length - 1; i++) {
-            line(mouseClicks[i][0], mouseClicks[i][1], mouseClicks[i + 1][0], mouseClicks[i + 1][1]);
+        for (let i = 0; i < mouseClickCoords.length - 1; i++) {
+            line(mouseClickCoords[i].x, mouseClickCoords[i].y, mouseClickCoords[i + 1].x, mouseClickCoords[i + 1].y);
         }
 
         stroke("magenta");
         noFill();
         strokeWeight(3);
-        let lastClick = mouseClicks[mouseClicks.length - 1];
-        lastClick = [lastClick[0], lastClick[1] - BOARD_Y_OFFSET];
-        const [x, y] = mousePositionToTileScreenLocation(lastClick, TILE_HEIGHT, BOARD_Y_OFFSET);
-        rect(x, y, TILE_HEIGHT, TILE_HEIGHT);
+        let lastClick = mouseClickCoords[mouseClickCoords.length - 1];
+        const tileCenter = utils.screenPositionToTileTopLeft(lastClick, this.boardConfig);
+        rect(tileCenter.x, tileCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
     }
 }
 

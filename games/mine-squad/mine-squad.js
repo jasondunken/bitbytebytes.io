@@ -2,8 +2,9 @@ import { GAME_STATE } from "./modules/game-state.js";
 import { Board } from "./modules/board.js";
 import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
-import { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect } from "./modules/visual-effects.js";
-import { setColor, Vec2 } from "./modules/utils.js";
+import { Vec2d } from "./modules/math.js";
+import { Explosion, Firework } from "./modules/visual-effects.js";
+import { setColor, getElapsedTimeString } from "./modules/utils.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -19,6 +20,7 @@ let game = null;
 function preload() {
     let sprites = {};
     sprites["bomb"] = loadImage("./mine-squad/res/img/bomb.png");
+    sprites["bomb_defused"] = loadImage("./mine-squad/res/img/bomb-defused.png");
     MineSquad.sprites = sprites;
 }
 
@@ -94,7 +96,7 @@ class MineSquad {
         textSize(28);
 
         this.board = new Board(this, MineSquad.sprites);
-        this.ui = new UI(screenWidth, screenHeight, this.board.height);
+        this.ui = new UI(this, screenWidth, screenHeight, this.board.height);
     }
 
     startDemo() {
@@ -148,10 +150,10 @@ class MineSquad {
     }
 
     handleMouseClick(mouseX, mouseY) {
-        const coords = new Vec2(mouseX, mouseY);
+        const coords = new Vec2d(mouseX, mouseY);
 
         if (this.board.isOnBoard(coords)) {
-            this.mouseClicks.push([mouseX, mouseY]);
+            this.mouseClicks.push(coords);
 
             const tileIndex = this.board.getIndex(coords);
             let tile = this.board.getTile(tileIndex);
@@ -178,13 +180,16 @@ class MineSquad {
                 if (tile.hidden) {
                     if (keyIsDown(SHIFT)) {
                         if (this.squadCount > 0) {
-                            this.useBombSquad(tileIndex);
+                            this.squadCount--;
+                            this.board.defuseWithinRadius(tile, tileIndex);
                         }
                     } else {
-                        this.board.uncover(tileIndex, []);
+                        this.board.checkTile(tile, tileIndex);
                     }
-                    this.checkForWin();
                 }
+
+                if (this.board.completed) this.endGame();
+
                 if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
                     this.squadAward = this.FIRST_SQUAD_AWARD;
                     this.addSquad();
@@ -229,7 +234,7 @@ class MineSquad {
         });
 
         if (this.currentState === GAME_STATE.GAME_OVER) {
-            this.board.showMousePath(this.mouseClicks);
+            this.board.drawMousePath(this.mouseClicks);
             if (this.highScorePanel && this.highScorePanel.isShowing()) {
                 this.highScorePanel.draw();
             }
@@ -244,19 +249,8 @@ class MineSquad {
     addSquad() {
         if (this.squadCount < this.MAX_SQUADS) {
             this.squadCount++;
-
-            const position = new Vec2(
-                this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.squadCount) * (this.TILE_HEIGHT * 2) + 120,
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
-            );
-
-            this.visualEffects.add(new BonusSquadEffect(position));
+            this.ui.addSquad();
         }
-    }
-
-    useBombSquad(tileIndex) {
-        this.squadCount--;
-        this.board.defuseWithinRadius(tileIndex);
     }
 
     checkForWin() {
@@ -265,24 +259,20 @@ class MineSquad {
         }
     }
 
-    isWinner() {
-        return this.board.isWinner();
-    }
-
     endGame() {
-        this.currentState = this.GAME_STATE.ENDING;
+        this.currentState = GAME_STATE.ENDING;
         this.calculateScore();
-        if (this.isWinner()) this.createFireworks();
+        if (this.board.winner) this.createFireworks();
     }
 
     gameOver() {
-        this.currentState = this.GAME_STATE.GAME_OVER;
+        this.currentState = GAME_STATE.GAME_OVER;
         this.highScorePanel = new HighScorePanel(
             this.width,
-            this.height - this.scoreboardHeight + this.BOARD_Y_OFFSET,
+            this.height - 54,
             this.score,
-            this.isWinner(),
-            this.getElapsedTimeString()
+            this.board.winner,
+            getElapsedTimeString(this.gameTime)
         );
         this.highScorePanel.showPanel();
     }
@@ -303,7 +293,7 @@ class MineSquad {
         for (let i = 0; i < numFireworks; i++) {
             this.visualEffects.add(
                 new Firework(
-                    new Vec2(
+                    new Vec2d(
                         this.width / 4 + (Math.random() * this.width) / 2,
                         this.height / 4 + (Math.random() * this.height) / 2
                     )

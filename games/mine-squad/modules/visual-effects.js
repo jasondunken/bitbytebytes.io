@@ -1,4 +1,5 @@
-import { valueToColor, Vec2 } from "./utils.js";
+import { valueToColor } from "./utils.js";
+import { Vec2d } from "./math.js";
 
 class VisualEffect {
     done = false;
@@ -193,7 +194,7 @@ class Firework extends VisualEffect {
                 particle.color.setAlpha(particle.alpha);
                 particle.alpha -= 10;
                 if (particle.alpha <= 0) particle.alpha = 0;
-                particle.position = particle.position.add(new Vec2(0, 0.5));
+                particle.position = particle.position.add(new Vec2d(0, 0.5));
             }
             particle.volleyTime--;
             if (particle.volleyTime <= 0) {
@@ -204,7 +205,7 @@ class Firework extends VisualEffect {
     }
 
     fireVolley() {
-        const volleyPosition = new Vec2(
+        const volleyPosition = new Vec2d(
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
         );
@@ -213,7 +214,7 @@ class Firework extends VisualEffect {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
                 position: volleyPosition,
-                direction: new Vec2(Math.cos(angle) * this.expansionSpeed, Math.sin(angle) * this.expansionSpeed),
+                direction: new Vec2d(Math.cos(angle) * this.expansionSpeed, Math.sin(angle) * this.expansionSpeed),
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
                 size: 8,

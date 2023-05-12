@@ -1,9 +1,9 @@
-import { Vec2 } from "./utils.js";
+import { Vec2d } from "./math.js";
 
 class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
-    position = new Vec2(0, 0);
+    position = new Vec2d(0, 0);
     MAX_SCORES = 10;
     stats = {};
     highScores = [];
