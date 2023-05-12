@@ -1,4 +1,5 @@
 import * as utils from "./utils.js";
+import { Vec2d } from "./math.js";
 import { BonusSquadEffect } from "./visual-effects.js";
 
 class UI {
@@ -15,8 +16,10 @@ class UI {
     }
 
     addSquad() {
-        const position = new Vec2(
-            this.TILE_HEIGHT * 1.5 + (this.MAX_SQUADS - this.gameData.squadCount) * (this.TILE_HEIGHT * 2) + 120,
+        const position = new Vec2d(
+            this.TILE_HEIGHT * 1.5 +
+                (this.mineSquad.MAX_SQUADS - this.gameData.squadCount) * (this.TILE_HEIGHT * 2) +
+                120,
             this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
         );
         this.mineSquad.visualEffects.add(new BonusSquadEffect(position));
@@ -24,7 +27,7 @@ class UI {
 
     update(gameData) {
         this.gameData = gameData;
-        console.log(gameData);
+        //console.log(gameData);
     }
 
     drawDashboard() {

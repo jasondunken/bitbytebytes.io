@@ -253,15 +253,9 @@ class MineSquad {
         }
     }
 
-    checkForWin() {
-        if (this.isWinner()) {
-            this.endGame();
-        }
-    }
-
     endGame() {
         this.currentState = GAME_STATE.ENDING;
-        this.calculateScore();
+        this.calculateFinalScore();
         if (this.board.winner) this.createFireworks();
     }
 
@@ -277,8 +271,8 @@ class MineSquad {
         this.highScorePanel.showPanel();
     }
 
-    calculateScore() {
-        this.score += this.board.calculateScore();
+    calculateFinalScore() {
+        this.score += this.board.calculateFinalScore();
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
         }

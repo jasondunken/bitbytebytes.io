@@ -111,6 +111,7 @@ class Board {
         this.board.forEach((tile) => {
             if (tile.hidden && !tile.bomb) isWinner = false;
         });
+        this.completed = isWinner;
         this.winner = isWinner;
     }
 
@@ -175,7 +176,7 @@ class Board {
         }
     }
 
-    calculateScore(tileBonus, flagPenalty) {
+    calculateFinalScore(tileBonus, flagPenalty) {
         let score = 0;
         for (let i = 0; i < this.totalTiles; i++) {
             const tile = this.board[i];
