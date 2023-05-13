@@ -161,7 +161,7 @@ class Board {
 
         for (let i = 0; i < defuseArea.length; i++) {
             const tile = this.getTile(defuseArea[i]);
-            if (tile.hidden) {
+            if (tile && tile.hidden) {
                 tile.hidden = false;
                 this.mineSquad.score += tile.value * this.mineSquad.TILE_BONUS;
                 if (tile.bomb) {
