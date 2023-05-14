@@ -1,18 +1,40 @@
-import * as utils from "./utils.js";
 import { Vec2d } from "./math.js";
 import { BonusSquadEffect } from "./visual-effects.js";
+import { GAME_STATE } from "./game-state.js";
+import { getElapsedTimeString } from "./utils.js";
 
 class UI {
-    constructor(mineSquad, width, height, boardHeight) {
+    UI_HEIGHT = 50;
+    UI_WIDTH = 952;
+
+    UI_MARGIN = 4;
+
+    UI_BOX_Y = 18;
+
+    UI_BOX_1_X = 4;
+    UI_BOX_2_X = 72;
+    UI_BOX_3_X = 412;
+    UI_BOX_4_X = 652;
+    UI_BOX_5_X = 752;
+    UI_BOX_6_X = 852;
+
+    UI_BOX_HEIGHT = 28;
+
+    UI_LABEL_MARGIN_TOP = 4;
+    UI_LABEL_MARGIN_LEFT = 4;
+
+    UI_VALUE_CENTER_Y = 16;
+
+    LEVEL_BOX_WIDTH = 64;
+    SCORE_BOX_WIDTH = 128;
+    SQUADS_BOX_WIDTH = 128;
+    TIME_BOX_WIDTH = 96;
+    TILES_BOX_WIDTH = 96;
+    FLAGS_BOX_WIDTH = 96;
+
+    constructor(mineSquad, position) {
         this.mineSquad = mineSquad;
-        this.width = width;
-        this.height = height;
-        this.scoreboardHeight = this.height - (this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.BOARD_Y_OFFSET);
-        this.minesLeftBox = Math.floor(this.scoreboardHeight / 2);
-        this.minesLeftBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (this.minesLeftBox + this.minesLeftBox / 2) - 64;
-        this.minesLeftBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
-        this.flagsPlacedBoxX = this.TILES_PER_ROW * this.TILE_HEIGHT - (this.minesLeftBox + this.minesLeftBox / 2);
-        this.flagsPlacedBoxY = this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.minesLeftBox / 2 + this.BOARD_Y_OFFSET;
+        this.position = position || new Vec2d(4, 487);
     }
 
     addSquad() {
@@ -30,104 +52,185 @@ class UI {
         //console.log(gameData);
     }
 
-    drawDashboard() {
-        setColor("black");
+    draw() {
+        stroke("black");
         strokeWeight(1);
-        rect(
-            4,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + 4 + this.BOARD_Y_OFFSET,
-            this.width - 8,
-            this.scoreboardHeight - 8
-        );
-        this.drawHiddenTiles();
-        this.drawFlagsPlaced();
-        this.drawSquads();
-        this.drawScore();
-        this.drawTimer();
+        fill("black");
+        rect(this.position.x, this.position.y, this.UI_WIDTH, this.UI_HEIGHT);
+        this.drawLevelBox();
+        this.drawScoreBox();
+        this.drawSquadsBox();
+        this.drawTimerBox();
+        this.drawFlagsBox();
+        this.drawTilesBox();
     }
 
-    drawHiddenTiles() {
+    drawLevelBox() {
         noStroke();
-        fill("gray");
-        rect(this.minesLeftBoxX, this.minesLeftBoxY, this.minesLeftBox * 2, this.minesLeftBox);
-        fill("red");
-        textAlign(CENTER);
-        textSize(24);
-        if (this.currentState != this.GAME_STATE.GAME_OVER) {
-            text(
-                "" + this.getNumHiddenTiles(),
-                this.minesLeftBoxX + this.minesLeftBox,
-                this.minesLeftBoxY + this.minesLeftBox / 2 + 2
-            );
-        } else {
-            text("X", this.minesLeftBoxX + this.minesLeftBox, this.minesLeftBoxY + this.minesLeftBox / 2 + 2);
-        }
-    }
-
-    drawFlagsPlaced() {
-        fill("gray");
-        rect(this.flagsPlacedBoxX, this.flagsPlacedBoxY, this.minesLeftBox * 2, this.minesLeftBox);
-        fill("red");
-        textAlign(CENTER);
-        textSize(24);
-        if (this.currentState != this.GAME_STATE.GAME_OVER) {
-            text(
-                "" + this.MAX_MINES - this.flaggedTiles,
-                this.flagsPlacedBoxX + this.minesLeftBox,
-                this.flagsPlacedBoxY + this.minesLeftBox / 2 + 2
-            );
-        } else {
-            text("X", this.flagsPlacedBoxX + this.minesLeftBox, this.flagsPlacedBoxY + this.minesLeftBox / 2 + 2);
-        }
-    }
-
-    drawSquads() {
         fill("white");
-        noStroke();
-        textAlign(CENTER);
-        textSize(24);
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("LEVEL", this.position.x + this.UI_BOX_1_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_1_X,
+            this.position.y + this.UI_BOX_Y,
+            this.LEVEL_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        fill("white");
+        textSize(18);
+        textAlign(CENTER, CENTER);
         text(
-            "SQUADS",
-            72,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
+            "" + this.gameData.level,
+            this.UI_BOX_1_X + this.LEVEL_BOX_WIDTH / 2,
+            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+        );
+    }
+
+    drawScoreBox() {
+        noStroke();
+        fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("SCORE", this.position.x + this.UI_BOX_2_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_2_X,
+            this.position.y + this.UI_BOX_Y,
+            this.SCORE_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        fill("white");
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        text(
+            "" + this.gameData.score,
+            this.UI_BOX_2_X + this.SCORE_BOX_WIDTH / 2,
+            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+        );
+    }
+
+    drawSquadsBox() {
+        noStroke();
+        fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("SQUADS", this.position.x + this.UI_BOX_3_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_3_X,
+            this.position.y + this.UI_BOX_Y,
+            this.SQUADS_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
         );
         fill("gray");
-        for (let i = 0; i < this.MAX_SQUADS; i++) {
-            if (i + 1 > this.MAX_SQUADS - this.squadCount) {
+        for (let i = 0; i < this.mineSquad.MAX_SQUADS; i++) {
+            if (i + 1 > this.mineSquad.MAX_SQUADS - this.gameData.squads) {
                 fill("SpringGreen");
             }
-            if (i === this.MAX_SQUADS - this.squadCount) {
+            if (i === this.mineSquad.MAX_SQUADS - this.gameData.squads) {
                 if (keyIsDown(SHIFT) && frameCount % 30 > 15) {
                     fill("Green");
                 } else if (!keyIsDown(SHIFT) && frameCount % 60 > 30) {
                     fill("Green");
                 }
             }
+            const xOff = 32 * (i - 1);
             ellipse(
-                this.TILE_HEIGHT * 1.5 + i * (this.TILE_HEIGHT * 2) + 120,
-                this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET,
-                this.BOMB_HEIGHT,
-                this.BOMB_HEIGHT
+                this.position.x + this.UI_BOX_3_X + this.SCORE_BOX_WIDTH / 2 + xOff,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y,
+                12,
+                12
             );
         }
     }
 
-    drawScore() {
+    drawTimerBox() {
+        noStroke();
         fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("TIME", this.position.x + this.UI_BOX_4_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_4_X,
+            this.position.y + this.UI_BOX_Y,
+            this.TIME_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        fill("white");
+        textSize(18);
+        textAlign(CENTER, CENTER);
         text(
-            "" + this.score,
-            this.width / 2,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
+            "" + getElapsedTimeString(this.gameData.time),
+            this.UI_BOX_4_X + this.TIME_BOX_WIDTH / 2,
+            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
     }
 
-    drawTimer() {
+    drawTilesBox() {
+        noStroke();
         fill("white");
-        text(
-            this.getElapsedTimeString(),
-            this.width * 0.75,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + 2 + this.BOARD_Y_OFFSET
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("HIDDEN", this.position.x + this.UI_BOX_5_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_5_X,
+            this.position.y + this.UI_BOX_Y,
+            this.TILES_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
         );
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+            fill("red");
+            text(
+                "" + this.gameData.hidden,
+                this.UI_BOX_5_X + this.TILES_BOX_WIDTH / 2,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        } else {
+            fill("black");
+            text(
+                "X",
+                this.UI_BOX_5_X + this.TILES_BOX_WIDTH / 2,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        }
+    }
+
+    drawFlagsBox() {
+        noStroke();
+        fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("FLAGS", this.position.x + this.UI_BOX_6_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.UI_BOX_6_X,
+            this.position.y + this.UI_BOX_Y,
+            this.TILES_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+            fill("yellow");
+            text(
+                "" + this.gameData.flags,
+                this.UI_BOX_6_X + this.FLAGS_BOX_WIDTH / 2,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        } else {
+            fill("black");
+            text(
+                "X",
+                this.UI_BOX_6_X + this.FLAGS_BOX_WIDTH / 2,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        }
     }
 
     showHelp() {
@@ -141,13 +244,13 @@ class UI {
     }
 
     drawCrosshair() {
-        utils.setColor("red");
-        noFill();
+        stroke("red");
         strokeWeight(1);
+        noFill();
         let crosshairDiameter = 10;
         if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
         ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
-        utils.setColor("black");
+        stroke("black");
         line(mouseX - 10, mouseY, mouseX + 10, mouseY);
         line(mouseX, mouseY - 10, mouseX, mouseY + 10);
     }

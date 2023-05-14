@@ -96,7 +96,7 @@ class MineSquad {
         textSize(28);
 
         this.board = new Board(this, MineSquad.sprites);
-        this.ui = new UI(this, screenWidth, screenHeight, this.board.height);
+        this.ui = new UI(this);
     }
 
     startDemo() {
@@ -226,7 +226,7 @@ class MineSquad {
         setColor("darkgray");
         rect(0, 0, this.width, this.height);
 
-        //this.ui.draw();
+        this.ui.draw();
         this.board.draw(this.currentState);
 
         this.visualEffects.forEach((effect) => {
