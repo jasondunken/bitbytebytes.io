@@ -23,14 +23,14 @@ class UI {
     SCORE_BOX_WIDTH = 128;
     SQUADS_BOX_WIDTH = 128;
     TIME_BOX_WIDTH = 96;
-    HIDDEN_BOX_WIDTH = 96;
+    BOMBS_BOX_WIDTH = 96;
     FLAGS_BOX_WIDTH = 96;
 
     LEVEL_BOX_X = 4;
     SCORE_BOX_X = 72;
     SQUADS_BOX_X = 412;
     TIME_BOX_X = 652;
-    HIDDEN_BOX_X = 752;
+    BOMBS_BOX_X = 752;
     FLAGS_BOX_X = 852;
 
     SQUADS_SPACING = 36;
@@ -64,8 +64,8 @@ class UI {
         this.drawScoreBox();
         this.drawSquadsBox();
         this.drawTimerBox();
+        this.drawBombsBox();
         this.drawFlagsBox();
-        this.drawTilesBox();
     }
 
     drawLevelBox() {
@@ -172,17 +172,17 @@ class UI {
         );
     }
 
-    drawTilesBox() {
+    drawBombsBox() {
         noStroke();
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("HIDDEN", this.position.x + this.HIDDEN_BOX_X, this.position.y + this.UI_BOX_Y);
+        text("BOMBS?", this.position.x + this.BOMBS_BOX_X, this.position.y + this.UI_BOX_Y);
         fill(color(44, 44, 44));
         rect(
-            this.position.x + this.HIDDEN_BOX_X,
+            this.position.x + this.BOMBS_BOX_X,
             this.position.y + this.UI_BOX_Y,
-            this.HIDDEN_BOX_WIDTH,
+            this.BOMBS_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
         textSize(18);
@@ -191,14 +191,14 @@ class UI {
             fill("red");
             text(
                 "" + this.gameData.hidden,
-                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.BOMBS_BOX_X + this.BOMBS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.BOMBS_BOX_X + this.BOMBS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }
@@ -214,7 +214,7 @@ class UI {
         rect(
             this.position.x + this.FLAGS_BOX_X,
             this.position.y + this.UI_BOX_Y,
-            this.HIDDEN_BOX_WIDTH,
+            this.BOMBS_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
         textSize(18);
