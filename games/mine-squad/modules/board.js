@@ -75,9 +75,10 @@ class Board {
         let totalTileValue = 0;
         this.board.forEach((tile) => {
             totalTiles++;
-            tile.hidden ? hidden++ : hidden;
-            tile.bomb ? mines++ : mines;
-            tile.flagged ? flags++ : flags;
+            if (tile.hidden) hidden++;
+            if (tile.bomb && tile.bomb.live === false) hidden++;
+            if (tile.bomb) mines;
+            if (tile.flagged) flags++;
             totalTileValue += tile.value;
         });
         return { totalTiles, hidden, mines, flags, totalTileValue };
