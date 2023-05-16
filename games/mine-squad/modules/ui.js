@@ -23,14 +23,16 @@ class UI {
     SCORE_BOX_WIDTH = 128;
     SQUADS_BOX_WIDTH = 128;
     TIME_BOX_WIDTH = 96;
-    BOMBS_BOX_WIDTH = 96;
+    MINES_BOX_WIDTH = 96;
+    HIDDEN_BOX_WIDTH = 96;
     FLAGS_BOX_WIDTH = 96;
 
     LEVEL_BOX_X = 4;
     SCORE_BOX_X = 72;
+    TIME_BOX_X = 204;
     SQUADS_BOX_X = 412;
-    TIME_BOX_X = 652;
-    BOMBS_BOX_X = 752;
+    MINES_BOX_X = 652;
+    HIDDEN_BOX_X = 752;
     FLAGS_BOX_X = 852;
 
     SQUADS_SPACING = 36;
@@ -40,12 +42,14 @@ class UI {
         this.position = position || new Vec2d(4, 487);
     }
 
-    addSquad() {
+    addSquad(squadCount) {
         const position = new Vec2d(
-            this.TILE_HEIGHT * 1.5 +
-                (this.mineSquad.MAX_SQUADS - this.gameData.squadCount) * (this.TILE_HEIGHT * 2) +
-                120,
-            this.TILES_PER_COLUMN * this.TILE_HEIGHT + this.scoreboardHeight / 2 + this.BOARD_Y_OFFSET
+            this.position.x +
+                this.SQUADS_BOX_X +
+                this.SQUADS_BOX_WIDTH / 2 +
+                this.SQUADS_SPACING -
+                (squadCount - 1) * this.SQUADS_SPACING,
+            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
         this.mineSquad.visualEffects.add(new BonusSquadEffect(position));
     }
@@ -64,7 +68,8 @@ class UI {
         this.drawScoreBox();
         this.drawSquadsBox();
         this.drawTimerBox();
-        this.drawBombsBox();
+        this.drawMinesBox();
+        this.drawHiddenBox();
         this.drawFlagsBox();
     }
 
@@ -172,17 +177,49 @@ class UI {
         );
     }
 
-    drawBombsBox() {
+    drawMinesBox() {
         noStroke();
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("BOMBS?", this.position.x + this.BOMBS_BOX_X, this.position.y + this.UI_BOX_Y);
+        text("MINES", this.position.x + this.MINES_BOX_X, this.position.y + this.UI_BOX_Y);
         fill(color(44, 44, 44));
         rect(
-            this.position.x + this.BOMBS_BOX_X,
+            this.position.x + this.MINES_BOX_X,
             this.position.y + this.UI_BOX_Y,
-            this.BOMBS_BOX_WIDTH,
+            this.MINES_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+            fill("white");
+            text(
+                "" + this.gameData.mines,
+                this.MINES_BOX_X + this.MINES_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        } else {
+            fill("black");
+            text(
+                "X",
+                this.MINES_BOX_X + this.MINES_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        }
+    }
+
+    drawHiddenBox() {
+        noStroke();
+        fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text("MINES?", this.position.x + this.HIDDEN_BOX_X, this.position.y + this.UI_BOX_Y);
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.HIDDEN_BOX_X,
+            this.position.y + this.UI_BOX_Y,
+            this.HIDDEN_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
         textSize(18);
@@ -191,14 +228,14 @@ class UI {
             fill("red");
             text(
                 "" + this.gameData.hidden,
-                this.BOMBS_BOX_X + this.BOMBS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.BOMBS_BOX_X + this.BOMBS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }
@@ -214,7 +251,7 @@ class UI {
         rect(
             this.position.x + this.FLAGS_BOX_X,
             this.position.y + this.UI_BOX_Y,
-            this.BOMBS_BOX_WIDTH,
+            this.MINES_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
         textSize(18);
@@ -240,10 +277,10 @@ class UI {
         stroke("black");
         strokeWeight(3);
         fill("gray");
-        rect(this.width / 2 - 200, 30, 400, 425);
+        rect(this.mineSquad.width / 2 - 200, 30, 400, 425);
         noStroke();
         fill("black");
-        text("Hold shift to use bomb squad!", this.width / 2, 70);
+        text("Hold shift to use bomb squad!", this.mineSquad.width / 2, 70);
     }
 
     drawCrosshair() {
