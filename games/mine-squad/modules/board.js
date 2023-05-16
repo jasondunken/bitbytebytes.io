@@ -77,7 +77,7 @@ class Board {
             totalTiles++;
             if (tile.hidden) hidden++;
             if (tile.bomb && tile.bomb.live === false) hidden++;
-            if (tile.bomb) mines;
+            if (tile.bomb) mines++;
             if (tile.flagged) flags++;
             totalTileValue += tile.value;
         });
@@ -101,38 +101,24 @@ class Board {
             this.mineSquad.visualEffects.add(new Explosion(position));
             this.completed = true;
             this.winner = false;
-            return;
+        } else {
+            this.uncover(tileIndex, []);
+            this.checkForWin();
         }
-        this.uncover(tileIndex, []);
-        this.checkForWin();
-    }
-
-    checkForWin() {
-        let isWinner = true;
-        this.board.forEach((tile) => {
-            if (tile.hidden && !tile.bomb) isWinner = false;
-        });
-        this.completed = isWinner;
-        this.winner = isWinner;
     }
 
     uncover(tileIndex, checkedTiles) {
         const tile = this.getTile(tileIndex);
-        if (tile.flagged === false) {
-            tile.hidden = false;
-            const tileScore = tile.value * 10;
-            this.mineSquad.score += tileScore;
-            if (tile.value > 0) {
-                const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
-                this.mineSquad.visualEffects.add(new ScoreEffect(position, tileScore, tile.value));
-            }
+        tile.hidden = false;
+        const tileScore = tile.value * 10;
+        this.mineSquad.score += tileScore;
+        if (tile.value > 0) {
+            const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
+            this.mineSquad.visualEffects.add(new ScoreEffect(position, tileScore, tile.value));
         }
-        // if tile.value is zero, uncover all the tiles around it
-        // if one of the ones uncovered is a zero uncover all the ones around it and so on
-        // checked is a blank list to track zeros already checked
+        // if tile.value is zero and not already checked, uncover all the tiles around it
         if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
             checkedTiles.push(tileIndex);
-            // a list of the valid neighbors
             let neighbors = this.boardBuilder.getNeighbors(tileIndex);
             for (let i = 0; i < neighbors.length; i++) {
                 this.uncover(neighbors[i], checkedTiles);
@@ -173,6 +159,16 @@ class Board {
                 }
             }
         }
+        this.checkForWin();
+    }
+
+    checkForWin() {
+        let isWinner = true;
+        this.board.forEach((tile) => {
+            if (tile.hidden && !tile.bomb) isWinner = false;
+        });
+        this.completed = isWinner;
+        this.winner = isWinner;
     }
 
     calculateFinalScore(tileBonus, flagPenalty) {
@@ -287,12 +283,19 @@ class Board {
             line(mouseClickCoords[i].x, mouseClickCoords[i].y, mouseClickCoords[i + 1].x, mouseClickCoords[i + 1].y);
         }
 
+        stroke("green");
+        noFill();
+        strokeWeight(3);
+        let firstClick = mouseClickCoords[0];
+        const firstClickCenter = utils.screenPositionToTileTopLeft(firstClick, this.boardConfig);
+        rect(firstClickCenter.x, firstClickCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+
         stroke("magenta");
         noFill();
         strokeWeight(3);
         let lastClick = mouseClickCoords[mouseClickCoords.length - 1];
-        const tileCenter = utils.screenPositionToTileTopLeft(lastClick, this.boardConfig);
-        rect(tileCenter.x, tileCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+        const lastClickCenter = utils.screenPositionToTileTopLeft(lastClick, this.boardConfig);
+        rect(lastClickCenter.x, lastClickCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
     }
 }
 
