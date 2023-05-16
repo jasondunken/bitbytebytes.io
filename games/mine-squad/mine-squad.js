@@ -62,8 +62,8 @@ class MineSquad {
 
     MAX_MINES = 99;
     STARTING_SQUADS = 1;
-    FIRST_SQUAD_AWARD = 7500;
-    SECOND_SQUAD_AWARD = 20000;
+    FIRST_SQUAD_AWARD = 10000;
+    SECOND_SQUAD_AWARD = 30000;
     MAX_SQUADS = 3;
     TILE_SCORE = 10;
     TILE_BONUS = 100;
@@ -249,7 +249,7 @@ class MineSquad {
     addSquad() {
         if (this.squadCount < this.MAX_SQUADS) {
             this.squadCount++;
-            this.ui.addSquad();
+            this.ui.addSquad(this.squadCount);
         }
     }
 
