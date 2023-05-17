@@ -3,9 +3,11 @@ import { Vec2d } from "./math.js";
 
 class VisualEffect {
     done = false;
+    layer = 0;
 
-    constructor(position) {
+    constructor(position, layer) {
         this.position = position;
+        this.layer = layer || 0;
     }
 
     update() {}
@@ -15,8 +17,8 @@ class VisualEffect {
 class ScoreEffect extends VisualEffect {
     opacity = 255;
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score, value) {
-        super(position);
+    constructor(position, score, value, layer) {
+        super(position, layer);
         this.score = score;
         this.color = color(valueToColor(value));
         this.outlineColor = color("white");
@@ -43,10 +45,10 @@ class ScoreEffect extends VisualEffect {
 
 class BonusEffect extends VisualEffect {
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score, color) {
-        super(position);
+    constructor(position, score, color, layer) {
+        super(position, layer);
         this.score = score;
-        this.color = color ? color : "red";
+        this.color = color || "red";
     }
 
     update() {
@@ -73,8 +75,8 @@ class BonusSquadEffect extends VisualEffect {
 
     repetitions = 4;
 
-    constructor(position) {
-        super(position);
+    constructor(position, layer) {
+        super(position, layer);
     }
 
     update() {
@@ -104,8 +106,8 @@ class Explosion extends VisualEffect {
 
     explosion = new Set();
 
-    constructor(position) {
-        super(position);
+    constructor(position, layer) {
+        super(position, layer);
         for (let i = 0; i < this.DENSITY; i++) {
             const b = Math.floor(Math.random() * 256);
             this.explosion.add({
@@ -167,8 +169,8 @@ class Firework extends VisualEffect {
         "coral",
     ];
 
-    constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay) {
-        super(position);
+    constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay, layer) {
+        super(position, layer);
         numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
         volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 50);
         expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 25);

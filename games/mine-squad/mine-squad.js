@@ -229,7 +229,11 @@ class MineSquad {
         this.ui.draw();
         this.board.draw(this.currentState);
 
-        this.visualEffects.forEach((effect) => {
+        let zSortedVisualEffects = Array.from(this.visualEffects).sort((a, b) => {
+            return a.layer - b.layer;
+        });
+        console.log("zSorted: ", zSortedVisualEffects);
+        zSortedVisualEffects.forEach((effect) => {
             effect.render();
         });
 

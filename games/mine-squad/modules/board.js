@@ -132,11 +132,11 @@ class Board {
         if (tile.bomb) {
             tile.bomb.live = false;
             this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green"));
+            this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green", 2));
         } else if (tile.value > 0) {
             this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
             this.mineSquad.visualEffects.add(
-                new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue")
+                new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue", 2)
             );
         }
 
