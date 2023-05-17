@@ -232,7 +232,6 @@ class MineSquad {
         let zSortedVisualEffects = Array.from(this.visualEffects).sort((a, b) => {
             return a.layer - b.layer;
         });
-        console.log("zSorted: ", zSortedVisualEffects);
         zSortedVisualEffects.forEach((effect) => {
             effect.render();
         });
