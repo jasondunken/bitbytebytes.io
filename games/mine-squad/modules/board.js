@@ -98,7 +98,7 @@ class Board {
         if (tile.bomb?.live) {
             tile.hidden = false;
             const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
-            this.mineSquad.visualEffects.add(new Explosion(position));
+            this.mineSquad.addToLayers(new Explosion(position));
             this.completed = true;
             this.winner = false;
         } else {
@@ -114,7 +114,7 @@ class Board {
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
             const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
-            this.mineSquad.visualEffects.add(new ScoreEffect(position, tileScore, tile.value));
+            this.mineSquad.addToLayers(new ScoreEffect(position, tileScore, tile.value));
         }
         // if tile.value is zero and not already checked, uncover all the tiles around it
         if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
@@ -132,12 +132,10 @@ class Board {
         if (tile.bomb) {
             tile.bomb.live = false;
             this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green", 2));
+            this.mineSquad.addToLayers(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green", 2));
         } else if (tile.value > 0) {
             this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.visualEffects.add(
-                new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue", 2)
-            );
+            this.mineSquad.addToLayers(new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue", 2));
         }
 
         const defuseArea = this.boardBuilder.getNeighbors(tileIndex);
@@ -155,7 +153,7 @@ class Board {
                     tile.bomb.live = false;
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
                     const position = utils.tileIndexToTileCenter(defuseArea[i], this.boardConfig);
-                    this.mineSquad.visualEffects.add(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS));
+                    this.mineSquad.addToLayers(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS));
                 }
             }
         }

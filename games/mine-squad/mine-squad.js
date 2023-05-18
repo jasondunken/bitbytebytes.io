@@ -119,7 +119,7 @@ class MineSquad {
         this.board.generateBoard(this.MAX_MINES);
 
         this.mouseClicks = [];
-        this.visualEffects = new Set();
+        this.layers = [];
 
         this.currentState = GAME_STATE.STARTING;
     }
@@ -131,12 +131,16 @@ class MineSquad {
         }
         this.lastTime = nowTime;
 
-        this.visualEffects.forEach((effect) => {
-            effect.update();
-            if (effect.done) this.visualEffects.delete(effect);
+        let layersComplete = true;
+        this.layers.forEach((layer) => {
+            layer.forEach((effect) => {
+                effect.update();
+                if (effect.done) layer.delete(effect);
+            });
+            if (layer.size) layersComplete = false;
         });
 
-        if (this.currentState === GAME_STATE.ENDING && this.visualEffects.size < 1) {
+        if (this.currentState === GAME_STATE.ENDING && layersComplete) {
             this.gameOver();
         }
 
@@ -222,6 +226,11 @@ class MineSquad {
         }
     }
 
+    addToLayers(effect) {
+        if (!this.layers[effect.layer]) this.layers[effect.layer] = new Set();
+        this.layers[effect.layer].add(effect);
+    }
+
     render() {
         setColor("darkgray");
         rect(0, 0, this.width, this.height);
@@ -229,11 +238,10 @@ class MineSquad {
         this.ui.draw();
         this.board.draw(this.currentState);
 
-        let zSortedVisualEffects = Array.from(this.visualEffects).sort((a, b) => {
-            return a.layer - b.layer;
-        });
-        zSortedVisualEffects.forEach((effect) => {
-            effect.render();
+        this.layers.forEach((layer) => {
+            layer.forEach((effect) => {
+                effect.render();
+            });
         });
 
         if (this.currentState === GAME_STATE.GAME_OVER) {
@@ -282,13 +290,13 @@ class MineSquad {
     }
 
     detonateBomb(coords) {
-        this.visualEffects.add(new Explosion(coords));
+        this.addToLayers(new Explosion(coords));
     }
 
     createFireworks() {
         const numFireworks = Math.floor(this.score / 10000);
         for (let i = 0; i < numFireworks; i++) {
-            this.visualEffects.add(
+            this.addToLayers(
                 new Firework(
                     new Vec2d(
                         this.width / 4 + (Math.random() * this.width) / 2,
