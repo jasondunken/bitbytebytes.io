@@ -110,7 +110,7 @@ class Board {
     uncover(tileIndex, checkedTiles) {
         const tile = this.getTile(tileIndex);
         tile.hidden = false;
-        const tileScore = tile.value * 10;
+        const tileScore = tile.value * this.mineSquad.TILE_MULTIPLIER;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
             const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
@@ -148,7 +148,7 @@ class Board {
             const tile = this.getTile(defuseArea[i]);
             if (tile && tile.hidden) {
                 tile.hidden = false;
-                this.mineSquad.score += tile.value * this.mineSquad.TILE_BONUS;
+                this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
                 if (tile.bomb) {
                     tile.bomb.live = false;
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
