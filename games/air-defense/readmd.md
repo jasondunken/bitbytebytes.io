@@ -1,6 +1,6 @@
 # Air Defense
 
-## Tribute to an old classic
+## Tribute to the Apple ][ classic - Sabotage
 
 -   Defend the skies!
 -   Shoot down planes, bombs, and paratroopers!
