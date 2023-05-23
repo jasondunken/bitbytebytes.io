@@ -8,16 +8,17 @@ import { Bomb } from "./weapons.js";
 class AirTrafficControl {
     static AIRCRAFT = ["light-bomber", "airborne-transport"];
     static MINIMUM_FLIGHT_CEILING = 200;
-    static FLIGHT_SEPARATION = 32;
+    static FLIGHT_SEPARATION = 64;
     static spawn(game, wave) {
-        let spawnX = wave.approach === 1 ? 0 : game.width;
+        let spawnX = wave.approach > 0 ? 0 : game.width;
         spawnX -= wave.approach * AirTrafficControl.FLIGHT_SEPARATION;
         for (let i = 0; i < wave.count; i++) {
             const aircraft = AirTrafficControl.getAircraft(wave.type);
+            const flightDeviation = AirTrafficControl.FLIGHT_SEPARATION * aircraft.pilotConfidence;
             aircraft.setPosition(
                 new Vec(
-                    spawnX * aircraft.pilotConfidence,
-                    aircraft.MINIMUM_FLIGHT_CEILING - i * AirTrafficControl.FLIGHT_SEPARATION * aircraft.pilotConfidence
+                    spawnX + flightDeviation,
+                    aircraft.MINIMUM_FLIGHT_CEILING - (i * AirTrafficControl.FLIGHT_SEPARATION) / 2
                 )
             );
             aircraft.setDirection(new Vec(wave.approach, 0));
@@ -79,6 +80,16 @@ class Aircraft extends Entity {
             this.width,
             this.height
         );
+        // noStroke();
+        // fill("red");
+        // textSize(10);
+        // text(`${this.pilotConfidence}`, this.position.x - 56, this.position.y - 16);
+        // circle(this.position.x, this.position.y, 8);
+        // if (this.isOverTarget()) {
+        //     stroke("magenta");
+        //     strokeWeight(3);
+        //     circle(this.position.x, this.position.y, 32);
+        // }
     }
 }
 
@@ -120,12 +131,12 @@ class LightBomber extends Aircraft {
         if (dir > 0) this.sprite = Resources.getSprite("blue_1_1_R");
     }
 
-    update(bounds, worldObjs) {
+    update(bounds, gameObjects) {
         this.position.add(this.direction);
         this.cooldown();
 
         if (this.bombReady() && this.isOverTarget()) {
-            this.dropBomb(worldObjs);
+            this.dropBomb(gameObjects);
         }
     }
 
@@ -140,9 +151,9 @@ class LightBomber extends Aircraft {
         return false;
     }
 
-    dropBomb(worldObjs) {
+    dropBomb(gameObjects) {
         this.bombs--;
-        worldObjs.bombs.add(new Bomb(new Vec(this.position.x, this.position.y), new Vec(this.direction.x, 0)));
+        gameObjects.bombs.add(new Bomb(new Vec(this.position.x, this.position.y), new Vec(this.direction.x, 0)));
         this.cooldownTime = this.BOMB_RELOAD_TIME;
     }
 }

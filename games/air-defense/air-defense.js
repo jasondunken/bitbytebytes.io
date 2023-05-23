@@ -35,7 +35,7 @@ function draw() {
 
 class AirDefense {
     DEBUG = false;
-    SIDE_IN_BOUNDS_BUFFER = 128;
+    SIDE_IN_BOUNDS_BUFFER = 256;
 
     PARATROOPER_MIN_ALT = 350;
     BOMBER_MIN_ALT = 200;
@@ -317,6 +317,7 @@ class AirDefense {
             bullets: new Set(),
             bombs: new Set(),
             crates: new Set(),
+            visualEffects: new Set(),
         };
     }
 
@@ -341,50 +342,6 @@ class AirDefense {
             default:
                 console.log(`unknown game object type ${obj.type}`);
         }
-    }
-
-    isBulletCollision(gameObj, bullet) {
-        if (
-            dist(gameObj.position.x, gameObj.position.y, bullet.position.x, bullet.position.y) <=
-            16 + bullet.BULLET_DIAMETER
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    isBombCollision(gameObj, bomb) {
-        if (dist(gameObj.position.x, gameObj.position.y, bomb.position.x, bomb.position.y) <= 8 + bomb.DIAMETER) {
-            return true;
-        }
-        return false;
-    }
-
-    isBlockCollision(bomb, block) {
-        if (
-            dist(bomb.position.x, bomb.position.y, block.center.x, block.center.y) <=
-            bomb.DIAMETER / 2 + block.width / 2
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    isCrateCollision(paratrooper, crate) {
-        if (
-            dist(paratrooper.position.x, paratrooper.position.y, crate.center.x, crate.center.y) <=
-            paratrooper.DIAMETER / 2 + crate.width / 2
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    getEnemySpawnPos(min, max) {
-        let x = Math.random() < 0.5 ? -32 : this.width + 32;
-        let y = Math.random() * (max - min) + min;
-        let z = x < 0 ? 1 : -1;
-        return { x, y, z };
     }
 
     outOfBounds(gameObj) {

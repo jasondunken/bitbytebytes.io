@@ -1,23 +1,46 @@
 import { Entity } from "./game-object.js";
-import { Vec } from "./math/vec.js";
-import { setColor } from "./utils.js";
+import { Splatter, Explosion } from "./particles.js";
+import { setColor, isBulletCollision, isBombCollision } from "./utils.js";
 
 class Bullet extends Entity {
     DIAMETER = 2;
     SPEED = 10;
+
+    DAMAGE = 10;
+
     constructor(position, direction) {
         super("bullet", position);
         this.direction = direction;
         this.width = this.DIAMETER;
         this.height = this.DIAMETER;
-        this.damage = 10;
     }
 
-    update() {
-        this.position = new Vec(
+    update(worldBounds, gameObjects) {
+        this.position.set(
             this.position.x + this.direction.x / this.SPEED,
             this.position.y + this.direction.y / this.SPEED
         );
+        gameObjects.bombs.forEach((bomb) => {
+            if (isBulletCollision(bomb, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                bomb.takeDamage(this.DAMAGE);
+            }
+        });
+        gameObjects.aircraft.forEach((aircraft) => {
+            if (isBulletCollision(aircraft, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                aircraft.takeDamage(this.DAMAGE);
+            }
+        });
+        gameObjects.paratroopers.forEach((paratrooper) => {
+            if (isBulletCollision(paratrooper, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Splatter(this.position, this.direction));
+                paratrooper.takeDamage(this.DAMAGE);
+            }
+        });
     }
 
     render() {
@@ -28,13 +51,13 @@ class Bullet extends Entity {
 
 class Bomb extends Entity {
     DIAMETER = 5;
-    MAX_HEALTH = 5;
-    MAX_FALLING_SPEED = 3;
+    MAX_HEALTH = 15;
+
+    MAX_Y_VELOCITY = 3;
     Y_GRAVITY = 0.1;
-    Y_VELOCITY = 0;
+
     DAMAGE = 100;
 
-    health;
     constructor(position, direction) {
         super("bomb", position);
         this.direction = direction;
@@ -43,11 +66,30 @@ class Bomb extends Entity {
         this.health = this.MAX_HEALTH;
     }
 
-    update() {
-        this.position.x += this.direction.x;
-        this.Y_VELOCITY += this.Y_GRAVITY;
-        if (this.Y_VELOCITY > this.MAX_FALLING_SPEED) this.Y_VELOCITY = this.MAX_FALLING_SPEED;
-        this.position.y += this.Y_VELOCITY;
+    update(worldBounds, gameObjects) {
+        let yVel = (this.direction.y += this.Y_GRAVITY);
+        if (yVel > this.MAX_Y_VELOCITY) yVel = this.MAX_Y_VELOCITY;
+        this.direction.set(this.direction.x, yVel);
+        this.position.add(this.direction);
+
+        gameObjects.paratroopers.forEach((paratroopers) => {
+            if (isBombCollision(paratroopers, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                paratroopers.takeDamage(this.DAMAGE);
+            }
+        });
+        gameObjects.crates.forEach((crate) => {
+            if (isBombCollision(crate, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                crate.takeDamage(this.DAMAGE);
+            }
+        });
+        if (this.position.y >= worldBounds.floor) {
+            this.dead = true;
+            gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+        }
     }
 
     takeDamage(amount) {

@@ -5,6 +5,12 @@ class Vec {
         this.z = z || 0;
     }
 
+    set(x, y, z) {
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+    }
+
     add(vec) {
         this.x += vec.x;
         this.y += vec.y;
