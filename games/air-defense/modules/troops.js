@@ -3,52 +3,57 @@ import { Animation } from "./animation.js";
 
 import { Resources } from "./resource-manager.js";
 
+import { Vec } from "./math/vec.js";
+
 class Paratrooper extends Entity {
-    SIZE = 16;
+    static WIDTH = 16;
+    static HEIGHT = 16;
+
     FALLING_SPEED = 3;
     MOVE_SPEED = 0.25;
 
-    animations = null;
-    parachute = null;
-    parachuting = null;
-    CHUTE_OPEN_DELAY = 40;
-    chuteOpenHeight;
-    chuteOpen = false;
+    CHUTE_OPEN_DELAY = 16;
+    parachute;
 
     MAX_HEALTH = 10;
     health;
 
-    constructor(position) {
-        super("paratrooper", position);
+    constructor(position, target) {
+        super("paratrooper", position, Paratrooper.WIDTH, Paratrooper.HEIGHT);
         this.animations = new Map();
         this.createSprites(Resources.getSprite("paratrooper"));
-        this.chuteOpenHeight = position.y + this.CHUTE_OPEN_DELAY;
+
+        this.target = target;
+        const direction = this.target.x - this.position.x > 0 ? 0.01 : -0.01;
+        this.direction = new Vec(direction, this.FALLING_SPEED);
+        this.chuteOpenTimer = this.CHUTE_OPEN_DELAY;
+        this.chuteOpen = false;
         this.health = this.MAX_HEALTH;
     }
 
-    update() {
-        if (!this.isOnGround) {
-            this.position.y += this.FALLING_SPEED;
-            if (this.position.y > this.chuteOpenHeight && !this.chuteOpen) {
-                this.FALLING_SPEED = this.FALLING_SPEED / 5;
-                this.chuteOpen = true;
-            }
-        } else {
+    update(bounds, gameObjects) {
+        this.checkGround(bounds);
+        if (this.isOnGround) {
             if (this.currentAnimation === this.animations.get("parachuting")) {
-                this.parachute = false;
-                if (this.position.z < 0) {
+                this.direction.y = 0;
+                this.chuteOpen = false;
+                if (this.direction.x < 0) {
+                    this.direction.x = -this.MOVE_SPEED;
                     this.currentAnimation = this.animations.get("walk-left");
                 }
-                if (this.position.z > 0) {
+                if (this.direction.x > 0) {
+                    this.direction.x = this.MOVE_SPEED;
                     this.currentAnimation = this.animations.get("walk-right");
                 }
             }
-            this.position.x += this.MOVE_SPEED * this.position.z;
+        } else {
+            this.chuteOpenTimer--;
+            if (this.chuteOpenTimer <= 0 && !this.chuteOpen) {
+                this.direction.y = this.FALLING_SPEED / 5;
+                this.chuteOpen = true;
+            }
         }
-        if (!this.animations) {
-            this.animations = new Map();
-            this.createSprites();
-        }
+        this.position.add(this.direction);
         this.currentAnimation.update();
     }
 
@@ -60,13 +65,13 @@ class Paratrooper extends Entity {
     render() {
         image(
             this.currentAnimation.currentFrame,
-            this.position.x - this.SIZE / 2,
-            this.position.y - this.SIZE / 2,
-            this.SIZE,
-            this.SIZE
+            this.position.x - this.width / 2,
+            this.position.y - this.height / 2,
+            this.width,
+            this.height
         );
-        if (this.parachute && this.position.y > this.chuteOpenHeight) {
-            image(this.parachute, this.position.x - this.SIZE / 2, this.position.y - 24, this.SIZE, this.SIZE);
+        if (this.chuteOpen) {
+            image(this.parachute, this.position.x - this.width / 2, this.position.y - 24, this.width, this.height);
         }
     }
 

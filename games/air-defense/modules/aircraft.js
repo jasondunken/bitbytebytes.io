@@ -56,6 +56,7 @@ class Aircraft extends Entity {
 
     setDirection(dir) {
         this.direction = dir;
+        this.direction.x *= this.MOVE_SPEED;
         this.setSprite(dir.x);
     }
 
@@ -102,11 +103,11 @@ class LightBomber extends Aircraft {
     MINIMUM_FLIGHT_CEILING = 200;
 
     MAX_HEALTH = 10;
-    MOVE_SPEED = 5.5;
+    MOVE_SPEED = 1.6;
     MAX_BOMBS = 2;
 
     BOMB_RELOAD_TIME = 25;
-    BOMB_DEPLOY_BUFFER = 150;
+    BOMB_DEPLOY_BUFFER = 200;
 
     health;
     bombs;
@@ -156,7 +157,7 @@ class LightBomber extends Aircraft {
 
     dropBomb(gameObjects) {
         this.bombs--;
-        gameObjects.bombs.add(new Bomb(new Vec(this.position.x, this.position.y), new Vec(this.direction.x, 0)));
+        gameObjects.bombs.add(new Bomb(this.position.copy(), new Vec(this.direction.x, 0)));
         this.cooldownTime = this.BOMB_RELOAD_TIME;
     }
 }
@@ -168,8 +169,8 @@ class AirborneTransport extends Aircraft {
     static HEIGHT = 32;
 
     MAX_HEALTH = 50;
-    MOVE_SPEED = 3.5;
-    PARATROOPER_COUNT = 10;
+    MOVE_SPEED = 1.2;
+    PARATROOPER_COUNT = 8;
     PARATROOPER_DEPLOY_BUFFER = 200;
     JUMP_INTERVAL = 30;
 
@@ -203,7 +204,7 @@ class AirborneTransport extends Aircraft {
         if (this.isOverTarget() && this.canDeploy()) {
             this.jumpTimer = this.JUMP_INTERVAL;
             this.paratroopers--;
-            gameObjects.paratroopers.add(new Paratrooper(this.position.copy()));
+            gameObjects.paratroopers.add(new Paratrooper(this.position.copy(), this.target));
         }
     }
 

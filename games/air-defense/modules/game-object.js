@@ -19,7 +19,6 @@ class Entity extends GameObject {
 
         this.width = width || 0;
         this.height = height || 0;
-        this.isOnGround = false;
     }
 
     setSize(width, height) {
@@ -28,7 +27,15 @@ class Entity extends GameObject {
     }
 
     onGround() {
-        return this.isGrounded;
+        return this.isOnGround;
+    }
+
+    checkGround(bounds) {
+        if (this.position.y + this.height / 2 > bounds.ground) {
+            this.isOnGround = true;
+        } else {
+            this.isOnGround = false;
+        }
     }
 
     update() {

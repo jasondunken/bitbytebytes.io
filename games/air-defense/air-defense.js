@@ -70,7 +70,7 @@ class AirDefense {
             y: 0,
             width: width,
             height: height,
-            floor: height - this.GROUND_HEIGHT,
+            ground: height - this.GROUND_HEIGHT,
         };
         this.sprites = resources.sprites;
         this.turretBlocks = resources.turretBlocks;

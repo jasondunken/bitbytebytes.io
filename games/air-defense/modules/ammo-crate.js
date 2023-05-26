@@ -9,7 +9,8 @@ class AmmoCrate extends Entity {
         this.height = sprite.height;
     }
 
-    update() {
+    update(bounds, gameObjects) {
+        this.checkGround(bounds);
         if (!this.isOnGround) {
             this.position.y += this.GRAVITY;
         }
