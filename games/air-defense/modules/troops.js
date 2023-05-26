@@ -1,6 +1,8 @@
 import { Entity } from "./game-object.js";
 import { Animation } from "./animation.js";
 
+import { Resources } from "./resource-manager.js";
+
 class Paratrooper extends Entity {
     SIZE = 16;
     FALLING_SPEED = 3;
@@ -13,14 +15,13 @@ class Paratrooper extends Entity {
     chuteOpenHeight;
     chuteOpen = false;
 
-    isOnGround = false;
-
     MAX_HEALTH = 10;
     health;
 
-    constructor(position, spriteSheet) {
+    constructor(position) {
         super("paratrooper", position);
-        this.spriteSheet = spriteSheet;
+        this.animations = new Map();
+        this.createSprites(Resources.getSprite("paratrooper"));
         this.chuteOpenHeight = position.y + this.CHUTE_OPEN_DELAY;
         this.health = this.MAX_HEALTH;
     }
@@ -69,17 +70,17 @@ class Paratrooper extends Entity {
         }
     }
 
-    createSprites() {
-        const cellHeight = this.spriteSheet.height;
-        const cells = this.spriteSheet.width / cellHeight;
-        const cellWidth = this.spriteSheet.width / cells;
+    createSprites(spriteSheet) {
+        const cellHeight = spriteSheet.height;
+        const cells = spriteSheet.width / cellHeight;
+        const cellWidth = spriteSheet.width / cells;
 
         const walkingLeftCells = createImage(cellWidth * 4, cellHeight);
-        walkingLeftCells.copy(this.spriteSheet, 0, 0, cellWidth * 4, cellHeight, 0, 0, cellWidth * 4, cellHeight);
+        walkingLeftCells.copy(spriteSheet, 0, 0, cellWidth * 4, cellHeight, 0, 0, cellWidth * 4, cellHeight);
         this.animations.set("walk-left", new Animation(walkingLeftCells, 30, true));
         const walkingRightCells = createImage(cellWidth * 4, cellHeight);
         walkingRightCells.copy(
-            this.spriteSheet,
+            spriteSheet,
             cellWidth * 6,
             0,
             cellWidth * 4,
@@ -92,10 +93,10 @@ class Paratrooper extends Entity {
         this.animations.set("walk-right", new Animation(walkingRightCells, 30, true));
 
         const parachuteCells = createImage(cellWidth, cellHeight);
-        parachuteCells.copy(this.spriteSheet, cellWidth * 10, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+        parachuteCells.copy(spriteSheet, cellWidth * 10, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
         this.parachute = parachuteCells;
         const parachutingCells = createImage(cellWidth, cellHeight);
-        parachutingCells.copy(this.spriteSheet, cellWidth * 5, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+        parachutingCells.copy(spriteSheet, cellWidth * 5, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
         this.animations.set("parachuting", new Animation(parachutingCells, 60, true));
 
         this.currentAnimation = this.animations.get("parachuting");

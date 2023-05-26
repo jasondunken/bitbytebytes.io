@@ -4,6 +4,7 @@ import { Entity } from "./game-object.js";
 import { Vec } from "./math/vec.js";
 
 import { Bomb } from "./weapons.js";
+import { Paratrooper } from "./troops.js";
 
 class AirTrafficControl {
     static AIRCRAFT = ["light-bomber", "airborne-transport"];
@@ -47,6 +48,7 @@ class Aircraft extends Entity {
     constructor(type, position, width, height) {
         super(type, position, width, height);
     }
+    targetBuffer;
 
     setPosition(pos) {
         this.position = pos;
@@ -63,7 +65,7 @@ class Aircraft extends Entity {
 
     isOverTarget() {
         const xDist = Math.abs(this.position.x - this.target.x);
-        if (xDist / this.pilotConfidence < this.MAX_BOMB_DROP_DELAY) return true;
+        if (xDist / this.pilotConfidence < this.targetBuffer) return true;
         return false;
     }
 
@@ -104,7 +106,7 @@ class LightBomber extends Aircraft {
     MAX_BOMBS = 2;
 
     BOMB_RELOAD_TIME = 25;
-    MAX_BOMB_DROP_DELAY = 150;
+    BOMB_DEPLOY_BUFFER = 150;
 
     health;
     bombs;
@@ -124,6 +126,7 @@ class LightBomber extends Aircraft {
         this.health = this.MAX_HEALTH;
         this.bombs = this.MAX_BOMBS;
         this.pilotConfidence = (Math.random() * 50 + 50) / 100;
+        this.targetBuffer = this.BOMB_DEPLOY_BUFFER;
     }
 
     setSprite(dir) {
@@ -167,7 +170,7 @@ class AirborneTransport extends Aircraft {
     MAX_HEALTH = 50;
     MOVE_SPEED = 3.5;
     PARATROOPER_COUNT = 10;
-    DROP_RANGE = 200;
+    PARATROOPER_DEPLOY_BUFFER = 200;
     JUMP_INTERVAL = 30;
 
     health;
@@ -186,6 +189,7 @@ class AirborneTransport extends Aircraft {
         this.health = this.MAX_HEALTH;
         this.paratroopers = this.PARATROOPER_COUNT;
         this.pilotConfidence = (Math.random() * 50 + 50) / 100;
+        this.targetBuffer = this.PARATROOPER_DEPLOY_BUFFER;
     }
 
     setSprite(dir) {
@@ -193,15 +197,18 @@ class AirborneTransport extends Aircraft {
         if (dir > 0) this.sprite = Resources.getSprite("airborne_right");
     }
 
-    update() {
+    update(bounds, gameObjects) {
         this.position.add(this.direction);
         if (this.jumpTimer > 0) this.jumpTimer--;
+        if (this.isOverTarget() && this.canDeploy()) {
+            this.jumpTimer = this.JUMP_INTERVAL;
+            this.paratroopers--;
+            gameObjects.paratroopers.add(new Paratrooper(this.position.copy()));
+        }
     }
 
     canDeploy() {
         if (this.jumpTimer === 0 && this.paratroopers > 0) {
-            this.jumpTimer = this.JUMP_INTERVAL;
-            this.paratroopers--;
             return true;
         }
         return false;

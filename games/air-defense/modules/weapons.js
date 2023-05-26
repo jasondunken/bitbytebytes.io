@@ -72,11 +72,11 @@ class Bomb extends Entity {
         this.direction.set(this.direction.x, yVel);
         this.position.add(this.direction);
 
-        gameObjects.paratroopers.forEach((paratroopers) => {
-            if (isBombCollision(paratroopers, this)) {
+        gameObjects.paratroopers.forEach((paratrooper) => {
+            if (paratrooper.onGround() && isBombCollision(paratrooper, this)) {
                 this.dead = true;
                 gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
-                paratroopers.takeDamage(this.DAMAGE);
+                paratrooper.takeDamage(this.DAMAGE);
             }
         });
         gameObjects.crates.forEach((crate) => {

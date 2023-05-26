@@ -138,102 +138,6 @@ class AirDefense {
         }
         if (this.DEBUG) this.logObjs(numObjs);
 
-        //     if (gameObj.type === "bullet") continue;
-        //     if (
-        //         gameObj.type === "bomber" ||
-        //         gameObj.type === "airborne" ||
-        //         gameObj.type === "paratrooper" ||
-        //         gameObj.type === "bomb"
-        //     ) {
-        //         bullets.forEach((bullet) => {
-        //             if (!bullet.dead && this.isBulletCollision(gameObj, bullet)) {
-        //                 bullet.dead = true;
-        //                 gameObj.takeDamage(5);
-        //                 if (gameObj.type === "paratrooper") {
-        //                     this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
-        //                 } else {
-        //                     this.gameObjects.add(new Explosion(bullet.position));
-        //                 }
-        //                 if (gameObj.dead) {
-        //                     switch (gameObj.type) {
-        //                         case "bomber":
-        //                             this.gameObjects.add(new Explosion(gameObj.position));
-        //                             this.score += 20;
-        //                             break;
-        //                         case "airborne":
-        //                             this.gameObjects.add(new Explosion(gameObj.position));
-        //                             this.score += 100;
-        //                             break;
-        //                         case "paratrooper":
-        //                             this.gameObjects.add(new Splatter(gameObj.position, bullet.direction));
-        //                             this.score += 10;
-        //                             break;
-        //                         case "bomb":
-        //                             this.gameObjects.add(new Explosion(gameObj.position));
-        //                             this.score += 5;
-        //                             break;
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     if (gameObj.type === "bomber" && this.isOverTarget(gameObj)) {
-        //         if (gameObj.dropBomb()) {
-        //             this.gameObjects.add(
-        //                 new Bomb({ x: gameObj.position.x, y: gameObj.position.y }, { x: gameObj.position.z, y: 0 })
-        //             );
-        //         }
-        //     }
-
-        //     if (gameObj.type === "bomb") {
-        //         this.turret.blocks.forEach((block) => {
-        //             if (this.isBlockCollision(gameObj, block)) {
-        //                 gameObj.dead = true;
-        //                 block.takeDamage(gameObj.DAMAGE);
-        //                 if (block.dead) {
-        //                     this.turret.blocks.delete(block);
-        //                     this.gameObjects.add(new Explosion(block.position));
-        //                 }
-        //             }
-        //         });
-        //         if (gameObj.position.y >= this.height - this.GROUND_HEIGHT * 1.5) {
-        //             gameObj.dead = true;
-        //         }
-        //         if (gameObj.dead) {
-        //             this.gameObjects.add(new Explosion(gameObj.position));
-        //         }
-        //     }
-
-        //     if (gameObj.type === "airborne" && this.isOverTarget(gameObj)) {
-        //         if (gameObj.canDeploy()) {
-        //             this.gameObjects.add(
-        //                 new Paratrooper(
-        //                     {
-        //                         x: gameObj.position.x + 16 * -gameObj.position.z,
-        //                         y: gameObj.position.y,
-        //                         z: gameObj.position.z,
-        //                     },
-        //                     this.sprites["paratrooper"],
-        //                     this.sprites["paratrooper"]
-        //                 )
-        //             );
-        //         }
-        //     }
-
-        //     if (gameObj.type === "paratrooper") {
-        //         if (gameObj.grounded) {
-        //             for (let bomb of bombs) {
-        //                 if (this.isBombCollision(gameObj, bomb)) {
-        //                     bomb.dead = true;
-        //                     gameObj.dead = true;
-        //                     this.gameObjects.add(new Explosion(bomb.position));
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         // advance the level
         this.wave.time--;
         if (this.wave.time <= 0) {
@@ -339,6 +243,9 @@ class AirDefense {
             case "crate":
                 this.gameObjects.crates.add(obj);
                 break;
+            case "visual-effect":
+                this.gameObjects.visualEffects.add(obj);
+                break;
             default:
                 console.log(`unknown game object type ${obj.type}`);
         }
@@ -366,7 +273,9 @@ class AirDefense {
             " | bomb: ",
             this.gameObjects.bombs.size,
             " | crat: ",
-            this.gameObjects.crates.size
+            this.gameObjects.crates.size,
+            " | visual: ",
+            this.gameObjects.visualEffects.size
         );
     }
 }
