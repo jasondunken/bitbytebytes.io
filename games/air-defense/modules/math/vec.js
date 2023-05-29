@@ -15,6 +15,7 @@ class Vec {
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
+        return this;
     }
 
     add(x, y, z) {
@@ -27,6 +28,7 @@ class Vec {
         this.x += x;
         this.y += y;
         this.z += z;
+        return this;
     }
 
     sub(x, y, z) {
@@ -39,12 +41,14 @@ class Vec {
         this.x -= x;
         this.y -= y;
         this.z -= z;
+        return this;
     }
 
     mult(scalar) {
         this.x *= scalar;
         this.y *= scalar;
         this.z *= scalar;
+        return this;
     }
 
     div(scalar) {
@@ -55,6 +59,7 @@ class Vec {
         } else {
             console.warn(`divide by zero error:  ${scalar} - ${this.toString()}`);
         }
+        return this;
     }
 
     mag() {
@@ -63,6 +68,22 @@ class Vec {
 
     magSq() {
         return this.x * this.x + this.y * this.y + this.z * this.z;
+    }
+
+    rotateZ(radians) {
+        const x = this.x;
+        const y = this.y;
+        this.x = x * Math.cos(radians) - y * Math.sin(radians);
+        this.y = x * Math.sin(radians) + y * Math.cos(radians);
+        return this;
+    }
+
+    normalize() {
+        const d = this.mag();
+        this.x = this.x / d;
+        this.y = this.y / d;
+        this.z = this.z / d;
+        return this;
     }
 
     dot(x, y, z) {
