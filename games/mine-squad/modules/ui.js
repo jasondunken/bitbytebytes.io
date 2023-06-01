@@ -145,12 +145,23 @@ class UI {
                 }
             }
             const xOff = this.SQUADS_SPACING * (i - 1);
-            ellipse(
-                this.position.x + this.SQUADS_BOX_X + this.SCORE_BOX_WIDTH / 2 + xOff,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y,
-                12,
-                12
-            );
+            if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+                ellipse(
+                    this.position.x + this.SQUADS_BOX_X + this.SCORE_BOX_WIDTH / 2 + xOff,
+                    this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y,
+                    12,
+                    12
+                );
+            } else {
+                textSize(18);
+                textAlign(CENTER, CENTER);
+                fill("black");
+                text(
+                    "X",
+                    this.position.x + this.SQUADS_BOX_X + this.SCORE_BOX_WIDTH / 2 + xOff,
+                    this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+                );
+            }
         }
     }
 
