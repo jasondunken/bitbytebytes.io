@@ -5,9 +5,10 @@ import { Vec } from "./math/vec.js";
 
 import { Bomb } from "./weapons.js";
 import { Paratrooper } from "./troops.js";
+import { AmmoCrate } from "./ammo-crate.js";
 
 class AirTrafficControl {
-    static AIRCRAFT = ["light-bomber", "airborne-transport"];
+    static AIRCRAFT = ["light-bomber", "airborne-transport", "airborne-cargo"];
     static MINIMUM_FLIGHT_CEILING = 200;
     static FLIGHT_SEPARATION = 64;
     static spawn(game, wave) {
@@ -34,6 +35,8 @@ class AirTrafficControl {
                 return new LightBomber();
             case "airborne-transport":
                 return new AirborneTransport();
+            case "airborne-cargo":
+                return new AirborneCargo();
             default:
                 console.warn(`no aircraft type ${type}`);
         }
@@ -182,7 +185,7 @@ class AirborneTransport extends Aircraft {
     sprites = ["airborne_left", "airborne_right"];
 
     constructor(position, direction, velocity) {
-        super("airborne", position, AirborneTransport.WIDTH, AirborneTransport.HEIGHT);
+        super("airborne-transport", position, AirborneTransport.WIDTH, AirborneTransport.HEIGHT);
         this.direction = direction || new Vec();
         this.velocity = velocity || new Vec();
         this.setSprite(this.direction.x);
@@ -216,4 +219,58 @@ class AirborneTransport extends Aircraft {
     }
 }
 
-export { AirTrafficControl, LightBomber, AirborneTransport };
+class AirborneCargo extends Aircraft {
+    MINIMUM_FLIGHT_CEILING = 50;
+
+    static WIDTH = 96;
+    static HEIGHT = 32;
+
+    MAX_HEALTH = 50;
+    MOVE_SPEED = 1.2;
+    CRATE_COUNT = 3;
+    CRATE_DEPLOY_BUFFER = 200;
+    DROP_INTERVAL = 30;
+
+    health;
+    crates;
+
+    jumpTimer = 0;
+
+    sprites = ["airborne_left", "airborne_right"];
+
+    constructor(position, direction, velocity) {
+        super("airborne-cargo", position, AirborneTransport.WIDTH, AirborneTransport.HEIGHT);
+        this.direction = direction || new Vec();
+        this.velocity = velocity || new Vec();
+        this.setSprite(this.direction.x);
+
+        this.health = this.MAX_HEALTH;
+        this.crates = this.CRATE_COUNT;
+        this.pilotConfidence = (Math.random() * 50 + 50) / 100;
+        this.targetBuffer = this.CRATE_DEPLOY_BUFFER;
+    }
+
+    setSprite(dir) {
+        if (dir < 0) this.sprite = Resources.getSprite("airborne_left");
+        if (dir > 0) this.sprite = Resources.getSprite("airborne_right");
+    }
+
+    update(bounds, gameObjects) {
+        this.position.add(this.direction);
+        if (this.jumpTimer > 0) this.jumpTimer--;
+        if (this.isOverTarget() && this.canDeploy()) {
+            this.jumpTimer = this.DROP_INTERVAL;
+            this.crates--;
+            gameObjects.crates.add(new AmmoCrate(this.position.copy()));
+        }
+    }
+
+    canDeploy() {
+        if (this.jumpTimer === 0 && this.crates > 0) {
+            return true;
+        }
+        return false;
+    }
+}
+
+export { AirTrafficControl, LightBomber, AirborneTransport, AirborneCargo };

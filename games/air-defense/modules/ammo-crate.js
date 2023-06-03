@@ -1,12 +1,13 @@
+import { Resources } from "./resource-manager.js";
 import { Entity } from "./game-object.js";
 
 class AmmoCrate extends Entity {
-    GRAVITY = 3;
-    constructor(position, sprite) {
+    GRAVITY = 2;
+    constructor(position) {
         super("ammo", position);
-        this.sprite = sprite;
-        this.width = sprite.width;
-        this.height = sprite.height;
+        this.sprite = Resources.getSprite("ammo-crate-500");
+        this.width = this.sprite.width;
+        this.height = this.sprite.height;
     }
 
     update(bounds, gameObjects) {

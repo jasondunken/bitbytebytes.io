@@ -108,14 +108,14 @@ class AirDefense {
         this.score = 0;
         this.wave = this.randomWave();
         this.waves = [];
-        for (let i = 0; i < 20; i++) {
-            this.gameObjects.crates.add(
-                new AmmoCrate(
-                    new Vec(Math.random() * this.width, this.height - this.GROUND_HEIGHT - 20),
-                    this.sprites["ammo-crate-500"]
-                )
-            );
-        }
+        // for (let i = 0; i < 20; i++) {
+        //     this.gameObjects.crates.add(
+        //         new AmmoCrate(
+        //             new Vec(Math.random() * this.width, this.height - this.GROUND_HEIGHT - 20),
+        //             this.sprites["ammo-crate-500"]
+        //         )
+        //     );
+        // }
     }
 
     update() {
@@ -150,7 +150,8 @@ class AirDefense {
         const waveNum = this.waves.length + 1;
         const time = Math.floor(Math.random() * 200 + 201);
         const type = AirTrafficControl.getRandomAircraft();
-        const count = type == "airborne-transport" ? 1 : Math.floor(Math.random() * 3 + 1);
+        let count = type == "airborne-transport" ? 1 : Math.floor(Math.random() * 3 + 1);
+        count = type == "airborne-cargo" ? 1 : count;
         const approach = Math.random() > 0.5 ? -1 : 1;
 
         const wave = { waveNum, time, type, count, approach };
@@ -230,7 +231,8 @@ class AirDefense {
     addGameObject(obj) {
         switch (obj.type) {
             case "light-bomber":
-            case "airborne":
+            case "airborne-transport":
+            case "airborne-cargo":
                 this.gameObjects.aircraft.add(obj);
                 break;
             case "paratrooper":
