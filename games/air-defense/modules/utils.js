@@ -34,4 +34,20 @@ function isCrateCollision(paratrooper, crate) {
     return false;
 }
 
-export { setColor, isBlockCollision, isBombCollision, isBulletCollision, isCrateCollision };
+function isParatrooperBlockCollision(paratrooper, block) {
+    const xDist = Math.abs(paratrooper.position.x - block.position.x);
+    const yDist = Math.abs(paratrooper.position.y - block.position.y);
+    if (xDist < paratrooper.width / 2 && yDist < paratrooper.height / 2) {
+        return true;
+    }
+    return false;
+}
+
+export {
+    setColor,
+    isBlockCollision,
+    isBombCollision,
+    isBulletCollision,
+    isCrateCollision,
+    isParatrooperBlockCollision,
+};

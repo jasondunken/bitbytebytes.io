@@ -1,8 +1,10 @@
 import { Entity } from "./game-object.js";
 import { Animation } from "./animation.js";
+import { Splatter, Explosion } from "./particles.js";
 
 import { Resources } from "./resource-manager.js";
 
+import { isParatrooperBlockCollision } from "./utils.js";
 import { Vec } from "./math/vec.js";
 
 class Paratrooper extends Entity {
@@ -11,6 +13,8 @@ class Paratrooper extends Entity {
 
     FALLING_SPEED = 3;
     MOVE_SPEED = 0.25;
+
+    DAMAGE = 50;
 
     CHUTE_OPEN_DELAY = 16;
     parachute;
@@ -46,6 +50,22 @@ class Paratrooper extends Entity {
                     this.currentAnimation = this.animations.get("walk-right");
                 }
             }
+            gameObjects.turretBlocks.forEach((block) => {
+                if (isParatrooperBlockCollision(this, block)) {
+                    this.dead = true;
+                    gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                    gameObjects.visualEffects.add(new Splatter(this.position, this.direction));
+                    block.takeDamage(this.DAMAGE);
+                }
+            });
+            gameObjects.crates.forEach((crate) => {
+                if (isParatrooperBlockCollision(this, crate)) {
+                    this.dead = true;
+                    gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                    gameObjects.visualEffects.add(new Splatter(this.position, this.direction));
+                    crate.takeDamage(this.DAMAGE);
+                }
+            });
         } else {
             this.chuteOpenTimer--;
             if (this.chuteOpenTimer <= 0 && !this.chuteOpen) {

@@ -50,6 +50,7 @@ class AirDefense {
     font = null;
 
     gameObjects = {
+        turretBlocks: new Set(),
         aircraft: new Set(),
         paratroopers: new Set(),
         bullets: new Set(),
@@ -73,7 +74,7 @@ class AirDefense {
             ground: height - this.GROUND_HEIGHT,
         };
         this.sprites = resources.sprites;
-        this.turretBlocks = resources.turretBlocks;
+        this.resources = resources;
         this.font = resources.font;
     }
 
@@ -84,7 +85,7 @@ class AirDefense {
         this.turret = new DemoTurret(
             this,
             new Vec(this.width / 2, this.height - this.GROUND_HEIGHT),
-            this.turretBlocks,
+            this.resources.turretBlocks,
             this.STARTING_AMMO
         );
         this.startGame();
@@ -95,7 +96,7 @@ class AirDefense {
         this.turret = new Turret(
             this,
             new Vec(this.width / 2, this.height - this.GROUND_HEIGHT),
-            this.turretBlocks,
+            this.resources.turretBlocks,
             this.STARTING_AMMO
         );
         this.startGame();
@@ -216,6 +217,7 @@ class AirDefense {
 
     initGameObjects() {
         this.gameObjects = {
+            turretBlocks: this.turret.blocks,
             aircraft: new Set(),
             paratroopers: new Set(),
             bullets: new Set(),

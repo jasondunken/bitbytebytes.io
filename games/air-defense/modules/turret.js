@@ -108,9 +108,6 @@ class Turret {
             this.HALF_BASE_HEIGHT * 2
         );
         this.core.render();
-        this.blocks.forEach((block) => {
-            block.render();
-        });
     }
 
     buildBattery() {
@@ -159,6 +156,8 @@ class Block extends GameObject {
             y: position.y + height / 2,
         };
     }
+
+    update() {}
 
     takeDamage(amount) {
         this.health -= amount;

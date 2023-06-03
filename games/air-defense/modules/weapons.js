@@ -1,7 +1,6 @@
 import { Entity } from "./game-object.js";
 import { Splatter, Explosion } from "./particles.js";
 import { setColor, isBulletCollision, isBombCollision } from "./utils.js";
-import { Vec } from "./math/vec.js";
 
 class Bullet extends Entity {
     DIAMETER = 2;
@@ -78,6 +77,13 @@ class Bomb extends Entity {
                 this.dead = true;
                 gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
                 paratrooper.takeDamage(this.DAMAGE);
+            }
+        });
+        gameObjects.turretBlocks.forEach((block) => {
+            if (isBombCollision(block, this)) {
+                this.dead = true;
+                gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
+                block.takeDamage(this.DAMAGE);
             }
         });
         gameObjects.crates.forEach((crate) => {
