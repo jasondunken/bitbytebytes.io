@@ -51,11 +51,11 @@ class AirDefense {
 
     gameObjects = {
         turretBlocks: new Set(),
+        crates: new Set(),
         aircraft: new Set(),
         paratroopers: new Set(),
         bullets: new Set(),
         bombs: new Set(),
-        crates: new Set(),
         visualEffects: new Set(),
     };
 
@@ -219,11 +219,11 @@ class AirDefense {
     initGameObjects() {
         this.gameObjects = {
             turretBlocks: this.turret.blocks,
+            crates: new Set(),
             aircraft: new Set(),
             paratroopers: new Set(),
             bullets: new Set(),
             bombs: new Set(),
-            crates: new Set(),
             visualEffects: new Set(),
         };
     }

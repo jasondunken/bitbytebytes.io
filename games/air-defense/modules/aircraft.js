@@ -207,8 +207,20 @@ class AirborneTransport extends Aircraft {
         if (this.isOverTarget() && this.canDeploy()) {
             this.jumpTimer = this.JUMP_INTERVAL;
             this.paratroopers--;
-            gameObjects.paratroopers.add(new Paratrooper(this.position.copy(), this.target));
+            gameObjects.paratroopers.add(new Paratrooper(this.getDeployPoint(), this.target));
         }
+    }
+
+    getDeployPoint() {
+        const dropPos = this.position.copy();
+        const dropOffset = new Vec();
+        if (this.direction.x > 0) {
+            dropOffset.set(-this.width / 6, 0);
+        } else {
+            dropOffset.set(this.width / 6, 0);
+        }
+        dropPos.add(dropOffset);
+        return dropPos;
     }
 
     canDeploy() {
@@ -261,8 +273,20 @@ class AirborneCargo extends Aircraft {
         if (this.isOverTarget() && this.canDeploy()) {
             this.jumpTimer = this.DROP_INTERVAL;
             this.crates--;
-            gameObjects.crates.add(new AmmoCrate(this.position.copy()));
+            gameObjects.crates.add(new AmmoCrate(this.getDeployPoint()));
         }
+    }
+
+    getDeployPoint() {
+        const dropPos = this.position.copy();
+        const dropOffset = new Vec();
+        if (this.direction.x > 0) {
+            dropOffset.set(-this.width / 4, 5);
+        } else {
+            dropOffset.set(this.width / 4, 5);
+        }
+        dropPos.add(dropOffset);
+        return dropPos;
     }
 
     canDeploy() {
