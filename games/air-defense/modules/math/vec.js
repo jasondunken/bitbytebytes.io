@@ -5,6 +5,11 @@ class Vec {
         this.z = z || 0;
     }
 
+    static UP = new Vec(0, -1);
+    static DOWN = new Vec(0, 1);
+    static LEFT = new Vec(-1, 0);
+    static RIGHT = new Vec(1, 0);
+
     set(x, y, z) {
         if (x instanceof Vec) {
             this.x = x.x;
@@ -57,7 +62,9 @@ class Vec {
             this.y /= scalar;
             this.z /= scalar;
         } else {
-            console.warn(`divide by zero error:  ${scalar} - ${this.toString()}`);
+            console.warn(
+                `divide by zero error:  ${scalar} - ${this.toString()}`
+            );
         }
         return this;
     }
