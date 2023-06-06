@@ -154,7 +154,8 @@ class World {
                             // add visual effect
                         }
                     }
-                    if (this.hitWall(obj)) this.shiftAliens(obj);
+                    const hitWall = this.hitWall(obj);
+                    if (hitWall) this.shiftAliens(obj);
                 }
                 if (this.outOfBounds(obj)) obj.remove = true;
                 if (obj.remove) this.gameObjects["aliens"].delete(obj);
@@ -165,22 +166,21 @@ class World {
         }
     }
 
-    render() {
-        background(World.resources.backgrounds[2]);
-
-        for (let group of Object.keys(this.gameObjects)) {
-            const objs = this.gameObjects[group];
-            for (let obj of objs) {
-                obj.render();
-            }
+    hitWall(obj) {
+        if (obj.direction == Vec.LEFT) {
+            return obj.position.x - obj.size / 2 <= 0;
         }
+        if (obj.direction == Vec.RIGHT) {
+            return obj.position.x + obj.size / 2 >= this.width;
+        }
+        return false;
     }
-
-    hitWall(obj) {}
 
     shiftAliens(obj) {
         const direction = obj.direction === Vec.RIGHT ? Vec.LEFT : Vec.RIGHT;
         for (let alien of this.gameObjects.aliens) {
+            alien.position.y += 24;
+            alien.direction = direction;
         }
     }
 
@@ -205,6 +205,17 @@ class World {
             shot.position.y > gameObj.position.y - gameObj.size / 2 &&
             shot.position.y < gameObj.position.y + gameObj.size / 2
         );
+    }
+
+    render() {
+        background(World.resources.backgrounds[2]);
+
+        for (let group of Object.keys(this.gameObjects)) {
+            const objs = this.gameObjects[group];
+            for (let obj of objs) {
+                obj.render();
+            }
+        }
     }
 }
 
