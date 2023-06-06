@@ -77,7 +77,7 @@ class PlanetInvaders {
         this.height = height;
         this.font = font;
         this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
-        this.world = new World(width, height);
+        this.world = new World(this, width, height);
         this.playerSpawn = new Vec(
             this.width / 2,
             this.height - this.world.PLAYER_SIZE
@@ -88,7 +88,7 @@ class PlanetInvaders {
         this.currentState = this.GAME_STATE.STARTING;
         this.player = new DemoPlayer(
             this.world,
-            this.playerSpawn,
+            this.playerSpawn.copy(),
             World.resources.sprites["ship"],
             this.world.PLAYER_SIZE,
             this.world.PLAYER_SPEED
@@ -100,7 +100,7 @@ class PlanetInvaders {
         this.currentState = this.GAME_STATE.STARTING;
         this.player = new Player(
             this.world,
-            this.playerSpawn,
+            this.playerSpawn.copy(),
             World.resources.sprites["ship"],
             this.world.PLAYER_SIZE,
             this.world.PLAYER_SPEED
@@ -112,6 +112,11 @@ class PlanetInvaders {
         this.lives = this.STARTING_LIVES;
         this.level = 0;
         this.score = 0;
+        this.startLevel();
+    }
+
+    startLevel() {
+        this.currentState = this.GAME_STATE.LEVEL_STARTING;
         this.world.start(this.level);
         this.currentState = this.GAME_STATE.PLAYING;
     }
@@ -121,6 +126,28 @@ class PlanetInvaders {
         // game over animations
         this.currentState = this.GAME_STATE.GAME_OVER;
         this.gameOverTime = 0;
+    }
+
+    respawnPlayer() {
+        this.player.position = this.playerSpawn.copy();
+    }
+
+    addScore(type, multi) {
+        multi = multi ? multi : 1;
+        switch (type) {
+            case "alien":
+                this.score += 100 * multi;
+                break;
+            case "bonus":
+                this.score += 1000 * multi;
+            default:
+                console.log(`unknown type ${type}, can't determine score!`);
+        }
+    }
+
+    levelCompleted() {
+        this.level++;
+        this.startLevel();
     }
 
     update() {
@@ -134,9 +161,16 @@ class PlanetInvaders {
         if (this.currentState === this.GAME_STATE.PLAYING) {
             this.world.update();
             this.player.update();
-            if (this.lives <= 0) this.endGame();
+            if (this.player.dead) {
+                this.lives--;
+                if (this.lives <= 0) {
+                    this.endGame();
+                } else {
+                    this.respawnPlayer();
+                }
+            }
         }
-        this.scoreboard.update();
+        this.scoreboard.update(this.level, this.score, this.lives);
         //this.currentState = this.GAME_STATE.GAME_OVER;
     }
 
@@ -145,11 +179,12 @@ class PlanetInvaders {
         this.player.render();
         this.scoreboard.render(this.score, this.level, this.lives);
 
-        textAlign(CENTER);
-        textSize(24);
-        stroke("red");
-        strokeWeight(1);
-        text("Planet Invaders", this.width / 2, this.height / 2);
+        // textAlign(CENTER);
+        // textSize(24);
+        // stroke("white");
+        // strokeWeight(1);
+        // noFill();
+        // text("Planet Invaders", this.width / 2, this.height / 2);
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");

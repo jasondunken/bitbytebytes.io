@@ -16,10 +16,12 @@ class World {
     BARRIER_COUNT = 3;
     GUTTER_WIDTH = 32;
     SPAWN_MAX_Y = 280;
-    SPAWN_MIN_Y = 32;
+    SPAWN_MIN_Y = 64;
     BONUS_SIZE = 16;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
+
+    ALIEN_SHIFT_VECTOR = Vec.DOWN.mult(10);
 
     static backgroundImages = [
         "./planet-invaders/res/img/bg_1.png",
@@ -58,7 +60,8 @@ class World {
 
     gameObjects;
 
-    constructor(width, height) {
+    constructor(game, width, height) {
+        this.game = game;
         this.width = width;
         this.height = height;
         this.spawnArea = {
@@ -78,7 +81,7 @@ class World {
         this.currentLevel = level % LEVELS.length;
         this.resetGameObjects();
         this.gameObjects.aliens = LevelLoader.LoadLevel(
-            level,
+            this.currentLevel,
             World.spriteMetadata,
             this.spawnArea
         );
@@ -142,7 +145,23 @@ class World {
             const objs = this.gameObjects[group];
             for (let obj of objs) {
                 obj.update();
+                if (obj.type === "alien") {
+                    for (let shot of this.gameObjects["shots"]) {
+                        if (this.shotCollision(shot, obj)) {
+                            obj.remove = true;
+                            this.gameObjects["shots"].delete(shot);
+                            this.game.addScore("alien");
+                            // add visual effect
+                        }
+                    }
+                    if (this.hitWall(obj)) this.shiftAliens(obj);
+                }
+                if (this.outOfBounds(obj)) obj.remove = true;
+                if (obj.remove) this.gameObjects["aliens"].delete(obj);
             }
+        }
+        if (this.gameObjects.aliens.size <= 0) {
+            this.game.levelCompleted();
         }
     }
 
@@ -157,12 +176,20 @@ class World {
         }
     }
 
-    outOfBounds(gameObj, width, height) {
+    hitWall(obj) {}
+
+    shiftAliens(obj) {
+        const direction = obj.direction === Vec.RIGHT ? Vec.LEFT : Vec.RIGHT;
+        for (let alien of this.gameObjects.aliens) {
+        }
+    }
+
+    outOfBounds(gameObj) {
         if (
             gameObj.position.x < 0 - gameObj.size ||
             gameObj.position.y < 0 - gameObj.size ||
-            gameObj.position.x > width + gameObj.size ||
-            gameObj.position.y > height + gameObj.size
+            gameObj.position.x > this.width + gameObj.size ||
+            gameObj.position.y > this.height + gameObj.size
         )
             return true;
         return false;
@@ -171,6 +198,7 @@ class World {
     shotCollision(shot, gameObj) {
         if (shot.direction.y > 0 && gameObj.type === "alien") return;
         if (shot.direction.y < 0 && gameObj.type === "player") return;
+
         return (
             shot.position.x > gameObj.position.x - gameObj.size / 2 &&
             shot.position.x < gameObj.position.x + gameObj.size / 2 &&

@@ -16,8 +16,19 @@ class LevelLoader {
                 if (levelData[y][x] == 1) {
                     aliens.add(
                         new Alien(
-                            LevelLoader.LevelIndexToWorldPosition({ x, y }, spawnArea, xNodes, yNodes),
-                            World.resources.sprites[alienNames[Math.floor(Math.random() * alienNames.length)]],
+                            LevelLoader.LevelIndexToWorldPosition(
+                                { x, y },
+                                spawnArea,
+                                xNodes,
+                                yNodes
+                            ),
+                            World.resources.sprites[
+                                alienNames[
+                                    Math.floor(
+                                        Math.random() * alienNames.length
+                                    )
+                                ]
+                            ],
                             World.ALIEN_SIZE,
                             World.ALIEN_SPEED
                         )
@@ -40,8 +51,19 @@ class LevelLoader {
                     if (levelData[j][i] == 1) {
                         aliens.add(
                             new Alien(
-                                LevelLoader.LevelIndexToWorldPosition({ x, y }, spawnArea, xNodes, yNodes),
-                                World.resources.sprites[alienNames[Math.floor(Math.random() * alienNames.length)]],
+                                LevelLoader.LevelIndexToWorldPosition(
+                                    { x, y },
+                                    spawnArea,
+                                    xNodes,
+                                    yNodes
+                                ),
+                                World.resources.sprites[
+                                    alienNames[
+                                        Math.floor(
+                                            Math.random() * alienNames.length
+                                        )
+                                    ]
+                                ],
                                 World.ALIEN_SIZE,
                                 World.ALIEN_SPEED
                             )
@@ -56,7 +78,10 @@ class LevelLoader {
     static LevelIndexToWorldPosition(index, spawnArea, xNodes, yNodes) {
         const xSpace = (spawnArea.br.x - spawnArea.tl.x) / (xNodes - 1);
         const ySpace = (spawnArea.br.y - spawnArea.tl.y) / (yNodes - 1);
-        return new Vec(index.x * xSpace + spawnArea.tl.x, index.y * ySpace + spawnArea.tl.y);
+        return new Vec(
+            index.x * xSpace + spawnArea.tl.x,
+            index.y * ySpace + spawnArea.tl.y
+        );
     }
 }
 
