@@ -1,24 +1,28 @@
 import { GameObject } from "./game-object.js";
-import { Vec2 } from "./vec2d.js";
+import { Shot } from "./shot.js";
+
+import { Vec } from "./math/vec.js";
 
 class Player extends GameObject {
     BASE_COOL_DOWN = 15;
     coolDown = 0;
     weaponReady = true;
 
-    constructor(world, position, sprite, size) {
+    constructor(world, position, sprite, size, speed) {
         super("player", position, size);
         this.world = world;
         this.sprite = sprite;
-        this.moveSpeed = world.PLAYER_SPEED;
+        this.moveSpeed = speed;
     }
 
     update() {
         if (keyIsDown(RIGHT_ARROW)) this.position.x += this.moveSpeed;
         if (keyIsDown(LEFT_ARROW)) this.position.x -= this.moveSpeed;
 
-        if (this.position.x < 0 + this.size / 2) this.position.x = this.size / 2;
-        if (this.position.x > this.world.width - this.size / 2) this.position.x = this.world.width - this.size / 2;
+        if (this.position.x < 0 + this.size / 2)
+            this.position.x = this.size / 2;
+        if (this.position.x > this.world.width - this.size / 2)
+            this.position.x = this.world.width - this.size / 2;
 
         if (keyIsDown(32) && this.weaponReady) {
             this.fire();
@@ -34,14 +38,24 @@ class Player extends GameObject {
 
     render() {
         if (this.sprite) {
-            image(this.sprite, this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
+            image(
+                this.sprite,
+                this.position.x - this.size,
+                this.position.y - this.size,
+                this.size * 2,
+                this.size * 2
+            );
         }
     }
 
     fire() {
-        console.log("fire!");
         if (this.weaponReady) {
-            this.world.level.gameObjects.add(new Shot(new Vec2(this.position.x, this.position.y), Vec2.UP));
+            this.world.addGameObject(
+                new Shot(
+                    new Vec(this.position.x, this.position.y - this.size / 2),
+                    Vec.UP
+                )
+            );
             this.coolDown = this.BASE_COOL_DOWN;
             this.weaponReady = false;
         }
@@ -53,8 +67,8 @@ class Player extends GameObject {
 }
 
 class DemoPlayer extends Player {
-    constructor(world) {
-        super(world);
+    constructor(world, position, sprite, size, speed) {
+        super(world, position, sprite, size, speed);
     }
 
     update() {
@@ -63,7 +77,10 @@ class DemoPlayer extends Player {
         }
         this.position.x += this.moveSpeed;
 
-        if (this.position.x < this.size || this.position.x > this.world.width - this.size) {
+        if (
+            this.position.x < this.size ||
+            this.position.x > this.world.width - this.size
+        ) {
             this.moveSpeed *= -1;
         }
 

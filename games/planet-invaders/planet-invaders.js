@@ -1,5 +1,8 @@
 import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
+import { Player, DemoPlayer } from "./modules/player.js";
+
+import { Vec } from "./modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -39,9 +42,11 @@ function draw() {
 
 // PlanetInvaders
 class PlanetInvaders {
-    PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
-        this.start1Player();
-    });
+    PLAYER_1_START_BUTTON = document
+        .getElementById("start-1p")
+        .addEventListener("click", () => {
+            this.start1Player();
+        });
     SCOREBOARD_HEIGHT = 48;
 
     START_DELAY = 60;
@@ -63,6 +68,9 @@ class PlanetInvaders {
     gameOverTime = 0;
 
     world = null;
+    player = null;
+    level = 0;
+    score = 0;
 
     constructor(width, height, font) {
         this.width = width;
@@ -70,21 +78,49 @@ class PlanetInvaders {
         this.font = font;
         this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
         this.world = new World(width, height);
+        this.playerSpawn = new Vec(
+            this.width / 2,
+            this.height - this.world.PLAYER_SIZE
+        );
     }
 
     startDemo() {
         this.currentState = this.GAME_STATE.STARTING;
-        this.world.start(this.DEMO_STARTING_LIVES, true);
+        this.player = new DemoPlayer(
+            this.world,
+            this.playerSpawn,
+            World.resources.sprites["ship"],
+            this.world.PLAYER_SIZE,
+            this.world.PLAYER_SPEED
+        );
+        this.startGame();
     }
 
     start1Player() {
         this.currentState = this.GAME_STATE.STARTING;
-        this.world.start(this.STARTING_LIVES, false);
+        this.player = new Player(
+            this.world,
+            this.playerSpawn,
+            World.resources.sprites["ship"],
+            this.world.PLAYER_SIZE,
+            this.world.PLAYER_SPEED
+        );
+        this.startGame();
+    }
+
+    startGame() {
+        this.lives = this.STARTING_LIVES;
+        this.level = 0;
+        this.score = 0;
+        this.world.start(this.level);
+        this.currentState = this.GAME_STATE.PLAYING;
     }
 
     endGame() {
-        this.gameOverTime = 0;
+        this.currentState = this.GAME_STATE.ENDING;
+        // game over animations
         this.currentState = this.GAME_STATE.GAME_OVER;
+        this.gameOverTime = 0;
     }
 
     update() {
@@ -97,13 +133,17 @@ class PlanetInvaders {
 
         if (this.currentState === this.GAME_STATE.PLAYING) {
             this.world.update();
-            if (this.world.lives <= 0) this.endGame();
+            this.player.update();
+            if (this.lives <= 0) this.endGame();
         }
+        this.scoreboard.update();
+        //this.currentState = this.GAME_STATE.GAME_OVER;
     }
 
     render() {
         this.world.render();
-        this.scoreboard.render(this.world.score, this.world.wave, this.world.lives);
+        this.player.render();
+        this.scoreboard.render(this.score, this.level, this.lives);
 
         textAlign(CENTER);
         textSize(24);

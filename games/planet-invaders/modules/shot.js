@@ -1,11 +1,11 @@
-import { GameObject } from "./game-object";
+import { GameObject } from "./game-object.js";
 
 class Shot extends GameObject {
-    WIDTH = 4;
-    LENGTH = 8;
+    static WIDTH = 4;
+    static LENGTH = 8;
     MOVE_SPEED = 3;
     constructor(position, direction) {
-        super("shot", position, this.LENGTH);
+        super("shot", position, Shot.LENGTH);
         this.direction = direction;
     }
 
@@ -19,8 +19,13 @@ class Shot extends GameObject {
         let b = random(0, 255);
         let a = random(0, 255);
         stroke(r, g, b, a);
-        strokeWeight(this.WIDTH);
-        line(this.position.x, this.position.y, this.position.x, this.position.y + this.size);
+        strokeWeight(Shot.WIDTH);
+        line(
+            this.position.x,
+            this.position.y,
+            this.position.x,
+            this.position.y + this.size
+        );
     }
 }
 

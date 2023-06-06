@@ -18,6 +18,8 @@ class Barrier extends GameObject {
         this.sprite = sprite;
     }
 
+    takeDamage(block, damage) {}
+
     update() {}
 
     render() {

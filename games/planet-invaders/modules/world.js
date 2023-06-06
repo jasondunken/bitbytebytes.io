@@ -1,21 +1,22 @@
 import { BackgroundLoader } from "./background-loader.js";
 import { SpriteLoader } from "./sprite-loader.js";
-import { Player, DemoPlayer } from "./player.js";
 import { Barrier } from "./barrier.js";
 import { LevelLoader } from "./level-loader.js";
 
-import { Vec2 } from "./vec2d.js";
+import { Vec } from "./math/vec.js";
 import { LEVELS } from "./levels.js";
 
 class World {
-    static PLAYER_SPEED = 2;
     static ALIEN_SIZE = 32;
     static ALIEN_SPEED = 0.25;
 
     PLAYER_SIZE = 24;
+    PLAYER_SPEED = 2;
     BARRIER_SIZE = 48;
     BARRIER_COUNT = 3;
     GUTTER_WIDTH = 32;
+    SPAWN_MAX_Y = 280;
+    SPAWN_MIN_Y = 32;
     BONUS_SIZE = 16;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
@@ -26,7 +27,16 @@ class World {
         "./planet-invaders/res/img/bg_3.png",
     ];
     static spriteMetadata = {
-        names: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5", "barrier", "ship", "bonus"],
+        names: [
+            "alien_1",
+            "alien_2",
+            "alien_3",
+            "alien_4",
+            "alien_5",
+            "barrier",
+            "ship",
+            "bonus",
+        ],
         alienNames: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5"],
         spriteSheetPath: "./planet-invaders/res/img/sprite_sheet.png",
         color: "0x00ff00ff",
@@ -38,81 +48,113 @@ class World {
     };
 
     static async loadResources() {
-        World.resources.backgrounds = BackgroundLoader.LoadBackgrounds(World.backgroundImages);
-        World.resources.sprites = await SpriteLoader.LoadSprites(World.spriteMetadata);
+        World.resources.backgrounds = BackgroundLoader.LoadBackgrounds(
+            World.backgroundImages
+        );
+        World.resources.sprites = await SpriteLoader.LoadSprites(
+            World.spriteMetadata
+        );
     }
 
-    gameObjects = {
-        player: null,
-        aliens: null,
-        visualEffects: null,
-    };
+    gameObjects;
 
     constructor(width, height) {
         this.width = width;
         this.height = height;
         this.spawnArea = {
-            tl: new Vec2(20, 20),
-            br: new Vec2(width - 20, this.height - 120),
+            tl: new Vec(this.GUTTER_WIDTH, this.SPAWN_MIN_Y),
+            br: new Vec(width - this.GUTTER_WIDTH, this.SPAWN_MAX_Y),
         };
         this.barrierY = this.height - 60;
         this.barriers = [];
-        this.playerSpawn = new Vec2(this.width / 2, this.height - this.PLAYER_SIZE);
-        this.currentLevel = 3;
     }
 
-    start(lives, isDemo) {
-        this.lives = lives;
-        this.player = isDemo
-            ? new Player(this, this.playerSpawn, World.resources.sprites["ship"], this.PLAYER_SIZE)
-            : new DemoPlayer(this, this.playerSpawn, World.resources.sprites["ship"], this.PLAYER_SIZE);
+    start(level) {
+        this.currentLevel = level;
         this.loadLevel(this.currentLevel);
     }
 
     loadLevel(level) {
         this.currentLevel = level % LEVELS.length;
-        this.gameObjects = LevelLoader.LoadLevel(level, World.spriteMetadata, this.spawnArea);
+        this.resetGameObjects();
+        this.gameObjects.aliens = LevelLoader.LoadLevel(
+            level,
+            World.spriteMetadata,
+            this.spawnArea
+        );
         this.resetBarriers();
         this.levelTime = 0;
     }
 
+    resetGameObjects() {
+        this.gameObjects = {
+            aliens: new Set(),
+            shots: new Set(),
+            barriers: new Set(),
+            visualEffects: new Set(),
+        };
+    }
+
+    addGameObject(obj) {
+        switch (obj.type) {
+            case "alien":
+                this.gameObjects.aliens.add(obj);
+                break;
+            case "shot":
+                this.gameObjects.shots.add(obj);
+                break;
+            case "barrier":
+                this.gameObjects.barriers.add(obj);
+                break;
+            case "visual-effect":
+                this.gameObjects.visualEffects.add(obj);
+            default:
+                console.log(`unknown obj type ${obj.type}`);
+        }
+    }
+
     resetBarriers() {
-        this.barriers = [
+        this.addGameObject(
             new Barrier(
-                new Vec2(this.width * 0.25, this.barrierY),
+                new Vec(this.width * 0.25, this.barrierY),
                 World.resources.sprites["barrier"],
                 this.BARRIER_SIZE
-            ),
+            )
+        );
+        this.addGameObject(
             new Barrier(
-                new Vec2(this.width * 0.5, this.barrierY),
+                new Vec(this.width * 0.5, this.barrierY),
                 World.resources.sprites["barrier"],
                 this.BARRIER_SIZE
-            ),
+            )
+        );
+        this.addGameObject(
             new Barrier(
-                new Vec2(this.width * 0.75, this.barrierY),
+                new Vec(this.width * 0.75, this.barrierY),
                 World.resources.sprites["barrier"],
                 this.BARRIER_SIZE
-            ),
-        ];
+            )
+        );
     }
 
     update() {
-        this.gameObjects.forEach((gameObj) => {
-            gameObj.update();
-        });
-        this.player.update();
+        for (let group of Object.keys(this.gameObjects)) {
+            const objs = this.gameObjects[group];
+            for (let obj of objs) {
+                obj.update();
+            }
+        }
     }
 
     render() {
         background(World.resources.backgrounds[2]);
 
-        for (let gameObj of this.gameObjects) {
-            gameObj.render();
+        for (let group of Object.keys(this.gameObjects)) {
+            const objs = this.gameObjects[group];
+            for (let obj of objs) {
+                obj.render();
+            }
         }
-        for (let barrier of this.barriers) {
-            barrier.render();
-        }
-        this.player.render();
     }
 
     outOfBounds(gameObj, width, height) {
