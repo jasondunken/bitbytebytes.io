@@ -10,10 +10,11 @@ const GAME_HEIGHT = 400; // 25 x 16px
 
 let game = null;
 
-function preload() {
-    World.loadResources();
-    let font = loadFont("./planet-invaders/res/font/PressStart2P.ttf");
-    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
+async function preload() {
+    await World.loadResources();
+    loadFont("./planet-invaders/res/font/PressStart2P.ttf", (font) => {
+        game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
+    });
 }
 
 function setup() {
@@ -78,7 +79,7 @@ class PlanetInvaders {
 
     start1Player() {
         this.currentState = this.GAME_STATE.STARTING;
-        this.world.start(this.STARTING_LIVES.false);
+        this.world.start(this.STARTING_LIVES, false);
     }
 
     endGame() {
@@ -107,6 +108,7 @@ class PlanetInvaders {
         textAlign(CENTER);
         textSize(24);
         stroke("red");
+        strokeWeight(1);
         text("Planet Invaders", this.width / 2, this.height / 2);
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {

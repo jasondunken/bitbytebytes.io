@@ -1,4 +1,6 @@
-class Barrier {
+import { GameObject } from "./game-object.js";
+
+class Barrier extends GameObject {
     BLOCK_SIZE = 4;
     BLOCK_MAP = [
         [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
@@ -11,16 +13,15 @@ class Barrier {
 
     blocks = new Set();
 
-    constructor(size, position, sprite) {
-        this.size = size;
-        this.pos = position;
+    constructor(position, sprite, size) {
+        super("barrier", position, size);
         this.sprite = sprite;
     }
 
     update() {}
 
     render() {
-        image(this.sprite, this.pos.x - this.size, this.pos.y - this.size, this.size * 2, this.size * 2);
+        image(this.sprite, this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
     }
 
     getBlocks() {

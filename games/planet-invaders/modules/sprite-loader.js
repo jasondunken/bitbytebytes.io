@@ -1,5 +1,5 @@
 class SpriteLoader {
-    static loadSprites(spriteSheetData) {
+    static LoadSprites(spriteSheetData) {
         return new Promise((resolve, reject) => {
             const SPRITE_SIZE = 16;
             let sprites = {};

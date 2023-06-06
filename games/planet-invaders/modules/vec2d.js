@@ -6,8 +6,8 @@ class Vec2 {
     static LEFT = new Vec2(-1, 0);
 
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        this.x = x || 0;
+        this.y = y || 0;
     }
 
     add(vector2) {

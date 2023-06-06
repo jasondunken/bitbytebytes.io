@@ -1,23 +1,16 @@
+import { GameObject } from "./game-object.js";
 import { Vec2 } from "./vec2d.js";
-
-class GameObject {
-    constructor(type, position, size) {
-        this.type = type ? type : "none";
-        this.position = position ? position : new Vec2(0, 0);
-        this.size = size ? size : 1;
-        this.remove = false;
-    }
-}
 
 class Player extends GameObject {
     BASE_COOL_DOWN = 15;
     coolDown = 0;
     weaponReady = true;
 
-    constructor(world) {
-        super("player", Vec2.ZERO, world.PLAYER_SIZE);
-        this.moveSpeed = world.PLAYER_SPEED;
+    constructor(world, position, sprite, size) {
+        super("player", position, size);
         this.world = world;
+        this.sprite = sprite;
+        this.moveSpeed = world.PLAYER_SPEED;
     }
 
     update() {
@@ -46,6 +39,7 @@ class Player extends GameObject {
     }
 
     fire() {
+        console.log("fire!");
         if (this.weaponReady) {
             this.world.level.gameObjects.add(new Shot(new Vec2(this.position.x, this.position.y), Vec2.UP));
             this.coolDown = this.BASE_COOL_DOWN;
@@ -55,10 +49,6 @@ class Player extends GameObject {
 
     setPosition(position) {
         this.position = position;
-    }
-
-    setSprite(sprite) {
-        this.sprite = sprite;
     }
 }
 
@@ -87,28 +77,4 @@ class DemoPlayer extends Player {
     }
 }
 
-class Shot extends GameObject {
-    WIDTH = 4;
-    static LENGTH = 8;
-    MOVE_SPEED = 3;
-    constructor(position, direction) {
-        super("shot", position, Shot.LENGTH);
-        this.direction = direction;
-    }
-
-    update() {
-        this.position.y += this.MOVE_SPEED * this.direction.y;
-    }
-
-    render() {
-        let r = random(0, 255);
-        let g = random(0, 255);
-        let b = random(0, 255);
-        let a = random(0, 255);
-        stroke(r, g, b, a);
-        strokeWeight(this.WIDTH);
-        line(this.position.x, this.position.y, this.position.x, this.position.y + this.size);
-    }
-}
-
-export { GameObject, Player, DemoPlayer, Shot };
+export { Player, DemoPlayer };

@@ -1,11 +1,11 @@
-import { GameObject } from "./player.js";
+import { GameObject } from "./game-object.js";
 
 class Alien extends GameObject {
     delta = 0;
     yRange = 2;
-    constructor(world, position, sprite) {
-        super("alien", position, world.ALIEN_SIZE);
-        this.moveSpeed = world.ALIEN_SPEED;
+    constructor(position, sprite, size, speed) {
+        super("alien", position, size);
+        this.moveSpeed = speed;
         this.sprite = sprite;
         this.delta = Math.random() * 2 * PI;
         this.yRange = Math.random() * this.yRange + this.yRange;
@@ -25,7 +25,7 @@ class Alien extends GameObject {
 
     render() {
         if (this.sprite) {
-            image(this.sprite, this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
+            image(this.sprite, this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
         }
     }
 }
