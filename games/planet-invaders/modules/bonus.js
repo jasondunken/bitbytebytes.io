@@ -1,29 +1,26 @@
-class Bonus {
-    constructor(position, size, speed, interval, sprite) {
-        this.position = position;
-        this.size = size;
-        this.moveSpeed = speed;
-        this.interval = interval;
-        this.sprite = sprite;
-        this.active = false;
-    }
+import { GameObject } from "./game-object.js";
 
-    reset(positionX) {
-        this.position.x = positionX;
-        this.speed = this.moveSpeed * positionX < 0 ? 1 : -1;
-        this.active = true;
+class Bonus extends GameObject {
+    constructor(position, sprite, size, speed, direction) {
+        super("bonus", position, size);
+        this.sprite = sprite;
+        this.moveSpeed = speed;
+        this.direction = direction;
+        this.remove = false;
     }
 
     update() {
-        if (this.active) {
-            this.position.x = this.position.x + this.speed;
-        }
+        this.position.x += this.moveSpeed * this.direction.x;
     }
 
     render() {
-        if (this.active) {
-            image(this.sprite, this.position.x - this.size, this.position.y - this.size, this.size * 2, this.size * 2);
-        }
+        image(
+            this.sprite,
+            this.position.x - this.size / 2,
+            this.position.y - this.size / 2,
+            this.size,
+            this.size
+        );
     }
 }
 

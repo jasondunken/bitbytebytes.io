@@ -140,6 +140,7 @@ class PlanetInvaders {
                 break;
             case "bonus":
                 this.score += 1000 * multi;
+                break;
             default:
                 console.log(`unknown type ${type}, can't determine score!`);
         }

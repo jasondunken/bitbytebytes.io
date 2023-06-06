@@ -1,10 +1,12 @@
 import { BackgroundLoader } from "./background-loader.js";
 import { SpriteLoader } from "./sprite-loader.js";
-import { Barrier } from "./barrier.js";
 import { LevelLoader } from "./level-loader.js";
+import { LEVELS } from "./levels.js";
+
+import { Barrier } from "./barrier.js";
+import { Bonus } from "./bonus.js";
 
 import { Vec } from "./math/vec.js";
-import { LEVELS } from "./levels.js";
 
 class World {
     static ALIEN_SIZE = 32;
@@ -15,9 +17,11 @@ class World {
     BARRIER_SIZE = 48;
     BARRIER_COUNT = 3;
     GUTTER_WIDTH = 32;
+    OUT_OF_BOUNDS_BUFFER = 64;
     SPAWN_MAX_Y = 280;
     SPAWN_MIN_Y = 64;
-    BONUS_SIZE = 16;
+    BONUS_Y = 32;
+    BONUS_SIZE = 32;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
 
@@ -95,6 +99,7 @@ class World {
             shots: new Set(),
             barriers: new Set(),
             visualEffects: new Set(),
+            bonus: new Set(),
         };
     }
 
@@ -111,6 +116,32 @@ class World {
                 break;
             case "visual-effect":
                 this.gameObjects.visualEffects.add(obj);
+                break;
+            case "bonus":
+                this.gameObjects.bonus.add(obj);
+                break;
+            default:
+                console.log(`unknown obj type ${obj.type}`);
+        }
+    }
+
+    deleteGameObject(obj) {
+        switch (obj.type) {
+            case "alien":
+                this.gameObjects.aliens.delete(obj);
+                break;
+            case "shot":
+                this.gameObjects.shots.delete(obj);
+                break;
+            case "barrier":
+                this.gameObjects.barriers.delete(obj);
+                break;
+            case "visual-effect":
+                this.gameObjects.visualEffects.delete(obj);
+                break;
+            case "bonus":
+                this.gameObjects.bonus.delete(obj);
+                break;
             default:
                 console.log(`unknown obj type ${obj.type}`);
         }
@@ -141,28 +172,34 @@ class World {
     }
 
     update() {
+        this.levelTime++;
         for (let group of Object.keys(this.gameObjects)) {
             const objs = this.gameObjects[group];
             for (let obj of objs) {
                 obj.update();
-                if (obj.type === "alien") {
+                if (obj.type === "alien" || obj.type === "bonus") {
                     for (let shot of this.gameObjects["shots"]) {
                         if (this.shotCollision(shot, obj)) {
                             obj.remove = true;
-                            this.gameObjects["shots"].delete(shot);
-                            this.game.addScore("alien");
+                            this.deleteGameObject(shot);
+                            this.game.addScore(obj.type);
                             // add visual effect
                         }
                     }
+                }
+                if (obj.type === "alien") {
                     const hitWall = this.hitWall(obj);
                     if (hitWall) this.shiftAliens(obj);
                 }
                 if (this.outOfBounds(obj)) obj.remove = true;
-                if (obj.remove) this.gameObjects["aliens"].delete(obj);
+                if (obj.remove) this.deleteGameObject(obj);
             }
         }
         if (this.gameObjects.aliens.size <= 0) {
             this.game.levelCompleted();
+        }
+        if (this.levelTime % 240 === 0) {
+            this.addGameObject(this.getRandomBonus());
         }
     }
 
@@ -184,11 +221,36 @@ class World {
         }
     }
 
+    getRandomBonus() {
+        const side = Math.random() < 0.5 ? "left" : "right";
+        let bonus = null;
+        if (side === "left") {
+            bonus = new Bonus(
+                new Vec(-32, this.BONUS_Y),
+                World.resources.sprites["bonus"],
+                this.BONUS_SIZE,
+                this.BONUS_SPEED,
+                Vec.RIGHT
+            );
+        }
+        if (side === "right") {
+            bonus = new Bonus(
+                new Vec(this.width + 32, this.BONUS_Y),
+                World.resources.sprites["bonus"],
+                this.BONUS_SIZE,
+                this.BONUS_SPEED,
+                Vec.LEFT
+            );
+        }
+        return bonus;
+    }
+
     outOfBounds(gameObj) {
         if (
-            gameObj.position.x < 0 - gameObj.size ||
+            gameObj.position.x < 0 - gameObj.size - this.OUT_OF_BOUNDS_BUFFER ||
             gameObj.position.y < 0 - gameObj.size ||
-            gameObj.position.x > this.width + gameObj.size ||
+            gameObj.position.x >
+                this.width + gameObj.size + this.OUT_OF_BOUNDS_BUFFER ||
             gameObj.position.y > this.height + gameObj.size
         )
             return true;
