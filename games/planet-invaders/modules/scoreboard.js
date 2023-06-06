@@ -17,7 +17,7 @@ class Scoreboard {
         fill("blue");
         textSize(16);
         textAlign(LEFT);
-        text(`Level ${this.level}`, 10, this.height / 2);
+        text(`Level ${this.level + 1}`, 10, this.height / 2);
         textAlign(CENTER);
         text(this.score, this.width / 2, this.height / 2);
         const sprite = World.resources.sprites["ship"];
