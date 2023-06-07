@@ -18,7 +18,6 @@ class SpriteLoader {
                 path,
                 (spriteSheet) => {
                     let spriteCount = spriteSheet.width / SPRITE_SIZE;
-                    // let spriteNumFrames = spriteSheet.height / this.SPRITE_SIZE;
                     spriteSheet.loadPixels();
                     for (let s = 0; s < spriteCount; s++) {
                         const sprite = createImage(SPRITE_SIZE, SPRITE_SIZE);
@@ -26,18 +25,35 @@ class SpriteLoader {
                         for (let i = 0; i < SPRITE_SIZE; i++) {
                             for (let j = 0; j < SPRITE_SIZE; j++) {
                                 if (
-                                    spriteSheet.pixels[i * 4 + SPRITE_SIZE * s * 4 + j * 4 * spriteSheet.width + 3] > 0
+                                    spriteSheet.pixels[
+                                        i * 4 +
+                                            SPRITE_SIZE * s * 4 +
+                                            j * 4 * spriteSheet.width +
+                                            3
+                                    ] > 0
                                 ) {
-                                    sprite.set(i, j, [color.r, color.g, color.b, color.a]);
+                                    sprite.set(i, j, [
+                                        color.r,
+                                        color.g,
+                                        color.b,
+                                        color.a,
+                                    ]);
                                 }
                             }
                         }
                         if (names[s] == "bonus") {
-                            const sprite_reversed = createImage(SPRITE_SIZE, SPRITE_SIZE);
+                            const sprite_reversed = createImage(
+                                SPRITE_SIZE,
+                                SPRITE_SIZE
+                            );
                             sprite_reversed.loadPixels();
                             for (let i = 0; i < SPRITE_SIZE; i++) {
                                 for (let j = 0; j < SPRITE_SIZE; j++) {
-                                    sprite_reversed.set(SPRITE_SIZE - i, SPRITE_SIZE - j, sprite.get(i, j));
+                                    sprite_reversed.set(
+                                        SPRITE_SIZE - i,
+                                        SPRITE_SIZE - j,
+                                        sprite.get(i, j)
+                                    );
                                 }
                             }
                             sprite_reversed.updatePixels();

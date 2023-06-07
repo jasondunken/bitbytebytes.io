@@ -30,6 +30,7 @@ class LevelLoader {
                                 ]
                             ],
                             World.ALIEN_SIZE,
+                            World.ALIEN_COLLIDER_SIZE,
                             World.ALIEN_SPEED
                         )
                     );

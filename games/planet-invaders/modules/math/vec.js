@@ -62,7 +62,8 @@ class Vec {
             this.y /= scalar;
             this.z /= scalar;
         } else {
-            console.warn(
+            console.assert(
+                scalar,
                 `divide by zero error:  ${scalar} - ${this.toString()}`
             );
         }

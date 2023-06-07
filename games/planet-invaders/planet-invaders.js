@@ -11,20 +11,17 @@ window.draw = draw;
 const GAME_WIDTH = 512; // 32 x 16px
 const GAME_HEIGHT = 400; // 25 x 16px
 
-let game = null;
+let game;
+let font;
 
-async function preload() {
-    await World.loadResources();
-    loadFont("./planet-invaders/res/font/PressStart2P.ttf", (font) => {
-        game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
-    });
+function preload() {
+    World.loadResources();
+    font = loadFont("./planet-invaders/res/font/PressStart2P.ttf");
 }
 
 function setup() {
     let canvas = createCanvas(GAME_WIDTH, GAME_HEIGHT);
     canvas.parent("game");
-
-    textFont(game.font);
 
     frameRate(60);
     noSmooth();
@@ -32,6 +29,7 @@ function setup() {
 }
 
 function initGame() {
+    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
     game.startDemo();
 }
 
@@ -54,6 +52,7 @@ class PlanetInvaders {
 
     STARTING_LIVES = 3;
     DEMO_STARTING_LIVES = 1;
+    BONUS_SHIP_INTERVAL = 25000;
 
     GAME_STATE = Object.freeze({
         STARTING: "STARTING",
@@ -62,6 +61,7 @@ class PlanetInvaders {
         PLAYING: "PLAYING",
         ENDING: "ENDING",
         GAME_OVER: "GAME_OVER",
+        CRITICAL_ERROR: "CRITICAL_ERROR",
     });
     currentState = this.GAME_STATE.GAME_OVER;
 
@@ -82,7 +82,18 @@ class PlanetInvaders {
             this.width / 2,
             this.height - this.world.PLAYER_SIZE
         );
+        //this.initGame();
     }
+
+    // async initGame() {
+    //     const resourcesLoaded = await ResourceLoader.LoadResources();
+    //     if (resourcesLoaded) {
+    //         this.resources = await ResourceLoader.GetResources();
+    //     } else {
+    //         console.log("failed to load resources!");
+    //         this.currentState = this.GAME_STATE.CRITICAL_ERROR;
+    //     }
+    // }
 
     startDemo() {
         this.currentState = this.GAME_STATE.STARTING;
@@ -91,6 +102,7 @@ class PlanetInvaders {
             this.playerSpawn.copy(),
             World.resources.sprites["ship"],
             this.world.PLAYER_SIZE,
+            this.world.PLAYER_COLLIDER_SIZE,
             this.world.PLAYER_SPEED
         );
         this.startGame();
@@ -103,6 +115,7 @@ class PlanetInvaders {
             this.playerSpawn.copy(),
             World.resources.sprites["ship"],
             this.world.PLAYER_SIZE,
+            this.world.PLAYER_COLLIDER_SIZE,
             this.world.PLAYER_SPEED
         );
         this.startGame();
@@ -110,6 +123,7 @@ class PlanetInvaders {
 
     startGame() {
         this.lives = this.STARTING_LIVES;
+        this.nextBonusShip = this.BONUS_SHIP_INTERVAL;
         this.level = 0;
         this.score = 0;
         this.startLevel();
@@ -117,15 +131,26 @@ class PlanetInvaders {
 
     startLevel() {
         this.currentState = this.GAME_STATE.LEVEL_STARTING;
+        // TODO: transition
         this.world.start(this.level);
         this.currentState = this.GAME_STATE.PLAYING;
     }
 
     endGame() {
         this.currentState = this.GAME_STATE.ENDING;
-        // game over animations
+        // TODO: transition
         this.currentState = this.GAME_STATE.GAME_OVER;
         this.gameOverTime = 0;
+    }
+
+    aliensWon() {
+        this.lives--;
+        if (this.lives <= 0) {
+            this.endGame();
+        } else {
+            this.player.position.set(this.playerSpawn.copy());
+            this.startLevel();
+        }
     }
 
     respawnPlayer() {
@@ -146,6 +171,10 @@ class PlanetInvaders {
         }
     }
 
+    addShip() {
+        this.lives++;
+    }
+
     levelCompleted() {
         this.level++;
         this.startLevel();
@@ -160,32 +189,33 @@ class PlanetInvaders {
         }
 
         if (this.currentState === this.GAME_STATE.PLAYING) {
-            this.world.update();
             this.player.update();
-            if (this.player.dead) {
-                this.lives--;
-                if (this.lives <= 0) {
-                    this.endGame();
-                } else {
-                    this.respawnPlayer();
+            this.world.update();
+            for (let shot of this.world.gameObjects.shots) {
+                if (this.world.shotCollision(shot, this.player)) {
+                    this.player;
+                    this.lives--;
+                    if (this.lives <= 0) {
+                        this.endGame();
+                    } else {
+                        this.respawnPlayer();
+                    }
                 }
             }
         }
+
+        if (this.score > this.nextBonusShip) {
+            this.addShip();
+            this.nextBonusShip += this.BONUS_SHIP_INTERVAL;
+        }
         this.scoreboard.update(this.level, this.score, this.lives);
-        //this.currentState = this.GAME_STATE.GAME_OVER;
     }
 
     render() {
+        if (this.font) textFont(this.font);
         this.world.render();
         this.player.render();
         this.scoreboard.render(this.score, this.level, this.lives);
-
-        // textAlign(CENTER);
-        // textSize(24);
-        // stroke("white");
-        // strokeWeight(1);
-        // noFill();
-        // text("Planet Invaders", this.width / 2, this.height / 2);
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");

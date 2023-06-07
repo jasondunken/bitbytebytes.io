@@ -4,15 +4,29 @@ import { Shot } from "./shot.js";
 import { Vec } from "./math/vec.js";
 
 class Player extends GameObject {
+    COLLIDER_OFFSET_X = 0.4;
+    COLLIDER_OFFSET_Y = 0.25;
+
     BASE_COOL_DOWN = 15;
     coolDown = 0;
     weaponReady = true;
 
-    constructor(world, position, sprite, size, speed) {
-        super("player", position, size);
+    constructor(world, position, sprite, size, colliderSize, speed) {
+        super("player", position, size, colliderSize);
         this.world = world;
         this.sprite = sprite;
         this.moveSpeed = speed;
+        this.colliders = [
+            new Vec(
+                position.x - size * this.COLLIDER_OFFSET_X,
+                position.y + this.size * this.COLLIDER_OFFSET_Y
+            ),
+            new Vec(position.x, position.y),
+            new Vec(
+                position.x + size * this.COLLIDER_OFFSET_X,
+                position.y + this.size * this.COLLIDER_OFFSET_Y
+            ),
+        ];
     }
 
     update() {
@@ -23,6 +37,16 @@ class Player extends GameObject {
             this.position.x = this.size / 2;
         if (this.position.x > this.world.width - this.size / 2)
             this.position.x = this.world.width - this.size / 2;
+
+        this.colliders[0].set(
+            this.position.x - this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
+        this.colliders[1].set(this.position.x, this.position.y);
+        this.colliders[2].set(
+            this.position.x + this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
 
         if (keyIsDown(32) && this.weaponReady) {
             this.fire();
@@ -67,8 +91,8 @@ class Player extends GameObject {
 }
 
 class DemoPlayer extends Player {
-    constructor(world, position, sprite, size, speed) {
-        super(world, position, sprite, size, speed);
+    constructor(world, position, sprite, size, colliderSize, speed) {
+        super(world, position, sprite, size, colliderSize, speed);
     }
 
     update() {
@@ -76,6 +100,16 @@ class DemoPlayer extends Player {
             this.fire();
         }
         this.position.x += this.moveSpeed;
+
+        this.colliders[0].set(
+            this.position.x - this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
+        this.colliders[1].set(this.position.x, this.position.y);
+        this.colliders[2].set(
+            this.position.x + this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
 
         if (
             this.position.x < this.size ||

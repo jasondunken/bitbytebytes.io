@@ -1,8 +1,8 @@
 import { GameObject } from "./game-object.js";
 
 class Bonus extends GameObject {
-    constructor(position, sprite, size, speed, direction) {
-        super("bonus", position, size);
+    constructor(position, sprite, size, colliderSize, speed, direction) {
+        super("bonus", position, size, colliderSize);
         this.sprite = sprite;
         this.moveSpeed = speed;
         this.direction = direction;

@@ -5,7 +5,7 @@ class Shot extends GameObject {
     static LENGTH = 8;
     MOVE_SPEED = 3;
     constructor(position, direction) {
-        super("shot", position, Shot.LENGTH);
+        super("shot", position, Shot.WIDTH, Shot.WIDTH);
         this.direction = direction;
     }
 
@@ -24,7 +24,7 @@ class Shot extends GameObject {
             this.position.x,
             this.position.y,
             this.position.x,
-            this.position.y + this.size
+            this.position.y + Shot.LENGTH
         );
     }
 }

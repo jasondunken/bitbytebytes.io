@@ -3,6 +3,7 @@ import { SpriteLoader } from "./sprite-loader.js";
 import { LevelLoader } from "./level-loader.js";
 import { LEVELS } from "./levels.js";
 
+import { Shot } from "./shot.js";
 import { Barrier } from "./barrier.js";
 import { Bonus } from "./bonus.js";
 
@@ -10,9 +11,11 @@ import { Vec } from "./math/vec.js";
 
 class World {
     static ALIEN_SIZE = 32;
+    static ALIEN_COLLIDER_SIZE = 16;
     static ALIEN_SPEED = 0.25;
 
     PLAYER_SIZE = 24;
+    PLAYER_COLLIDER_SIZE = 16;
     PLAYER_SPEED = 2;
     BARRIER_SIZE = 48;
     BARRIER_COUNT = 3;
@@ -22,10 +25,11 @@ class World {
     SPAWN_MIN_Y = 64;
     BONUS_Y = 32;
     BONUS_SIZE = 32;
+    BONUS_COLLIDER_SIZE = 24;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
 
-    ALIEN_SHIFT_VECTOR = Vec.DOWN.mult(10);
+    ALIEN_SHIFT_VECTOR = Vec.DOWN.copy().mult(10);
 
     static backgroundImages = [
         "./planet-invaders/res/img/bg_1.png",
@@ -73,7 +77,6 @@ class World {
             br: new Vec(width - this.GUTTER_WIDTH, this.SPAWN_MAX_Y),
         };
         this.barrierY = this.height - 60;
-        this.barriers = [];
     }
 
     start(level) {
@@ -97,7 +100,7 @@ class World {
         this.gameObjects = {
             aliens: new Set(),
             shots: new Set(),
-            barriers: new Set(),
+            blocks: new Set(),
             visualEffects: new Set(),
             bonus: new Set(),
         };
@@ -111,8 +114,8 @@ class World {
             case "shot":
                 this.gameObjects.shots.add(obj);
                 break;
-            case "barrier":
-                this.gameObjects.barriers.add(obj);
+            case "block":
+                this.gameObjects.blocks.add(obj);
                 break;
             case "visual-effect":
                 this.gameObjects.visualEffects.add(obj);
@@ -133,8 +136,8 @@ class World {
             case "shot":
                 this.gameObjects.shots.delete(obj);
                 break;
-            case "barrier":
-                this.gameObjects.barriers.delete(obj);
+            case "block":
+                this.gameObjects.blocks.delete(obj);
                 break;
             case "visual-effect":
                 this.gameObjects.visualEffects.delete(obj);
@@ -148,27 +151,14 @@ class World {
     }
 
     resetBarriers() {
-        this.addGameObject(
-            new Barrier(
-                new Vec(this.width * 0.25, this.barrierY),
-                World.resources.sprites["barrier"],
-                this.BARRIER_SIZE
-            )
-        );
-        this.addGameObject(
-            new Barrier(
-                new Vec(this.width * 0.5, this.barrierY),
-                World.resources.sprites["barrier"],
-                this.BARRIER_SIZE
-            )
-        );
-        this.addGameObject(
-            new Barrier(
-                new Vec(this.width * 0.75, this.barrierY),
-                World.resources.sprites["barrier"],
-                this.BARRIER_SIZE
-            )
-        );
+        const locations = [
+            new Vec(this.width * 0.25, this.barrierY),
+            new Vec(this.width * 0.5, this.barrierY),
+            new Vec(this.width * 0.75, this.barrierY),
+        ];
+        const blocks = new Set();
+        Barrier.getBlocks(locations, blocks);
+        this.gameObjects.blocks = blocks;
     }
 
     update() {
@@ -183,13 +173,30 @@ class World {
                             obj.remove = true;
                             this.deleteGameObject(shot);
                             this.game.addScore(obj.type);
-                            // add visual effect
+                            // TODO: add visual effect
+                        }
+                    }
+                }
+                if (obj.type === "block") {
+                    for (let shot of this.gameObjects["shots"]) {
+                        if (this.shotCollision(shot, obj)) {
+                            obj.remove = true;
+                            this.deleteGameObject(shot);
+                            // TODO: add visual effect
+                        }
+                    }
+                    for (let alien of this.gameObjects.aliens) {
+                        if (this.shotCollision(alien, obj)) {
+                            obj.remove = true;
+                            this.deleteGameObject(alien);
+                            // TODO: add visual effect
+                            this.game.aliensWon();
                         }
                     }
                 }
                 if (obj.type === "alien") {
-                    const hitWall = this.hitWall(obj);
-                    if (hitWall) this.shiftAliens(obj);
+                    if (this.hitWall(obj)) this.shiftAliens(obj);
+                    if (this.hasLanded(obj)) this.game.aliensWon();
                 }
                 if (this.outOfBounds(obj)) obj.remove = true;
                 if (obj.remove) this.deleteGameObject(obj);
@@ -198,9 +205,19 @@ class World {
         if (this.gameObjects.aliens.size <= 0) {
             this.game.levelCompleted();
         }
+        if (this.levelTime % 60 === 0) {
+            this.randomAlienFire();
+        }
         if (this.levelTime % 240 === 0) {
             this.addGameObject(this.getRandomBonus());
         }
+    }
+
+    hasLanded(obj) {
+        if (obj.position.y + obj.size / 2 >= this.game.playerSpawn.y) {
+            return true;
+        }
+        return false;
     }
 
     hitWall(obj) {
@@ -211,6 +228,20 @@ class World {
             return obj.position.x + obj.size / 2 >= this.width;
         }
         return false;
+    }
+
+    randomAlienFire() {
+        const alienIdx = Math.floor(
+            Math.random() * this.gameObjects.aliens.size
+        );
+        let curIdx = 0;
+        for (let alien of this.gameObjects.aliens) {
+            if (curIdx === alienIdx) {
+                this.addGameObject(new Shot(alien.position.copy(), Vec.DOWN));
+                return;
+            }
+            curIdx++;
+        }
     }
 
     shiftAliens(obj) {
@@ -229,6 +260,7 @@ class World {
                 new Vec(-32, this.BONUS_Y),
                 World.resources.sprites["bonus"],
                 this.BONUS_SIZE,
+                this.BONUS_COLLIDER_SIZE,
                 this.BONUS_SPEED,
                 Vec.RIGHT
             );
@@ -238,6 +270,7 @@ class World {
                 new Vec(this.width + 32, this.BONUS_Y),
                 World.resources.sprites["bonus"],
                 this.BONUS_SIZE,
+                this.BONUS_COLLIDER_SIZE,
                 this.BONUS_SPEED,
                 Vec.LEFT
             );
@@ -257,16 +290,12 @@ class World {
         return false;
     }
 
-    shotCollision(shot, gameObj) {
-        if (shot.direction.y > 0 && gameObj.type === "alien") return;
-        if (shot.direction.y < 0 && gameObj.type === "player") return;
+    shotCollision(shot, obj) {
+        if (shot.direction === Vec.DOWN && obj.type === "alien") return;
+        if (shot.direction === Vec.UP && obj.type === "player") return;
 
-        return (
-            shot.position.x > gameObj.position.x - gameObj.size / 2 &&
-            shot.position.x < gameObj.position.x + gameObj.size / 2 &&
-            shot.position.y > gameObj.position.y - gameObj.size / 2 &&
-            shot.position.y < gameObj.position.y + gameObj.size / 2
-        );
+        const dist = Vec.sub2(shot.position, obj.position).mag();
+        return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
     }
 
     render() {

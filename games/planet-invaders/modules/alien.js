@@ -1,11 +1,12 @@
 import { GameObject } from "./game-object.js";
+
 import { Vec } from "./math/vec.js";
 
 class Alien extends GameObject {
     delta = 0;
     yRange = 2;
-    constructor(position, sprite, size, speed) {
-        super("alien", position, size);
+    constructor(position, sprite, size, colliderSize, speed) {
+        super("alien", position, size, colliderSize);
         this.direction = Vec.RIGHT;
         this.moveSpeed = speed;
         this.sprite = sprite;
