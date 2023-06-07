@@ -15,7 +15,7 @@ class World {
     static ALIEN_SPEED = 0.25;
 
     PLAYER_SIZE = 24;
-    PLAYER_COLLIDER_SIZE = 16;
+    PLAYER_COLLIDER_SIZE = 12;
     PLAYER_SPEED = 2;
     BARRIER_SIZE = 48;
     BARRIER_COUNT = 3;
@@ -294,8 +294,15 @@ class World {
         if (shot.direction === Vec.DOWN && obj.type === "alien") return;
         if (shot.direction === Vec.UP && obj.type === "player") return;
 
-        const dist = Vec.sub2(shot.position, obj.position).mag();
-        return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
+        if (obj.type === "player") {
+            for (let i = 0; i < obj.colliders.length; i++) {
+                const dist = Vec.sub2(shot.position, obj.colliders[i]).mag();
+                return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
+            }
+        } else {
+            const dist = Vec.sub2(shot.position, obj.position).mag();
+            return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
+        }
     }
 
     render() {

@@ -99,6 +99,9 @@ class DemoPlayer extends Player {
         if (frameCount % 30 === 0) {
             this.fire();
         }
+        if (frameCount % 120 === 0 && Math.random() < 0.25) {
+            this.changeDirection();
+        }
         this.position.x += this.moveSpeed;
 
         this.colliders[0].set(
@@ -115,7 +118,7 @@ class DemoPlayer extends Player {
             this.position.x < this.size ||
             this.position.x > this.world.width - this.size
         ) {
-            this.moveSpeed *= -1;
+            this.changeDirection();
         }
 
         if (!this.weaponReady) {
@@ -125,6 +128,10 @@ class DemoPlayer extends Player {
                 this.weaponReady = true;
             }
         }
+    }
+
+    changeDirection() {
+        this.moveSpeed *= -1;
     }
 }
 
