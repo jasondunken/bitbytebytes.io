@@ -2,11 +2,14 @@ import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
 import { Player, DemoPlayer } from "./modules/player.js";
 
+import { PixelExplosion } from "./modules/visual-effects.js";
+
 import { Vec } from "./modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
+window.mousePressed = mousePressed;
 
 const GAME_WIDTH = 512; // 32 x 16px
 const GAME_HEIGHT = 400; // 25 x 16px
@@ -36,6 +39,11 @@ function initGame() {
 function draw() {
     game.update();
     game.render();
+}
+
+function mousePressed(event) {
+    console.log(event);
+    game.mouseClicked(event);
 }
 
 // PlanetInvaders
@@ -94,6 +102,10 @@ class PlanetInvaders {
     //         this.currentState = this.GAME_STATE.CRITICAL_ERROR;
     //     }
     // }
+
+    mouseClicked(event) {
+        this.world.addGameObject(new PixelExplosion(new Vec(mouseX, mouseY)));
+    }
 
     startDemo() {
         this.currentState = this.GAME_STATE.STARTING;
@@ -193,7 +205,15 @@ class PlanetInvaders {
             this.world.update();
             for (let shot of this.world.gameObjects.shots) {
                 if (this.world.shotCollision(shot, this.player)) {
-                    this.player;
+                    this.world.addGameObject(
+                        new PixelExplosion(this.player.colliders[0].copy())
+                    );
+                    this.world.addGameObject(
+                        new PixelExplosion(this.player.colliders[1].copy())
+                    );
+                    this.world.addGameObject(
+                        new PixelExplosion(this.player.colliders[2].copy())
+                    );
                     this.lives--;
                     if (this.lives <= 0) {
                         this.endGame();

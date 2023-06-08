@@ -69,6 +69,18 @@ class Player extends GameObject {
                 this.size * 2,
                 this.size * 2
             );
+
+            // for (let collider of this.colliders) {
+            //     stroke("red");
+            //     strokeWeight(1);
+            //     noFill();
+            //     ellipse(
+            //         collider.x,
+            //         collider.y,
+            //         this.colliderSize,
+            //         this.colliderSize
+            //     );
+            // }
         }
     }
 

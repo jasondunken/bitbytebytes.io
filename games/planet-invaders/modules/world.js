@@ -7,6 +7,8 @@ import { Shot } from "./shot.js";
 import { Barrier } from "./barrier.js";
 import { Bonus } from "./bonus.js";
 
+import { PixelExplosion } from "./visual-effects.js";
+
 import { Vec } from "./math/vec.js";
 
 class World {
@@ -15,7 +17,7 @@ class World {
     static ALIEN_SPEED = 0.25;
 
     PLAYER_SIZE = 24;
-    PLAYER_COLLIDER_SIZE = 12;
+    PLAYER_COLLIDER_SIZE = 16;
     PLAYER_SPEED = 2;
     BARRIER_SIZE = 48;
     BARRIER_COUNT = 3;
@@ -129,6 +131,7 @@ class World {
     }
 
     deleteGameObject(obj) {
+        // console.log(`deleting ${obj.type} object`);
         switch (obj.type) {
             case "alien":
                 this.gameObjects.aliens.delete(obj);
@@ -173,7 +176,9 @@ class World {
                             obj.remove = true;
                             this.deleteGameObject(shot);
                             this.game.addScore(obj.type);
-                            // TODO: add visual effect
+                            this.addGameObject(
+                                new PixelExplosion(obj.position.copy())
+                            );
                         }
                     }
                 }
@@ -182,14 +187,18 @@ class World {
                         if (this.shotCollision(shot, obj)) {
                             obj.remove = true;
                             this.deleteGameObject(shot);
-                            // TODO: add visual effect
+                            this.addGameObject(
+                                new PixelExplosion(obj.position.copy())
+                            );
                         }
                     }
                     for (let alien of this.gameObjects.aliens) {
                         if (this.shotCollision(alien, obj)) {
                             obj.remove = true;
                             this.deleteGameObject(alien);
-                            // TODO: add visual effect
+                            this.addGameObject(
+                                new PixelExplosion(obj.position.copy())
+                            );
                             this.game.aliensWon();
                         }
                     }
@@ -297,7 +306,7 @@ class World {
         if (obj.type === "player") {
             for (let i = 0; i < obj.colliders.length; i++) {
                 const dist = Vec.sub2(shot.position, obj.colliders[i]).mag();
-                return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
+                return dist <= shot.colliderSize + obj.colliderSize / 2;
             }
         } else {
             const dist = Vec.sub2(shot.position, obj.position).mag();

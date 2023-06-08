@@ -1,5 +1,7 @@
 import { GameObject } from "./game-object.js";
 
+import { Vec } from "./math/vec.js";
+
 class Shot extends GameObject {
     static WIDTH = 4;
     static LENGTH = 8;
@@ -20,12 +22,27 @@ class Shot extends GameObject {
         let a = random(0, 255);
         stroke(r, g, b, a);
         strokeWeight(Shot.WIDTH);
+        noFill();
         line(
             this.position.x,
             this.position.y,
             this.position.x,
             this.position.y + Shot.LENGTH
         );
+
+        noStroke();
+        if (this.direction === Vec.UP) {
+            fill("yellow");
+            ellipse(this.position.x, this.position.y, this.size, this.size);
+        } else {
+            fill("red");
+            ellipse(
+                this.position.x,
+                this.position.y + Shot.LENGTH,
+                this.size,
+                this.size
+            );
+        }
     }
 }
 
