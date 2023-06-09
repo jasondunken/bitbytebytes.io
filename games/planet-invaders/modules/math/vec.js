@@ -24,7 +24,7 @@ class Vec {
             this.x = x.x;
             this.y = x.y;
             this.z = x.z;
-            return;
+            return this;
         }
         this.x = x || 0;
         this.y = y || 0;
@@ -37,7 +37,7 @@ class Vec {
             this.x += x.x;
             this.y += x.y;
             this.z += x.z;
-            return;
+            return this;
         }
         this.x += x;
         this.y += y;
@@ -50,7 +50,7 @@ class Vec {
             this.x -= x.x;
             this.y -= x.y;
             this.z -= x.z;
-            return;
+            return this;
         }
         this.x -= x;
         this.y -= y;

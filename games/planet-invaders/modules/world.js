@@ -171,7 +171,7 @@ class World {
             for (let obj of objs) {
                 obj.update();
                 if (obj.type === "alien" || obj.type === "bonus") {
-                    for (let shot of this.gameObjects["shots"]) {
+                    for (let shot of this.gameObjects.shots) {
                         if (this.shotCollision(shot, obj)) {
                             obj.remove = true;
                             this.deleteGameObject(shot);
@@ -182,8 +182,12 @@ class World {
                         }
                     }
                 }
+                if (obj.type === "alien") {
+                    if (this.hitWall(obj)) this.shiftAliens(obj);
+                    if (this.hasLanded(obj)) this.game.aliensWon();
+                }
                 if (obj.type === "block") {
-                    for (let shot of this.gameObjects["shots"]) {
+                    for (let shot of this.gameObjects.shots) {
                         if (this.shotCollision(shot, obj)) {
                             obj.remove = true;
                             this.deleteGameObject(shot);
@@ -203,10 +207,6 @@ class World {
                         }
                     }
                 }
-                if (obj.type === "alien") {
-                    if (this.hitWall(obj)) this.shiftAliens(obj);
-                    if (this.hasLanded(obj)) this.game.aliensWon();
-                }
                 if (this.outOfBounds(obj)) obj.remove = true;
                 if (obj.remove) this.deleteGameObject(obj);
             }
@@ -221,6 +221,12 @@ class World {
         // 22 seconds
         if (this.levelTime % 1320 === 0) {
             this.addGameObject(this.getRandomBonus());
+        }
+    }
+
+    updateVisualEffects() {
+        for (let effect of this.gameObjects.visualEffects) {
+            effect.update();
         }
     }
 
@@ -260,6 +266,7 @@ class World {
         for (let alien of this.gameObjects.aliens) {
             alien.position.y += 24;
             alien.direction = direction;
+            alien.colliders[0].set(alien.position);
         }
     }
 
@@ -305,19 +312,25 @@ class World {
         if (shot.direction === Vec.DOWN && obj.type === "alien") return;
         if (shot.direction === Vec.UP && obj.type === "player") return;
 
+        let collision = false;
         for (let i = 0; i < obj.colliders.length; i++) {
-            const dist = Vec.sub2(shot.colliders[0], obj.colliders[i]).mag();
-            return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
+            const dist = Math.abs(
+                Vec.sub2(shot.colliders[0], obj.colliders[i]).mag()
+            );
+            if (dist <= shot.colliderSize / 2 + obj.colliderSize / 2) {
+                collision = true;
+            }
         }
+        return collision;
     }
 
-    render() {
+    render(debug) {
         background(World.resources.backgrounds[2]);
 
         for (let group of Object.keys(this.gameObjects)) {
             const objs = this.gameObjects[group];
             for (let obj of objs) {
-                obj.render();
+                obj.render(debug);
             }
         }
     }

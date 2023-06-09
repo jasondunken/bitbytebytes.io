@@ -12,9 +12,10 @@ class Bonus extends GameObject {
 
     update() {
         this.position.x += this.moveSpeed * this.direction.x;
+        this.colliders[0] = this.position.copy();
     }
 
-    render() {
+    render(debug) {
         image(
             this.sprite,
             this.position.x - this.size / 2,
@@ -22,6 +23,20 @@ class Bonus extends GameObject {
             this.size,
             this.size
         );
+
+        if (debug) {
+            for (let collider of this.colliders) {
+                stroke("red");
+                strokeWeight(1);
+                noFill();
+                ellipse(
+                    collider.x,
+                    collider.y,
+                    this.colliderSize,
+                    this.colliderSize
+                );
+            }
+        }
     }
 }
 

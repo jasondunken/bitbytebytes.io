@@ -16,17 +16,8 @@ class Player extends GameObject {
         this.world = world;
         this.sprite = sprite;
         this.moveSpeed = speed;
-        this.colliders = [
-            new Vec(
-                position.x - size * this.COLLIDER_OFFSET_X,
-                position.y + this.size * this.COLLIDER_OFFSET_Y
-            ),
-            new Vec(position.x, position.y),
-            new Vec(
-                position.x + size * this.COLLIDER_OFFSET_X,
-                position.y + this.size * this.COLLIDER_OFFSET_Y
-            ),
-        ];
+        this.colliders = [new Vec(), new Vec(), new Vec()];
+        this.updateColliders();
     }
 
     update() {
@@ -38,15 +29,7 @@ class Player extends GameObject {
         if (this.position.x > this.world.width - this.size / 2)
             this.position.x = this.world.width - this.size / 2;
 
-        this.colliders[0].set(
-            this.position.x - this.size * this.COLLIDER_OFFSET_X,
-            this.position.y + this.size * this.COLLIDER_OFFSET_Y
-        );
-        this.colliders[1].set(this.position.x, this.position.y);
-        this.colliders[2].set(
-            this.position.x + this.size * this.COLLIDER_OFFSET_X,
-            this.position.y + this.size * this.COLLIDER_OFFSET_Y
-        );
+        this.updateColliders();
 
         if (keyIsDown(32) && this.weaponReady) {
             this.fire();
@@ -60,7 +43,19 @@ class Player extends GameObject {
         }
     }
 
-    render() {
+    updateColliders() {
+        this.colliders[0].set(
+            this.position.x - this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
+        this.colliders[1].set(this.position);
+        this.colliders[2].set(
+            this.position.x + this.size * this.COLLIDER_OFFSET_X,
+            this.position.y + this.size * this.COLLIDER_OFFSET_Y
+        );
+    }
+
+    render(debug) {
         if (this.sprite) {
             image(
                 this.sprite,
@@ -70,17 +65,19 @@ class Player extends GameObject {
                 this.size * 2
             );
 
-            // for (let collider of this.colliders) {
-            //     stroke("red");
-            //     strokeWeight(1);
-            //     noFill();
-            //     ellipse(
-            //         collider.x,
-            //         collider.y,
-            //         this.colliderSize,
-            //         this.colliderSize
-            //     );
-            // }
+            if (debug) {
+                for (let collider of this.colliders) {
+                    stroke("red");
+                    strokeWeight(1);
+                    noFill();
+                    ellipse(
+                        collider.x,
+                        collider.y,
+                        this.colliderSize,
+                        this.colliderSize
+                    );
+                }
+            }
         }
     }
 
@@ -105,6 +102,8 @@ class Player extends GameObject {
 class DemoPlayer extends Player {
     constructor(world, position, sprite, size, colliderSize, speed) {
         super(world, position, sprite, size, colliderSize, speed);
+        this.direction = Math.random() < 5.0 ? Vec.LEFT : Vec.RIGHT;
+        this.lastPosition = position.copy();
     }
 
     update() {
@@ -114,17 +113,9 @@ class DemoPlayer extends Player {
         if (frameCount % 120 === 0 && Math.random() < 0.25) {
             this.changeDirection();
         }
-        this.position.x += this.moveSpeed;
+        this.position.x += this.moveSpeed * this.direction.x;
 
-        this.colliders[0].set(
-            this.position.x - this.size * this.COLLIDER_OFFSET_X,
-            this.position.y + this.size * this.COLLIDER_OFFSET_Y
-        );
-        this.colliders[1].set(this.position.x, this.position.y);
-        this.colliders[2].set(
-            this.position.x + this.size * this.COLLIDER_OFFSET_X,
-            this.position.y + this.size * this.COLLIDER_OFFSET_Y
-        );
+        this.updateColliders();
 
         if (
             this.position.x < this.size ||
@@ -140,10 +131,12 @@ class DemoPlayer extends Player {
                 this.weaponReady = true;
             }
         }
+
+        this.lastPosition.set(this.position);
     }
 
     changeDirection() {
-        this.moveSpeed *= -1;
+        this.direction = this.direction === Vec.LEFT ? Vec.RIGHT : Vec.LEFT;
     }
 }
 

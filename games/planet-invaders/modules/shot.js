@@ -6,6 +6,7 @@ class Shot extends GameObject {
     static WIDTH = 4;
     static LENGTH = 8;
     MOVE_SPEED = 3;
+    COLLIDER_OFFSET = new Vec(0, Shot.LENGTH);
     constructor(position, direction) {
         super("shot", position, Shot.WIDTH, Shot.WIDTH);
         this.colliders = [position.copy()];
@@ -14,10 +15,10 @@ class Shot extends GameObject {
 
     update() {
         this.position.y += this.MOVE_SPEED * this.direction.y;
-        this.colliders[0] = this.position.copy();
+        this.colliders[0] = this.position.copy().add(this.COLLIDER_OFFSET);
     }
 
-    render() {
+    render(debug) {
         let r = random(0, 255);
         let g = random(0, 255);
         let b = random(0, 255);
@@ -44,6 +45,20 @@ class Shot extends GameObject {
                 this.size,
                 this.size
             );
+        }
+
+        if (debug) {
+            for (let collider of this.colliders) {
+                stroke("red");
+                strokeWeight(1);
+                noFill();
+                ellipse(
+                    collider.x,
+                    collider.y,
+                    this.colliderSize,
+                    this.colliderSize
+                );
+            }
         }
     }
 }

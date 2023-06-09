@@ -9,6 +9,7 @@ import { Vec } from "./modules/math/vec.js";
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
+window.keyPressed = keyPressed;
 window.mousePressed = mousePressed;
 
 const GAME_WIDTH = 512; // 32 x 16px
@@ -36,13 +37,17 @@ function initGame() {
     game.startDemo();
 }
 
+const DEBUG = false;
 function draw() {
     game.update();
-    game.render();
+    game.render(DEBUG);
+}
+
+function keyPressed(event) {
+    event.preventDefault();
 }
 
 function mousePressed(event) {
-    console.log(event);
     game.mouseClicked(event);
 }
 
@@ -55,7 +60,8 @@ class PlanetInvaders {
         });
     SCOREBOARD_HEIGHT = 48;
 
-    START_DELAY = 60;
+    LEVEL_START_DELAY = 120;
+    END_GAME_TIMER = 120;
     DEMO_RESTART_DELAY = 1800;
 
     STARTING_LIVES = 3;
@@ -67,6 +73,7 @@ class PlanetInvaders {
         HELP: "HELP",
         LEVEL_STARTING: "LEVEL_STARTING",
         PLAYING: "PLAYING",
+        RESPAWNING: "RESPAWNING",
         ENDING: "ENDING",
         GAME_OVER: "GAME_OVER",
         CRITICAL_ERROR: "CRITICAL_ERROR",
@@ -143,16 +150,12 @@ class PlanetInvaders {
 
     startLevel() {
         this.currentState = this.GAME_STATE.LEVEL_STARTING;
-        // TODO: transition
         this.world.start(this.level);
-        this.currentState = this.GAME_STATE.PLAYING;
     }
 
     endGame() {
+        this.gameEndTimer = this.END_GAME_TIMER;
         this.currentState = this.GAME_STATE.ENDING;
-        // TODO: transition
-        this.currentState = this.GAME_STATE.GAME_OVER;
-        this.gameOverTime = 0;
     }
 
     aliensWon() {
@@ -160,13 +163,16 @@ class PlanetInvaders {
         if (this.lives <= 0) {
             this.endGame();
         } else {
+            this.currentState = this.GAME_STATE.RESPAWNING;
             this.player.position.set(this.playerSpawn.copy());
             this.startLevel();
         }
     }
 
     respawnPlayer() {
-        this.player.position = this.playerSpawn.copy();
+        this.respawnTimer = this.LEVEL_START_DELAY;
+        this.currentState = this.GAME_STATE.RESPAWNING;
+        this.player.position.set(this.playerSpawn);
     }
 
     addScore(type, multi) {
@@ -200,6 +206,21 @@ class PlanetInvaders {
             }
         }
 
+        if (this.currentState === this.GAME_STATE.LEVEL_STARTING) {
+            this.world.levelTime++;
+            if (this.world.levelTime >= this.LEVEL_START_DELAY) {
+                this.currentState = this.GAME_STATE.PLAYING;
+            }
+        }
+
+        if (this.currentState === this.GAME_STATE.RESPAWNING) {
+            this.respawnTimer--;
+            this.world.updateVisualEffects();
+            if (this.respawnTimer <= 0) {
+                this.currentState = this.GAME_STATE.PLAYING;
+            }
+        }
+
         if (this.currentState === this.GAME_STATE.PLAYING) {
             this.player.update();
             this.world.update();
@@ -224,6 +245,15 @@ class PlanetInvaders {
             }
         }
 
+        if (this.currentState === this.GAME_STATE.ENDING) {
+            this.gameEndTimer--;
+            this.world.updateVisualEffects();
+            if (this.gameEndTimer <= 0) {
+                this.gameOverTime = 0;
+                this.currentState = this.GAME_STATE.GAME_OVER;
+            }
+        }
+
         if (this.score > this.nextBonusShip) {
             this.addShip();
             this.nextBonusShip += this.BONUS_SHIP_INTERVAL;
@@ -231,10 +261,16 @@ class PlanetInvaders {
         this.scoreboard.update(this.level, this.score, this.lives);
     }
 
-    render() {
+    render(debug) {
         if (this.font) textFont(this.font);
-        this.world.render();
-        this.player.render();
+        this.world.render(debug);
+        if (this.currentState === this.GAME_STATE.LEVEL_STARTING) {
+            if (this.world.levelTime % 30 < 15) this.player.render();
+        } else if (this.currentState === this.GAME_STATE.RESPAWNING) {
+            if (this.respawnTimer % 30 < 15) this.player.render();
+        } else {
+            this.player.render(debug);
+        }
         this.scoreboard.render(this.score, this.level, this.lives);
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {

@@ -61,7 +61,7 @@ class BarrierBlock extends GameObject {
 
     update() {}
 
-    render() {
+    render(debug) {
         noStroke();
         fill("#00ff00ff");
         rect(
@@ -70,6 +70,20 @@ class BarrierBlock extends GameObject {
             this.size,
             this.size
         );
+
+        if (debug) {
+            for (let collider of this.colliders) {
+                stroke("red");
+                strokeWeight(1);
+                noFill();
+                ellipse(
+                    collider.x,
+                    collider.y,
+                    this.colliderSize,
+                    this.colliderSize
+                );
+            }
+        }
     }
 }
 
