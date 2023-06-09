@@ -1,14 +1,23 @@
 class Vec {
     constructor(x, y, z) {
+        if (x instanceof Vec) {
+            this.x = x.x;
+            this.y = x.y;
+            this.z = x.z;
+            return this;
+        }
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
+        return this;
     }
 
     static UP = new Vec(0, -1);
     static DOWN = new Vec(0, 1);
     static LEFT = new Vec(-1, 0);
     static RIGHT = new Vec(1, 0);
+
+    static GRAVITY = new Vec(0, 9.8);
 
     set(x, y, z) {
         if (x instanceof Vec) {
@@ -62,7 +71,8 @@ class Vec {
             this.y /= scalar;
             this.z /= scalar;
         } else {
-            console.warn(
+            console.assert(
+                scalar,
                 `divide by zero error:  ${scalar} - ${this.toString()}`
             );
         }
@@ -114,6 +124,15 @@ class Vec {
 
     static div2(vec1, vec2) {
         return new Vec(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
+    }
+
+    static Random() {
+        return new Vec(Math.random() * 2 - 1, Math.random() * 2 - 1);
+    }
+
+    static UnitRandom2d() {
+        const vec = new Vec(Math.random() * 2 - 1, Math.random() * 2 - 1);
+        return vec.normalize();
     }
 
     copy() {
