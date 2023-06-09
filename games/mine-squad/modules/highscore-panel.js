@@ -1,9 +1,9 @@
-import { Vec2d } from "./math.js";
+import { Vec } from "./vec.js";
 
 class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
-    position = new Vec2d(0, 0);
+    position = new Vec();
     MAX_SCORES = 10;
     stats = {};
     highScores = [];
@@ -26,7 +26,12 @@ class HighScorePanel {
         }
 
         const scoreDate = Date.now();
-        gameScores.push({ scoreDate, score: score, winner: winner, time: time });
+        gameScores.push({
+            scoreDate,
+            score: score,
+            winner: winner,
+            time: time,
+        });
 
         if (gameScores.length > this.MAX_SCORES) {
             let lowestScore = gameScores[0];
@@ -64,7 +69,10 @@ class HighScorePanel {
             } else if (this.stats.losses <= 0) {
                 return 100;
             } else {
-                return ((this.stats.wins / (this.stats.wins + this.stats.losses)) * 100).toFixed(2);
+                return (
+                    (this.stats.wins / (this.stats.wins + this.stats.losses)) *
+                    100
+                ).toFixed(2);
             }
         } else return 0;
     }
@@ -110,7 +118,9 @@ class HighScorePanel {
         fill("black");
         textSize(16);
         text(
-            `wins ${this.stats.wins} - losses ${this.stats.losses} - win rate ${this.getWinRate()}%`,
+            `wins ${this.stats.wins} - losses ${
+                this.stats.losses
+            } - win rate ${this.getWinRate()}%`,
             this.position.x + this.WIDTH / 2,
             100
         );
@@ -122,9 +132,17 @@ class HighScorePanel {
                     fill("red");
                 } else fill("black");
                 textAlign(LEFT);
-                text(new Date(+score.scoreDate).toLocaleDateString(), this.position.x + 32, 135 + i * 24);
+                text(
+                    new Date(+score.scoreDate).toLocaleDateString(),
+                    this.position.x + 32,
+                    135 + i * 24
+                );
                 textAlign(RIGHT);
-                text(score.score, this.position.x + this.WIDTH - 32, 135 + i * 24);
+                text(
+                    score.score,
+                    this.position.x + this.WIDTH - 32,
+                    135 + i * 24
+                );
             }
         });
 
@@ -133,7 +151,11 @@ class HighScorePanel {
         if (frameCount % 120 > 60) {
             text("Click to restart", this.position.x + this.WIDTH / 2, 430);
         } else {
-            text("Space to hide high scores", this.position.x + this.WIDTH / 2, 430);
+            text(
+                "Space to hide high scores",
+                this.position.x + this.WIDTH / 2,
+                430
+            );
         }
     }
 }

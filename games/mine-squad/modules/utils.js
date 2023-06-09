@@ -1,4 +1,4 @@
-import { Vec2d } from "./math.js";
+import { Vec } from "./vec.js";
 
 function setColor(newColor) {
     fill(newColor);
@@ -34,17 +34,22 @@ function screenPositionToTileIndex(coords, config) {
 
 // returns the screen position of the center of the tile at the given array index
 function tileIndexToTileCenter(tileIndex, config) {
-    return new Vec2d(
-        (tileIndex % config.tilesPerRow) * config.tileSize + config.xOffset + config.tileSize / 2,
-        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize + config.yOffset + config.tileSize / 2
+    return new Vec(
+        (tileIndex % config.tilesPerRow) * config.tileSize +
+            config.xOffset +
+            config.tileSize / 2,
+        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize +
+            config.yOffset +
+            config.tileSize / 2
     );
 }
 
 // returns the screen position of the top-left of the tile at the given array index
 function tileIndexToTileTopLeft(tileIndex, config) {
-    return new Vec2d(
+    return new Vec(
         (tileIndex % config.tilesPerRow) * config.tileSize + config.xOffset,
-        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize + config.yOffset
+        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize +
+            config.yOffset
     );
 }
 

@@ -2,7 +2,7 @@ import { GAME_STATE } from "./modules/game-state.js";
 import { Board } from "./modules/board.js";
 import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
-import { Vec2d } from "./modules/math.js";
+import { Vec } from "./modules/vec.js";
 import { Explosion, Firework } from "./modules/visual-effects.js";
 import { setColor, getElapsedTimeString } from "./modules/utils.js";
 
@@ -20,7 +20,9 @@ let game = null;
 function preload() {
     let sprites = {};
     sprites["bomb"] = loadImage("./mine-squad/res/img/bomb.png");
-    sprites["bomb_defused"] = loadImage("./mine-squad/res/img/bomb-defused.png");
+    sprites["bomb_defused"] = loadImage(
+        "./mine-squad/res/img/bomb-defused.png"
+    );
     MineSquad.sprites = sprites;
 }
 
@@ -54,9 +56,11 @@ function mousePressed(event) {
 }
 
 class MineSquad {
-    PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
-        this.start1Player();
-    });
+    PLAYER_1_START_BUTTON = document
+        .getElementById("start-1p")
+        .addEventListener("click", () => {
+            this.start1Player();
+        });
 
     static sprites;
 
@@ -154,7 +158,7 @@ class MineSquad {
     }
 
     handleMouseClick(mouseX, mouseY) {
-        const coords = new Vec2d(mouseX, mouseY);
+        const coords = new Vec(mouseX, mouseY);
 
         if (this.board.isOnBoard(coords)) {
             this.mouseClicks.push(coords);
@@ -194,11 +198,17 @@ class MineSquad {
 
                 if (this.board.completed) this.endGame();
 
-                if (this.score > this.FIRST_SQUAD_AWARD && this.squadAward === 0) {
+                if (
+                    this.score > this.FIRST_SQUAD_AWARD &&
+                    this.squadAward === 0
+                ) {
                     this.squadAward = this.FIRST_SQUAD_AWARD;
                     this.addSquad();
                 }
-                if (this.score > this.SECOND_SQUAD_AWARD && this.squadAward === this.FIRST_SQUAD_AWARD) {
+                if (
+                    this.score > this.SECOND_SQUAD_AWARD &&
+                    this.squadAward === this.FIRST_SQUAD_AWARD
+                ) {
                     this.squadAward = this.SECOND_SQUAD_AWARD;
                     this.addSquad();
                 }
@@ -211,8 +221,13 @@ class MineSquad {
 
     handleKeyPress(key) {
         if (key.code === "Space") {
-            if (this.currentState === GAME_STATE.GAME_OVER && this.highScorePanel) {
-                this.highScorePanel.isShowing() ? this.highScorePanel.hidePanel() : this.highScorePanel.showPanel();
+            if (
+                this.currentState === GAME_STATE.GAME_OVER &&
+                this.highScorePanel
+            ) {
+                this.highScorePanel.isShowing()
+                    ? this.highScorePanel.hidePanel()
+                    : this.highScorePanel.showPanel();
             }
         }
         if (key.code === "Tab") {
@@ -298,7 +313,7 @@ class MineSquad {
         for (let i = 0; i < numFireworks; i++) {
             this.addToLayers(
                 new Firework(
-                    new Vec2d(
+                    new Vec(
                         this.width / 4 + (Math.random() * this.width) / 2,
                         this.height / 4 + (Math.random() * this.height) / 2
                     )

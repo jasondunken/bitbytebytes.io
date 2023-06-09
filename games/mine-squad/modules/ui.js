@@ -1,4 +1,4 @@
-import { Vec2d } from "./math.js";
+import { Vec } from "./vec.js";
 import { BonusSquadEffect } from "./visual-effects.js";
 import { GAME_STATE } from "./game-state.js";
 import { getElapsedTimeString } from "./utils.js";
@@ -39,11 +39,11 @@ class UI {
 
     constructor(mineSquad, position) {
         this.mineSquad = mineSquad;
-        this.position = position || new Vec2d(4, 487);
+        this.position = position || new Vec(4, 487);
     }
 
     addSquad(squadCount) {
-        const position = new Vec2d(
+        const position = new Vec(
             this.position.x +
                 this.SQUADS_BOX_X +
                 this.SQUADS_BOX_WIDTH / 2 +
@@ -78,7 +78,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("LEVEL", this.position.x + this.LEVEL_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "LEVEL",
+            this.position.x + this.LEVEL_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.LEVEL_BOX_X,
@@ -91,7 +95,9 @@ class UI {
         textAlign(CENTER, CENTER);
         text(
             "" + this.gameData.level,
-            this.LEVEL_BOX_X + this.LEVEL_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+            this.LEVEL_BOX_X +
+                this.LEVEL_BOX_WIDTH / 2 +
+                this.P5_TEXT_ISNT_REALLY_CENTERED,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
     }
@@ -101,7 +107,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("SCORE", this.position.x + this.SCORE_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "SCORE",
+            this.position.x + this.SCORE_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.SCORE_BOX_X,
@@ -114,7 +124,9 @@ class UI {
         textAlign(CENTER, CENTER);
         text(
             "" + this.gameData.score,
-            this.SCORE_BOX_X + this.SCORE_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+            this.SCORE_BOX_X +
+                this.SCORE_BOX_WIDTH / 2 +
+                this.P5_TEXT_ISNT_REALLY_CENTERED,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
     }
@@ -124,7 +136,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("SQUADS", this.position.x + this.SQUADS_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "SQUADS",
+            this.position.x + this.SQUADS_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.SQUADS_BOX_X,
@@ -147,7 +163,10 @@ class UI {
             const xOff = this.SQUADS_SPACING * (i - 1);
             if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
                 ellipse(
-                    this.position.x + this.SQUADS_BOX_X + this.SCORE_BOX_WIDTH / 2 + xOff,
+                    this.position.x +
+                        this.SQUADS_BOX_X +
+                        this.SCORE_BOX_WIDTH / 2 +
+                        xOff,
                     this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y,
                     12,
                     12
@@ -158,7 +177,10 @@ class UI {
                 fill("black");
                 text(
                     "X",
-                    this.position.x + this.SQUADS_BOX_X + this.SCORE_BOX_WIDTH / 2 + xOff,
+                    this.position.x +
+                        this.SQUADS_BOX_X +
+                        this.SCORE_BOX_WIDTH / 2 +
+                        xOff,
                     this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
                 );
             }
@@ -170,7 +192,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("TIME", this.position.x + this.TIME_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "TIME",
+            this.position.x + this.TIME_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.TIME_BOX_X,
@@ -183,7 +209,9 @@ class UI {
         textAlign(CENTER, CENTER);
         text(
             "" + getElapsedTimeString(this.gameData.time),
-            this.TIME_BOX_X + this.TIME_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+            this.TIME_BOX_X +
+                this.TIME_BOX_WIDTH / 2 +
+                this.P5_TEXT_ISNT_REALLY_CENTERED,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
     }
@@ -193,7 +221,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("MINES", this.position.x + this.MINES_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "MINES",
+            this.position.x + this.MINES_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.MINES_BOX_X,
@@ -207,14 +239,18 @@ class UI {
             fill("white");
             text(
                 "" + this.gameData.mines,
-                this.MINES_BOX_X + this.MINES_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.MINES_BOX_X +
+                    this.MINES_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.MINES_BOX_X + this.MINES_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.MINES_BOX_X +
+                    this.MINES_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }
@@ -225,7 +261,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("MINES?", this.position.x + this.HIDDEN_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "MINES?",
+            this.position.x + this.HIDDEN_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.HIDDEN_BOX_X,
@@ -239,14 +279,18 @@ class UI {
             fill("red");
             text(
                 "" + this.gameData.hidden,
-                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.HIDDEN_BOX_X +
+                    this.HIDDEN_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.HIDDEN_BOX_X + this.HIDDEN_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.HIDDEN_BOX_X +
+                    this.HIDDEN_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }
@@ -257,7 +301,11 @@ class UI {
         fill("white");
         textSize(14);
         textAlign(LEFT, BOTTOM);
-        text("FLAGS", this.position.x + this.FLAGS_BOX_X, this.position.y + this.UI_BOX_Y);
+        text(
+            "FLAGS",
+            this.position.x + this.FLAGS_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
         fill(color(44, 44, 44));
         rect(
             this.position.x + this.FLAGS_BOX_X,
@@ -271,14 +319,18 @@ class UI {
             fill("yellow");
             text(
                 "" + this.gameData.flags,
-                this.FLAGS_BOX_X + this.FLAGS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.FLAGS_BOX_X +
+                    this.FLAGS_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.FLAGS_BOX_X + this.FLAGS_BOX_WIDTH / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.FLAGS_BOX_X +
+                    this.FLAGS_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }

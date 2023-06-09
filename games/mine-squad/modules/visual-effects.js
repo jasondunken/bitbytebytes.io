@@ -1,5 +1,5 @@
 import { valueToColor } from "./utils.js";
-import { Vec2d } from "./math.js";
+import { Vec } from "./vec.js";
 
 class VisualEffect {
     done = false;
@@ -112,10 +112,18 @@ class Explosion extends VisualEffect {
             const b = Math.floor(Math.random() * 256);
             this.explosion.add({
                 position: {
-                    x: Math.random() * this.CONCENTRATION * 2 - this.CONCENTRATION + position.x,
-                    y: Math.random() * this.CONCENTRATION * 2 - this.CONCENTRATION + position.y,
+                    x:
+                        Math.random() * this.CONCENTRATION * 2 -
+                        this.CONCENTRATION +
+                        position.x,
+                    y:
+                        Math.random() * this.CONCENTRATION * 2 -
+                        this.CONCENTRATION +
+                        position.y,
                 },
-                life: Math.floor((Math.random() * this.MAX_LIFE) / 2 + this.MAX_LIFE / 2),
+                life: Math.floor(
+                    (Math.random() * this.MAX_LIFE) / 2 + this.MAX_LIFE / 2
+                ),
                 speed: Math.floor(Math.random() * 4 + 4),
                 size: 4,
                 brightness: b,
@@ -133,7 +141,10 @@ class Explosion extends VisualEffect {
             else {
                 particle.alpha = particle.alpha -= particle.speed * 5;
                 if (particle.alpha < 0) particle.alpha = 0;
-                particle.color = this.setBrightnessAlpha(particle.brightness, particle.alpha);
+                particle.color = this.setBrightnessAlpha(
+                    particle.brightness,
+                    particle.alpha
+                );
             }
         }
         if (this.explosion.size < 1) this.done = true;
@@ -148,7 +159,12 @@ class Explosion extends VisualEffect {
         ellipseMode(CENTER);
         for (let particle of this.explosion) {
             fill(particle.color);
-            ellipse(particle.position.x, particle.position.y, particle.size, particle.size);
+            ellipse(
+                particle.position.x,
+                particle.position.y,
+                particle.size,
+                particle.size
+            );
         }
     }
 }
@@ -169,11 +185,24 @@ class Firework extends VisualEffect {
         "coral",
     ];
 
-    constructor(position, numParticles, volleyTime, expansionTime, volleys, volleyRate, startDelay, layer) {
+    constructor(
+        position,
+        numParticles,
+        volleyTime,
+        expansionTime,
+        volleys,
+        volleyRate,
+        startDelay,
+        layer
+    ) {
         super(position, layer);
-        numParticles ? (this.numParticles = numParticles) : (this.numParticles = 20);
+        numParticles
+            ? (this.numParticles = numParticles)
+            : (this.numParticles = 20);
         volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 50);
-        expansionTime ? (this.expansionTime = expansionTime) : (this.expansionTime = 25);
+        expansionTime
+            ? (this.expansionTime = expansionTime)
+            : (this.expansionTime = 25);
         volleys ? (this.volleys = volleys) : (this.volleys = 4);
         volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 20);
         startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
@@ -196,7 +225,7 @@ class Firework extends VisualEffect {
                 particle.color.setAlpha(particle.alpha);
                 particle.alpha -= 10;
                 if (particle.alpha <= 0) particle.alpha = 0;
-                particle.position = particle.position.add(new Vec2d(0, 0.5));
+                particle.position = particle.position.add(new Vec(0, 0.5));
             }
             particle.volleyTime--;
             if (particle.volleyTime <= 0) {
@@ -211,12 +240,19 @@ class Firework extends VisualEffect {
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
         );
-        const pColor = color(this.fireworkColors[Math.floor(Math.random() * this.fireworkColors.length)]);
+        const pColor = color(
+            this.fireworkColors[
+                Math.floor(Math.random() * this.fireworkColors.length)
+            ]
+        );
         for (let i = 0; i < this.numParticles; i++) {
             const angle = (i * 2 * PI) / this.numParticles;
             this.particles.add({
                 position: volleyPosition,
-                direction: new Vec2d(Math.cos(angle) * this.expansionSpeed, Math.sin(angle) * this.expansionSpeed),
+                direction: new Vec2d(
+                    Math.cos(angle) * this.expansionSpeed,
+                    Math.sin(angle) * this.expansionSpeed
+                ),
                 volleyTime: this.volleyTime,
                 expansionTime: this.expansionTime,
                 size: 8,
@@ -230,7 +266,12 @@ class Firework extends VisualEffect {
         noStroke();
         this.particles.forEach((particle) => {
             fill(particle.color);
-            ellipse(particle.position.x, particle.position.y, particle.size, particle.size);
+            ellipse(
+                particle.position.x,
+                particle.position.y,
+                particle.size,
+                particle.size
+            );
         });
     }
 }

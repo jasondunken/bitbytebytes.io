@@ -1,6 +1,6 @@
 import { BoardBuilder } from "./board-builder.js";
 import * as utils from "./utils.js";
-import { Vec2d } from "./math.js";
+import { Vec } from "./vec.js";
 import { GAME_STATE } from "./game-state.js";
 import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
 
@@ -30,7 +30,8 @@ class Board {
         this.bounds = {
             top: this.BOARD_Y_OFFSET,
             right: this.BOARD_X_OFFSET + this.TILES_PER_ROW * this.TILE_HEIGHT,
-            bottom: this.BOARD_Y_OFFSET + this.TILES_PER_COLUMN * this.TILE_HEIGHT,
+            bottom:
+                this.BOARD_Y_OFFSET + this.TILES_PER_COLUMN * this.TILE_HEIGHT,
             left: this.BOARD_X_OFFSET,
         };
         this.boardConfig = {
@@ -97,7 +98,10 @@ class Board {
     checkTile(tile, tileIndex) {
         if (tile.bomb?.live) {
             tile.hidden = false;
-            const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
+            const position = utils.tileIndexToTileCenter(
+                tileIndex,
+                this.boardConfig
+            );
             this.mineSquad.addToLayers(new Explosion(position));
             this.completed = true;
             this.winner = false;
@@ -113,8 +117,13 @@ class Board {
         const tileScore = tile.value * this.mineSquad.TILE_MULTIPLIER;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
-            const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
-            this.mineSquad.addToLayers(new ScoreEffect(position, tileScore, tile.value));
+            const position = utils.tileIndexToTileCenter(
+                tileIndex,
+                this.boardConfig
+            );
+            this.mineSquad.addToLayers(
+                new ScoreEffect(position, tileScore, tile.value)
+            );
         }
         // if tile.value is zero and not already checked, uncover all the tiles around it
         if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
@@ -128,19 +137,40 @@ class Board {
 
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        const position = utils.tileIndexToTileCenter(tileIndex, this.boardConfig);
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.boardConfig
+        );
         if (tile.bomb) {
             tile.bomb.live = false;
             this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.addToLayers(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, "green", 2));
+            this.mineSquad.addToLayers(
+                new BonusEffect(
+                    position,
+                    this.mineSquad.DEFUSE_BONUS,
+                    "green",
+                    2
+                )
+            );
         } else if (tile.value > 0) {
             this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.addToLayers(new BonusEffect(position, tile.value * this.mineSquad.DEFUSE_BONUS, "blue", 2));
+            this.mineSquad.addToLayers(
+                new BonusEffect(
+                    position,
+                    tile.value * this.mineSquad.DEFUSE_BONUS,
+                    "blue",
+                    2
+                )
+            );
         }
 
         const defuseArea = this.boardBuilder.getNeighbors(tileIndex);
-        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex + 2) ? defuseArea.push(tileIndex + 2) : undefined;
-        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2) ? defuseArea.push(tileIndex - 2) : undefined;
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex + 2)
+            ? defuseArea.push(tileIndex + 2)
+            : undefined;
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2)
+            ? defuseArea.push(tileIndex - 2)
+            : undefined;
         defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
         defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
 
@@ -148,12 +178,18 @@ class Board {
             const tile = this.getTile(defuseArea[i]);
             if (tile && tile.hidden) {
                 tile.hidden = false;
-                this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
+                this.mineSquad.score +=
+                    tile.value * this.mineSquad.DEFUSE_BONUS;
                 if (tile.bomb) {
                     tile.bomb.live = false;
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-                    const position = utils.tileIndexToTileCenter(defuseArea[i], this.boardConfig);
-                    this.mineSquad.addToLayers(new BonusEffect(position, this.mineSquad.DEFUSE_BONUS));
+                    const position = utils.tileIndexToTileCenter(
+                        defuseArea[i],
+                        this.boardConfig
+                    );
+                    this.mineSquad.addToLayers(
+                        new BonusEffect(position, this.mineSquad.DEFUSE_BONUS)
+                    );
                 }
             }
         }
@@ -197,12 +233,21 @@ class Board {
                 utils.setColor("gray");
                 stroke("darkgray");
                 strokeWeight(1);
-                rect(position.x, position.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+                rect(
+                    position.x,
+                    position.y,
+                    this.TILE_HEIGHT,
+                    this.TILE_HEIGHT
+                );
                 if (!tile.bomb && tile.value !== 0) {
                     utils.setColor(utils.valueToColor(tile.value));
                     textAlign(CENTER, CENTER);
                     textSize(24);
-                    text(tile.value, position.x + this.HALF_TILE, position.y + this.TILE_HEIGHT * 0.6);
+                    text(
+                        tile.value,
+                        position.x + this.HALF_TILE,
+                        position.y + this.TILE_HEIGHT * 0.6
+                    );
                     utils.setColor("black");
                 }
 
@@ -213,7 +258,12 @@ class Board {
                 utils.setColor("green");
                 stroke("black");
                 strokeWeight(1);
-                rect(position.x, position.y, this.TILE_HEIGHT - 1, this.TILE_HEIGHT - 1);
+                rect(
+                    position.x,
+                    position.y,
+                    this.TILE_HEIGHT - 1,
+                    this.TILE_HEIGHT - 1
+                );
                 if (tile.flagged) {
                     this.drawFlag(position);
                 }
@@ -224,7 +274,7 @@ class Board {
                 if (tile.flagged === true) {
                     this.markFlag(tile.bomb);
                 } else if (this.tile.bomb) {
-                    this.drawBomb(new Vec2d(this.tileIndexX, this.tileIndexY));
+                    this.drawBomb(new Vec(this.tileIndexX, this.tileIndexY));
                 }
             }
         }
@@ -233,12 +283,25 @@ class Board {
     drawFlag(position) {
         utils.setColor("yellow");
         strokeWeight(1);
-        ellipse(position.x + this.HALF_TILE, position.y + this.HALF_TILE, this.BOMB_HEIGHT, this.BOMB_HEIGHT);
+        ellipse(
+            position.x + this.HALF_TILE,
+            position.y + this.HALF_TILE,
+            this.BOMB_HEIGHT,
+            this.BOMB_HEIGHT
+        );
     }
 
     drawBomb(bomb, position) {
-        const sprite = bomb.live ? this.sprites["bomb"] : this.sprites["bomb_defused"];
-        image(sprite, position.x + 2, position.y + 2, this.TILE_HEIGHT - 4, this.TILE_HEIGHT - 4);
+        const sprite = bomb.live
+            ? this.sprites["bomb"]
+            : this.sprites["bomb_defused"];
+        image(
+            sprite,
+            position.x + 2,
+            position.y + 2,
+            this.TILE_HEIGHT - 4,
+            this.TILE_HEIGHT - 4
+        );
     }
 
     markFlag(isBomb) {
@@ -259,9 +322,12 @@ class Board {
     }
 
     drawCursor() {
-        const coords = new Vec2d(mouseX, mouseY);
+        const coords = new Vec(mouseX, mouseY);
         if (this.isOnBoard(coords)) {
-            const tileCenter = utils.screenPositionToTileCenter(coords, this.boardConfig);
+            const tileCenter = utils.screenPositionToTileCenter(
+                coords,
+                this.boardConfig
+            );
             utils.setColor("yellow");
             strokeWeight(4);
             noFill();
@@ -278,22 +344,43 @@ class Board {
         stroke("orange");
         strokeWeight(2);
         for (let i = 0; i < mouseClickCoords.length - 1; i++) {
-            line(mouseClickCoords[i].x, mouseClickCoords[i].y, mouseClickCoords[i + 1].x, mouseClickCoords[i + 1].y);
+            line(
+                mouseClickCoords[i].x,
+                mouseClickCoords[i].y,
+                mouseClickCoords[i + 1].x,
+                mouseClickCoords[i + 1].y
+            );
         }
 
         stroke("green");
         noFill();
         strokeWeight(3);
         let firstClick = mouseClickCoords[0];
-        const firstClickCenter = utils.screenPositionToTileTopLeft(firstClick, this.boardConfig);
-        rect(firstClickCenter.x, firstClickCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+        const firstClickCenter = utils.screenPositionToTileTopLeft(
+            firstClick,
+            this.boardConfig
+        );
+        rect(
+            firstClickCenter.x,
+            firstClickCenter.y,
+            this.TILE_HEIGHT,
+            this.TILE_HEIGHT
+        );
 
         stroke("magenta");
         noFill();
         strokeWeight(3);
         let lastClick = mouseClickCoords[mouseClickCoords.length - 1];
-        const lastClickCenter = utils.screenPositionToTileTopLeft(lastClick, this.boardConfig);
-        rect(lastClickCenter.x, lastClickCenter.y, this.TILE_HEIGHT, this.TILE_HEIGHT);
+        const lastClickCenter = utils.screenPositionToTileTopLeft(
+            lastClick,
+            this.boardConfig
+        );
+        rect(
+            lastClickCenter.x,
+            lastClickCenter.y,
+            this.TILE_HEIGHT,
+            this.TILE_HEIGHT
+        );
     }
 }
 
