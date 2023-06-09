@@ -3,8 +3,8 @@ import { GameObject } from "./game-object.js";
 import { Vec } from "./math/vec.js";
 
 class PixelExplosion extends GameObject {
-    size = 2;
-    pixelCount = 64;
+    size = 4;
+    pixelCount = 32;
     maxPixelLife = 60;
     pixels = new Set();
     constructor(position) {

@@ -49,6 +49,7 @@ class Barrier extends GameObject {
 class BarrierBlock extends GameObject {
     constructor(position, size, colliderSize) {
         super("block", position, size, colliderSize);
+        this.colliders = [position.copy()];
     }
 
     takeDamage(damage) {

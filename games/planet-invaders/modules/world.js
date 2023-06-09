@@ -214,10 +214,12 @@ class World {
         if (this.gameObjects.aliens.size <= 0) {
             this.game.levelCompleted();
         }
+        // 1 second
         if (this.levelTime % 60 === 0) {
             this.randomAlienFire();
         }
-        if (this.levelTime % 240 === 0) {
+        // 22 seconds
+        if (this.levelTime % 1320 === 0) {
             this.addGameObject(this.getRandomBonus());
         }
     }
@@ -303,13 +305,8 @@ class World {
         if (shot.direction === Vec.DOWN && obj.type === "alien") return;
         if (shot.direction === Vec.UP && obj.type === "player") return;
 
-        if (obj.type === "player") {
-            for (let i = 0; i < obj.colliders.length; i++) {
-                const dist = Vec.sub2(shot.position, obj.colliders[i]).mag();
-                return dist <= shot.colliderSize + obj.colliderSize / 2;
-            }
-        } else {
-            const dist = Vec.sub2(shot.position, obj.position).mag();
+        for (let i = 0; i < obj.colliders.length; i++) {
+            const dist = Vec.sub2(shot.colliders[0], obj.colliders[i]).mag();
             return dist <= shot.colliderSize / 2 + obj.colliderSize / 2;
         }
     }

@@ -8,11 +8,13 @@ class Shot extends GameObject {
     MOVE_SPEED = 3;
     constructor(position, direction) {
         super("shot", position, Shot.WIDTH, Shot.WIDTH);
+        this.colliders = [position.copy()];
         this.direction = direction;
     }
 
     update() {
         this.position.y += this.MOVE_SPEED * this.direction.y;
+        this.colliders[0] = this.position.copy();
     }
 
     render() {

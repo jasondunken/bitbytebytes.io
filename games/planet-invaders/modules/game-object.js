@@ -3,7 +3,7 @@ import { Vec } from "./math/vec.js";
 class GameObject {
     constructor(type, position, size, colliderSize) {
         this.type = type ? type : "none";
-        this.position = position ? position : new Vec(0, 0);
+        this.position = position ? position : new Vec();
         this.size = size ? size : 1;
         this.colliderSize = colliderSize ? colliderSize : 1;
         this.remove = false;

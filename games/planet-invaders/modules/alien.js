@@ -10,6 +10,7 @@ class Alien extends GameObject {
         this.direction = Vec.RIGHT;
         this.moveSpeed = speed;
         this.sprite = sprite;
+        this.colliders = [position.copy()];
         this.delta = Math.random() * 2 * PI;
         this.yRange = Math.random() * this.yRange + this.yRange;
     }
@@ -19,6 +20,7 @@ class Alien extends GameObject {
         if (this.delta >= 2 * PI) this.delta = 0;
         this.position.x = this.position.x + this.moveSpeed * this.direction.x;
         this.position.y = this.position.y + Math.sin(this.delta);
+        this.colliders[0] = this.position.copy();
     }
 
     render() {

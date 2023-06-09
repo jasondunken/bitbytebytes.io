@@ -6,6 +6,7 @@ class Bonus extends GameObject {
         this.sprite = sprite;
         this.moveSpeed = speed;
         this.direction = direction;
+        this.colliders = [position.copy()];
         this.remove = false;
     }
 
