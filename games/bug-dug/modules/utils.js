@@ -1,5 +1,10 @@
+import { Vec } from "./vec.js";
+
 function getGridIndex(position, blockSize) {
-    return new Vec2(Math.floor(position.x / blockSize), Math.floor(position.y / blockSize));
+    return new Vec(
+        Math.floor(position.x / blockSize),
+        Math.floor(position.y / blockSize)
+    );
 }
 
 function getBlockAtPosition(position, blocks, blockSize) {
@@ -102,29 +107,6 @@ function calculateAABBCollision(obj1, obj2) {
     return null;
 }
 
-class Vec2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    add(vec) {
-        return new Vec2(this.x + vec.x, this.y + vec.y);
-    }
-
-    sub(vec) {
-        return new Vec2(this.x - vec.x, this.y - vec.y);
-    }
-
-    scale(f) {
-        return new Vec2(this.x * f, this.y * f);
-    }
-
-    static ZEROS() {
-        return new Vec2(0, 0);
-    }
-}
-
 export {
     getGridIndex,
     getBlockAtPosition,
@@ -132,5 +114,4 @@ export {
     getBlockAbove,
     clearForegroundAround,
     calculateAABBCollision,
-    Vec2,
 };

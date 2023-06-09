@@ -1,9 +1,9 @@
 import { GameObject } from "./gameObject.js";
-import { Vec2 } from "./utils.js";
+import { Vec } from "./vec.js";
 
 class Particle {
     constructor(position, velocity, size, life) {
-        this.position = position;
+        this.position = position.copy();
         this.velocity = velocity;
         this.size = size;
         this.life = life;
@@ -11,7 +11,7 @@ class Particle {
 
     update() {
         this.life--;
-        this.position = this.position.add(this.velocity);
+        this.position.add(this.velocity);
     }
 }
 
@@ -30,7 +30,7 @@ class ParticleEmitter extends GameObject {
     update() {}
 
     setPosition(position) {
-        this.position = position;
+        this.position.set(position);
     }
 
     emit() {
@@ -48,7 +48,12 @@ class ParticleEmitter extends GameObject {
     spawnParticles(numParticles) {
         for (let i = 0; i < numParticles; i++) {
             this.particles.add(
-                new Particle(this.position, new Vec2(Math.random() * 2 - 1, Math.random() * -0.25), 5, 60)
+                new Particle(
+                    this.position.copy(),
+                    new Vec(Math.random() * 2 - 1, Math.random() * -0.25),
+                    5,
+                    60
+                )
             );
         }
     }
@@ -60,7 +65,12 @@ class ParticleEmitter extends GameObject {
                 let color = `rgba(255, 0, 0, ${alpha})`;
                 fill(color);
                 noStroke();
-                ellipse(particle.position.x, particle.position.y, particle.size, particle.size);
+                ellipse(
+                    particle.position.x,
+                    particle.position.y,
+                    particle.size,
+                    particle.size
+                );
             }
         });
     }

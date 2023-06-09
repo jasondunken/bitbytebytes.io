@@ -3,18 +3,26 @@ import { Enemy } from "./modules/enemies.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
 import { Animation } from "./modules/animation.js";
-import { clearForegroundAround, getGridIndex, getBlockAbove } from "./modules/utils.js";
+import {
+    clearForegroundAround,
+    getGridIndex,
+    getBlockAbove,
+} from "./modules/utils.js";
 
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
-// window.keyPressed = keyPressed;
+window.keyPressed = keyPressed;
 // window.mousePressed = mousePressed;
 
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 768;
 
 let game = null;
+
+function keyPressed(key) {
+    key.preventDefault();
+}
 
 // p5.js functions ------------------------>
 function preload() {
@@ -24,7 +32,14 @@ function preload() {
 
     let font = loadFont("./bug-dug/res/font/PressStart2P.ttf");
 
-    game = new BugDug(GAME_WIDTH, GAME_HEIGHT, blockSprites, playerSprites, enemySprites, font);
+    game = new BugDug(
+        GAME_WIDTH,
+        GAME_HEIGHT,
+        blockSprites,
+        playerSprites,
+        enemySprites,
+        font
+    );
 }
 
 function setup() {
@@ -46,9 +61,11 @@ function draw() {
 }
 
 class BugDug {
-    PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
-        this.start1Player();
-    });
+    PLAYER_1_START_BUTTON = document
+        .getElementById("start-1p")
+        .addEventListener("click", () => {
+            this.start1Player();
+        });
 
     STARTING_LIVES = 3;
     lives = 0;
@@ -64,7 +81,14 @@ class BugDug {
 
     gameObjects = null;
 
-    constructor(width, height, blockSprites, playerSprites, enemySprites, font) {
+    constructor(
+        width,
+        height,
+        blockSprites,
+        playerSprites,
+        enemySprites,
+        font
+    ) {
         this.width = width;
         this.height = height;
         this.blockSprites = blockSprites;
@@ -105,7 +129,10 @@ class BugDug {
             if (gameObj.type === "block") {
                 gameObj.update();
                 if (gameObj.destroyed) {
-                    clearForegroundAround(getGridIndex(gameObj.position, this.level.BLOCK_SIZE), this.foregroundLayer);
+                    clearForegroundAround(
+                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
+                        this.foregroundLayer
+                    );
                 }
             }
             if (gameObj.type === "enemy") gameObj.update(this.level);
@@ -135,7 +162,13 @@ class BugDug {
             if (gameObj.type === "block") {
                 if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
                     let damageSpriteIndex = Math.floor(
-                        map(gameObj.health, 0, gameObj.MAX_HEALTH, this.mineBlockAnimation.keyFrames.length - 1, 0)
+                        map(
+                            gameObj.health,
+                            0,
+                            gameObj.MAX_HEALTH,
+                            this.mineBlockAnimation.keyFrames.length - 1,
+                            0
+                        )
                     );
                     image(
                         this.mineBlockAnimation.keyFrames[damageSpriteIndex],
@@ -150,7 +183,10 @@ class BugDug {
                         getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
                         this.level.blocks
                     );
-                    if (blockAbove.destroyed || blockAbove.blockType === "air") {
+                    if (
+                        blockAbove.destroyed ||
+                        blockAbove.blockType === "air"
+                    ) {
                         image(
                             this.blockSprites["background-ladder"],
                             gameObj.position.x,
@@ -211,10 +247,30 @@ class BugDug {
         textSize(16);
         text("Level " + (this.currentLevel + 1), 24, 40);
         if (this.player.hasKey) {
-            image(this.blockSprites["white-key"], this.width - 80, 54, 32, 32, 0, 0, 16, 16);
+            image(
+                this.blockSprites["white-key"],
+                this.width - 80,
+                54,
+                32,
+                32,
+                0,
+                0,
+                16,
+                16
+            );
         }
         for (let i = 0; i < this.lives; i++) {
-            image(this.playerSprites["idle"], this.width - 44 - 32 * i, 20, 24, 24, 0, 0, 32, 32);
+            image(
+                this.playerSprites["idle"],
+                this.width - 44 - 32 * i,
+                20,
+                24,
+                24,
+                0,
+                0,
+                32,
+                32
+            );
         }
     }
 
@@ -233,8 +289,10 @@ class BugDug {
 
         this.player.setPosition(this.level.playerSpawn);
 
-        this.mineBlockAnimation = new Animation(this.blockSprites["block-damage"], 60, false);
-
-        console.log("gameObjects: ", this.gameObjects);
+        this.mineBlockAnimation = new Animation(
+            this.blockSprites["block-damage"],
+            60,
+            false
+        );
     }
 }

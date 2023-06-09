@@ -1,5 +1,6 @@
 import { GameObject } from "./gameObject.js";
-import { Vec2, getAdjacentBlocks } from "./utils.js";
+import { getAdjacentBlocks } from "./utils.js";
+import { Vec } from "./vec.js";
 
 class Entity extends GameObject {
     width = 32;
@@ -17,10 +18,10 @@ class Entity extends GameObject {
     particleEmitter = null;
 
     collider = {
-        a: Vec2.ZEROS(),
-        b: Vec2.ZEROS(),
-        c: Vec2.ZEROS(),
-        d: Vec2.ZEROS(),
+        a: new Vec(),
+        b: new Vec(),
+        c: new Vec(),
+        d: new Vec(),
     };
 
     constructor(type, position) {
@@ -37,16 +38,28 @@ class Entity extends GameObject {
         this.getInput(terrain);
 
         // constrain x
-        if (this.position.x < this.width / 2) this.setPosition({ x: this.width / 2, y: this.position.y });
+        if (this.position.x < this.width / 2)
+            this.setPosition({ x: this.width / 2, y: this.position.y });
         if (this.position.x > terrain.width - this.width / 2)
-            this.setPosition({ x: terrain.width - this.width / 2, y: this.position.y });
+            this.setPosition({
+                x: terrain.width - this.width / 2,
+                y: this.position.y,
+            });
         // constrain y
-        if (this.position.y < this.height / 2) this.setPosition({ x: this.position.x, y: this.height / 2 });
+        if (this.position.y < this.height / 2)
+            this.setPosition({ x: this.position.x, y: this.height / 2 });
         if (this.position.y > terrain.height - this.height / 2)
-            this.setPosition({ x: this.position.x, y: terrain.height - this.height / 2 });
+            this.setPosition({
+                x: this.position.x,
+                y: terrain.height - this.height / 2,
+            });
 
         // check blocks around enemy
-        this.blocks = getAdjacentBlocks(this.position, terrain.blocks, terrain.BLOCK_SIZE);
+        this.blocks = getAdjacentBlocks(
+            this.position,
+            terrain.blocks,
+            terrain.BLOCK_SIZE
+        );
         let block = this.blocks.above;
         if (block && block.solid) {
             if (this.position.y - this.height / 2 <= block.collider.d.y) {
@@ -93,10 +106,22 @@ class Entity extends GameObject {
 
     updateCollider() {
         this.collider = {
-            a: { x: this.position.x - this.width / 2, y: this.position.y - this.height / 2 },
-            b: { x: this.position.x + this.width / 2, y: this.position.y - this.height / 2 },
-            c: { x: this.position.x + this.width / 2, y: this.position.y + this.height / 2 },
-            d: { x: this.position.x - this.width / 2, y: this.position.y + this.height / 2 },
+            a: {
+                x: this.position.x - this.width / 2,
+                y: this.position.y - this.height / 2,
+            },
+            b: {
+                x: this.position.x + this.width / 2,
+                y: this.position.y - this.height / 2,
+            },
+            c: {
+                x: this.position.x + this.width / 2,
+                y: this.position.y + this.height / 2,
+            },
+            d: {
+                x: this.position.x - this.width / 2,
+                y: this.position.y + this.height / 2,
+            },
         };
     }
 
