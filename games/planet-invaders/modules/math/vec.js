@@ -17,6 +17,8 @@ class Vec {
     static LEFT = new Vec(-1, 0);
     static RIGHT = new Vec(1, 0);
 
+    static GRAVITY = new Vec(0, 9.8);
+
     set(x, y, z) {
         if (x instanceof Vec) {
             this.x = x.x;
