@@ -1,7 +1,7 @@
 import { GameObject } from "./game-object.js";
 import { Shot } from "./shot.js";
 
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Player extends GameObject {
     COLLIDER_OFFSET_X = 0.4;

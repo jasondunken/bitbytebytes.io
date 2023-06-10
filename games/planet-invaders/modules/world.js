@@ -9,7 +9,7 @@ import { Bonus } from "./bonus.js";
 
 import { PixelExplosion } from "./visual-effects.js";
 
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class World {
     static ALIEN_SIZE = 32;
@@ -47,6 +47,7 @@ class World {
             "alien_5",
             "barrier",
             "ship",
+            "ship-destroyed",
             "bonus",
         ],
         alienNames: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5"],
@@ -131,7 +132,8 @@ class World {
     }
 
     deleteGameObject(obj) {
-        // console.log(`deleting ${obj.type} object`);
+        //console.log(`deleting ${obj.type} object`);
+        //console.log(`counting ${this.objectCount()} objects`);
         switch (obj.type) {
             case "alien":
                 this.gameObjects.aliens.delete(obj);
@@ -151,6 +153,17 @@ class World {
             default:
                 console.log(`unknown obj type ${obj.type}`);
         }
+    }
+
+    objectCount() {
+        let count = 0;
+        for (let group of Object.keys(this.gameObjects)) {
+            const objs = this.gameObjects[group];
+            for (let obj of objs) {
+                count++;
+            }
+        }
+        return count;
     }
 
     resetBarriers() {

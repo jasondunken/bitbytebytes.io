@@ -2,7 +2,7 @@ import { World } from "./world.js";
 import { LEVELS } from "./levels.js";
 import { Alien } from "./alien.js";
 
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class LevelLoader {
     static LoadLevel(level, spriteMetadata, spawnArea) {

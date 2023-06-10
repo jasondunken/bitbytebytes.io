@@ -1,17 +1,17 @@
 import { GameObject } from "./game-object.js";
 
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class PixelExplosion extends GameObject {
     size = 2;
-    pixelCount = 32;
+    pixelCount = 64;
     maxPixelLife = 30;
     pixels = new Set();
     constructor(position) {
         super("visual-effect");
         for (let i = 0; i < this.pixelCount; i++) {
             const pixel = new Vec(position);
-            pixel.velocity = Vec.UnitRandom2d().mult(2);
+            pixel.velocity = Vec.UnitRandom2d().mult(Math.random() * 2);
             pixel.life = Math.random() * this.maxPixelLife;
 
             this.pixels.add(pixel);

@@ -1,6 +1,6 @@
 import { GameObject } from "./game-object.js";
 
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Alien extends GameObject {
     delta = 0;

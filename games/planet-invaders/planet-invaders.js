@@ -4,7 +4,7 @@ import { Player, DemoPlayer } from "./modules/player.js";
 
 import { PixelExplosion } from "./modules/visual-effects.js";
 
-import { Vec } from "./modules/math/vec.js";
+import { Vec } from "../modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
