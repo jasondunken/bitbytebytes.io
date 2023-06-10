@@ -111,6 +111,7 @@ class PlanetInvaders {
     // }
 
     mouseClicked(event) {
+        event.preventDefault();
         this.world.addGameObject(new PixelExplosion(new Vec(mouseX, mouseY)));
     }
 
@@ -172,7 +173,6 @@ class PlanetInvaders {
     respawnPlayer() {
         this.respawnTimer = this.LEVEL_START_DELAY;
         this.currentState = this.GAME_STATE.RESPAWNING;
-        this.player.position.set(this.playerSpawn);
     }
 
     addScore(type, multi) {
@@ -217,6 +217,8 @@ class PlanetInvaders {
             this.respawnTimer--;
             this.world.updateVisualEffects();
             if (this.respawnTimer <= 0) {
+                this.player.sprite = World.resources.sprites["ship"];
+                this.player.position.set(this.playerSpawn);
                 this.currentState = this.GAME_STATE.PLAYING;
             }
         }
@@ -226,6 +228,9 @@ class PlanetInvaders {
             this.world.update();
             for (let shot of this.world.gameObjects.shots) {
                 if (this.world.shotCollision(shot, this.player)) {
+                    this.world.deleteGameObject(shot);
+                    this.player.sprite =
+                        World.resources.sprites["ship-destroyed"];
                     this.world.addGameObject(
                         new PixelExplosion(this.player.colliders[0].copy())
                     );
