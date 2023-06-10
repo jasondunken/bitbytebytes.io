@@ -2,7 +2,7 @@ import { GAME_STATE } from "./modules/game-state.js";
 import { Board } from "./modules/board.js";
 import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
-import { Vec } from "./modules/vec.js";
+import { Vec } from "../modules/math/vec.js";
 import { Explosion, Firework } from "./modules/visual-effects.js";
 import { setColor, getElapsedTimeString } from "./modules/utils.js";
 

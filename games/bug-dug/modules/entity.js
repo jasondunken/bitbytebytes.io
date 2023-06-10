@@ -1,6 +1,6 @@
 import { GameObject } from "./gameObject.js";
 import { getAdjacentBlocks } from "./utils.js";
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Entity extends GameObject {
     width = 32;

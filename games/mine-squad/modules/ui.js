@@ -1,4 +1,4 @@
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 import { BonusSquadEffect } from "./visual-effects.js";
 import { GAME_STATE } from "./game-state.js";
 import { getElapsedTimeString } from "./utils.js";

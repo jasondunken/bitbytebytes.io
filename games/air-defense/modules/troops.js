@@ -5,7 +5,7 @@ import { Splatter, Explosion } from "./particles.js";
 import { Resources } from "./resource-manager.js";
 
 import { isParatrooperBlockCollision } from "./utils.js";
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Paratrooper extends Entity {
     static WIDTH = 16;
@@ -53,16 +53,24 @@ class Paratrooper extends Entity {
             gameObjects.turretBlocks.forEach((block) => {
                 if (isParatrooperBlockCollision(this, block)) {
                     this.dead = true;
-                    gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
-                    gameObjects.visualEffects.add(new Splatter(this.position, this.direction));
+                    gameObjects.visualEffects.add(
+                        new Explosion(this.position, this.direction)
+                    );
+                    gameObjects.visualEffects.add(
+                        new Splatter(this.position, this.direction)
+                    );
                     block.takeDamage(this.DAMAGE);
                 }
             });
             gameObjects.crates.forEach((crate) => {
                 if (isParatrooperBlockCollision(this, crate)) {
                     this.dead = true;
-                    gameObjects.visualEffects.add(new Explosion(this.position, this.direction));
-                    gameObjects.visualEffects.add(new Splatter(this.position, this.direction));
+                    gameObjects.visualEffects.add(
+                        new Explosion(this.position, this.direction)
+                    );
+                    gameObjects.visualEffects.add(
+                        new Splatter(this.position, this.direction)
+                    );
                     crate.takeDamage(this.DAMAGE);
                 }
             });
@@ -91,7 +99,13 @@ class Paratrooper extends Entity {
             this.height
         );
         if (this.chuteOpen) {
-            image(this.parachute, this.position.x - this.width / 2, this.position.y - 24, this.width, this.height);
+            image(
+                this.parachute,
+                this.position.x - this.width / 2,
+                this.position.y - 24,
+                this.width,
+                this.height
+            );
         }
     }
 
@@ -101,8 +115,21 @@ class Paratrooper extends Entity {
         const cellWidth = spriteSheet.width / cells;
 
         const walkingLeftCells = createImage(cellWidth * 4, cellHeight);
-        walkingLeftCells.copy(spriteSheet, 0, 0, cellWidth * 4, cellHeight, 0, 0, cellWidth * 4, cellHeight);
-        this.animations.set("walk-left", new Animation(walkingLeftCells, 30, true));
+        walkingLeftCells.copy(
+            spriteSheet,
+            0,
+            0,
+            cellWidth * 4,
+            cellHeight,
+            0,
+            0,
+            cellWidth * 4,
+            cellHeight
+        );
+        this.animations.set(
+            "walk-left",
+            new Animation(walkingLeftCells, 30, true)
+        );
         const walkingRightCells = createImage(cellWidth * 4, cellHeight);
         walkingRightCells.copy(
             spriteSheet,
@@ -115,14 +142,40 @@ class Paratrooper extends Entity {
             cellWidth * 4,
             cellHeight
         );
-        this.animations.set("walk-right", new Animation(walkingRightCells, 30, true));
+        this.animations.set(
+            "walk-right",
+            new Animation(walkingRightCells, 30, true)
+        );
 
         const parachuteCells = createImage(cellWidth, cellHeight);
-        parachuteCells.copy(spriteSheet, cellWidth * 10, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+        parachuteCells.copy(
+            spriteSheet,
+            cellWidth * 10,
+            0,
+            cellWidth,
+            cellHeight,
+            0,
+            0,
+            cellWidth,
+            cellHeight
+        );
         this.parachute = parachuteCells;
         const parachutingCells = createImage(cellWidth, cellHeight);
-        parachutingCells.copy(spriteSheet, cellWidth * 5, 0, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
-        this.animations.set("parachuting", new Animation(parachutingCells, 60, true));
+        parachutingCells.copy(
+            spriteSheet,
+            cellWidth * 5,
+            0,
+            cellWidth,
+            cellHeight,
+            0,
+            0,
+            cellWidth,
+            cellHeight
+        );
+        this.animations.set(
+            "parachuting",
+            new Animation(parachutingCells, 60, true)
+        );
 
         this.currentAnimation = this.animations.get("parachuting");
     }

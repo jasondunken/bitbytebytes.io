@@ -1,6 +1,6 @@
 import { BoardBuilder } from "./board-builder.js";
 import * as utils from "./utils.js";
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 import { GAME_STATE } from "./game-state.js";
 import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
 

@@ -1,7 +1,7 @@
 import { Entity } from "./entity.js";
 import { Animation } from "./animation.js";
 import { ParticleEmitter } from "./particle.js";
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 import { getBlockAtPosition } from "./utils.js";
 
 class Player extends Entity {

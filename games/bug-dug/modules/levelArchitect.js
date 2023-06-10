@@ -1,4 +1,4 @@
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 import { Block } from "./blocks.js";
 import { Chest, Item, Coin, Key, Door } from "./item.js";
 import { Enemy } from "./enemies.js";

@@ -4,7 +4,7 @@ import { AmmoCrate } from "./modules/ammo-crate.js";
 import { AirTrafficControl } from "./modules/aircraft.js";
 import { Explosion, Splatter } from "./modules/particles.js";
 import { setColor } from "./modules/utils.js";
-import { Vec } from "./modules/math/vec.js";
+import { Vec } from "../modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -150,7 +150,10 @@ class AirDefense {
         const waveNum = this.waves.length + 1;
         const time = Math.floor(Math.random() * 200 + 201);
         const type = AirTrafficControl.getRandomAircraft();
-        let count = type == "airborne-transport" ? 1 : Math.floor(Math.random() * 3 + 1);
+        let count =
+            type == "airborne-transport"
+                ? 1
+                : Math.floor(Math.random() * 3 + 1);
         count = type == "airborne-cargo" ? 1 : count;
         const approach = Math.random() > 0.5 ? -1 : 1;
 
@@ -186,7 +189,11 @@ class AirDefense {
         setColor("white");
         noStroke();
         textSize(16);
-        text(this.turret.ammo, WIDTH - textWidth("" + this.turret.ammo) - 10, 30);
+        text(
+            this.turret.ammo,
+            WIDTH - textWidth("" + this.turret.ammo) - 10,
+            30
+        );
 
         setColor("white");
         noStroke();
@@ -200,10 +207,20 @@ class AirDefense {
                     noFill();
                     if (obj.SIZE) {
                         stroke("yellow");
-                        rect(obj.position.x - obj.SIZE / 2, obj.position.y - obj.SIZE / 2, obj.SIZE, obj.SIZE);
+                        rect(
+                            obj.position.x - obj.SIZE / 2,
+                            obj.position.y - obj.SIZE / 2,
+                            obj.SIZE,
+                            obj.SIZE
+                        );
                     } else if (obj.width && obj.height) {
                         stroke("red");
-                        rect(obj.position.x - obj.width / 2, obj.position.y - obj.height / 2, obj.width, obj.height);
+                        rect(
+                            obj.position.x - obj.width / 2,
+                            obj.position.y - obj.height / 2,
+                            obj.width,
+                            obj.height
+                        );
                     } else {
                         stroke("magenta");
                         rect(obj.position.x - 4, obj.position.y - 4, 8, 8);
@@ -212,7 +229,12 @@ class AirDefense {
             }
 
             setColor("red");
-            line(0, this.height - this.GROUND_HEIGHT, this.width, this.height - this.GROUND_HEIGHT);
+            line(
+                0,
+                this.height - this.GROUND_HEIGHT,
+                this.width,
+                this.height - this.GROUND_HEIGHT
+            );
         }
     }
 

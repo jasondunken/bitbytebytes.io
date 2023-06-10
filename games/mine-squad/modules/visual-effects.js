@@ -1,5 +1,5 @@
 import { valueToColor } from "./utils.js";
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class VisualEffect {
     done = false;

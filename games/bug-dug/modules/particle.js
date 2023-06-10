@@ -1,5 +1,5 @@
 import { GameObject } from "./gameObject.js";
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Particle {
     constructor(position, velocity, size, life) {

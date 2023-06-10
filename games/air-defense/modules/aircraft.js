@@ -1,7 +1,7 @@
 import { Resources } from "./resource-manager.js";
 
 import { Entity } from "./game-object.js";
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 import { Bomb } from "./weapons.js";
 import { Paratrooper } from "./troops.js";
@@ -16,11 +16,13 @@ class AirTrafficControl {
         spawnX -= wave.approach * AirTrafficControl.FLIGHT_SEPARATION;
         for (let i = 0; i < wave.count; i++) {
             const aircraft = AirTrafficControl.getAircraft(wave.type);
-            const flightDeviation = AirTrafficControl.FLIGHT_SEPARATION * aircraft.pilotConfidence;
+            const flightDeviation =
+                AirTrafficControl.FLIGHT_SEPARATION * aircraft.pilotConfidence;
             aircraft.setPosition(
                 new Vec(
                     spawnX + flightDeviation,
-                    aircraft.MINIMUM_FLIGHT_CEILING - (i * AirTrafficControl.FLIGHT_SEPARATION) / 2
+                    aircraft.MINIMUM_FLIGHT_CEILING -
+                        (i * AirTrafficControl.FLIGHT_SEPARATION) / 2
                 )
             );
             aircraft.setDirection(new Vec(wave.approach, 0));
@@ -43,7 +45,9 @@ class AirTrafficControl {
     }
     static getRandomAircraft() {
         //return "light-bomber";
-        return AirTrafficControl.AIRCRAFT[Math.floor(Math.random() * AirTrafficControl.AIRCRAFT.length)];
+        return AirTrafficControl.AIRCRAFT[
+            Math.floor(Math.random() * AirTrafficControl.AIRCRAFT.length)
+        ];
     }
 }
 
@@ -160,7 +164,9 @@ class LightBomber extends Aircraft {
 
     dropBomb(gameObjects) {
         this.bombs--;
-        gameObjects.bombs.add(new Bomb(this.position.copy(), new Vec(this.direction.x, 0)));
+        gameObjects.bombs.add(
+            new Bomb(this.position.copy(), new Vec(this.direction.x, 0))
+        );
         this.cooldownTime = this.BOMB_RELOAD_TIME;
     }
 }
@@ -185,7 +191,12 @@ class AirborneTransport extends Aircraft {
     sprites = ["airborne_left", "airborne_right"];
 
     constructor(position, direction, velocity) {
-        super("airborne-transport", position, AirborneTransport.WIDTH, AirborneTransport.HEIGHT);
+        super(
+            "airborne-transport",
+            position,
+            AirborneTransport.WIDTH,
+            AirborneTransport.HEIGHT
+        );
         this.direction = direction || new Vec();
         this.velocity = velocity || new Vec();
         this.setSprite(this.direction.x);
@@ -207,7 +218,9 @@ class AirborneTransport extends Aircraft {
         if (this.isOverTarget() && this.canDeploy()) {
             this.jumpTimer = this.JUMP_INTERVAL;
             this.paratroopers--;
-            gameObjects.paratroopers.add(new Paratrooper(this.getDeployPoint(), this.target));
+            gameObjects.paratroopers.add(
+                new Paratrooper(this.getDeployPoint(), this.target)
+            );
         }
     }
 
@@ -251,7 +264,12 @@ class AirborneCargo extends Aircraft {
     sprites = ["airborne_left", "airborne_right"];
 
     constructor(position, direction, velocity) {
-        super("airborne-cargo", position, AirborneTransport.WIDTH, AirborneTransport.HEIGHT);
+        super(
+            "airborne-cargo",
+            position,
+            AirborneTransport.WIDTH,
+            AirborneTransport.HEIGHT
+        );
         this.direction = direction || new Vec();
         this.velocity = velocity || new Vec();
         this.setSprite(this.direction.x);

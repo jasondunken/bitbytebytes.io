@@ -1,4 +1,4 @@
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class HighScorePanel {
     WIDTH = 400;

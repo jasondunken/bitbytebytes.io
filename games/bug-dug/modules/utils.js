@@ -1,4 +1,4 @@
-import { Vec } from "./vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 function getGridIndex(position, blockSize) {
     return new Vec(

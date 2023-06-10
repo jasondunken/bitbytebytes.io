@@ -1,4 +1,4 @@
-import { Vec } from "./math/vec.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class GameObject {
     constructor(type, position) {

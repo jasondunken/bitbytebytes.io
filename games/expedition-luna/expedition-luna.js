@@ -1,5 +1,5 @@
 import { pointOnLine } from "./modules/utils.js";
-import { Vec } from "./modules/vec.js";
+import { Vec } from "../modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
