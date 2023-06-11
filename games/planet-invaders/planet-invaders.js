@@ -20,7 +20,6 @@ let font;
 
 function preload() {
     World.loadResources();
-    font = loadFont("./planet-invaders/res/font/PressStart2P.ttf");
 }
 
 function setup() {
@@ -33,7 +32,7 @@ function setup() {
 }
 
 function initGame() {
-    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT, font);
+    game = new PlanetInvaders(GAME_WIDTH, GAME_HEIGHT);
     game.startDemo();
 }
 
@@ -87,28 +86,16 @@ class PlanetInvaders {
     level = 0;
     score = 0;
 
-    constructor(width, height, font) {
+    constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.font = font;
         this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
         this.world = new World(this, width, height);
         this.playerSpawn = new Vec(
             this.width / 2,
             this.height - this.world.PLAYER_SIZE
         );
-        //this.initGame();
     }
-
-    // async initGame() {
-    //     const resourcesLoaded = await ResourceLoader.LoadResources();
-    //     if (resourcesLoaded) {
-    //         this.resources = await ResourceLoader.GetResources();
-    //     } else {
-    //         console.log("failed to load resources!");
-    //         this.currentState = this.GAME_STATE.CRITICAL_ERROR;
-    //     }
-    // }
 
     mouseClicked(event) {
         event.preventDefault();
@@ -199,6 +186,12 @@ class PlanetInvaders {
     }
 
     update() {
+        if (World.resourcesLoaded) {
+            this.updateGameLogic();
+        }
+    }
+
+    updateGameLogic() {
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             this.gameOverTime++;
             if (this.gameOverTime >= this.DEMO_RESTART_DELAY) {
@@ -227,10 +220,23 @@ class PlanetInvaders {
             this.player.update();
             this.world.update();
             for (let shot of this.world.gameObjects.shots) {
-                if (this.world.shotCollision(shot, this.player)) {
+                const collision = this.world.shotCollision(shot, this.player);
+                if (collision) {
                     this.world.deleteGameObject(shot);
-                    this.player.sprite =
-                        World.resources.sprites["ship-destroyed"];
+                    switch (collision.colliderId) {
+                        case 0:
+                            this.player.sprite =
+                                World.resources.sprites["ship-destroyedL"];
+                            break;
+                        case 1:
+                            this.player.sprite =
+                                World.resources.sprites["ship-destroyedC"];
+                            break;
+                        case 2:
+                            this.player.sprite =
+                                World.resources.sprites["ship-destroyedR"];
+                            break;
+                    }
                     this.world.addGameObject(
                         new PixelExplosion(this.player.colliders[0].copy())
                     );
@@ -267,16 +273,36 @@ class PlanetInvaders {
     }
 
     render(debug) {
-        if (this.font) textFont(this.font);
-        this.world.render(debug);
-        if (this.currentState === this.GAME_STATE.LEVEL_STARTING) {
-            if (this.world.levelTime % 30 < 15) this.player.render();
-        } else if (this.currentState === this.GAME_STATE.RESPAWNING) {
-            if (this.respawnTimer % 30 < 15) this.player.render();
-        } else {
-            this.player.render(debug);
+        if (World.resourcesLoaded) {
+            textFont(World.resources.font);
+            this.world.render(debug);
+            if (this.currentState === this.GAME_STATE.LEVEL_STARTING) {
+                if (this.world.levelTime % 30 < 15) this.player.render();
+            } else if (this.currentState === this.GAME_STATE.RESPAWNING) {
+                if (this.respawnTimer % 30 < 15) this.player.render();
+            } else {
+                this.player.render(debug);
+            }
+            this.scoreboard.render(this.score, this.level, this.lives);
         }
-        this.scoreboard.render(this.score, this.level, this.lives);
+
+        if (
+            this.player instanceof DemoPlayer &&
+            this.currentState != this.GAME_STATE.GAME_OVER
+        ) {
+            stroke("red");
+            strokeWeight(1);
+            noFill();
+            textSize(28);
+            textAlign(CENTER, CENTER);
+            text("Planet Invaders", this.width / 2, this.height / 2);
+            noStroke();
+            fill("red");
+            textSize(14);
+            if (frameCount % 60 < 30) {
+                text("PRESS START", this.width / 2, this.height / 2 + 32);
+            }
+        }
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");
