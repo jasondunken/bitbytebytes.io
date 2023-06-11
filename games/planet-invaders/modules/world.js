@@ -47,7 +47,9 @@ class World {
             "alien_5",
             "barrier",
             "ship",
-            "ship-destroyed",
+            "ship-destroyedL",
+            "ship-destroyedC",
+            "ship-destroyedR",
             "bonus",
         ],
         alienNames: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5"],
@@ -58,7 +60,10 @@ class World {
     static resources = {
         backgrounds: [],
         sprites: [],
+        font: null,
     };
+
+    static resourcesLoaded = false;
 
     static async loadResources() {
         World.resources.backgrounds = BackgroundLoader.LoadBackgrounds(
@@ -67,6 +72,10 @@ class World {
         World.resources.sprites = await SpriteLoader.LoadSprites(
             World.spriteMetadata
         );
+        World.resources.font = await loadFont(
+            "./planet-invaders/res/font/PressStart2P.ttf"
+        );
+        this.resourcesLoaded = true;
     }
 
     gameObjects;
@@ -326,15 +335,17 @@ class World {
         if (shot.direction === Vec.UP && obj.type === "player") return;
 
         let collision = false;
+        let colliderId = 0;
         for (let i = 0; i < obj.colliders.length; i++) {
             const dist = Math.abs(
                 Vec.sub2(shot.colliders[0], obj.colliders[i]).mag()
             );
             if (dist <= shot.colliderSize / 2 + obj.colliderSize / 2) {
                 collision = true;
+                colliderId = i;
             }
         }
-        return collision;
+        return collision ? { colliderId } : false;
     }
 
     render(debug) {
