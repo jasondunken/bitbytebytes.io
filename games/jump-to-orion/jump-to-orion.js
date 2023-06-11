@@ -5,6 +5,8 @@ import { Rocket } from "./modules/rocket.js";
 import { Explosion } from "./modules/explosion.js";
 import { KeyframesAnimation } from "./modules/animation.js";
 
+import { Vec } from "../modules/math/vec.js";
+
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
@@ -49,21 +51,45 @@ function preload() {
     sprites["player"] = loadImage("./jump-to-orion/res/img/sprite1.png");
     sprites["rocket"] = loadImage("./jump-to-orion/res/img/rocket.png");
     sprites["alien"] = loadImage("./jump-to-orion/res/img/alien.png");
-    sprites["alien-spriteSheet"] = loadImage("./jump-to-orion/res/img/alienStrip.png");
-    sprites["alienRocket"] = loadImage("./jump-to-orion/res/img/rocket-alien.png");
-    sprites["healthSML"] = loadImage("./jump-to-orion/res/img/healthSMLImage.png");
-    sprites["healthMED"] = loadImage("./jump-to-orion/res/img/healthMEDImage.png");
-    sprites["healthLRG"] = loadImage("./jump-to-orion/res/img/healthLRGImage.png");
+    sprites["alien-spriteSheet"] = loadImage(
+        "./jump-to-orion/res/img/alienStrip.png"
+    );
+    sprites["alienRocket"] = loadImage(
+        "./jump-to-orion/res/img/rocket-alien.png"
+    );
+    sprites["healthSML"] = loadImage(
+        "./jump-to-orion/res/img/healthSMLImage.png"
+    );
+    sprites["healthMED"] = loadImage(
+        "./jump-to-orion/res/img/healthMEDImage.png"
+    );
+    sprites["healthLRG"] = loadImage(
+        "./jump-to-orion/res/img/healthLRGImage.png"
+    );
     sprites["ammo"] = loadImage("./jump-to-orion/res/img/ammoImage.png");
     sprites["shield"] = loadImage("./jump-to-orion/res/img/shieldImage.png");
-    sprites["health_ui"] = loadImage("./jump-to-orion/res/img/healthImage_ui.png");
+    sprites["health_ui"] = loadImage(
+        "./jump-to-orion/res/img/healthImage_ui.png"
+    );
     sprites["ammo_ui"] = loadImage("./jump-to-orion/res/img/ammoImage_ui.png");
-    sprites["shield_ui"] = loadImage("./jump-to-orion/res/img/shieldImage_ui.png");
-    sprites["explosion_0"] = loadImage("./jump-to-orion/res/img/explosion_0.png");
-    sprites["explosion_1"] = loadImage("./jump-to-orion/res/img/explosion_1.png");
-    sprites["explosion_2"] = loadImage("./jump-to-orion/res/img/explosion_2.png");
-    sprites["explosion_3"] = loadImage("./jump-to-orion/res/img/explosion_3.png");
-    sprites["explosion_4"] = loadImage("./jump-to-orion/res/img/explosion_4.png");
+    sprites["shield_ui"] = loadImage(
+        "./jump-to-orion/res/img/shieldImage_ui.png"
+    );
+    sprites["explosion_0"] = loadImage(
+        "./jump-to-orion/res/img/explosion_0.png"
+    );
+    sprites["explosion_1"] = loadImage(
+        "./jump-to-orion/res/img/explosion_1.png"
+    );
+    sprites["explosion_2"] = loadImage(
+        "./jump-to-orion/res/img/explosion_2.png"
+    );
+    sprites["explosion_3"] = loadImage(
+        "./jump-to-orion/res/img/explosion_3.png"
+    );
+    sprites["explosion_4"] = loadImage(
+        "./jump-to-orion/res/img/explosion_4.png"
+    );
 
     let font = loadFont("./jump-to-orion/res/font/PressStart2P.ttf");
 
@@ -99,9 +125,11 @@ function keyPressed() {
 // p5.js functions end -------------------->
 
 class JumpToOrion {
-    PLAYER_1_START_BUTTON = document.getElementById("start-1p").addEventListener("click", () => {
-        this.start1Player();
-    });
+    PLAYER_1_START_BUTTON = document
+        .getElementById("start-1p")
+        .addEventListener("click", () => {
+            this.start1Player();
+        });
 
     HEIGHT;
     WIDTH;
@@ -128,7 +156,8 @@ class JumpToOrion {
         this.sprites = sprites;
         this.font = font;
         this.titleMusic = new Audio();
-        this.titleMusic.src = "./jump-to-orion/res/snd/Juhani Junkala-Title Screen.wav";
+        this.titleMusic.src =
+            "./jump-to-orion/res/snd/Juhani Junkala-Title Screen.wav";
         this.bgMusic = new Audio();
         this.bgMusic.src = "./jump-to-orion/res/snd/Juhani Junkala-Level 1.wav";
         this.bgMusic.loop = true;
@@ -138,30 +167,43 @@ class JumpToOrion {
         if (!this.demo) {
             for (let gameObj of this.gameObjects) {
                 if (gameObj.type === "item") {
-                    if (dist(pos.x, pos.y, gameObj.currentPos.x, gameObj.currentPos.y) < gameObj.size) {
-                        switch (gameObj.id) {
+                    if (
+                        dist(
+                            pos.x,
+                            pos.y,
+                            gameObj.position.x,
+                            gameObj.position.y
+                        ) < gameObj.size
+                    ) {
+                        switch (gameObj.name) {
                             case "healthSML":
                             case "healthMED":
                             case "healthLRG":
                                 this.player.addHealth(gameObj.value);
                                 const healthSound = new Audio();
-                                healthSound.src = "./jump-to-orion/res/snd/health_1.wav";
+                                healthSound.src =
+                                    "./jump-to-orion/res/snd/health_1.wav";
                                 healthSound.play();
                                 break;
                             case "ammo":
                                 this.player.addAmmo(gameObj.value);
                                 const reloadSound = new Audio();
-                                reloadSound.src = "./jump-to-orion/res/snd/reload.wav";
+                                reloadSound.src =
+                                    "./jump-to-orion/res/snd/reload.wav";
                                 reloadSound.play();
                                 break;
                             case "shield":
                                 this.player.addShield(gameObj.value);
                                 const shieldChargeSound = new Audio();
-                                shieldChargeSound.src = "./jump-to-orion/res/snd/got_it.wav";
+                                shieldChargeSound.src =
+                                    "./jump-to-orion/res/snd/got_it.wav";
                                 shieldChargeSound.play();
                                 break;
                         }
-                        this.gameObjects.splice(this.gameObjects.indexOf(gameObj), 1);
+                        this.gameObjects.splice(
+                            this.gameObjects.indexOf(gameObj),
+                            1
+                        );
                     }
                 }
             }
@@ -170,13 +212,19 @@ class JumpToOrion {
 
     startDemo() {
         this.demo = true;
-        this.player = new DemoPlayer({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
+        this.player = new DemoPlayer(
+            new Vec(100, this.HEIGHT / 2),
+            this.sprites["player"]
+        );
         this.startGame();
     }
 
     start1Player() {
         this.demo = false;
-        this.player = new Player({ x: 100, y: this.HEIGHT / 2 }, 2, 32, this.sprites["player"]);
+        this.player = new Player(
+            new Vec(100, this.HEIGHT / 2),
+            this.sprites["player"]
+        );
         this.startGame();
     }
 
@@ -201,16 +249,24 @@ class JumpToOrion {
         if (!this.gameOver) {
             this.player.update();
 
-            if (this.player.pathPos.y < this.player.size) this.player.pathPos.y = this.player.size;
-            if (this.player.pathPos.y > this.HEIGHT - this.player.size)
-                this.player.pathPos.y = this.HEIGHT - this.player.size;
+            if (this.player.position.y < this.player.size)
+                this.player.position.y = this.player.size;
+            if (this.player.position.y > this.HEIGHT - this.player.size)
+                this.player.position.y = this.HEIGHT - this.player.size;
 
             if (this.player.health <= 0) {
                 for (let i = 0; i < 6; i++) {
-                    this.addExplosion({
-                        x: this.player.currentPos.x + Math.random() * this.player.size - this.player.size / 2,
-                        y: this.player.currentPos.y + Math.random() * this.player.size - this.player.size / 2,
-                    });
+                    this.addExplosion(
+                        new Vec(
+                            this.player.position.x +
+                                Math.random() * this.player.size -
+                                this.player.size / 2,
+
+                            this.player.position.y +
+                                Math.random() * this.player.size -
+                                this.player.size / 2
+                        )
+                    );
                     const explosion = new Audio();
                     explosion.src = "./jump-to-orion/res/snd/deep_boom.wav";
                     // Audio.volume = [0, 1]
@@ -223,7 +279,12 @@ class JumpToOrion {
             if (!this.demo) {
                 if (keyIsDown(32)) {
                     if (this.player.fire()) {
-                        this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                        this.gameObjects.push(
+                            new Rocket(
+                                this.player.position.copy(),
+                                this.sprites["rocket"]
+                            )
+                        );
                     }
                 }
             }
@@ -242,46 +303,67 @@ class JumpToOrion {
         for (let gameObj of this.gameObjects) {
             if (this.demo) {
                 if (
-                    this.player.currentPos.y > gameObj.currentPos.y - this.player.size / 2 &&
-                    this.player.currentPos.y < gameObj.currentPos.y + this.player.size / 2 &&
-                    this.player.currentPos.x < gameObj.currentPos.x
+                    this.player.position.y >
+                        gameObj.position.y - this.player.size / 2 &&
+                    this.player.position.y <
+                        gameObj.position.y + this.player.size / 2 &&
+                    this.player.position.x < gameObj.position.x
                 ) {
                     if (gameObj.type === "alien") {
                         if (this.player.fire()) {
-                            this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                            this.gameObjects.push(
+                                new Rocket(
+                                    this.player.position.copy(),
+                                    this.sprites["rocket"]
+                                )
+                            );
                         }
                     }
-                    if (gameObj.type === "item" && gameObj.currentPos.x - this.player.currentPos.x < 32) {
+                    if (
+                        gameObj.type === "item" &&
+                        gameObj.position.x - this.player.position.x < 32
+                    ) {
                         if (this.player.fire()) {
-                            this.gameObjects.push(new Rocket(this.player.currentPos, 5, 32, this.sprites["rocket"]));
+                            this.gameObjects.push(
+                                new Rocket(
+                                    this.player.position.copy(),
+                                    this.sprites["rocket"]
+                                )
+                            );
                         }
                     }
                 }
                 if (
                     gameObj.type != "rocket" &&
                     dist(
-                        this.player.currentPos.x,
-                        this.player.currentPos.y,
-                        gameObj.currentPos.x,
-                        gameObj.currentPos.y
+                        this.player.position.x,
+                        this.player.position.y,
+                        gameObj.position.x,
+                        gameObj.position.y
                     ) < 80
                 ) {
                     demoPlayerRaiseShield = true;
                 }
             }
             gameObj.update();
-            if (gameObj.currentPos.x < -gameObj.size) {
+            if (gameObj.position.x < -gameObj.size) {
                 gameObj.remove = true;
                 continue;
             }
-            if (gameObj.type === "rocket" && gameObj.currentPos.x > this.WIDTH + gameObj.size) gameObj.remove = true;
+            if (
+                gameObj.type === "rocket" &&
+                gameObj.position.x > this.WIDTH + gameObj.size
+            )
+                gameObj.remove = true;
             if (!this.gameOver) {
                 const playerCollision = this.player.checkForCollision(gameObj);
                 const rocketCollision = this.checkForRocketCollision(gameObj);
                 if (rocketCollision) this.score++;
                 if (playerCollision || rocketCollision) {
                     gameObj.remove = true;
-                    this.addExplosion({ x: gameObj.currentPos.x, y: gameObj.currentPos.y });
+                    this.addExplosion(
+                        new Vec(gameObj.position.x, gameObj.position.y)
+                    );
                     const explosion = new Audio();
                     explosion.src = "./jump-to-orion/res/snd/deep_boom.wav";
                     explosion.play();
@@ -308,23 +390,20 @@ class JumpToOrion {
             for (let alien = 0; alien < 1 * waveFactor; alien++) {
                 if (!lastAlien) {
                     lastAlien = new Alien(
-                        {
-                            x: this.WIDTH + 32 + Math.random() * 100,
-                            y: Math.floor(Math.random() * this.HEIGHT),
-                        },
-                        -3,
-                        32,
-                        this.sprites["alien"],
+                        new Vec(
+                            this.WIDTH + 32 + Math.random() * 100,
+                            Math.floor(Math.random() * this.HEIGHT)
+                        ),
                         this.sprites["alien-spriteSheet"]
                     );
                     this.gameObjects.push(lastAlien);
                     continue;
                 }
                 let newAlien = new Alien(
-                    { x: lastAlien.currentPos.x + 32 + Math.random() * 64, y: Math.floor(Math.random() * this.HEIGHT) },
-                    -3,
-                    32,
-                    this.sprites["alien"],
+                    new Vec(
+                        lastAlien.position.x + 32 + Math.random() * 64,
+                        Math.floor(Math.random() * this.HEIGHT)
+                    ),
                     this.sprites["alien-spriteSheet"]
                 );
                 this.gameObjects.push(newAlien);
@@ -332,13 +411,21 @@ class JumpToOrion {
             }
         }
         if (frameCount % 120 === 0) {
-            const itemTypes = ["healthSML", "healthMED", "healthLRG", "ammo", "shield"];
-            const item = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            const itemTypes = [
+                "healthSML",
+                "healthMED",
+                "healthLRG",
+                "ammo",
+                "shield",
+            ];
+            const item =
+                itemTypes[Math.floor(Math.random() * itemTypes.length)];
             this.gameObjects.push(
                 new Item(
-                    { x: this.WIDTH + 32, y: Math.floor(Math.random() * this.HEIGHT) },
-                    -2,
-                    32,
+                    new Vec(
+                        this.WIDTH + 32,
+                        Math.floor(Math.random() * this.HEIGHT)
+                    ),
                     this.sprites[item],
                     item
                 )
@@ -351,12 +438,10 @@ class JumpToOrion {
         this.gameOverTime = frameCount;
     }
 
-    addExplosion(pos) {
+    addExplosion(position) {
         this.gameObjects.push(
             new Explosion(
-                pos,
-                -1,
-                32,
+                position,
                 new KeyframesAnimation(
                     [
                         this.sprites["explosion_0"],
@@ -380,7 +465,7 @@ class JumpToOrion {
             for (let rocket of rockets) {
                 if (rocket !== entity && !rocket.remove) {
                     if (
-                        dist(entity.currentPos.x, entity.currentPos.y, rocket.currentPos.x, rocket.currentPos.y) <
+                        Vec.dist(entity.position, rocket.position) <
                         (entity.size + rocket.size) / 2
                     ) {
                         rocket.remove = true;
@@ -415,8 +500,10 @@ class JumpToOrion {
 
     render() {
         background("black");
-        if (this.scenery[0].show) this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
-        if (this.scenery[1].show) this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
+        if (this.scenery[0].show)
+            this.renderSceneryLayer(this.scenery[0], this.WIDTH, this.HEIGHT);
+        if (this.scenery[1].show)
+            this.renderSceneryLayer(this.scenery[1], this.WIDTH, this.HEIGHT);
 
         if (!this.gameOver) {
             this.player.draw();
@@ -428,7 +515,8 @@ class JumpToOrion {
             gameObj.draw();
         }
 
-        if (this.scenery[2].show) this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
+        if (this.scenery[2].show)
+            this.renderSceneryLayer(this.scenery[2], this.WIDTH, this.HEIGHT);
 
         // UI elements
         const statBar = {
@@ -437,30 +525,70 @@ class JumpToOrion {
         };
         noStroke();
         const health = this.player.getHealth();
-        const healthWidth = (health / this.player.STARTING_HEALTH) * statBar.width;
+        const healthWidth =
+            (health / this.player.STARTING_HEALTH) * statBar.width;
         fill("red");
-        rect(42, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
+        rect(
+            42,
+            this.HEIGHT - 13 - statBar.height,
+            statBar.width,
+            statBar.height
+        );
         fill("green");
-        rect(42, this.HEIGHT - 13 - statBar.height, healthWidth, statBar.height);
+        rect(
+            42,
+            this.HEIGHT - 13 - statBar.height,
+            healthWidth,
+            statBar.height
+        );
         image(this.sprites["health_ui"], 10, this.HEIGHT - 42, 32, 32);
 
         const shield = this.player.getShield();
-        const shieldWidth = (shield / this.player.STARTING_SHIELD) * statBar.width;
+        const shieldWidth =
+            (shield / this.player.STARTING_SHIELD) * statBar.width;
         fill("red");
-        rect(170, this.HEIGHT - 13 - statBar.height, statBar.width, statBar.height);
+        rect(
+            170,
+            this.HEIGHT - 13 - statBar.height,
+            statBar.width,
+            statBar.height
+        );
         fill("lightblue");
-        rect(170, this.HEIGHT - 13 - statBar.height, shieldWidth, statBar.height);
+        rect(
+            170,
+            this.HEIGHT - 13 - statBar.height,
+            shieldWidth,
+            statBar.height
+        );
         image(this.sprites["shield_ui"], 138, this.HEIGHT - 42, 32, 32);
 
         image(this.sprites["ammo_ui"], 270, this.HEIGHT - 42, 32, 32);
         const ammo = this.player.getAmmo();
-        const topRowCount = this.countBelow(ammo, this.player.STARTING_AMMO / 2);
-        const bottomRowCount = this.countAbove(ammo, this.player.STARTING_AMMO / 2);
+        const topRowCount = this.countBelow(
+            ammo,
+            this.player.STARTING_AMMO / 2
+        );
+        const bottomRowCount = this.countAbove(
+            ammo,
+            this.player.STARTING_AMMO / 2
+        );
         for (let i = 0; i < topRowCount; i++) {
-            image(this.sprites["rocket"], 302 + i * 8, this.HEIGHT - 40, 16, 16);
+            image(
+                this.sprites["rocket"],
+                302 + i * 8,
+                this.HEIGHT - 40,
+                16,
+                16
+            );
         }
         for (let i = 0; i < bottomRowCount; i++) {
-            image(this.sprites["rocket"], 302 + i * 8, this.HEIGHT - 25, 16, 16);
+            image(
+                this.sprites["rocket"],
+                302 + i * 8,
+                this.HEIGHT - 25,
+                16,
+                16
+            );
         }
 
         fill("red");
@@ -520,7 +648,13 @@ class JumpToOrion {
     renderSceneryLayer(layer, width, height) {
         image(layer.img, layer.xScroll, 0, layer.img.width, height);
         if (layer.xScroll < -layer.img.width + width) {
-            image(layer.img, layer.xScroll + layer.img.width, 0, layer.img.width, height);
+            image(
+                layer.img,
+                layer.xScroll + layer.img.width,
+                0,
+                layer.img.width,
+                height
+            );
         }
     }
 

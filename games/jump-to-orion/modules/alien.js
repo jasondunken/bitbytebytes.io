@@ -1,28 +1,36 @@
 import { GameObject } from "./gameObject.js";
 import { SpriteStripAnimation } from "./animation.js";
 
-class Alien extends GameObject {
-    imageAlien;
+import { Vec } from "../../modules/math/vec.js";
 
-    constructor(initialPos, speed, size, imageAlien, spriteSheet) {
-        super("alien", initialPos, speed, size);
-        this.imageAlien = imageAlien;
+class Alien extends GameObject {
+    static SIZE = 32;
+    static COLLIDER_SIZE = 24;
+    static SPEED = 3;
+
+    constructor(position, spriteSheet) {
+        super("alien", position, Alien.SIZE, Alien.COLLIDER_SIZE, Alien.SPEED);
         this.animation = new SpriteStripAnimation(spriteSheet, 20, true);
+        this.direction = Vec.LEFT;
+        this.delta = 0;
     }
 
     update() {
-        this.pathPos.x = this.pathPos.x + this.speed;
-        this.delta += this.speed / 60.0;
-        this.currentPos = {
-            x: this.pathPos.x,
-            y: this.pathPos.y + Math.cos(this.delta % 360) * this.size,
-        };
-        this.setCorners();
+        this.delta += 0.03;
+        if (this.delta >= 2 * PI) this.delta = 0;
+        this.position.x = this.position.x + this.direction.x * this.speed;
+        this.position.y = this.position.y + Math.sin(this.delta);
+        this.updateColliders();
         this.animation.update();
     }
-
     draw() {
-        image(this.animation.currentFrame, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        image(
+            this.animation.currentFrame,
+            this.position.x - this.size / 2,
+            this.position.y - this.size / 2,
+            this.size,
+            this.size
+        );
     }
 }
 

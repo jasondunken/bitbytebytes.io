@@ -1,9 +1,11 @@
 import { GameObject } from "./gameObject.js";
 
+import { Vec } from "../../modules/math/vec.js";
+
 class Item extends GameObject {
-    value;
-    image;
-    id;
+    static SIZE = 32;
+    static COLLIDER_SIZE = 32;
+    static SPEED = 2;
 
     values = {
         healthSML: 10,
@@ -13,20 +15,17 @@ class Item extends GameObject {
         shield: 250,
     };
 
-    constructor(initialPos, speed, size, itemImage, id) {
-        super("item", initialPos, speed, size);
-        this.itemImage = itemImage;
-        this.id = id;
-        this.value = this.values[id];
+    constructor(position, sprite, item) {
+        super("item", position, Item.SIZE, Item.COLLIDER_SIZE, Item.SPEED);
+        this.sprite = sprite;
+        this.name = item;
+        this.value = this.values[item];
+        this.direction = Vec.LEFT;
     }
 
     update() {
-        this.pathPos.x += this.speed;
-        this.setCorners();
-    }
-
-    draw() {
-        image(this.itemImage, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        this.position.add(this.direction);
+        this.updateColliders();
     }
 }
 

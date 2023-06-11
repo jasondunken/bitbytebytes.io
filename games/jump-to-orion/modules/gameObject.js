@@ -1,47 +1,37 @@
+import { Vec } from "../../modules/math/vec.js";
+
 class GameObject {
     type;
-    currentPos; // the current position of the sprite, including any offset
-    pathPos; // the path position, currentPos is pathPos plus an offset
-    corners; // a collision box?
-    size; // in pixels
-    speed; // pixels / tick
-    delta; // lifetime
-    remove; // should be removed from gameObjects[]
+    position;
+    size;
+    speed;
+    remove;
 
-    constructor(type, initialPos, speed, size) {
+    colliders = [new Vec()];
+
+    constructor(type, position, size, colliderSize, speed) {
         this.type = type;
-        this.currentPos = initialPos;
-        this.pathPos = initialPos;
-        this.speed = speed;
+        this.position = position;
         this.size = size;
-        this.halfSize = size / 2;
-        this.delta = 0;
+        this.colliderSize = colliderSize;
+        this.speed = speed;
         this.remove = false;
-        this.setCorners();
+        this.updateColliders();
     }
 
     update() {}
-    draw() {}
+    draw() {
+        image(
+            this.sprite,
+            this.position.x - this.size / 2,
+            this.position.y - this.size / 2,
+            this.size,
+            this.size
+        );
+    }
 
-    setCorners() {
-        this.corners = {
-            a: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            b: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y - this.halfSize,
-            },
-            c: {
-                x: this.currentPos.x + this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-            d: {
-                x: this.currentPos.x - this.halfSize,
-                y: this.currentPos.y + this.halfSize,
-            },
-        };
+    updateColliders() {
+        this.colliders[0] = this.position.copy();
     }
 }
 

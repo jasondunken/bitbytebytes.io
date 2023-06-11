@@ -1,23 +1,27 @@
 import { GameObject } from "./gameObject.js";
 
+import { Vec } from "../../modules/math/vec.js";
+
 class Rocket extends GameObject {
-    constructor(initialPos, speed, size, imageRocket) {
-        super("rocket", initialPos, speed, size);
-        this.imageRocket = imageRocket;
+    static SIZE = 32;
+    static COLLIDER_SIZE = 24;
+    static SPEED = 4;
+
+    constructor(position, sprite) {
+        super(
+            "rocket",
+            position,
+            Rocket.SIZE,
+            Rocket.COLLIDER_SIZE,
+            Rocket.SPEED
+        );
+        this.direction = Vec.RIGHT;
+        this.sprite = sprite;
     }
 
     update() {
-        this.pathPos.x += this.speed;
-        this.delta += this.speed / 60.0;
-        this.currentPos = {
-            x: this.pathPos.x,
-            y: this.pathPos.y,
-        };
-        this.setCorners();
-    }
-
-    draw() {
-        image(this.imageRocket, this.corners.a.x, this.corners.a.y, this.size, this.size);
+        this.position.x += this.direction.x * this.speed;
+        this.updateColliders();
     }
 }
 

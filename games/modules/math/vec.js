@@ -135,6 +135,10 @@ class Vec {
         return vec.normalize();
     }
 
+    static dist(v1, v2) {
+        return Vec.sub2(v1, v2).mag();
+    }
+
     copy() {
         return new Vec(this.x, this.y, this.z);
     }
