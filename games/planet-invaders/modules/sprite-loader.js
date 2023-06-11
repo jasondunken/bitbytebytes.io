@@ -41,24 +41,6 @@ class SpriteLoader {
                                 }
                             }
                         }
-                        if (names[s] == "bonus") {
-                            const sprite_reversed = createImage(
-                                SPRITE_SIZE,
-                                SPRITE_SIZE
-                            );
-                            sprite_reversed.loadPixels();
-                            for (let i = 0; i < SPRITE_SIZE; i++) {
-                                for (let j = 0; j < SPRITE_SIZE; j++) {
-                                    sprite_reversed.set(
-                                        SPRITE_SIZE - i,
-                                        SPRITE_SIZE - j,
-                                        sprite.get(i, j)
-                                    );
-                                }
-                            }
-                            sprite_reversed.updatePixels();
-                            sprites[names[s] + "_reversed"] = sprite_reversed;
-                        }
                         sprite.updatePixels();
 
                         sprites[names[s]] = sprite;
