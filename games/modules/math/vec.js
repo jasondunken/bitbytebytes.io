@@ -97,6 +97,7 @@ class Vec {
 
     normalize() {
         const d = this.mag();
+        if (d === 0) return new Vec();
         this.x = this.x / d;
         this.y = this.y / d;
         this.z = this.z / d;
