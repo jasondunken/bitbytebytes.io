@@ -7,7 +7,7 @@ import { Shot } from "./shot.js";
 import { Barrier } from "./barrier.js";
 import { Bonus } from "./bonus.js";
 
-import { PixelExplosion } from "./visual-effects.js";
+import { PixelExplosionSmall, PixelExplosionLarge } from "./visual-effects.js";
 
 import { Vec } from "../../modules/math/vec.js";
 
@@ -199,7 +199,7 @@ class World {
                             this.deleteGameObject(shot);
                             this.game.addScore(obj.type);
                             this.addGameObject(
-                                new PixelExplosion(obj.position.copy())
+                                new PixelExplosionLarge(obj.position.copy())
                             );
                         }
                     }
@@ -214,7 +214,7 @@ class World {
                             obj.remove = true;
                             this.deleteGameObject(shot);
                             this.addGameObject(
-                                new PixelExplosion(obj.position.copy())
+                                new PixelExplosionSmall(obj.position.copy())
                             );
                         }
                     }
@@ -223,10 +223,10 @@ class World {
                             obj.remove = true;
                             this.deleteGameObject(alien);
                             this.addGameObject(
-                                new PixelExplosion(alien.position.copy())
+                                new PixelExplosionLarge(alien.position.copy())
                             );
                             this.addGameObject(
-                                new PixelExplosion(obj.position.copy())
+                                new PixelExplosionSmall(obj.position.copy())
                             );
                             this.game.aliensWon();
                         }
@@ -244,8 +244,7 @@ class World {
             this.randomAlienFire();
         }
         // 22 seconds
-        //if (this.levelTime % 1320 === 0) {
-        if (this.levelTime % 120 === 0) {
+        if (this.levelTime % 1320 === 0) {
             this.addGameObject(this.getRandomBonus());
         }
     }

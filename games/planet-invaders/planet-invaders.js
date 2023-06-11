@@ -2,7 +2,7 @@ import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
 import { Player, DemoPlayer } from "./modules/player.js";
 
-import { PixelExplosion } from "./modules/visual-effects.js";
+import { PixelExplosionLarge } from "./modules/visual-effects.js";
 
 import { Vec } from "../modules/math/vec.js";
 
@@ -94,11 +94,6 @@ class PlanetInvaders {
             this.width / 2,
             this.height - this.world.PLAYER_SIZE
         );
-    }
-
-    mouseClicked(event) {
-        event.preventDefault();
-        this.world.addGameObject(new PixelExplosion(new Vec(mouseX, mouseY)));
     }
 
     startDemo() {
@@ -237,13 +232,13 @@ class PlanetInvaders {
                             break;
                     }
                     this.world.addGameObject(
-                        new PixelExplosion(this.player.colliders[0].copy())
+                        new PixelExplosionLarge(this.player.colliders[0].copy())
                     );
                     this.world.addGameObject(
-                        new PixelExplosion(this.player.colliders[1].copy())
+                        new PixelExplosionLarge(this.player.colliders[1].copy())
                     );
                     this.world.addGameObject(
-                        new PixelExplosion(this.player.colliders[2].copy())
+                        new PixelExplosionLarge(this.player.colliders[2].copy())
                     );
                     this.lives--;
                     if (this.lives <= 0) {
@@ -305,11 +300,13 @@ class PlanetInvaders {
 
         if (this.currentState === this.GAME_STATE.GAME_OVER) {
             stroke("white");
-            strokeWeight(4);
-            fill("blue");
+            strokeWeight(2);
+            fill("red");
             textAlign(CENTER);
             textSize(32);
-            text(`GAME OVER`, this.width / 2, this.height / 2);
+            if (frameCount % 120 < 100) {
+                text(`GAME OVER`, this.width / 2, this.height / 2);
+            }
         }
     }
 }
