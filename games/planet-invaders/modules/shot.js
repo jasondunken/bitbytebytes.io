@@ -15,7 +15,11 @@ class Shot extends GameObject {
 
     update() {
         this.position.y += this.MOVE_SPEED * this.direction.y;
-        this.colliders[0] = this.position.copy().add(this.COLLIDER_OFFSET);
+        if (this.direction === Vec.UP) {
+            this.colliders[0] = this.position.copy();
+        } else {
+            this.colliders[0] = this.position.copy().add(this.COLLIDER_OFFSET);
+        }
     }
 
     render(debug) {
