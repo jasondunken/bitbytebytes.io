@@ -16,7 +16,6 @@ const GAME_WIDTH = 512; // 32 x 16px
 const GAME_HEIGHT = 400; // 25 x 16px
 
 let game;
-let font;
 
 function preload() {
     World.loadResources();
@@ -36,7 +35,7 @@ function initGame() {
     game.startDemo();
 }
 
-const DEBUG = false;
+const DEBUG = true;
 function draw() {
     game.update();
     game.render(DEBUG);

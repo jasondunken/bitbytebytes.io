@@ -27,7 +27,7 @@ class World {
     SPAWN_MIN_Y = 64;
     BONUS_Y = 32;
     BONUS_SIZE = 32;
-    BONUS_COLLIDER_SIZE = 24;
+    BONUS_COLLIDER_SIZE = 14;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
 
@@ -223,6 +223,9 @@ class World {
                             obj.remove = true;
                             this.deleteGameObject(alien);
                             this.addGameObject(
+                                new PixelExplosion(alien.position.copy())
+                            );
+                            this.addGameObject(
                                 new PixelExplosion(obj.position.copy())
                             );
                             this.game.aliensWon();
@@ -241,7 +244,8 @@ class World {
             this.randomAlienFire();
         }
         // 22 seconds
-        if (this.levelTime % 1320 === 0) {
+        //if (this.levelTime % 1320 === 0) {
+        if (this.levelTime % 120 === 0) {
             this.addGameObject(this.getRandomBonus());
         }
     }
