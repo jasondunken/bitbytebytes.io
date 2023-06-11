@@ -86,7 +86,6 @@ class Player extends GameObject {
         if (this.health <= 30 && damageDir === "down" && this.lastHealth > 30) {
             this.updateDelta = true;
             this.delta = 0;
-            console.log("updateDelta: ", this.updateDelta);
         }
         if (
             this.health > 30 / 2 &&
@@ -266,18 +265,15 @@ class DemoPlayer extends Player {
     currentMove = null;
     centerY = null;
     targetLocked = null;
-    cursorPos = null; // a vector away from the player's position
     cursorMoveSpeed = 3;
     cursorMaxDistance = 450;
     constructor(position, speed, size, imagePlayer, imageRocket) {
         super(position, speed, size, imagePlayer, imageRocket);
         this.centerY = position.y;
+        this.cursorPos = position.copy();
     }
 
     target(items) {
-        if (this.targetLocked && this.targetLocked.remove) {
-            this.targetLocked = null;
-        }
         if (!this.targetLocked) {
             let targetItem = null;
             let closestTarget = Number.MAX_VALUE;
@@ -289,9 +285,6 @@ class DemoPlayer extends Player {
                 }
             }
             this.targetLocked = targetItem;
-            if (this.cursorPos === null) {
-                this.cursorPos = this.position.copy();
-            }
         }
     }
 
@@ -330,7 +323,6 @@ class DemoPlayer extends Player {
             const targetDist = Vec.dist(targetPos, this.cursorPos);
 
             if (targetDist < this.targetLocked.size / 4) {
-                this.targetLocked.remove = true;
                 if (this.targetLocked.name === "ammo") {
                     this.addAmmo(this.targetLocked.value);
                     const reloadSound = new Audio();
@@ -344,27 +336,28 @@ class DemoPlayer extends Player {
                         "./jump-to-orion/res/snd/got_it.wav";
                     shieldChargeSound.play();
                 }
-                if (this.targetLocked.name === "health") {
+                if (
+                    this.targetLocked.name === "healthSML" ||
+                    this.targetLocked.name === "healthMED" ||
+                    this.targetLocked.name === "healthLRG"
+                ) {
                     this.addHealth(this.targetLocked.value);
                     const healthSound = new Audio();
                     healthSound.src = "./jump-to-orion/res/snd/health_1.wav";
                     healthSound.play();
                 }
+                this.targetLocked.remove = true;
+                this.targetLocked = null;
             } else {
-                const targetVectorNormal = {
-                    x: targetVector.x / targetDist,
-                    y: targetVector.y / targetDist,
-                };
-                if (
-                    Vec.dist(this.cursorPos, this.position) <
-                    this.cursorMaxDistance
-                ) {
-                    this.cursorPos.x +=
-                        targetVectorNormal.x * this.cursorMoveSpeed;
-                    this.cursorPos.y +=
-                        targetVectorNormal.y * this.cursorMoveSpeed;
-                }
+                const targetVectorNormal = targetVector.normalize();
+                this.cursorPos.x += targetVectorNormal.x * this.cursorMoveSpeed;
+                this.cursorPos.y += targetVectorNormal.y * this.cursorMoveSpeed;
             }
+        } else {
+            const targetVector = Vec.sub2(this.position, this.cursorPos);
+            const targetVectorNormal = targetVector.normalize();
+            this.cursorPos.x += targetVectorNormal.x * this.cursorMoveSpeed;
+            this.cursorPos.y += targetVectorNormal.y * this.cursorMoveSpeed;
         }
 
         this.updateColliders();
@@ -391,7 +384,7 @@ class DemoPlayer extends Player {
         if (this.cursorPos) {
             stroke("yellow");
             noFill();
-            ellipse(this.cursorPos.x, this.cursorPos.y, 3, 3);
+            ellipse(this.cursorPos.x, this.cursorPos.y, 4, 4);
         }
     }
 }

@@ -247,6 +247,15 @@ class JumpToOrion {
         }
 
         if (!this.gameOver) {
+            if (this.demo) {
+                const items = this.gameObjects.filter((obj) => {
+                    return obj.type === "item";
+                });
+                if (items) {
+                    this.player.target(items);
+                }
+            }
+
             this.player.update();
 
             if (this.player.position.y < this.player.size)
@@ -286,15 +295,6 @@ class JumpToOrion {
                             )
                         );
                     }
-                }
-            }
-
-            if (this.demo) {
-                const items = this.gameObjects.filter((obj) => {
-                    return obj.type === "item";
-                });
-                if (items) {
-                    this.player.target(items);
                 }
             }
         }
