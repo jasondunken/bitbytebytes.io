@@ -1,0 +1,27 @@
+export const config = {
+    backgroundsPath: "img/",
+    backgrounds: ["bg_1.png", "bg_2.png", "bg_3.png"],
+    spritesPath: "img/",
+    sprites: {
+        names: [
+            "alien_1",
+            "alien_2",
+            "alien_3",
+            "alien_4",
+            "alien_5",
+            "barrier",
+            "ship",
+            "ship-destroyedL",
+            "ship-destroyedC",
+            "ship-destroyedR",
+            "bonus",
+        ],
+        alienNames: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5"],
+        spriteSheet: "sprite_sheet.png",
+        color: "0x00ff00ff",
+    },
+    fontsPath: "font/",
+    fonts: ["PressStart2P.ttf"],
+    soundsPath: "snd/",
+    sounds: [],
+};

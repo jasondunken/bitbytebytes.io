@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>static async resource loader test</title>
+        <style>
+            body {
+                background-color: cadetblue;
+                image-rendering: pixelated;
+                text-rendering: geometricPrecision;
+            }
+            #testDiv,
+            #testCanvas {
+                background-color: antiquewhite;
+                image-rendering: pixelated;
+                text-rendering: geometricPrecision;
+                font: 32px PressStart2P;
+                position: relative;
+            }
+        </style>
+        <script type="module" src="resource-loader-test.js"></script>
+    </head>
+    <body>
+        <div id="testDiv">WeeGame</div>
+        <canvas id="testCanvas"></canvas>
+    </body>
+</html>
