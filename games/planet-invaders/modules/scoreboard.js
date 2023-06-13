@@ -1,6 +1,9 @@
 import { World } from "./world.js";
 
 class Scoreboard {
+    ICON_SIZE = 32;
+    PADDING_RIGHT = 22;
+
     constructor(width, height) {
         this.width = width;
         this.height = height;
@@ -26,19 +29,25 @@ class Scoreboard {
                 if (frameCount % 60 > 30) {
                     image(
                         sprite,
-                        this.width - 16 + -i * 32 - 24,
-                        this.height / 2 - 24,
-                        32,
-                        32
+                        this.width -
+                            this.PADDING_RIGHT -
+                            i * this.ICON_SIZE -
+                            this.ICON_SIZE / 2,
+                        this.height / 2 - this.ICON_SIZE / 2,
+                        this.ICON_SIZE,
+                        this.ICON_SIZE
                     );
                 }
             } else {
                 image(
                     sprite,
-                    this.width - 16 + -i * 32 - 24,
-                    this.height / 2 - 24,
-                    32,
-                    32
+                    this.width -
+                        this.PADDING_RIGHT -
+                        i * this.ICON_SIZE -
+                        this.ICON_SIZE / 2,
+                    this.height / 2 - this.ICON_SIZE / 2,
+                    this.ICON_SIZE,
+                    this.ICON_SIZE
                 );
             }
         }

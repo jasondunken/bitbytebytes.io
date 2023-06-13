@@ -4,8 +4,9 @@ import { Shot } from "./shot.js";
 import { Vec } from "../../modules/math/vec.js";
 
 class Player extends GameObject {
-    COLLIDER_OFFSET_X = 0.4;
-    COLLIDER_OFFSET_Y = 0.25;
+    COLLIDER_OFFSET_X = 0.34;
+    COLLIDER_OFFSET_Y = 0.21;
+    COLLIDER_OFFSET_Y_CENTER = 0.0;
 
     BASE_COOL_DOWN = 15;
     coolDown = 0;
@@ -48,7 +49,10 @@ class Player extends GameObject {
             this.position.x - this.size * this.COLLIDER_OFFSET_X,
             this.position.y + this.size * this.COLLIDER_OFFSET_Y
         );
-        this.colliders[1].set(this.position);
+        this.colliders[1].set(
+            this.position.x,
+            this.position.y - this.size * this.COLLIDER_OFFSET_Y_CENTER
+        );
         this.colliders[2].set(
             this.position.x + this.size * this.COLLIDER_OFFSET_X,
             this.position.y + this.size * this.COLLIDER_OFFSET_Y

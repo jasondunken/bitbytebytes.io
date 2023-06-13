@@ -10,10 +10,9 @@ window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 window.keyPressed = keyPressed;
-window.mousePressed = mousePressed;
 
-const GAME_WIDTH = 512; // 32 x 16px
-const GAME_HEIGHT = 400; // 25 x 16px
+const GAME_WIDTH = 512;
+const GAME_HEIGHT = 400;
 
 let game;
 
@@ -35,7 +34,7 @@ function initGame() {
     game.startDemo();
 }
 
-const DEBUG = true;
+const DEBUG = false;
 function draw() {
     game.update();
     game.render(DEBUG);
@@ -45,18 +44,13 @@ function keyPressed(event) {
     event.preventDefault();
 }
 
-function mousePressed(event) {
-    game.mouseClicked(event);
-}
-
-// PlanetInvaders
 class PlanetInvaders {
     PLAYER_1_START_BUTTON = document
         .getElementById("start-1p")
         .addEventListener("click", () => {
             this.start1Player();
         });
-    SCOREBOARD_HEIGHT = 48;
+    SCOREBOARD_HEIGHT = 36;
 
     LEVEL_START_DELAY = 120;
     END_GAME_TIMER = 120;

@@ -75,7 +75,7 @@ class World {
         World.resources.font = await loadFont(
             "./planet-invaders/res/font/PressStart2P.ttf"
         );
-        this.resourcesLoaded = true;
+        World.resourcesLoaded = true;
     }
 
     gameObjects;
@@ -229,6 +229,21 @@ class World {
                                 new PixelExplosionSmall(obj.position.copy())
                             );
                             this.game.aliensWon();
+                        }
+                    }
+                }
+
+                if (obj.type === "shot" && obj.direction === Vec.UP) {
+                    for (let shot of this.gameObjects.shots) {
+                        if (obj !== shot && this.shotCollision(shot, obj)) {
+                            this.addGameObject(
+                                new PixelExplosionSmall(shot.position)
+                            );
+                            this.deleteGameObject(shot);
+                            this.addGameObject(
+                                new PixelExplosionSmall(obj.position)
+                            );
+                            this.deleteGameObject(obj);
                         }
                     }
                 }
