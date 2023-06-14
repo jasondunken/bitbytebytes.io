@@ -16,20 +16,21 @@ class World {
     static ALIEN_COLLIDER_SIZE = 16;
     static ALIEN_SPEED = 0.25;
 
-    PLAYER_SIZE = 24;
-    PLAYER_COLLIDER_SIZE = 16;
-    PLAYER_SPEED = 2;
-    BARRIER_SIZE = 48;
-    BARRIER_COUNT = 3;
-    GUTTER_WIDTH = 32;
-    OUT_OF_BOUNDS_BUFFER = 64;
-    SPAWN_MAX_Y = 280;
-    SPAWN_MIN_Y = 64;
     BONUS_Y = 32;
     BONUS_SIZE = 32;
     BONUS_COLLIDER_SIZE = 14;
     BONUS_SPEED = 1;
     BONUS_INTERVAL = 1000;
+
+    PLAYER_SIZE = 24;
+    PLAYER_COLLIDER_SIZE = 16;
+    PLAYER_SPEED = 2;
+
+    SPAWN_MAX_Y = 280;
+    SPAWN_MIN_Y = 64;
+
+    GUTTER_WIDTH = 32;
+    OUT_OF_BOUNDS_BUFFER = 64;
 
     ALIEN_SHIFT_VECTOR = Vec.DOWN.copy().mult(10);
 
@@ -53,7 +54,7 @@ class World {
             "bonus",
         ],
         alienNames: ["alien_1", "alien_2", "alien_3", "alien_4", "alien_5"],
-        spriteSheetPath: "./planet-invaders/res/img/sprite_sheet.png",
+        spriteSheet: "sprite_sheet.png",
         color: "0x00ff00ff",
     };
 
@@ -70,6 +71,7 @@ class World {
             World.backgroundImages
         );
         World.resources.sprites = await SpriteLoader.LoadSprites(
+            "./planet-invaders/res/img/",
             World.spriteMetadata
         );
         World.resources.font = await loadFont(

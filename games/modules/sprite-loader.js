@@ -52,6 +52,8 @@ class SpriteLoader {
                     spriteSize
                 );
 
+                console.log("imageData: ", imageData);
+
                 const data = imageData.data;
                 for (let i = 0; i < data.length; i += 4) {
                     if (data[i + 3]) {
