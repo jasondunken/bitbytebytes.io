@@ -1,3 +1,5 @@
+import { KEY_CODES } from "../modules/imput/keys.js";
+
 import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
 import { Player, DemoPlayer } from "./modules/player.js";
@@ -41,7 +43,9 @@ function draw() {
 }
 
 function keyPressed(event) {
-    event.preventDefault();
+    if (KEY_CODES.contains(event.keyCode)) {
+        event.preventDefault();
+    }
 }
 
 class PlanetInvaders {
