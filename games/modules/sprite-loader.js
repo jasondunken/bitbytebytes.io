@@ -1,4 +1,5 @@
 import { ImageLoader } from "./graphics/image-loader.js";
+import { Sprite } from "../modules/graphics/sprite.js";
 
 class SpriteLoader {
     static LoadSprites(path, spriteData) {
@@ -24,16 +25,8 @@ class SpriteLoader {
             let spriteCount = spriteSheet.width / spriteSize;
 
             for (let s = 0; s < spriteCount; s++) {
-                const sprite = new Image();
-                sprite.width = spriteSize;
-                sprite.height = spriteSize;
-
-                const canvas = document.createElement("canvas");
-                canvas.width = spriteSize;
-                canvas.height = spriteSize;
-
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(
+                const sprite = new Sprite(spriteSize, spriteSize);
+                sprite.drawingContext.drawImage(
                     spriteSheet,
                     s * spriteSize,
                     0,
@@ -45,27 +38,18 @@ class SpriteLoader {
                     spriteSize
                 );
 
-                const imageData = ctx.getImageData(
-                    0,
-                    0,
-                    spriteSize,
-                    spriteSize
-                );
+                sprite.loadPixels();
 
-                console.log("imageData: ", imageData);
-
-                const data = imageData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    if (data[i + 3]) {
-                        data[i] = color.r;
-                        data[i + 1] = color.g;
-                        data[i + 2] = color.b;
-                        data[i + 3] = color.a;
+                const pixels = sprite.pixels;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i + 3]) {
+                        pixels[i] = color.r;
+                        pixels[i + 1] = color.g;
+                        pixels[i + 2] = color.b;
+                        pixels[i + 3] = color.a;
                     }
                 }
-
-                ctx.putImageData(imageData, 0, 0);
-                sprite.src = canvas.toDataURL("image/png");
+                sprite.updatePixels();
                 sprites[names[s]] = sprite;
             }
             resolve(sprites);

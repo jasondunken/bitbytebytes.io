@@ -25,7 +25,7 @@ async function testLoadResources() {
     for (let i = 0; i < spriteNames.length; i++) {
         const sprite = sprites[spriteNames[i]];
         canvasCtx.drawImage(
-            sprite,
+            sprite.canvas,
             i * sprite.width * SCALE,
             0,
             sprite.width * SCALE,
