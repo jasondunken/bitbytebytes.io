@@ -1,4 +1,4 @@
-import { KEY_CODES } from "../modules/imput/keys.js";
+import { KEY_CODES } from "../modules/input/keys.js";
 
 import { World } from "./modules/world.js";
 import { Scoreboard } from "./modules/scoreboard.js";
