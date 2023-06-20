@@ -4,7 +4,7 @@
 
 -   Random Images!
 -   Starts with a random piece missing!
--   First pizzle is 2 x 2, and the dimensions increase by one each time you complete a puzzle!
+-   First puzzle is 2 x 2, and the dimensions increase by one each time you complete a puzzle!
 -   Goes on forever!
 -   No points to score!
 -   Not even a timer!
