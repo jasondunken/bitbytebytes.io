@@ -18,8 +18,8 @@ const GAME_HEIGHT = 400;
 
 let game;
 
-function preload() {
-    World.loadResources();
+async function preload() {
+    await World.loadResources();
 }
 
 function setup() {
@@ -125,11 +125,10 @@ class PlanetInvaders {
         this.nextBonusShip = this.BONUS_SHIP_INTERVAL;
         this.level = 0;
         this.score = 0;
-        this.startLevel();
     }
 
     startLevel() {
-        this.currentState = this.GAME_STATE.LEVEL_STARTING;
+        // can't load level until resources have finished loading!
         this.world.start(this.level);
     }
 
@@ -178,7 +177,12 @@ class PlanetInvaders {
     }
 
     update() {
-        if (World.resourcesLoaded) {
+        if (this.currentState === this.GAME_STATE.STARTING) {
+            if (World.resourcesLoaded) {
+                this.currentState = this.GAME_STATE.LEVEL_STARTING;
+                this.startLevel();
+            }
+        } else {
             this.updateGameLogic();
         }
     }
