@@ -23,33 +23,36 @@ function preload() {
     images.push(loadImage("./slider/img/image_4.png"));
     images.push(loadImage("./slider/img/image_5.png"));
     images.push(loadImage("./slider/img/image_6.png"));
+    images.push(loadImage("./slider/img/image_7.png"));
+    images.push(loadImage("./slider/img/image_8.png"));
+    images.push(loadImage("./slider/img/image_9.png"));
+    images.push(loadImage("./slider/img/image_10.png"));
 }
 
 function setup() {
-    // setup stuff here
     const canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent("game");
     initGame();
 }
 
-// image(img, dx, dy, dWidth, dHeight, sx, sy, [sWidth], [sHeight])
 function initGame() {
+    let currentImageIndex = level % images.length;
     playing = true;
     turns = 0;
     tilesPerSide = STARTING_TILES_PER_SIDE + level;
     tileSize = width / tilesPerSide;
     tiles = [];
-    const currentImage = images[Math.floor(Math.random() * images.length)];
+    const currentImage = images[currentImageIndex];
     for (let i = 0; i < tilesPerSide; i++) {
         tiles[i] = [];
         for (let j = 0; j < tilesPerSide; j++) {
             let tileImage = createImage(tileSize, tileSize);
             tileImage.copy(
                 currentImage,
-                (width / tilesPerSide) * i,
-                (height / tilesPerSide) * j,
-                tileSize,
-                tileSize,
+                (currentImage.width / tilesPerSide) * i,
+                (currentImage.height / tilesPerSide) * j,
+                currentImage.width / tilesPerSide,
+                currentImage.height / tilesPerSide,
                 0,
                 0,
                 tileSize,
@@ -63,7 +66,7 @@ function initGame() {
             };
         }
     }
-    shuffleTiles(999);
+    shuffleTiles(999 * level + 1);
 }
 
 function update() {
@@ -78,7 +81,14 @@ function update() {
 function mouseClicked(event) {
     const clickX = Math.floor(mouseX / tileSize);
     const clickY = Math.floor(mouseY / tileSize);
-    if (playing && tiles && clickX >= 0 && clickY >= 0 && clickX < tilesPerSide && clickY < tilesPerSide) {
+    if (
+        playing &&
+        tiles &&
+        clickX >= 0 &&
+        clickY >= 0 &&
+        clickX < tilesPerSide &&
+        clickY < tilesPerSide
+    ) {
         turns++;
         checkTiles(clickX, clickY);
         checkForWin();
@@ -89,11 +99,17 @@ function checkTiles(indexX, indexY) {
     if (!tiles[indexX][indexY].empty) {
         if (indexX !== 0 && tiles[indexX - 1][indexY].empty) {
             swapTiles(indexX, indexY, indexX - 1, indexY);
-        } else if (indexX !== tilesPerSide - 1 && tiles[indexX + 1][indexY].empty) {
+        } else if (
+            indexX !== tilesPerSide - 1 &&
+            tiles[indexX + 1][indexY].empty
+        ) {
             swapTiles(indexX, indexY, indexX + 1, indexY);
         } else if (indexY !== 0 && tiles[indexX][indexY - 1].empty) {
             swapTiles(indexX, indexY, indexX, indexY - 1);
-        } else if (indexY !== tilesPerSide - 1 && tiles[indexX][indexY + 1].empty) {
+        } else if (
+            indexY !== tilesPerSide - 1 &&
+            tiles[indexX][indexY + 1].empty
+        ) {
             swapTiles(indexX, indexY, indexX, indexY + 1);
         }
     }
@@ -187,7 +203,11 @@ function draw() {
         for (let j = 0; j < tiles[i].length; j++) {
             setColor("white");
             if (!tiles[i][j].empty) {
-                image(tiles[i][j].tileImage, (width / tilesPerSide) * i, (height / tilesPerSide) * j);
+                image(
+                    tiles[i][j].tileImage,
+                    (width / tilesPerSide) * i,
+                    (height / tilesPerSide) * j
+                );
             }
         }
     }
