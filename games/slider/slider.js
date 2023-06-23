@@ -133,10 +133,10 @@ function checkForWin() {
 }
 
 function swapTiles(x1, y1, x2, y2) {
-    let tempTile1 = tiles[x1][y1];
-    let tempTile2 = tiles[x2][y2];
-    tiles[x1][y1] = tempTile2;
-    tiles[x2][y2] = tempTile1;
+    let tile1 = tiles[x1][y1];
+    let tile2 = tiles[x2][y2];
+    tiles[x1][y1] = tile2;
+    tiles[x2][y2] = tile1;
 }
 
 function shuffleTiles(times) {

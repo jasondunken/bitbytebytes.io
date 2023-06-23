@@ -1,0 +1,11 @@
+export const GAME_STATE = Object.freeze({
+    STARTUP: Symbol("STARTUP"),
+    LOADING_RESOURCES: Symbol("LOADING_RESOURCES"),
+    STARTUP_COMPLETE: Symbol("STARTUP_COMPLETE"),
+    LEVEL_STARTING: Symbol("LEVEL_STARTING"),
+    PLAYING: Symbol("PLAYING"),
+    PAUSED: Symbol("PAUSED"),
+    LEVEL_RESTARTING: Symbol("LEVEL_RESTARTING"),
+    GAME_ENDING: Symbol("ENDING"),
+    GAME_OVER: Symbol("GAME_OVER"),
+});

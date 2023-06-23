@@ -79,6 +79,7 @@ class PlanetInvaders {
     gameOverTime = 0;
 
     world = null;
+    scoreboard = null;
     player = null;
     level = 0;
     score = 0;
@@ -92,6 +93,19 @@ class PlanetInvaders {
             this.width / 2,
             this.height - this.world.PLAYER_SIZE
         );
+
+        // this.init(width, height);
+    }
+
+    async init(width, height) {
+        await World.loadResources();
+        this.scoreboard = new Scoreboard(width, this.SCOREBOARD_HEIGHT);
+        this.world = new World(this, width, height);
+        this.playerSpawn = new Vec(
+            this.width / 2,
+            this.height - this.world.PLAYER_SIZE
+        );
+        this.startDemo();
     }
 
     startDemo() {
