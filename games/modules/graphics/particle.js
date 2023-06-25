@@ -1,15 +1,11 @@
 import { Vec } from "../math/vec.js";
 
 export class Particle {
-    constructor(position, direction, size) {
+    constructor(position, direction, life, size) {
         this.position = position || new Vec();
         this.direction = direction || new Vec();
-        this.size = size || 1;
-    }
-
-    update(delta) {
-        delta = delta || 1;
-        const step = this.direction.copy().mult(delta * 10);
-        this.position.add(step);
+        this.life = life || 1;
+        this.size = size || 8;
+        this.alphaRate = Math.random() * 0.25 + 0.5;
     }
 }

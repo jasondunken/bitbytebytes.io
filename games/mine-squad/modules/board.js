@@ -3,6 +3,7 @@ import * as utils from "./utils.js";
 import { Vec } from "../../modules/math/vec.js";
 import { GAME_STATE } from "./game-state.js";
 import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
+import { LayerManager } from "../../modules/graphics/layer-manager.js";
 
 class Board {
     TILES_PER_COLUMN = 16;
@@ -102,7 +103,7 @@ class Board {
                 tileIndex,
                 this.boardConfig
             );
-            this.mineSquad.addToLayers(new Explosion(position));
+            LayerManager.AddObject(new Explosion(position));
             this.completed = true;
             this.winner = false;
         } else {
@@ -121,7 +122,7 @@ class Board {
                 tileIndex,
                 this.boardConfig
             );
-            this.mineSquad.addToLayers(
+            LayerManager.AddObject(
                 new ScoreEffect(position, tileScore, tile.value)
             );
         }
@@ -144,7 +145,7 @@ class Board {
         if (tile.bomb) {
             tile.bomb.live = false;
             this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.addToLayers(
+            LayerManager.AddObject(
                 new BonusEffect(
                     position,
                     this.mineSquad.DEFUSE_BONUS,
@@ -154,7 +155,7 @@ class Board {
             );
         } else if (tile.value > 0) {
             this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
-            this.mineSquad.addToLayers(
+            LayerManager.AddObject(
                 new BonusEffect(
                     position,
                     tile.value * this.mineSquad.DEFUSE_BONUS,
@@ -187,7 +188,7 @@ class Board {
                         defuseArea[i],
                         this.boardConfig
                     );
-                    this.mineSquad.addToLayers(
+                    LayerManager.AddObject(
                         new BonusEffect(position, this.mineSquad.DEFUSE_BONUS)
                     );
                 }
