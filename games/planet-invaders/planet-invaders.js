@@ -194,6 +194,9 @@ class PlanetInvaders {
         if (this.currentState === this.GAME_STATE.STARTING) {
             if (World.resourcesLoaded) {
                 this.currentState = this.GAME_STATE.LEVEL_STARTING;
+                if (!this.player.sprite) {
+                    this.player.sprite = World.resources.sprites["ship"];
+                }
                 this.startLevel();
             }
         } else {
