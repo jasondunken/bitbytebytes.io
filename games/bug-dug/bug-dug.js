@@ -7,6 +7,7 @@ import {
     clearForegroundAround,
     getGridIndex,
     getBlockAbove,
+    calculateAABBCollision,
 } from "./modules/utils.js";
 
 window.preload = preload;
@@ -136,7 +137,18 @@ class BugDug {
                 }
             }
             if (gameObj.type === "enemy") gameObj.update(this.level);
+            if (gameObj.type === "coin") {
+                if (calculateAABBCollision(gameObj, this.player)) {
+                    this.gameObjects.delete(gameObj);
+                    gameObj.collected = true;
+                    this.collectCoin();
+                }
+            }
         });
+    }
+
+    collectCoin() {
+        this.score += 100;
     }
 
     render() {
@@ -213,27 +225,21 @@ class BugDug {
             this.level.foregroundLayer,
             1.75
         );
-        for (let enemy of this.level.enemies) {
-            enemy.render();
-        }
-        for (let item of this.level.items) {
-            item.render();
-        }
 
         // draw foreground
-        // for (let i = 0; i < this.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-        //         if (this.foregroundLayer[i][j] !== "none") {
-        //             image(
-        //                 this.foregroundLayer[i][j],
-        //                 i * this.level.BLOCK_SIZE,
-        //                 j * this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE
-        //             );
-        //         }
-        //     }
-        // }
+        for (let i = 0; i < this.foregroundLayer.length; i++) {
+            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+                if (this.foregroundLayer[i][j] !== "none") {
+                    image(
+                        this.foregroundLayer[i][j],
+                        i * this.level.BLOCK_SIZE,
+                        j * this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE
+                    );
+                }
+            }
+        }
 
         //draw UI
         stroke("brown");

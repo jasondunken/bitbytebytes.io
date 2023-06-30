@@ -1,6 +1,8 @@
 import { GameObject } from "./gameObject.js";
 import { Animation } from "./animation.js";
 
+import { Vec } from "../../modules/math/vec.js";
+
 class Item extends GameObject {
     static SIZE = 16;
     collected = false;
@@ -15,7 +17,13 @@ class Item extends GameObject {
     render() {
         if (this.animation) {
             this.animation.update();
-            image(this.animation.currentFrame, this.position.x, this.position.y, Item.SIZE, Item.SIZE);
+            image(
+                this.animation.currentFrame,
+                this.position.x,
+                this.position.y,
+                Item.SIZE,
+                Item.SIZE
+            );
         }
     }
 }
@@ -38,15 +46,66 @@ class Chest extends GameObject {
 
     render() {
         if (!this.opened) {
-            image(this.sprite, this.position.x, this.position.y, Chest.SIZE, Chest.SIZE);
+            image(
+                this.sprite,
+                this.position.x,
+                this.position.y,
+                Chest.SIZE,
+                Chest.SIZE
+            );
         }
     }
 }
 
 class Coin extends GameObject {
-    constructor(position, sprite) {
+    static SIZE = 16;
+    collected = false;
+
+    collider = {
+        a: new Vec(),
+        b: new Vec(),
+        c: new Vec(),
+        d: new Vec(),
+    };
+    constructor(position, spriteSheet) {
         super("coin", position);
-        this.sprite = sprite;
+        this.animation = new Animation(spriteSheet, 45, true);
+        this.animation.time = Math.random() * this.animation.duration;
+        this.updateCollider();
+    }
+
+    updateCollider() {
+        this.collider = {
+            a: {
+                x: this.position.x - Coin.SIZE / 2,
+                y: this.position.y - Coin.SIZE / 2,
+            },
+            b: {
+                x: this.position.x + Coin.SIZE / 2,
+                y: this.position.y - Coin.SIZE / 2,
+            },
+            c: {
+                x: this.position.x + Coin.SIZE / 2,
+                y: this.position.y + Coin.SIZE / 2,
+            },
+            d: {
+                x: this.position.x - Coin.SIZE / 2,
+                y: this.position.y + Coin.SIZE / 2,
+            },
+        };
+    }
+
+    render() {
+        if (this.animation) {
+            this.animation.update();
+            image(
+                this.animation.currentFrame,
+                this.position.x,
+                this.position.y,
+                Item.SIZE,
+                Item.SIZE
+            );
+        }
     }
 }
 

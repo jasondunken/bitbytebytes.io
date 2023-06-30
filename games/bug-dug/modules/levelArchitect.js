@@ -193,7 +193,7 @@ class LevelArchitect {
                         y: blockAbove.position.y + Item.SIZE,
                     };
                     this.items.add(
-                        new Item(coinPosition, blockSprites["coin-gold"])
+                        new Coin(coinPosition, blockSprites["coin-gold"])
                     );
                 }
 
