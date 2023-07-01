@@ -34,6 +34,12 @@ function draw() {
 }
 
 class AirDefense {
+    PLAYER_1_START_BUTTON = document
+        .getElementById("start-1p")
+        .addEventListener("click", () => {
+            this.start1Player();
+        });
+
     DEBUG = false;
     SIDE_IN_BOUNDS_BUFFER = 256;
 
