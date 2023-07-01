@@ -1,3 +1,9 @@
+const RESTART_BUTTON = document
+    .getElementById("restart")
+    .addEventListener("click", () => {
+        this.initGame();
+    });
+
 const WIDTH = 512;
 const HEIGHT = 512;
 
