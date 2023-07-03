@@ -1,14 +1,9 @@
-class GameObject {
-    type;
-    position;
-    collider;
-    remove = false;
-    width;
-    height;
+import { Vec } from "../../modules/math/vec.js";
 
-    constructor(type, position = { x: 0, y: 0 }) {
-        this.type = type;
-        this.position = position;
+class GameObject {
+    constructor(type, position) {
+        this.type = type || "default";
+        this.position = position || new Vec();
         this.remove = false;
     }
 
@@ -20,13 +15,8 @@ class GameObject {
         console.log("gameObj.render()");
     }
 
-    updateCollider() {
-        console.log("gameObj.updateCollider()");
-    }
-
     setPosition(position) {
         this.position = position;
-        this.updateCollider();
     }
 }
 

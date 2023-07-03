@@ -1,6 +1,6 @@
 import { GameObject } from "./gameObject.js";
 import { getAdjacentBlocks } from "./utils.js";
-import { Vec } from "../../modules/math/vec.js";
+import { Collider } from "../../modules/collider.js";
 
 class Entity extends GameObject {
     width = 32;
@@ -17,15 +17,11 @@ class Entity extends GameObject {
 
     particleEmitter = null;
 
-    collider = {
-        a: new Vec(),
-        b: new Vec(),
-        c: new Vec(),
-        d: new Vec(),
-    };
+    collider = new Collider(this.width, this.height);
 
     constructor(type, position) {
         super(type, position);
+        this.collider = new Collider(position, this.width, this.height);
     }
 
     update(terrain) {
@@ -94,7 +90,7 @@ class Entity extends GameObject {
             }
         }
 
-        this.updateCollider();
+        this.collider.update(this.position);
         if (this.particleEmitter) {
             this.updateParticleEmitter();
         }
@@ -102,27 +98,6 @@ class Entity extends GameObject {
 
     getInput() {
         // console.log("this: ", this);
-    }
-
-    updateCollider() {
-        this.collider = {
-            a: {
-                x: this.position.x - this.width / 2,
-                y: this.position.y - this.height / 2,
-            },
-            b: {
-                x: this.position.x + this.width / 2,
-                y: this.position.y - this.height / 2,
-            },
-            c: {
-                x: this.position.x + this.width / 2,
-                y: this.position.y + this.height / 2,
-            },
-            d: {
-                x: this.position.x - this.width / 2,
-                y: this.position.y + this.height / 2,
-            },
-        };
     }
 
     updateParticleEmitter() {}

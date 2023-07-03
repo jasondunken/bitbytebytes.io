@@ -10,6 +10,8 @@ import {
     calculateAABBCollision,
 } from "./modules/utils.js";
 
+import { KEY_CODES } from "../modules/input/keys.js";
+
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
@@ -22,7 +24,9 @@ const GAME_HEIGHT = 768;
 let game = null;
 
 function keyPressed(key) {
-    key.preventDefault();
+    if (KEY_CODES.contains(key.code)) {
+        key.preventDefault();
+    }
 }
 
 // p5.js functions ------------------------>
@@ -227,19 +231,19 @@ class BugDug {
         );
 
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+        //         if (this.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.foregroundLayer[i][j],
+        //                 i * this.level.BLOCK_SIZE,
+        //                 j * this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
 
         //draw UI
         stroke("brown");

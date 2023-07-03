@@ -5,9 +5,10 @@ export class Collider {
     b = new Vec();
     c = new Vec();
     d = new Vec();
-    constructor(position, size) {
+    constructor(position, width, height) {
         this.position = position || new Vec();
-        this.size = size || 1;
+        this.width = width || 1;
+        this.height = height || 1;
         this.updateBounds();
     }
 
