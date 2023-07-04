@@ -3,7 +3,7 @@ import { Vec } from "../../modules/math/vec.js";
 import { Particle } from "../../modules/graphics/particle.js";
 
 class VisualEffect {
-    done = false;
+    remove = false;
     layer = 0;
 
     constructor(position, layer) {
@@ -31,7 +31,7 @@ class ScoreEffect extends VisualEffect {
         this.opacity -= 5;
         this.color.setAlpha(this.opacity);
         this.outlineColor.setAlpha(this.opacity);
-        if (this.opacity <= 0) this.done = true;
+        if (this.opacity <= 0) this.remove = true;
     }
 
     render() {
@@ -55,7 +55,7 @@ class BonusEffect extends VisualEffect {
     update() {
         this.position.x += Math.random() * 4 - 2;
         this.position.y -= this.vSpeed;
-        if (this.position.y < -64) this.done = true;
+        if (this.position.y < -64) this.remove = true;
     }
 
     render() {
@@ -87,7 +87,7 @@ class BonusSquadEffect extends VisualEffect {
             if (this.repetitions > 0) {
                 this.size = 32;
             } else {
-                this.done = true;
+                this.remove = true;
             }
         }
     }
@@ -148,7 +148,7 @@ class Explosion extends VisualEffect {
                 );
             }
         }
-        if (this.explosion.size < 1) this.done = true;
+        if (this.explosion.size < 1) this.remove = true;
     }
 
     setBrightnessAlpha(b, a) {
@@ -207,12 +207,12 @@ class Fireworks extends VisualEffect {
         }
         this.shells.forEach((shell) => {
             shell.update(delta);
-            if (shell.done) {
+            if (shell.remove) {
                 this.shells.delete(shell);
             }
         });
         if (this.numVolleys === 0 && this.shells.size === 0) {
-            this.done = true;
+            this.remove = true;
         }
     }
 
@@ -245,7 +245,7 @@ class FireworkShell {
         this.numStars = config?.numStars || 20;
         this.color = config?.starColor || "white";
 
-        this.done = false;
+        this.remove = false;
         this.life = 150;
         this.burstSpeed = 25;
         this.alpha = 255;
@@ -286,7 +286,7 @@ class FireworkShell {
             }
         });
         if (this.particles.size <= 0) {
-            this.done = true;
+            this.remove = true;
         }
     }
 
