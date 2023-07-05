@@ -146,11 +146,11 @@ class MineSquad {
 
     update() {
         const nowTime = Date.now();
-        this.dt = (nowTime - this.lastTime) / 100;
-        this.gameTime += this.dt;
+        this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
 
         if (this.currentState === GAME_STATE.PLAYING) {
+            this.gameTime += this.dt;
             if (this.board.completed) this.endGame();
         }
 
