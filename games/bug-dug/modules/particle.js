@@ -1,4 +1,4 @@
-import { GameObject } from "./gameObject.js";
+import { GameObject } from "../../modules/gameObject.js";
 import { Vec } from "../../modules/math/vec.js";
 
 class Particle {

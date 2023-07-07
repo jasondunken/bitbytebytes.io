@@ -1,4 +1,4 @@
-import { GameObject } from "./gameObject.js";
+import { GameObject } from "../../modules/gameObject.js";
 import { LevelArchitect } from "./levelArchitect.js";
 
 class Block extends GameObject {
@@ -36,7 +36,10 @@ class Block extends GameObject {
         this.collider = {
             a: { x: this.position.x, y: this.position.y },
             b: { x: this.position.x + this.width, y: this.position.y },
-            c: { x: this.position.x + this.width, y: this.position.y + this.height },
+            c: {
+                x: this.position.x + this.width,
+                y: this.position.y + this.height,
+            },
             d: { x: this.position.x, y: this.position.y + this.height },
         };
     }
@@ -59,7 +62,13 @@ class Block extends GameObject {
     render() {
         if (!this.destroyed) {
             if (this.sprite) {
-                image(this.sprite, this.position.x, this.position.y, this.width, this.height);
+                image(
+                    this.sprite,
+                    this.position.x,
+                    this.position.y,
+                    this.width,
+                    this.height
+                );
             } else {
                 fill(LevelArchitect.getColor(this.blockType));
                 rect(this.position.x, this.position.y, this.width, this.height);

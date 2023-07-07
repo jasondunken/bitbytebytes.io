@@ -1,4 +1,4 @@
-import { Vec } from "../../modules/math/vec.js";
+import { Vec } from "./math/vec.js";
 
 class GameObject {
     constructor(type, position) {
@@ -7,13 +7,9 @@ class GameObject {
         this.remove = false;
     }
 
-    update() {
-        console.log("gameObj.update()");
-    }
+    update(delta) {}
 
-    render() {
-        console.log("gameObj.render()");
-    }
+    render() {}
 
     setPosition(position) {
         this.position = position;

@@ -1,4 +1,4 @@
-import { Vec } from "./math/vec.js";
+import { Vec } from "../math/vec.js";
 
 export class Collider {
     a = new Vec();

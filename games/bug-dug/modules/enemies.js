@@ -1,15 +1,14 @@
 import { Entity } from "./entity.js";
-import { Animation } from "./animation.js";
+import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 
 class Enemy extends Entity {
     static STATE = {
         IDLE: "idle",
-        WALKING: { LEFT: "walk-left", RIGHT: "walk-right" },
+        WALKING: "walk",
         JUMPING: "jump",
         CLIMBING: "climb",
         ATTACKING: "attack",
-        MINING: "mining",
         HURT: "hurt",
         DEAD: "dead",
     };
@@ -25,18 +24,21 @@ class Enemy extends Entity {
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
         };
         this.currentAnimation = this.animations["idle"];
-        this.currentAnimation.time = Math.random() * this.currentAnimation.duration;
-    }
-
-    getInput() {
-        // console.log("this: ", this);
+        this.currentAnimation.time =
+            Math.random() * this.currentAnimation.duration;
     }
 
     static loadSpriteSheets() {
         let spriteSheets = {};
-        spriteSheets["idle"] = loadImage("./bug-dug/res/img/animations/big_mushroom_idle.png");
-        spriteSheets["walk-left"] = loadImage("./bug-dug/res/img/animations/big_mushroom_walk_left.png");
-        spriteSheets["walk-right"] = loadImage("./bug-dug/res/img/animations/big_mushroom_walk_right.png");
+        spriteSheets["idle"] = loadImage(
+            "./bug-dug/res/img/animations/big_mushroom_idle.png"
+        );
+        spriteSheets["walk-left"] = loadImage(
+            "./bug-dug/res/img/animations/big_mushroom_walk_left.png"
+        );
+        spriteSheets["walk-right"] = loadImage(
+            "./bug-dug/res/img/animations/big_mushroom_walk_right.png"
+        );
         return spriteSheets;
     }
 }

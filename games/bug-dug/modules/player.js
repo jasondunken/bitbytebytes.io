@@ -1,5 +1,5 @@
 import { Entity } from "./entity.js";
-import { Animation } from "./animation.js";
+import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
 import { getBlockAtPosition } from "./utils.js";
@@ -7,7 +7,7 @@ import { getBlockAtPosition } from "./utils.js";
 class Player extends Entity {
     static STATE = Object.freeze({
         IDLE: "idle",
-        WALKING: { LEFT: "walk-left", RIGHT: "walk-right" },
+        WALKING: "walk",
         JUMPING: "jump",
         CLIMBING: "climb",
         ATTACKING: "attack",

@@ -1,5 +1,5 @@
-import { GameObject } from "./gameObject.js";
-import { Animation } from "./animation.js";
+import { GameObject } from "../../modules/gameObject.js";
+import { Animation } from "../../modules/graphics/animation.js";
 
 import { Vec } from "../../modules/math/vec.js";
 

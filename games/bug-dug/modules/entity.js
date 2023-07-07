@@ -1,14 +1,12 @@
-import { GameObject } from "./gameObject.js";
 import { getAdjacentBlocks } from "./utils.js";
-import { Collider } from "../../modules/collider.js";
+import { Collider } from "../../modules/collisions/collider.js";
+import { GameObject } from "../../modules/gameObject.js";
 
 class Entity extends GameObject {
     width = 32;
     height = 32;
     grounded = false;
     speed = 1;
-
-    blocks = [];
 
     state;
     animations;
@@ -17,90 +15,24 @@ class Entity extends GameObject {
 
     particleEmitter = null;
 
-    collider = new Collider(this.width, this.height);
-
     constructor(type, position) {
         super(type, position);
         this.collider = new Collider(position, this.width, this.height);
     }
 
-    update(terrain) {
+    update(dt) {
         this.currentAnimation = this.animations[this.state];
         this.currentAnimation.update();
 
         if (!this.grounded) {
             this.position.y += terrain.gravity;
         }
-        this.getInput(terrain);
-
-        // constrain x
-        if (this.position.x < this.width / 2)
-            this.setPosition({ x: this.width / 2, y: this.position.y });
-        if (this.position.x > terrain.width - this.width / 2)
-            this.setPosition({
-                x: terrain.width - this.width / 2,
-                y: this.position.y,
-            });
-        // constrain y
-        if (this.position.y < this.height / 2)
-            this.setPosition({ x: this.position.x, y: this.height / 2 });
-        if (this.position.y > terrain.height - this.height / 2)
-            this.setPosition({
-                x: this.position.x,
-                y: terrain.height - this.height / 2,
-            });
-
-        // check blocks around enemy
-        this.blocks = getAdjacentBlocks(
-            this.position,
-            terrain.blocks,
-            terrain.BLOCK_SIZE
-        );
-        let block = this.blocks.above;
-        if (block && block.solid) {
-            if (this.position.y - this.height / 2 <= block.collider.d.y) {
-                this.position.y = block.collider.d.y + this.height / 2;
-            }
-        }
-        block = this.blocks.below;
-        if (block && block.solid) {
-            if (this.position.y + this.height / 2 >= block.collider.a.y) {
-                this.position.y = block.collider.a.y - this.height / 2;
-                this.grounded = true;
-            }
-        }
-        if (
-            block &&
-            !block.solid &&
-            this.position.x - (this.width / 2) * 0.8 > block.collider.a.x &&
-            this.position.x + (this.width / 2) * 0.8 < block.collider.b.x
-        ) {
-            this.grounded = false;
-        }
-        block = this.blocks.left;
-        if (block && block.solid) {
-            if (this.position.x - this.width / 2 <= block.collider.b.x) {
-                this.position.x = block.collider.b.x + this.width / 2;
-            }
-        }
-        block = this.blocks.right;
-        if (block && block.solid) {
-            if (this.position.x + this.width / 2 >= block.collider.a.x) {
-                this.position.x = block.collider.a.x - this.width / 2;
-            }
-        }
 
         this.collider.update(this.position);
         if (this.particleEmitter) {
-            this.updateParticleEmitter();
+            this.particleEmitter.update();
         }
     }
-
-    getInput() {
-        // console.log("this: ", this);
-    }
-
-    updateParticleEmitter() {}
 
     render() {
         if (this.currentAnimation) {

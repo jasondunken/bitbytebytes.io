@@ -2,7 +2,7 @@ import { Player, DemoPlayer } from "./modules/player.js";
 import { Enemy } from "./modules/enemies.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
-import { Animation } from "./modules/animation.js";
+import { Animation } from "../modules/graphics/animation.js";
 import {
     clearForegroundAround,
     getGridIndex,
@@ -11,6 +11,7 @@ import {
 } from "./modules/utils.js";
 
 import { KEY_CODES } from "../modules/input/keys.js";
+import { LayerManager } from "../modules/graphics/layer-manager.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -101,10 +102,12 @@ class BugDug {
         this.enemySprites = enemySprites;
         this.font = font;
 
+        this.lastTime = 0;
+        this.dt = 0;
+
         this.demo = true;
         this.gameOver = true;
         this.score = 0;
-        this.gameObjects = new Set();
     }
 
     startDemo() {
@@ -129,7 +132,26 @@ class BugDug {
     }
 
     update() {
-        this.player.update(this.level);
+        const nowTime = Date.now();
+        this.dt = nowTime - this.lastTime;
+        this.lastTime = nowTime;
+        // update entity positions
+        for (let gameObjs of this.gameObjects.values()) {
+            for (let obj of gameObjs.values()) {
+                obj.update(this.dt);
+                // check entity/terrain collisions
+                this.validatePosition(obj);
+                if (obj.remove) {
+                    gameObjs.delete(obj);
+                }
+            }
+        }
+        this.player.update(this.dt);
+
+        // check player/enemy collisions
+
+        // check player/item collisions
+
         this.gameObjects.forEach((gameObj) => {
             if (gameObj.type === "block") {
                 gameObj.update();
@@ -149,6 +171,65 @@ class BugDug {
                 }
             }
         });
+    }
+
+    validatePosition(obj) {
+        // constrain x
+        if (obj.position.x < obj.width / 2)
+            obj.setPosition({ x: obj.width / 2, y: obj.position.y });
+        if (obj.position.x > terrain.width - obj.width / 2)
+            obj.setPosition({
+                x: terrain.width - obj.width / 2,
+                y: obj.position.y,
+            });
+        // constrain y
+        if (obj.position.y < obj.height / 2)
+            obj.setPosition({ x: obj.position.x, y: obj.height / 2 });
+        if (obj.position.y > terrain.height - obj.height / 2)
+            obj.setPosition({
+                x: obj.position.x,
+                y: terrain.height - obj.height / 2,
+            });
+
+        // check blocks around enemy
+        this.blocks = getAdjacentBlocks(
+            obj.position,
+            terrain.blocks,
+            terrain.BLOCK_SIZE
+        );
+        let block = this.blocks.above;
+        if (block && block.solid) {
+            if (obj.position.y - obj.height / 2 <= block.collider.d.y) {
+                obj.position.y = block.collider.d.y + obj.height / 2;
+            }
+        }
+        block = this.blocks.below;
+        if (block && block.solid) {
+            if (this.position.y + this.height / 2 >= block.collider.a.y) {
+                this.position.y = block.collider.a.y - this.height / 2;
+                this.grounded = true;
+            }
+        }
+        if (
+            block &&
+            !block.solid &&
+            this.position.x - (this.width / 2) * 0.8 > block.collider.a.x &&
+            this.position.x + (this.width / 2) * 0.8 < block.collider.b.x
+        ) {
+            this.grounded = false;
+        }
+        block = this.blocks.left;
+        if (block && block.solid) {
+            if (this.position.x - this.width / 2 <= block.collider.b.x) {
+                this.position.x = block.collider.b.x + this.width / 2;
+            }
+        }
+        block = this.blocks.right;
+        if (block && block.solid) {
+            if (this.position.x + this.width / 2 >= block.collider.a.x) {
+                this.position.x = block.collider.a.x - this.width / 2;
+            }
+        }
     }
 
     collectCoin() {
@@ -173,57 +254,61 @@ class BugDug {
             }
         }
 
-        this.gameObjects.forEach((gameObj) => {
-            gameObj.render();
-            if (gameObj.type === "block") {
-                if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
-                    let damageSpriteIndex = Math.floor(
-                        map(
-                            gameObj.health,
-                            0,
-                            gameObj.MAX_HEALTH,
-                            this.mineBlockAnimation.keyFrames.length - 1,
-                            0
-                        )
-                    );
+        this.gameObjects.get("blocks").forEach((block) => {
+            block.render();
+            if (!block.destroyed && block.health < block.MAX_HEALTH) {
+                let damageSpriteIndex = Math.floor(
+                    map(
+                        block.health,
+                        0,
+                        block.MAX_HEALTH,
+                        this.mineBlockAnimation.keyFrames.length - 1,
+                        0
+                    )
+                );
+                image(
+                    this.mineBlockAnimation.keyFrames[damageSpriteIndex],
+                    block.position.x,
+                    block.position.y,
+                    block.width,
+                    block.height
+                );
+            }
+            if (block.destroyed) {
+                const blockAbove = getBlockAbove(
+                    getGridIndex(block.position, this.level.BLOCK_SIZE),
+                    this.level.blocks
+                );
+                if (blockAbove.destroyed || blockAbove.blockType === "air") {
                     image(
-                        this.mineBlockAnimation.keyFrames[damageSpriteIndex],
-                        gameObj.position.x,
-                        gameObj.position.y,
-                        gameObj.width,
-                        gameObj.height
+                        this.blockSprites["background-ladder"],
+                        block.position.x,
+                        block.position.y,
+                        block.width,
+                        block.height
                     );
-                }
-                if (gameObj.destroyed) {
-                    const blockAbove = getBlockAbove(
-                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
-                        this.level.blocks
+                } else {
+                    image(
+                        this.blockSprites["background-wall"],
+                        block.position.x,
+                        block.position.y,
+                        block.width,
+                        block.height
                     );
-                    if (
-                        blockAbove.destroyed ||
-                        blockAbove.blockType === "air"
-                    ) {
-                        image(
-                            this.blockSprites["background-ladder"],
-                            gameObj.position.x,
-                            gameObj.position.y,
-                            gameObj.width,
-                            gameObj.height
-                        );
-                    } else {
-                        image(
-                            this.blockSprites["background-wall"],
-                            gameObj.position.x,
-                            gameObj.position.y,
-                            gameObj.width,
-                            gameObj.height
-                        );
-                    }
                 }
             }
         });
 
+        this.gameObjects.get("enemies").forEach((enemy) => {
+            enemy.render();
+        });
+
         this.player.render();
+
+        this.gameObjects.get("items").forEach((item) => {
+            item.render();
+        });
+
         clearForegroundAround(
             getGridIndex(this.player.position, this.level.BLOCK_SIZE),
             this.level.foregroundLayer,
@@ -293,6 +378,8 @@ class BugDug {
             this.enemySprites
         );
         this.gameObjects = this.level.getGameObjects();
+        console.log("player: ", this.player);
+        console.log("gObjs: ", this.gameObjects);
 
         this.backgroundLayer = this.level.backgroundLayer;
         this.foregroundLayer = this.level.foregroundLayer;

@@ -18,9 +18,6 @@ class LevelArchitect {
     backgroundLayer = [];
     foregroundLayer = [];
 
-    items = null;
-    enemies = [];
-
     constructor(
         screenWidth,
         screenHeight,
@@ -36,6 +33,7 @@ class LevelArchitect {
         this.skyColor = levelConfig.SKY_COLOR;
         this.backgroundLayer = [];
         this.foregroundLayer = [];
+        this.enemies = new Set();
         this.items = new Set();
 
         this.gravity = levelConfig.gravity;
@@ -170,7 +168,7 @@ class LevelArchitect {
                 blockAbove.blockType = "none";
 
                 if (j === enemyIndex) {
-                    this.enemies.push(
+                    this.enemies.add(
                         new Enemy({ ...blockAbove.position }, enemySprites)
                     );
                 }
@@ -233,19 +231,16 @@ class LevelArchitect {
     }
 
     getGameObjects() {
-        const gameObjects = new Set();
+        const gameObjects = new Map();
+        gameObjects.set("blocks", new Set());
+        const blocks = gameObjects.get("blocks");
         this.blocks.forEach((column) => {
             column.forEach((block) => {
-                gameObjects.add(block);
+                blocks.add(block);
             });
         });
-        this.enemies.forEach((enemy) => {
-            gameObjects.add(enemy);
-        });
-        this.items.forEach((item) => {
-            gameObjects.add(item);
-        });
-
+        gameObjects.set("enemies", this.enemies);
+        gameObjects.set("items", this.items);
         return gameObjects;
     }
 

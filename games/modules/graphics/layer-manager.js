@@ -44,7 +44,7 @@ export class LayerManager {
         for (let gameObjs of LayerManager.layers.values()) {
             for (let obj of gameObjs.values()) {
                 obj.update(delta);
-                if (obj.done) {
+                if (obj.remove) {
                     gameObjs.delete(obj);
                 }
             }
