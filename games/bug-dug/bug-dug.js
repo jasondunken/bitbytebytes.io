@@ -8,6 +8,7 @@ import {
     getGridIndex,
     getBlockAbove,
     calculateAABBCollision,
+    getAdjacentBlocks,
 } from "./modules/utils.js";
 
 import { KEY_CODES } from "../modules/input/keys.js";
@@ -177,57 +178,58 @@ class BugDug {
         // constrain x
         if (obj.position.x < obj.width / 2)
             obj.setPosition({ x: obj.width / 2, y: obj.position.y });
-        if (obj.position.x > terrain.width - obj.width / 2)
+        if (obj.position.x > this.width - obj.width / 2)
             obj.setPosition({
-                x: terrain.width - obj.width / 2,
+                x: this.width - obj.width / 2,
                 y: obj.position.y,
             });
         // constrain y
         if (obj.position.y < obj.height / 2)
             obj.setPosition({ x: obj.position.x, y: obj.height / 2 });
-        if (obj.position.y > terrain.height - obj.height / 2)
+        if (obj.position.y > this.level.height - obj.height / 2)
             obj.setPosition({
                 x: obj.position.x,
-                y: terrain.height - obj.height / 2,
+                y: this.level.height - obj.height / 2,
             });
 
         // check blocks around enemy
         this.blocks = getAdjacentBlocks(
             obj.position,
-            terrain.blocks,
-            terrain.BLOCK_SIZE
+            this.level.blocks,
+            this.level.BLOCK_SIZE
         );
         let block = this.blocks.above;
         if (block && block.solid) {
-            if (obj.position.y - obj.height / 2 <= block.collider.d.y) {
+            if (obj.position.y - this.level.height / 2 <= block.collider.d.y) {
                 obj.position.y = block.collider.d.y + obj.height / 2;
             }
         }
         block = this.blocks.below;
         if (block && block.solid) {
-            if (this.position.y + this.height / 2 >= block.collider.a.y) {
-                this.position.y = block.collider.a.y - this.height / 2;
-                this.grounded = true;
+            if (obj.position.y + this.level.height / 2 >= block.collider.a.y) {
+                obj.position.y = block.collider.a.y - this.level.height / 2;
+                obj.grounded = true;
             }
         }
         if (
             block &&
             !block.solid &&
-            this.position.x - (this.width / 2) * 0.8 > block.collider.a.x &&
-            this.position.x + (this.width / 2) * 0.8 < block.collider.b.x
+            obj.position.x - (this.level.width / 2) * 0.8 >
+                block.collider.a.x &&
+            obj.position.x + (this.level.width / 2) * 0.8 < block.collider.b.x
         ) {
-            this.grounded = false;
+            obj.grounded = false;
         }
         block = this.blocks.left;
         if (block && block.solid) {
-            if (this.position.x - this.width / 2 <= block.collider.b.x) {
-                this.position.x = block.collider.b.x + this.width / 2;
+            if (obj.position.x - this.level.width / 2 <= block.collider.b.x) {
+                obj.position.x = block.collider.b.x + this.level.width / 2;
             }
         }
         block = this.blocks.right;
         if (block && block.solid) {
-            if (this.position.x + this.width / 2 >= block.collider.a.x) {
-                this.position.x = block.collider.a.x - this.width / 2;
+            if (obj.position.x + this.level.width / 2 >= block.collider.a.x) {
+                obj.position.x = block.collider.a.x - this.level.width / 2;
             }
         }
     }
@@ -391,5 +393,6 @@ class BugDug {
             60,
             false
         );
+        console.log("level: ", this.level);
     }
 }

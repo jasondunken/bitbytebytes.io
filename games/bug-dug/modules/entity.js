@@ -25,7 +25,7 @@ class Entity extends GameObject {
         this.currentAnimation.update();
 
         if (!this.grounded) {
-            this.position.y += terrain.gravity;
+            this.position.y += 3; // terrain.gravity;
         }
 
         this.collider.update(this.position);
