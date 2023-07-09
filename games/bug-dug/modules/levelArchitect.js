@@ -169,7 +169,7 @@ class LevelArchitect {
 
                 if (j === enemyIndex) {
                     this.enemies.add(
-                        new Enemy({ ...blockAbove.position }, enemySprites)
+                        new Enemy(blockAbove.position.copy(), enemySprites)
                     );
                 }
                 if (j === chestIndex) {

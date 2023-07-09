@@ -1,5 +1,7 @@
 import { GameObject } from "../../modules/gameObject.js";
 import { LevelArchitect } from "./levelArchitect.js";
+import { Collider } from "../../modules/collisions/collider.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Block extends GameObject {
     solid = true;
@@ -15,7 +17,12 @@ class Block extends GameObject {
         this.height = height;
         this.blockType = blockType;
         this.sprite = sprite;
-        this.updateCollider();
+        const colliderPos = new Vec(
+            position.x + width / 2,
+            position.y + height / 2
+        );
+        this.collider = new Collider(colliderPos, this.width, this.height);
+
         if (blockType === "air" || blockType === "water") {
             this.solid = false;
         }
@@ -29,19 +36,6 @@ class Block extends GameObject {
         if (this.animation) {
             this.animation.update();
         }
-        this.updateCollider();
-    }
-
-    updateCollider() {
-        this.collider = {
-            a: { x: this.position.x, y: this.position.y },
-            b: { x: this.position.x + this.width, y: this.position.y },
-            c: {
-                x: this.position.x + this.width,
-                y: this.position.y + this.height,
-            },
-            d: { x: this.position.x, y: this.position.y + this.height },
-        };
     }
 
     takeDamage(dmg) {
@@ -69,9 +63,11 @@ class Block extends GameObject {
                     this.width,
                     this.height
                 );
+                this.collider.render("magenta");
             } else {
                 fill(LevelArchitect.getColor(this.blockType));
                 rect(this.position.x, this.position.y, this.width, this.height);
+                this.collider.render();
             }
         }
     }

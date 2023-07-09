@@ -103,7 +103,7 @@ class BugDug {
         this.enemySprites = enemySprites;
         this.font = font;
 
-        this.lastTime = 0;
+        this.lastTime = Date.now();
         this.dt = 0;
 
         this.demo = true;
@@ -136,100 +136,88 @@ class BugDug {
         const nowTime = Date.now();
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
-        // update entity positions
+
+        this.player.update(this.dt);
+        this.constrainPosition(this.player);
+
         for (let gameObjs of this.gameObjects.values()) {
             for (let obj of gameObjs.values()) {
                 obj.update(this.dt);
                 // check entity/terrain collisions
-                this.validatePosition(obj);
+                if (obj.type == "enemy") {
+                    this.constrainPosition(obj);
+                    // check player/enemy collisions
+                }
+                if (obj.type === "block") {
+                    if (obj.destroyed) {
+                        clearForegroundAround(
+                            getGridIndex(obj.position, this.level.BLOCK_SIZE),
+                            this.level.foregroundLayer
+                        );
+                    }
+                }
+                if (obj.type === "coin") {
+                    if (calculateAABBCollision(obj, this.player)) {
+                        this.gameObjects.get("items").delete(obj);
+                        this.collectCoin();
+                    }
+                }
+                // check player/item collisions
                 if (obj.remove) {
                     gameObjs.delete(obj);
                 }
             }
         }
-        this.player.update(this.dt);
-
-        // check player/enemy collisions
-
-        // check player/item collisions
-
-        this.gameObjects.forEach((gameObj) => {
-            if (gameObj.type === "block") {
-                gameObj.update();
-                if (gameObj.destroyed) {
-                    clearForegroundAround(
-                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
-                        this.foregroundLayer
-                    );
-                }
-            }
-            if (gameObj.type === "enemy") gameObj.update(this.level);
-            if (gameObj.type === "coin") {
-                if (calculateAABBCollision(gameObj, this.player)) {
-                    this.gameObjects.delete(gameObj);
-                    gameObj.collected = true;
-                    this.collectCoin();
-                }
-            }
-        });
     }
 
-    validatePosition(obj) {
+    constrainPosition(obj) {
+        const { x, y } = obj.position;
         // constrain x
-        if (obj.position.x < obj.width / 2)
-            obj.setPosition({ x: obj.width / 2, y: obj.position.y });
-        if (obj.position.x > this.width - obj.width / 2)
-            obj.setPosition({
-                x: this.width - obj.width / 2,
-                y: obj.position.y,
-            });
+        if (x < obj.width / 2) obj.position.x = obj.width / 2;
+        if (x > this.width - obj.width / 2)
+            obj.position.x = this.width - obj.width / 2;
         // constrain y
-        if (obj.position.y < obj.height / 2)
-            obj.setPosition({ x: obj.position.x, y: obj.height / 2 });
-        if (obj.position.y > this.level.height - obj.height / 2)
-            obj.setPosition({
-                x: obj.position.x,
-                y: this.level.height - obj.height / 2,
-            });
+        if (y < obj.height / 2) obj.position.y = obj.height / 2;
+        if (y > this.level.height - obj.height / 2)
+            obj.position.y = this.level.height - obj.height / 2;
 
         // check blocks around enemy
-        this.blocks = getAdjacentBlocks(
+        const blocks = getAdjacentBlocks(
             obj.position,
             this.level.blocks,
             this.level.BLOCK_SIZE
         );
-        let block = this.blocks.above;
+        let block = blocks.above;
         if (block && block.solid) {
-            if (obj.position.y - this.level.height / 2 <= block.collider.d.y) {
+            if (y - obj.height / 2 <= block.collider.d.y) {
                 obj.position.y = block.collider.d.y + obj.height / 2;
             }
         }
-        block = this.blocks.below;
+        block = blocks.below;
         if (block && block.solid) {
-            if (obj.position.y + this.level.height / 2 >= block.collider.a.y) {
-                obj.position.y = block.collider.a.y - this.level.height / 2;
+            if (y + obj.height / 2 >= block.collider.a.y) {
+                obj.position.y = block.collider.a.y - obj.height / 2;
                 obj.grounded = true;
             }
         }
         if (
             block &&
             !block.solid &&
-            obj.position.x - (this.level.width / 2) * 0.8 >
-                block.collider.a.x &&
-            obj.position.x + (this.level.width / 2) * 0.8 < block.collider.b.x
+            x - (obj.width / 2) * 0.8 > block.collider.a.x &&
+            x + (obj.width / 2) * 0.8 < block.collider.b.x
         ) {
             obj.grounded = false;
         }
-        block = this.blocks.left;
+        block = blocks.left;
         if (block && block.solid) {
-            if (obj.position.x - this.level.width / 2 <= block.collider.b.x) {
-                obj.position.x = block.collider.b.x + this.level.width / 2;
+            if (x - obj.width / 2 <= block.collider.b.x) {
+                obj.position.x = block.collider.b.x + obj.width / 2;
             }
         }
-        block = this.blocks.right;
+        block = blocks.right;
         if (block && block.solid) {
-            if (obj.position.x + this.level.width / 2 >= block.collider.a.x) {
-                obj.position.x = block.collider.a.x - this.level.width / 2;
+            if (x + obj.width / 2 >= block.collider.a.x) {
+                obj.position.x = block.collider.a.x - obj.width / 2;
             }
         }
     }

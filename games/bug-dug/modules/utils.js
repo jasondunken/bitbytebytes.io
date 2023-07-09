@@ -23,28 +23,40 @@ function getAdjacentBlocks(position, blocks, blockSize) {
 }
 
 function getBlockBelow(index, blocks) {
-    if (index + 1 > blocks[index.x].length - 1) {
+    if (index.x < 0 || index.x >= blocks.length) {
+        return null;
+    }
+    if (index.y < 0 || index.y >= blocks[index.x].length - 1) {
         return null;
     }
     return blocks[index.x][index.y + 1];
 }
 
 function getBlockAbove(index, blocks) {
-    if (index.y < 1) {
+    if (index.x < 0 || index.x >= blocks.length) {
         return null;
     }
-    return blocks[index.x][index.y - 1];
+    if (index.y < 1 || index.y >= blocks[index.x].length) {
+        return null;
+    }
+    return blocks[index.x][index.y + 1];
 }
 
 function getBlockLeft(index, blocks) {
-    if (index.x < 1) {
+    if (index.x < 1 || index.x >= blocks.length) {
+        return null;
+    }
+    if (index.y < 0 || index.y >= blocks[index.x].length) {
         return null;
     }
     return blocks[index.x - 1][index.y];
 }
 
 function getBlockRight(index, blocks) {
-    if (index.x + 1 > blocks.length - 1) {
+    if (index.x < 0 || index.x >= blocks.length - 1) {
+        return null;
+    }
+    if (index.y < 0 || index.y >= blocks[index.x].length) {
         return null;
     }
     return blocks[index.x + 1][index.y];

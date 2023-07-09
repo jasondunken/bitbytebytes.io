@@ -13,26 +13,38 @@ export class Collider {
     }
 
     update(position) {
-        this.position = position;
+        this.position.set(position);
         this.updateBounds();
     }
 
     updateBounds() {
         this.a.set(
-            this.position.x - this.size / 2,
-            this.position.y - this.size / 2
+            this.position.x - this.width / 2,
+            this.position.y - this.height / 2
         );
         this.b.set(
-            this.position.x + this.size / 2,
-            this.position.y - this.size / 2
+            this.position.x + this.width / 2,
+            this.position.y - this.height / 2
         );
         this.c.set(
-            this.position.x + this.size / 2,
-            this.position.y + this.size / 2
+            this.position.x + this.width / 2,
+            this.position.y + this.height / 2
         );
         this.d.set(
-            this.position.x - this.size / 2,
-            this.position.y + this.size / 2
+            this.position.x - this.width / 2,
+            this.position.y + this.height / 2
         );
+    }
+
+    render(color) {
+        color = color || "red";
+        fill("magenta");
+        stroke(color);
+        strokeWeight(1);
+        noFill();
+        line(this.a.x, this.a.y, this.b.x, this.b.y);
+        line(this.b.x, this.b.y, this.c.x, this.c.y);
+        line(this.c.x, this.c.y, this.d.x, this.d.y);
+        line(this.d.x, this.d.y, this.a.x, this.a.y);
     }
 }

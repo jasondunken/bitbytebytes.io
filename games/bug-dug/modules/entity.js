@@ -1,4 +1,3 @@
-import { getAdjacentBlocks } from "./utils.js";
 import { Collider } from "../../modules/collisions/collider.js";
 import { GameObject } from "../../modules/gameObject.js";
 
@@ -17,7 +16,7 @@ class Entity extends GameObject {
 
     constructor(type, position) {
         super(type, position);
-        this.collider = new Collider(position, this.width, this.height);
+        this.collider = new Collider(this.position, this.width, this.height);
     }
 
     update(dt) {
@@ -25,7 +24,7 @@ class Entity extends GameObject {
         this.currentAnimation.update();
 
         if (!this.grounded) {
-            this.position.y += 3; // terrain.gravity;
+            this.position.y = this.position.y + 3; // terrain.gravity;
         }
 
         this.collider.update(this.position);
@@ -48,6 +47,7 @@ class Entity extends GameObject {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
         }
+        this.collider.render("blue");
         if (this.particleEmitter) {
             this.particleEmitter.render();
         }

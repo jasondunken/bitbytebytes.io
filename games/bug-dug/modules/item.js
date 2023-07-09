@@ -1,5 +1,6 @@
 import { GameObject } from "../../modules/gameObject.js";
 import { Animation } from "../../modules/graphics/animation.js";
+import { Collider } from "../../modules/collisions/collider.js";
 
 import { Vec } from "../../modules/math/vec.js";
 
@@ -9,6 +10,7 @@ class Item extends GameObject {
     itemType = "";
     constructor(position, spriteSheet, itemType) {
         super("item", position);
+        this.collider = new Collider(position, this.width, this.height);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
         this.itemType = itemType;
@@ -25,6 +27,7 @@ class Item extends GameObject {
                 Item.SIZE
             );
         }
+        this.collider.render("orange");
     }
 }
 
@@ -33,6 +36,11 @@ class Chest extends GameObject {
     opened = false;
     constructor(position, sprite, contents) {
         super("chest", position);
+        const colliderPos = new Vec(
+            position.x + Coin.SIZE / 2,
+            position.y + Coin.SIZE / 2
+        );
+        this.collider = new Collider(colliderPos, Coin.SIZE, Coin.SIZE);
         this.sprite = sprite;
         this.contents = contents;
     }
@@ -54,6 +62,7 @@ class Chest extends GameObject {
                 Chest.SIZE
             );
         }
+        this.collider.render("green");
     }
 }
 
@@ -69,30 +78,13 @@ class Coin extends GameObject {
     };
     constructor(position, spriteSheet) {
         super("coin", position);
+        const colliderPos = new Vec(
+            position.x + Coin.SIZE / 2,
+            position.y + Coin.SIZE / 2
+        );
+        this.collider = new Collider(colliderPos, Coin.SIZE, Coin.SIZE);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
-        this.updateCollider();
-    }
-
-    updateCollider() {
-        this.collider = {
-            a: {
-                x: this.position.x - Coin.SIZE / 2,
-                y: this.position.y - Coin.SIZE / 2,
-            },
-            b: {
-                x: this.position.x + Coin.SIZE / 2,
-                y: this.position.y - Coin.SIZE / 2,
-            },
-            c: {
-                x: this.position.x + Coin.SIZE / 2,
-                y: this.position.y + Coin.SIZE / 2,
-            },
-            d: {
-                x: this.position.x - Coin.SIZE / 2,
-                y: this.position.y + Coin.SIZE / 2,
-            },
-        };
     }
 
     render() {
@@ -102,10 +94,11 @@ class Coin extends GameObject {
                 this.animation.currentFrame,
                 this.position.x,
                 this.position.y,
-                Item.SIZE,
-                Item.SIZE
+                Coin.SIZE,
+                Coin.SIZE
             );
         }
+        this.collider.render("orange");
     }
 }
 
