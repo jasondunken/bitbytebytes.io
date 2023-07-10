@@ -27,7 +27,9 @@ class ParticleEmitter extends GameObject {
         this.spawnParticles(numParticles);
     }
 
-    update() {}
+    update(position) {
+        this.position = position;
+    }
 
     setPosition(position) {
         this.position.set(position);

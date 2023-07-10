@@ -39,7 +39,7 @@ function getBlockAbove(index, blocks) {
     if (index.y < 1 || index.y >= blocks[index.x].length) {
         return null;
     }
-    return blocks[index.x][index.y + 1];
+    return blocks[index.x][index.y - 1];
 }
 
 function getBlockLeft(index, blocks) {

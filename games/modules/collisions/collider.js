@@ -36,11 +36,12 @@ export class Collider {
         );
     }
 
-    render(color) {
+    render(color, strokeW) {
         color = color || "red";
+        strokeW = strokeW || 1;
         fill("magenta");
         stroke(color);
-        strokeWeight(1);
+        strokeWeight(strokeW);
         noFill();
         line(this.a.x, this.a.y, this.b.x, this.b.y);
         line(this.b.x, this.b.y, this.c.x, this.c.y);

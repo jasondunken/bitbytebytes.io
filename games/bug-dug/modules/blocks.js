@@ -63,12 +63,25 @@ class Block extends GameObject {
                     this.width,
                     this.height
                 );
-                this.collider.render("magenta");
             } else {
+                noStroke();
                 fill(LevelArchitect.getColor(this.blockType));
                 rect(this.position.x, this.position.y, this.width, this.height);
-                this.collider.render();
             }
+        }
+    }
+
+    renderDebug() {
+        if (this.sprite) {
+            if (this.blockType) {
+                this.collider.render("magenta", 3);
+            }
+            textSize(10);
+            noStroke();
+            fill("white");
+            text(`${this.blockType}`, this.position.x, this.position.y + 12);
+        } else {
+            this.collider.render("green", 1);
         }
     }
 }

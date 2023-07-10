@@ -27,6 +27,9 @@ class Item extends GameObject {
                 Item.SIZE
             );
         }
+    }
+
+    renderDebug() {
         this.collider.render("orange");
     }
 }
@@ -62,7 +65,10 @@ class Chest extends GameObject {
                 Chest.SIZE
             );
         }
-        this.collider.render("green");
+    }
+
+    renderDebug() {
+        this.collider.render("green", 2);
     }
 }
 
@@ -98,7 +104,10 @@ class Coin extends GameObject {
                 Coin.SIZE
             );
         }
-        this.collider.render("orange");
+    }
+
+    renderDebug() {
+        this.collider.render("orange", 2);
     }
 }
 

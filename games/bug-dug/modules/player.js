@@ -31,12 +31,12 @@ class Player extends Entity {
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
             mining: new Animation(spriteSheets["mining"], 60, true),
         };
-        this.particleEmitter = new ParticleEmitter(
-            new Vec(this.position.x, this.position.y),
-            10,
-            10,
-            ParticleEmitter.RadialBurst
-        );
+        // this.particleEmitter = new ParticleEmitter(
+        //     new Vec(this.position.x, this.position.y),
+        //     10,
+        //     10,
+        //     ParticleEmitter.RadialBurst
+        // );
     }
 
     getInput(terrain) {

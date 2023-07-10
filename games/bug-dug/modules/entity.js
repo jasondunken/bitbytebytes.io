@@ -29,7 +29,7 @@ class Entity extends GameObject {
 
         this.collider.update(this.position);
         if (this.particleEmitter) {
-            this.particleEmitter.update();
+            this.particleEmitter.update(this.position);
         }
     }
 
@@ -47,10 +47,13 @@ class Entity extends GameObject {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
         }
-        this.collider.render("blue");
         if (this.particleEmitter) {
             this.particleEmitter.render();
         }
+    }
+
+    renderDebug() {
+        this.collider.render("blue", 5);
     }
 }
 

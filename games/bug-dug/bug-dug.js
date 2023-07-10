@@ -88,6 +88,8 @@ class BugDug {
 
     gameObjects = null;
 
+    DEBUG = false;
+
     constructor(
         width,
         height,
@@ -246,6 +248,9 @@ class BugDug {
 
         this.gameObjects.get("blocks").forEach((block) => {
             block.render();
+            if (this.DEBUG) {
+                block.renderDebug();
+            }
             if (!block.destroyed && block.health < block.MAX_HEALTH) {
                 let damageSpriteIndex = Math.floor(
                     map(
@@ -291,12 +296,21 @@ class BugDug {
 
         this.gameObjects.get("enemies").forEach((enemy) => {
             enemy.render();
+            if (this.DEBUG) {
+                enemy.renderDebug();
+            }
         });
 
         this.player.render();
+        if (this.DEBUG) {
+            this.player.renderDebug();
+        }
 
         this.gameObjects.get("items").forEach((item) => {
             item.render();
+            if (this.DEBUG) {
+                item.renderDebug();
+            }
         });
 
         clearForegroundAround(
@@ -325,7 +339,6 @@ class BugDug {
         strokeWeight(8);
         fill("gray");
         rect(10, 10, this.width - 20, 96);
-        // p5 text font
         textFont(this.font);
         fill("blue");
         noStroke();
@@ -368,8 +381,6 @@ class BugDug {
             this.enemySprites
         );
         this.gameObjects = this.level.getGameObjects();
-        console.log("player: ", this.player);
-        console.log("gObjs: ", this.gameObjects);
 
         this.backgroundLayer = this.level.backgroundLayer;
         this.foregroundLayer = this.level.foregroundLayer;
@@ -381,6 +392,8 @@ class BugDug {
             60,
             false
         );
-        console.log("level: ", this.level);
+
+        console.log("player: ", this.player);
+        console.log("gObjs: ", this.gameObjects);
     }
 }
