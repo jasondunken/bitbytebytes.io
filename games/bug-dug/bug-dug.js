@@ -115,13 +115,13 @@ class BugDug {
 
     startDemo() {
         this.demo = true;
-        this.player = new DemoPlayer(this.playerSprites);
+        this.player = new DemoPlayer(this, this.playerSprites);
         this.startGame();
     }
 
     start1Player() {
         this.demo = false;
-        this.player = new Player(this.playerSprites);
+        this.player = new Player(this, this.playerSprites);
         this.startGame();
     }
 

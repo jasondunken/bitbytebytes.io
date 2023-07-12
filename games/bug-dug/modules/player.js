@@ -22,8 +22,9 @@ class Player extends Entity {
 
     hasKey = true;
 
-    constructor(spriteSheets) {
+    constructor(world, spriteSheets) {
         super("player");
+        this.world = world;
         this.state = Player.STATE.IDLE;
         this.animations = {
             idle: new Animation(spriteSheets["idle"], 240, true),
@@ -39,17 +40,10 @@ class Player extends Entity {
         // );
     }
 
-    getInput(terrain) {
+    getInput() {
         if (this.mining) this.mining--;
-        if (
-            getBlockAtPosition(
-                this.position,
-                terrain.blocks,
-                terrain.BLOCK_SIZE
-            ).destroyed
-        ) {
-            if (keyIsDown(87)) this.climbUp();
-        }
+
+        if (keyIsDown(87)) this.climbUp();
         if (keyIsDown(83)) this.climbDown();
         if (keyIsDown(65)) this.moveLeft();
         if (keyIsDown(68)) this.moveRight();
@@ -148,8 +142,8 @@ class Player extends Entity {
 }
 
 class DemoPlayer extends Player {
-    constructor(spriteSheets) {
-        super(spriteSheets);
+    constructor(world, spriteSheets) {
+        super(world, spriteSheets);
     }
 }
 
