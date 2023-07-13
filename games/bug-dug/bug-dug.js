@@ -139,6 +139,7 @@ class BugDug {
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
 
+        this.player.getInput();
         this.player.update(this.dt);
         this.constrainPosition(this.player);
 
@@ -183,12 +184,8 @@ class BugDug {
         if (y > this.level.height - obj.height / 2)
             obj.position.y = this.level.height - obj.height / 2;
 
-        // check blocks around enemy
-        const blocks = getAdjacentBlocks(
-            obj.position,
-            this.level.blocks,
-            this.level.BLOCK_SIZE
-        );
+        // check for block collisions
+        const blocks = this.getBlocks(obj.position);
         let block = blocks.above;
         if (block && block.solid) {
             if (y - obj.height / 2 <= block.collider.d.y) {
@@ -205,8 +202,8 @@ class BugDug {
         if (
             block &&
             !block.solid &&
-            x - (obj.width / 2) * 0.8 > block.collider.a.x &&
-            x + (obj.width / 2) * 0.8 < block.collider.b.x
+            x - obj.width / 2 > block.collider.a.x &&
+            x + obj.width / 2 < block.collider.b.x
         ) {
             obj.grounded = false;
         }
@@ -222,6 +219,14 @@ class BugDug {
                 obj.position.x = block.collider.a.x - obj.width / 2;
             }
         }
+    }
+
+    getBlocks(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.BLOCK_SIZE
+        );
     }
 
     collectCoin() {
@@ -393,7 +398,7 @@ class BugDug {
             false
         );
 
-        console.log("player: ", this.player);
-        console.log("gObjs: ", this.gameObjects);
+        // console.log("player: ", this.player);
+        // console.log("gObjs: ", this.gameObjects);
     }
 }

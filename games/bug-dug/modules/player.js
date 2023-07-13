@@ -82,22 +82,23 @@ class Player extends Entity {
         this.state = Player.STATE.WALKING.RIGHT;
     }
     dig(direction) {
+        const blocks = this.world.getBlocks(this.position);
         if (!this.mining) {
             this.mining = this.MINING_TIME;
             this.state = Player.STATE.MINING;
             let block = null;
             switch (direction) {
                 case "up":
-                    block = this.blocks.above;
+                    block = blocks.above;
                     break;
                 case "down":
-                    block = this.blocks.below;
+                    block = blocks.below;
                     break;
                 case "left":
-                    block = this.blocks.left;
+                    block = blocks.left;
                     break;
                 case "right":
-                    block = this.blocks.right;
+                    block = blocks.right;
                     break;
             }
             if (block) {
