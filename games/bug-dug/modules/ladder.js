@@ -1,4 +1,3 @@
-import { rejects } from "assert";
 import { GameObject } from "../../modules/gameObject.js";
 
 class Ladder extends GameObject {
