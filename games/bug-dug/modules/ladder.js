@@ -8,7 +8,7 @@ class Ladder extends GameObject {
 
     render() {
         if (this.sprite) {
-            Image(this.sprite, this.position.x, this.position.y, 32, 32);
+            image(this.sprite, this.position.x, this.position.y, 32, 32);
         } else {
             noStroke();
             fill("magenta");

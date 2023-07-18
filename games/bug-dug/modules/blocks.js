@@ -48,7 +48,6 @@ class Block extends GameObject {
             this.health -= dmg;
             if (this.health <= 0) {
                 this.destroyed = true;
-                this.solid = false;
             }
         }
     }

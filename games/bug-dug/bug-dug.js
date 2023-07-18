@@ -1,5 +1,6 @@
 import { Player, DemoPlayer } from "./modules/player.js";
 import { Enemy } from "./modules/enemies.js";
+import { Ladder } from "./modules/ladder.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
 import { Animation } from "../modules/graphics/animation.js";
@@ -80,7 +81,7 @@ class BugDug {
     level = null;
     backgroundLayer = null;
     foregroundLayer = null;
-    mineBlockAnimation = null;
+    blockDamageSprites = null;
 
     player = null;
     currentLevel = 0;
@@ -157,6 +158,10 @@ class BugDug {
                             getGridIndex(obj.position, this.level.BLOCK_SIZE),
                             this.level.foregroundLayer
                         );
+                        this.seeIfLadder(obj.position.copy());
+                        gameObjs.delete(obj);
+                        console.log("objs: ", this.gameObjects);
+                        continue;
                     }
                 }
                 if (obj.type === "coin") {
@@ -202,8 +207,8 @@ class BugDug {
         if (
             block &&
             !block.solid &&
-            x - obj.width / 2 > block.collider.a.x &&
-            x + obj.width / 2 < block.collider.b.x
+            x - obj.width / 2 >= block.collider.a.x &&
+            x + obj.width / 2 <= block.collider.b.x
         ) {
             obj.grounded = false;
         }
@@ -221,6 +226,17 @@ class BugDug {
         }
     }
 
+    seeIfLadder(position) {
+        const blocks = this.getBlocks(position);
+        if (blocks.above.blockType === "air") {
+            this.gameObjects
+                .get("blocks")
+                .add(
+                    new Ladder(position, this.blockSprites["background-ladder"])
+                );
+        }
+    }
+
     getBlocks(position) {
         return getAdjacentBlocks(
             position,
@@ -228,6 +244,8 @@ class BugDug {
             this.level.BLOCK_SIZE
         );
     }
+
+    mineBlock(blockIndex) {}
 
     collectCoin() {
         this.score += 100;
@@ -253,49 +271,26 @@ class BugDug {
 
         this.gameObjects.get("blocks").forEach((block) => {
             block.render();
-            if (this.DEBUG) {
-                block.renderDebug();
-            }
-            if (!block.destroyed && block.health < block.MAX_HEALTH) {
+            if (block.health < block.MAX_HEALTH) {
                 let damageSpriteIndex = Math.floor(
                     map(
                         block.health,
                         0,
                         block.MAX_HEALTH,
-                        this.mineBlockAnimation.keyFrames.length - 1,
+                        this.blockDamageSprites.keyFrames.length - 1,
                         0
                     )
                 );
                 image(
-                    this.mineBlockAnimation.keyFrames[damageSpriteIndex],
+                    this.blockDamageSprites.keyFrames[damageSpriteIndex],
                     block.position.x,
                     block.position.y,
                     block.width,
                     block.height
                 );
             }
-            if (block.destroyed) {
-                const blockAbove = getBlockAbove(
-                    getGridIndex(block.position, this.level.BLOCK_SIZE),
-                    this.level.blocks
-                );
-                if (blockAbove.destroyed || blockAbove.blockType === "air") {
-                    image(
-                        this.blockSprites["background-ladder"],
-                        block.position.x,
-                        block.position.y,
-                        block.width,
-                        block.height
-                    );
-                } else {
-                    image(
-                        this.blockSprites["background-wall"],
-                        block.position.x,
-                        block.position.y,
-                        block.width,
-                        block.height
-                    );
-                }
+            if (this.DEBUG) {
+                block.renderDebug();
             }
         });
 
@@ -325,19 +320,19 @@ class BugDug {
         );
 
         // draw foreground
-        // for (let i = 0; i < this.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-        //         if (this.foregroundLayer[i][j] !== "none") {
-        //             image(
-        //                 this.foregroundLayer[i][j],
-        //                 i * this.level.BLOCK_SIZE,
-        //                 j * this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE
-        //             );
-        //         }
-        //     }
-        // }
+        for (let i = 0; i < this.foregroundLayer.length; i++) {
+            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
+                if (this.foregroundLayer[i][j] !== "none") {
+                    image(
+                        this.foregroundLayer[i][j],
+                        i * this.level.BLOCK_SIZE,
+                        j * this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE,
+                        this.level.BLOCK_SIZE
+                    );
+                }
+            }
+        }
 
         //draw UI
         stroke("brown");
@@ -392,7 +387,7 @@ class BugDug {
 
         this.player.setPosition(this.level.playerSpawn);
 
-        this.mineBlockAnimation = new Animation(
+        this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
             60,
             false

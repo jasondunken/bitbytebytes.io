@@ -10,8 +10,6 @@ class Entity extends GameObject {
     state;
     animations;
     currentAnimation = null;
-    walkDirection = "right";
-
     particleEmitter = null;
 
     constructor(type, position) {
