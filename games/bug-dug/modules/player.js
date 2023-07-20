@@ -2,7 +2,6 @@ import { Entity } from "./entity.js";
 import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
-import { getBlockAtPosition } from "./utils.js";
 
 class Player extends Entity {
     static STATE = Object.freeze({
@@ -66,12 +65,18 @@ class Player extends Entity {
     }
 
     climbUp() {
-        this.position.y -= 4;
-        this.grounded = false;
+        const block = this.world.getBlock(this.position);
+        if (block.type === "ladder") {
+            this.position.y -= 4;
+            this.grounded = false;
+        }
     }
     climbDown() {
-        this.position.y += 2;
-        this.grounded = false;
+        const block = this.world.getBlockBelow(this.position);
+        if (block.type === "ladder") {
+            this.position.y += 2;
+            this.grounded = false;
+        }
     }
     moveLeft() {
         this.position.x -= this.speed;

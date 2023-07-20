@@ -12,6 +12,11 @@ function getBlockAtPosition(position, blocks, blockSize) {
     return blocks[index.x][index.y];
 }
 
+function getBlockBelowPosition(position, blocks, blockSize) {
+    const index = getGridIndex(position, blockSize);
+    return getBlockBelow(index, blocks);
+}
+
 function getAdjacentBlocks(position, blocks, blockSize) {
     const index = getGridIndex(position, blockSize);
     return {
@@ -122,6 +127,7 @@ function calculateAABBCollision(obj1, obj2) {
 export {
     getGridIndex,
     getBlockAtPosition,
+    getBlockBelowPosition,
     getAdjacentBlocks,
     getBlockAbove,
     clearForegroundAround,

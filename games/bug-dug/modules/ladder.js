@@ -1,9 +1,11 @@
 import { GameObject } from "../../modules/gameObject.js";
+import { Collider } from "../../modules/collisions/collider.js";
 
 class Ladder extends GameObject {
     constructor(position, sprite) {
         super("ladder", position);
         this.sprite = sprite;
+        this.collider = new Collider(position, 32, 32);
     }
 
     render() {

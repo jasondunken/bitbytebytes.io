@@ -10,6 +10,8 @@ import {
     getBlockAbove,
     calculateAABBCollision,
     getAdjacentBlocks,
+    getBlockAtPosition,
+    getBlockBelowPosition,
 } from "./modules/utils.js";
 
 import { KEY_CODES } from "../modules/input/keys.js";
@@ -229,16 +231,34 @@ class BugDug {
     seeIfLadder(position) {
         const blocks = this.getBlocks(position);
         if (blocks.above.blockType === "air") {
-            this.gameObjects
-                .get("blocks")
-                .add(
-                    new Ladder(position, this.blockSprites["background-ladder"])
-                );
+            const ladder = new Ladder(
+                position,
+                this.blockSprites["background-ladder"]
+            );
+            this.gameObjects.get("blocks").add(ladder);
+            const idx = getGridIndex(position, this.level.BLOCK_SIZE);
+            this.level.blocks[idx.x][idx.y] = ladder;
         }
     }
 
     getBlocks(position) {
         return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.BLOCK_SIZE
+        );
+    }
+
+    getBlock(position) {
+        return getBlockAtPosition(
+            position,
+            this.level.blocks,
+            this.level.BLOCK_SIZE
+        );
+    }
+
+    getBlockBelow(position) {
+        return getBlockBelowPosition(
             position,
             this.level.blocks,
             this.level.BLOCK_SIZE
@@ -395,5 +415,6 @@ class BugDug {
 
         // console.log("player: ", this.player);
         // console.log("gObjs: ", this.gameObjects);
+        console.log("level: ", this.level);
     }
 }
