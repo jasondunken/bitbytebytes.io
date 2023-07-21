@@ -67,6 +67,7 @@ class Player extends Entity {
     climbUp() {
         const block = this.world.getBlock(this.position);
         if (block.type === "ladder") {
+            this.onLadder = true;
             this.position.y -= 4;
             this.grounded = false;
         }
@@ -74,6 +75,7 @@ class Player extends Entity {
     climbDown() {
         const block = this.world.getBlockBelow(this.position);
         if (block.type === "ladder") {
+            this.onLadder = true;
             this.position.y += 2;
             this.grounded = false;
         }

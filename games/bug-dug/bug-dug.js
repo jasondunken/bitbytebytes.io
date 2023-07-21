@@ -289,30 +289,58 @@ class BugDug {
             }
         }
 
-        this.gameObjects.get("blocks").forEach((block) => {
-            block.render();
-            if (block.health < block.MAX_HEALTH) {
-                let damageSpriteIndex = Math.floor(
-                    map(
-                        block.health,
-                        0,
-                        block.MAX_HEALTH,
-                        this.blockDamageSprites.keyFrames.length - 1,
-                        0
-                    )
-                );
-                image(
-                    this.blockDamageSprites.keyFrames[damageSpriteIndex],
-                    block.position.x,
-                    block.position.y,
-                    block.width,
-                    block.height
-                );
+        for (let i = 0; i < this.level.blocks.length; i++) {
+            for (let j = 0; j < this.level.blocks[i].length; j++) {
+                const block = this.level.blocks[i][j];
+                block.render();
+                if (block.health < block.MAX_HEALTH) {
+                    let damageSpriteIndex = Math.floor(
+                        map(
+                            block.health,
+                            0,
+                            block.MAX_HEALTH,
+                            this.blockDamageSprites.keyFrames.length - 1,
+                            0
+                        )
+                    );
+                    image(
+                        this.blockDamageSprites.keyFrames[damageSpriteIndex],
+                        block.position.x,
+                        block.position.y,
+                        block.width,
+                        block.height
+                    );
+                }
+                if (this.DEBUG) {
+                    block.renderDebug();
+                }
             }
-            if (this.DEBUG) {
-                block.renderDebug();
-            }
-        });
+        }
+
+        // this.gameObjects.get("blocks").forEach((block) => {
+        //     block.render();
+        //     if (block.health < block.MAX_HEALTH) {
+        //         let damageSpriteIndex = Math.floor(
+        //             map(
+        //                 block.health,
+        //                 0,
+        //                 block.MAX_HEALTH,
+        //                 this.blockDamageSprites.keyFrames.length - 1,
+        //                 0
+        //             )
+        //         );
+        //         image(
+        //             this.blockDamageSprites.keyFrames[damageSpriteIndex],
+        //             block.position.x,
+        //             block.position.y,
+        //             block.width,
+        //             block.height
+        //         );
+        //     }
+        //     if (this.DEBUG) {
+        //         block.renderDebug();
+        //     }
+        // });
 
         this.gameObjects.get("enemies").forEach((enemy) => {
             enemy.render();
