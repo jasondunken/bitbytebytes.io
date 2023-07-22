@@ -81,8 +81,6 @@ class BugDug {
     lives = 0;
 
     level = null;
-    backgroundLayer = null;
-    foregroundLayer = null;
     blockDamageSprites = null;
 
     player = null;
@@ -146,35 +144,44 @@ class BugDug {
         this.player.update(this.dt);
         this.constrainPosition(this.player);
 
-        for (let gameObjs of this.gameObjects.values()) {
-            for (let obj of gameObjs.values()) {
-                obj.update(this.dt);
-                // check entity/terrain collisions
-                if (obj.type == "enemy") {
-                    this.constrainPosition(obj);
-                    // check player/enemy collisions
+        clearForegroundAround(
+            getGridIndex(this.player.position, this.level.BLOCK_SIZE),
+            this.level.foregroundLayer,
+            1.75
+        );
+
+        this.level.enemies.forEach((enemy) => {
+            enemy.update(this.dt);
+            this.constrainPosition(enemy);
+        });
+
+        this.level.items.forEach((item) => {
+            item.update(this.dt);
+            if (item.type === "coin") {
+                if (calculateAABBCollision(item, this.player)) {
+                    this.level.items.delete(item);
+                    this.collectCoin();
                 }
-                if (obj.type === "block") {
-                    if (obj.destroyed) {
-                        clearForegroundAround(
-                            getGridIndex(obj.position, this.level.BLOCK_SIZE),
-                            this.level.foregroundLayer
+            }
+        });
+
+        for (let i = 0; i < this.level.blocks.length; i++) {
+            for (let j = 0; j < this.level.blocks[i].length; j++) {
+                const block = this.level.blocks[i][j];
+                block.update(this.dt);
+                if (block.destroyed) {
+                    clearForegroundAround(
+                        getGridIndex(block.position, this.level.BLOCK_SIZE),
+                        this.level.foregroundLayer
+                    );
+                    const blocks = this.getBlocks(block.position);
+                    if (blocks.above.blockType === "air") {
+                        this.level.blocks[i][j] = new Ladder(
+                            position,
+                            this.blockSprites["background-ladder"]
                         );
-                        this.seeIfLadder(obj.position.copy());
-                        gameObjs.delete(obj);
-                        console.log("objs: ", this.gameObjects);
-                        continue;
                     }
-                }
-                if (obj.type === "coin") {
-                    if (calculateAABBCollision(obj, this.player)) {
-                        this.gameObjects.get("items").delete(obj);
-                        this.collectCoin();
-                    }
-                }
-                // check player/item collisions
-                if (obj.remove) {
-                    gameObjs.delete(obj);
+                    console.log("objs: ", this.gameObjects);
                 }
             }
         }
@@ -235,7 +242,6 @@ class BugDug {
                 position,
                 this.blockSprites["background-ladder"]
             );
-            this.gameObjects.get("blocks").add(ladder);
             const idx = getGridIndex(position, this.level.BLOCK_SIZE);
             this.level.blocks[idx.x][idx.y] = ladder;
         }
@@ -275,11 +281,11 @@ class BugDug {
         background(color(this.level.skyColor));
         noStroke();
         // draw background
-        for (let i = 0; i < this.backgroundLayer.length; i++) {
-            for (let j = 0; j < this.backgroundLayer[i].length; j++) {
-                if (this.backgroundLayer[i][j] !== "none") {
+        for (let i = 0; i < this.level.backgroundLayer.length; i++) {
+            for (let j = 0; j < this.level.backgroundLayer[i].length; j++) {
+                if (this.level.backgroundLayer[i][j] !== "none") {
                     image(
-                        this.backgroundLayer[i][j],
+                        this.level.backgroundLayer[i][j],
                         i * this.level.BLOCK_SIZE,
                         j * this.level.BLOCK_SIZE,
                         this.level.BLOCK_SIZE,
@@ -317,32 +323,7 @@ class BugDug {
             }
         }
 
-        // this.gameObjects.get("blocks").forEach((block) => {
-        //     block.render();
-        //     if (block.health < block.MAX_HEALTH) {
-        //         let damageSpriteIndex = Math.floor(
-        //             map(
-        //                 block.health,
-        //                 0,
-        //                 block.MAX_HEALTH,
-        //                 this.blockDamageSprites.keyFrames.length - 1,
-        //                 0
-        //             )
-        //         );
-        //         image(
-        //             this.blockDamageSprites.keyFrames[damageSpriteIndex],
-        //             block.position.x,
-        //             block.position.y,
-        //             block.width,
-        //             block.height
-        //         );
-        //     }
-        //     if (this.DEBUG) {
-        //         block.renderDebug();
-        //     }
-        // });
-
-        this.gameObjects.get("enemies").forEach((enemy) => {
+        this.level.enemies.forEach((enemy) => {
             enemy.render();
             if (this.DEBUG) {
                 enemy.renderDebug();
@@ -354,33 +335,27 @@ class BugDug {
             this.player.renderDebug();
         }
 
-        this.gameObjects.get("items").forEach((item) => {
+        this.level.items.forEach((item) => {
             item.render();
             if (this.DEBUG) {
                 item.renderDebug();
             }
         });
 
-        clearForegroundAround(
-            getGridIndex(this.player.position, this.level.BLOCK_SIZE),
-            this.level.foregroundLayer,
-            1.75
-        );
-
         // draw foreground
-        for (let i = 0; i < this.foregroundLayer.length; i++) {
-            for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-                if (this.foregroundLayer[i][j] !== "none") {
-                    image(
-                        this.foregroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        // for (let i = 0; i < this.level.foregroundLayer.length; i++) {
+        //     for (let j = 0; j < this.level.foregroundLayer[i].length; j++) {
+        //         if (this.level.foregroundLayer[i][j] !== "none") {
+        //             image(
+        //                 this.level.foregroundLayer[i][j],
+        //                 i * this.level.BLOCK_SIZE,
+        //                 j * this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE,
+        //                 this.level.BLOCK_SIZE
+        //             );
+        //         }
+        //     }
+        // }
 
         //draw UI
         stroke("brown");
@@ -421,19 +396,15 @@ class BugDug {
     }
 
     loadLevel() {
-        this.level = new LevelArchitect(
+        const level = new LevelArchitect(
             this.width,
             this.height,
             LEVELS[this.currentLevel],
             this.blockSprites,
             this.enemySprites
         );
-        this.gameObjects = this.level.getGameObjects();
 
-        this.backgroundLayer = this.level.backgroundLayer;
-        this.foregroundLayer = this.level.foregroundLayer;
-
-        this.player.setPosition(this.level.playerSpawn);
+        this.player.setPosition(level.playerSpawn);
 
         this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
@@ -443,6 +414,7 @@ class BugDug {
 
         // console.log("player: ", this.player);
         // console.log("gObjs: ", this.gameObjects);
-        console.log("level: ", this.level);
+        console.log("level: ", level);
+        this.level = level;
     }
 }
