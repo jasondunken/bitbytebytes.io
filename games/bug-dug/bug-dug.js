@@ -175,13 +175,16 @@ class BugDug {
                         this.level.foregroundLayer
                     );
                     const blocks = this.getBlocks(block.position);
-                    if (blocks.above.blockType === "air") {
+                    if (
+                        blocks.above.blockType === "air" ||
+                        blocks.above.type === "ladder"
+                    ) {
                         this.level.blocks[i][j] = new Ladder(
-                            position,
+                            block.position,
                             this.blockSprites["background-ladder"]
                         );
                     }
-                    console.log("objs: ", this.gameObjects);
+                    console.log("blocks: ", this.level.blocks);
                 }
             }
         }
