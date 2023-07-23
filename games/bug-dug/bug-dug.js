@@ -7,7 +7,6 @@ import { Animation } from "../modules/graphics/animation.js";
 import {
     clearForegroundAround,
     getGridIndex,
-    getBlockAbove,
     calculateAABBCollision,
     getAdjacentBlocks,
     getBlockAtPosition,
@@ -15,7 +14,6 @@ import {
 } from "./modules/utils.js";
 
 import { KEY_CODES } from "../modules/input/keys.js";
-import { LayerManager } from "../modules/graphics/layer-manager.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -29,7 +27,7 @@ const GAME_HEIGHT = 768;
 let game = null;
 
 function keyPressed(key) {
-    if (KEY_CODES.contains(key.code)) {
+    if (KEY_CODES.contains(key.keyCode)) {
         key.preventDefault();
     }
 }

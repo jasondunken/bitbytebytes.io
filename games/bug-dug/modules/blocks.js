@@ -17,6 +17,10 @@ class Block extends GameObject {
         this.height = height;
         this.blockType = blockType;
         this.sprite = sprite;
+        const colliderPos = new Vec(
+            position.x + width / 2,
+            position.y + height / 2
+        );
         this.collider = new Collider(colliderPos, this.width, this.height);
 
         if (blockType === "air" || blockType === "water") {
