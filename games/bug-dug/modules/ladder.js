@@ -21,6 +21,8 @@ class Ladder extends GameObject {
         this.health = this.MAX_HEALTH;
     }
 
+    takeDamage(dmg) {}
+
     render() {
         if (this.sprite) {
             image(this.sprite, this.position.x, this.position.y, 32, 32);
