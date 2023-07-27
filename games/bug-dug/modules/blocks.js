@@ -40,10 +40,11 @@ class Block extends GameObject {
 
     takeDamage(dmg) {
         if (
-            this.blockType !== "bedrock" &&
-            this.blockType !== "air" &&
-            this.blockType !== "exit" &&
-            this.blockType !== "none"
+            this.blockType == "grass" &&
+            this.blockType == "sand" &&
+            this.blockType == "clay" &&
+            this.blockType == "dirt" &&
+            this.blockType == "stone"
         ) {
             this.health -= dmg;
             if (this.health <= 0) {
@@ -85,4 +86,18 @@ class Block extends GameObject {
     }
 }
 
-export { Block };
+class Ladder extends Block {
+    constructor(position, sprite) {
+        super("ladder", position);
+        this.sprite = sprite;
+    }
+}
+
+class Door extends Block {
+    constructor(position, sprite) {
+        super("door", position);
+        this.sprite = sprite;
+    }
+}
+
+export { Block, Door, Ladder };

@@ -118,11 +118,4 @@ class Key extends GameObject {
     }
 }
 
-class Door extends GameObject {
-    constructor(position, sprite) {
-        super("door", position);
-        this.sprite = sprite;
-    }
-}
-
-export { Item, Chest, Coin, Key, Door };
+export { Item, Chest, Coin, Key };
