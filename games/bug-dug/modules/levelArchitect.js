@@ -1,6 +1,6 @@
 import { Vec } from "../../modules/math/vec.js";
-import { Block } from "./blocks.js";
-import { Chest, Item, Coin, Key, Door } from "./item.js";
+import { Block, Door } from "./blocks.js";
+import { Chest, Item, Coin, Key } from "./item.js";
 import { Enemy } from "./enemies.js";
 
 class LevelArchitect {

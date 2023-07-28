@@ -10,3 +10,5 @@ You'll find it here (but not yet) => [:mage:](http://www.bitbytebytes.io)
 -   :elf: Working retro Terminal, featuring BBBDOS!
 -   :space_invader: Free to play retro games!
 -   :lotus_position: Hidden surprises! :grinning:
+
+![Homepage](img/bitbytebytes.io.png)
