@@ -87,16 +87,32 @@ class Block extends GameObject {
 }
 
 class Ladder extends Block {
+    solid = true;
+    sprite;
+    animation;
+
+    MAX_HEALTH = 120;
+    health;
+    destroyed = false;
     constructor(position, sprite) {
-        super("ladder", position);
-        this.sprite = sprite;
+        super(position, 32, 32, "ladder", sprite);
     }
 }
 
 class Door extends Block {
+    solid = true;
+    sprite;
+    animation;
+
+    MAX_HEALTH = 120;
+    health;
+    destroyed = false;
+
+    open = false;
+    locked = true;
+
     constructor(position, sprite) {
-        super("door", position);
-        this.sprite = sprite;
+        super(position, 32, 32, "door", sprite);
     }
 }
 

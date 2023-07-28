@@ -1,6 +1,6 @@
 import { Player, DemoPlayer } from "./modules/player.js";
 import { Enemy } from "./modules/enemies.js";
-import { Ladder } from "./modules/ladder.js";
+import { Ladder } from "./modules/blocks.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
 import { Animation } from "../modules/graphics/animation.js";
@@ -175,7 +175,7 @@ class BugDug {
                     const blocks = this.getBlocks(block.position);
                     if (
                         blocks.above.blockType === "air" ||
-                        blocks.above.type === "ladder"
+                        blocks.above.blockType === "ladder"
                     ) {
                         this.level.blocks[i][j] = new Ladder(
                             block.position,
