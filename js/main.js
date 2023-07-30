@@ -10,22 +10,30 @@ function setup() {
     initializeBanner();
     initializeTerminal();
 
-    document.getElementById("toggle-power").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-        this.terminal.shutdown();
-    });
-    document.getElementById("toggle-mode").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-        this.terminal.toggleMode();
-    });
-    document.getElementById("toggle-size").addEventListener("click", ($event) => {
-        this.toggleSwitch($event.target);
-        this.switchScaleGOL();
-    });
-    document.getElementById("toggle-reset").addEventListener("click", ($event) => {
-        this.momentarySwitch($event.target);
-        this.gol.restart();
-    });
+    document
+        .getElementById("toggle-power")
+        .addEventListener("click", ($event) => {
+            this.toggleSwitch($event.target);
+            this.terminal.shutdown();
+        });
+    document
+        .getElementById("toggle-mode")
+        .addEventListener("click", ($event) => {
+            this.toggleSwitch($event.target);
+            this.terminal.toggleMode();
+        });
+    document
+        .getElementById("toggle-size")
+        .addEventListener("click", ($event) => {
+            this.toggleSwitch($event.target);
+            this.switchScaleGOL();
+        });
+    document
+        .getElementById("toggle-reset")
+        .addEventListener("click", ($event) => {
+            this.momentarySwitch($event.target);
+            this.gol.restart();
+        });
 }
 
 function momentarySwitch(switchElement) {
@@ -57,15 +65,21 @@ function draw() {
 }
 
 function initializeGOL() {
-    this.gol = new GOL(document.getElementById("gol-container").getBoundingClientRect());
+    this.gol = new GOL(
+        document.getElementById("gol-container").getBoundingClientRect()
+    );
 }
 
 function setSizeGOL() {
-    this.gol.resize(document.getElementById("gol-container").getBoundingClientRect());
+    this.gol.resize(
+        document.getElementById("gol-container").getBoundingClientRect()
+    );
 }
 
 function switchScaleGOL() {
-    this.gol.switchScale(document.getElementById("gol-container").getBoundingClientRect());
+    this.gol.switchScale(
+        document.getElementById("gol-container").getBoundingClientRect()
+    );
 }
 
 function initializeBanner() {
@@ -148,8 +162,13 @@ class GOL {
         const golContainer = document.getElementById("p5-container");
         if (this.cellScale === GOL.CELL_SCALE.LARGE) {
             golContainer.style.transform = `
-                translate(${(this.bounds.width * this.cellScale) / 2 - this.bounds.width / 2}px, ${
-                (this.bounds.height * this.cellScale) / 2 - this.bounds.height / 2 + 5
+                translate(${
+                    (this.bounds.width * this.cellScale) / 2 -
+                    this.bounds.width / 2
+                }px, ${
+                (this.bounds.height * this.cellScale) / 2 -
+                this.bounds.height / 2 +
+                5
             }px) scale(${this.cellScale})`;
         } else {
             golContainer.style.transform = `none`;
@@ -158,7 +177,10 @@ class GOL {
     }
 
     switchScale(bounds) {
-        this.cellScale = this.cellScale == GOL.CELL_SCALE.SMALL ? GOL.CELL_SCALE.LARGE : GOL.CELL_SCALE.SMALL;
+        this.cellScale =
+            this.cellScale == GOL.CELL_SCALE.SMALL
+                ? GOL.CELL_SCALE.LARGE
+                : GOL.CELL_SCALE.SMALL;
         this.resize(bounds);
     }
 
@@ -175,8 +197,15 @@ class GOL {
     restart() {
         this.restartTime = this.RESTART_DELAY;
         clear();
-        this.pixelAge = new Array(this.bounds.width * this.bounds.height).fill(0);
-        for (let i = 0; i < this.bounds.width * this.bounds.height * this.INITIAL_CELL_DENSITY; i++) {
+        this.pixelAge = new Uint8Array(
+            this.bounds.width * this.bounds.height
+        ).fill(0);
+        for (
+            let i = 0;
+            i <
+            this.bounds.width * this.bounds.height * this.INITIAL_CELL_DENSITY;
+            i++
+        ) {
             const index = Math.floor(Math.random() * this.pixelAge.length);
             this.pixelAge[index] = 1;
         }
@@ -224,7 +253,11 @@ class GOL {
     currentRandomColor = null;
     draw(pixels) {
         this.randomColorDelta += 0.001;
-        this.currentRandomColor = hslToRgb(Math.sin(this.randomColorDelta), 0.5, 0.5);
+        this.currentRandomColor = hslToRgb(
+            Math.sin(this.randomColorDelta),
+            0.5,
+            0.5
+        );
 
         let age = 0;
         for (let index = 0; index < this.pixelAge.length; index++) {
@@ -263,7 +296,10 @@ class GOL {
                     pixels[index * 4 + 3] = 255;
                 }
             } else {
-                pixels[index * 4] = pixels[index * 4 + 1] = pixels[index * 4 + 2] = 0;
+                pixels[index * 4] =
+                    pixels[index * 4 + 1] =
+                    pixels[index * 4 + 2] =
+                        0;
                 pixels[index * 4 + 3] = 255;
             }
         }
@@ -291,8 +327,16 @@ class GOL {
         x = Math.floor(x / this.cellScale);
         y = Math.floor(y / this.cellScale);
         let cellIndex = y * this.bounds.width + x;
-        for (let i = -Math.floor(this.SPAWN_AREA_SIZE / 2); i < this.SPAWN_AREA_SIZE; i++) {
-            for (let j = -Math.floor(this.SPAWN_AREA_SIZE / 2); j < this.SPAWN_AREA_SIZE; j++) {
+        for (
+            let i = -Math.floor(this.SPAWN_AREA_SIZE / 2);
+            i < this.SPAWN_AREA_SIZE;
+            i++
+        ) {
+            for (
+                let j = -Math.floor(this.SPAWN_AREA_SIZE / 2);
+                j < this.SPAWN_AREA_SIZE;
+                j++
+            ) {
                 const index = cellIndex + i * this.bounds.width + j;
                 if (index > 0 && index < this.pixelAge.length) {
                     this.pixelAge[index] = Math.random() > 0.5 ? 1 : 0;
@@ -313,7 +357,15 @@ class Terminal {
     CURSORS = ["▀", "▄", "█", "▌", "▐", "░", "▒", "▓"];
     CURSOR = this.CURSORS[6];
 
-    GAMES = ["jump-to-orion", "slider", "air-defense", "mine-squad", "planet-invaders", "bug-dug", "expedition-luna"];
+    GAMES = [
+        "jump-to-orion",
+        "slider",
+        "air-defense",
+        "mine-squad",
+        "planet-invaders",
+        "bug-dug",
+        "expedition-luna",
+    ];
 
     loading = false;
     settings = null;
@@ -359,7 +411,8 @@ class Terminal {
     toggleMode() {
         const guiElement = document.getElementById("gui");
         const consoleElement = document.getElementById("console");
-        this.mode = this.mode === this.MODES.CLI ? this.MODES.GUI : this.MODES.CLI;
+        this.mode =
+            this.mode === this.MODES.CLI ? this.MODES.GUI : this.MODES.CLI;
         if (this.mode === this.MODES.GUI) {
             guiElement.style.display = "block";
             guiElement.focus();
@@ -380,8 +433,10 @@ class Terminal {
                     this.cmdHistoryIndex--;
                 }
                 if (this.cmdHistory.length) {
-                    this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
-                    this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+                    this.hiddenInput.value =
+                        this.cmdHistory[this.cmdHistoryIndex];
+                    this.dummyInput.innerText =
+                        this.cmdHistory[this.cmdHistoryIndex];
                 }
             }
             if (keyEvent.key === "ArrowDown") {
@@ -389,8 +444,10 @@ class Terminal {
                     this.cmdHistoryIndex++;
                 }
                 if (this.cmdHistory.length) {
-                    this.hiddenInput.value = this.cmdHistory[this.cmdHistoryIndex];
-                    this.dummyInput.innerText = this.cmdHistory[this.cmdHistoryIndex];
+                    this.hiddenInput.value =
+                        this.cmdHistory[this.cmdHistoryIndex];
+                    this.dummyInput.innerText =
+                        this.cmdHistory[this.cmdHistoryIndex];
                 }
             }
             if (keyEvent.key === "Enter") {
@@ -454,11 +511,21 @@ class Terminal {
     }
 
     showWelcome() {
-        this.appendConsole(`        ______ ______ ______       __               `);
-        this.appendConsole(`       |   __ |   __ |   __ .--.--|  |_.-----.-----.`);
-        this.appendConsole(`       |   __ |   __ |   __ |  |  |   _|  -__|__ --|`);
-        this.appendConsole(`       |______|______|______|___  |____|_____|_____|`);
-        this.appendConsole(`  +---+---+---+---+---+---+-|_____|Welcome to BitByteBytes!`);
+        this.appendConsole(
+            `        ______ ______ ______       __               `
+        );
+        this.appendConsole(
+            `       |   __ |   __ |   __ .--.--|  |_.-----.-----.`
+        );
+        this.appendConsole(
+            `       |   __ |   __ |   __ |  |  |   _|  -__|__ --|`
+        );
+        this.appendConsole(
+            `       |______|______|______|___  |____|_____|_____|`
+        );
+        this.appendConsole(
+            `  +---+---+---+---+---+---+-|_____|Welcome to BitByteBytes!`
+        );
         this.appendConsole(this.VERSION);
         this.appendConsole(`Last Login:${this.getLastLogin()}`);
     }
@@ -519,9 +586,11 @@ class Terminal {
     }
 
     async getIP() {
-        const ipify = await fetch("https://api.ipify.org?format=json").catch((error) => {
-            // console.log("catch.error: ", error);
-        });
+        const ipify = await fetch("https://api.ipify.org?format=json").catch(
+            (error) => {
+                // console.log("catch.error: ", error);
+            }
+        );
         if (ipify) {
             const data = await ipify.json();
             return data.ip;
@@ -560,7 +629,10 @@ class Terminal {
         let newLine = document.createElement("p");
         newLine.innerHTML = line;
 
-        this.outputInsertPoint.parentNode.insertBefore(newLine, this.outputInsertPoint);
+        this.outputInsertPoint.parentNode.insertBefore(
+            newLine,
+            this.outputInsertPoint
+        );
         this.retroConsole.scrollTo(0, document.body.offsetHeight);
     }
 
