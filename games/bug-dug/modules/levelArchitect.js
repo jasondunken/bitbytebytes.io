@@ -217,15 +217,12 @@ class LevelArchitect {
         let exitX = Math.floor(Math.random() * (this.blocksPerRow - 1));
         let exitY = this.blocksPerColumn - 2;
 
-        let blockPosition = {
-            x: exitX * this.BLOCK_SIZE,
-            y: exitY * this.BLOCK_SIZE,
-        };
-        this.blocks[exitX][exitY] = new Block(
+        let blockPosition = new Vec(
+            exitX * this.BLOCK_SIZE,
+            exitY * this.BLOCK_SIZE
+        );
+        this.blocks[exitX][exitY] = new Door(
             blockPosition,
-            this.BLOCK_SIZE,
-            this.BLOCK_SIZE,
-            "exit",
             blockSprites["door-locked"]
         );
     }
@@ -260,6 +257,7 @@ class LevelArchitect {
                 return "black";
             case "air":
             case "none":
+            case "door":
                 return color("#00000000");
             default:
                 console.log("unknown block type: ", blockType);

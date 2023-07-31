@@ -415,7 +415,7 @@ class BugDug {
 
         // console.log("player: ", this.player);
         // console.log("gObjs: ", this.gameObjects);
-        console.log("level: ", level);
+        // console.log("level: ", level);
         this.level = level;
     }
 }
