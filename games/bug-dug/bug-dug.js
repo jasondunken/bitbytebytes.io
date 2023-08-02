@@ -397,7 +397,7 @@ class BugDug {
     }
 
     loadLevel() {
-        const level = new LevelArchitect(
+        this.level = new LevelArchitect(
             this.width,
             this.height,
             LEVELS[this.currentLevel],
@@ -405,17 +405,15 @@ class BugDug {
             this.enemySprites
         );
 
-        this.player.setPosition(level.playerSpawn);
+        this.player.setPosition(this.level.playerSpawn);
 
         this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
             60,
             false
         );
-
         // console.log("player: ", this.player);
         // console.log("gObjs: ", this.gameObjects);
-        // console.log("level: ", level);
-        this.level = level;
+        // console.log("level: ", this.level);
     }
 }
