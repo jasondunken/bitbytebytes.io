@@ -7,4 +7,4 @@
 -   Rescue stranded astronauts!
 -   Gather resources!
 
-![Expedition Luna](expedition-luna.png)
+![Expedition Luna](res/img/expedition-luna.png)
