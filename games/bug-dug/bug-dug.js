@@ -15,6 +15,9 @@ import {
 
 import { KEY_CODES } from "../modules/input/keys.js";
 
+import { UI } from "./modules/ui.js";
+import { Vec } from "../modules/math/vec.js";
+
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
@@ -110,6 +113,8 @@ class BugDug {
         this.demo = true;
         this.gameOver = true;
         this.score = 0;
+
+        this.ui = new UI(new Vec(10, 10), this.width - 20, 96);
     }
 
     startDemo() {
@@ -359,41 +364,14 @@ class BugDug {
         // }
 
         //draw UI
-        stroke("brown");
-        strokeWeight(8);
-        fill("gray");
-        rect(10, 10, this.width - 20, 96);
         textFont(this.font);
-        fill("blue");
-        noStroke();
-        textSize(16);
-        text("Level " + (this.currentLevel + 1), 24, 40);
-        if (this.player.hasKey) {
-            image(
-                this.blockSprites["white-key"],
-                this.width - 80,
-                54,
-                32,
-                32,
-                0,
-                0,
-                16,
-                16
-            );
-        }
-        for (let i = 0; i < this.lives; i++) {
-            image(
-                this.playerSprites["idle"],
-                this.width - 44 - 32 * i,
-                20,
-                24,
-                24,
-                0,
-                0,
-                32,
-                32
-            );
-        }
+        this.ui.render({
+            currentLevel: this.currentLevel,
+            hasKey: this.player.hasKey,
+            keyIcon: this.blockSprites["white-key"],
+            playerIcon: this.playerSprites["idle"],
+            lives: this.lives,
+        });
     }
 
     loadLevel() {
