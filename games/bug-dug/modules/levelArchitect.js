@@ -1,7 +1,46 @@
 import { Vec } from "../../modules/math/vec.js";
 import { Block, Door } from "./blocks.js";
-import { Chest, Item, Coin, Key } from "./item.js";
+import { Chest, Item, Coin } from "./item.js";
 import { Enemy } from "./enemies.js";
+
+class Level {
+    constructor(spawn, background, foreground, blocks, items) {
+        this.playerSpawn = spawn;
+        this.backgroundLayer = background;
+        this.foregroundLayer = foreground;
+        this.blocks = blocks;
+        this.blockSize = blocks[0][0].width;
+        this.items = items;
+    }
+
+    update() {}
+
+    renderBlocks() {}
+
+    renderLayer(layer) {
+        for (let i = 0; i < layer.length; i++) {
+            for (let j = 0; j < layer[i].length; j++) {
+                if (layer[i][j] !== "none") {
+                    image(
+                        layer[i][j],
+                        i * this.blockSize,
+                        j * this.blockSize,
+                        this.blockSize,
+                        this.blockSize
+                    );
+                }
+            }
+        }
+    }
+
+    renderBackground() {
+        this.renderLayer(this.backgroundLayer);
+    }
+
+    renderForeground() {
+        this.renderLayer(this.foregroundLayer);
+    }
+}
 
 class LevelArchitect {
     BLOCK_SIZE = 32;
