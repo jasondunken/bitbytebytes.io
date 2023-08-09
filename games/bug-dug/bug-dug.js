@@ -201,8 +201,8 @@ class BugDug {
             obj.position.x = this.width - obj.width / 2;
         // constrain y
         if (y < obj.height / 2) obj.position.y = obj.height / 2;
-        if (y > this.level.height - obj.height / 2)
-            obj.position.y = this.level.height - obj.height / 2;
+        if (y > this.height - obj.height / 2)
+            obj.position.y = this.height - obj.height / 2;
 
         // check for block collisions
         const blocks = this.getBlocks(obj.position);
@@ -257,7 +257,7 @@ class BugDug {
         return getAdjacentBlocks(
             position,
             this.level.blocks,
-            this.level.BLOCK_SIZE
+            this.level.blockSize
         );
     }
 
@@ -265,7 +265,7 @@ class BugDug {
         return getBlockAtPosition(
             position,
             this.level.blocks,
-            this.level.BLOCK_SIZE
+            this.level.blockSize
         );
     }
 
@@ -273,7 +273,7 @@ class BugDug {
         return getBlockBelowPosition(
             position,
             this.level.blocks,
-            this.level.BLOCK_SIZE
+            this.level.blockSize
         );
     }
 
