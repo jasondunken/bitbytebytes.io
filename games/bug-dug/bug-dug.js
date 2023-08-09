@@ -287,19 +287,7 @@ class BugDug {
         background(color(this.level.skyColor));
         noStroke();
         // draw background
-        for (let i = 0; i < this.level.backgroundLayer.length; i++) {
-            for (let j = 0; j < this.level.backgroundLayer[i].length; j++) {
-                if (this.level.backgroundLayer[i][j] !== "none") {
-                    image(
-                        this.level.backgroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        this.level.renderBackground();
 
         for (let i = 0; i < this.level.blocks.length; i++) {
             for (let j = 0; j < this.level.blocks[i].length; j++) {
@@ -349,19 +337,7 @@ class BugDug {
         });
 
         // draw foreground
-        // for (let i = 0; i < this.level.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.level.foregroundLayer[i].length; j++) {
-        //         if (this.level.foregroundLayer[i][j] !== "none") {
-        //             image(
-        //                 this.level.foregroundLayer[i][j],
-        //                 i * this.level.BLOCK_SIZE,
-        //                 j * this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE
-        //             );
-        //         }
-        //     }
-        // }
+        // this.level.renderForeground();
 
         //draw UI
         textFont(this.font);
@@ -375,7 +351,7 @@ class BugDug {
     }
 
     loadLevel() {
-        this.level = new LevelArchitect(
+        this.level = LevelArchitect.createLevel(
             this.width,
             this.height,
             LEVELS[this.currentLevel],
@@ -391,7 +367,6 @@ class BugDug {
             false
         );
         // console.log("player: ", this.player);
-        // console.log("gObjs: ", this.gameObjects);
-        // console.log("level: ", this.level);
+        console.log("level: ", this.level);
     }
 }
