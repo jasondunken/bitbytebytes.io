@@ -1,6 +1,6 @@
 import { Vec } from "../../modules/math/vec.js";
 import { Block, Door } from "./blocks.js";
-import { Chest, Item, Coin } from "./item.js";
+import { Chest, Item, Coin, Key } from "./item.js";
 import { Enemy } from "./enemies.js";
 
 class Level {
@@ -229,15 +229,28 @@ class LevelArchitect {
                     );
                 }
                 if (j === chestIndex) {
-                    const chestPosition = {
-                        x: blockAbove.position.x + Chest.SIZE / 2,
-                        y: blockAbove.position.y + Chest.SIZE,
-                    };
+                    const chestPosition = new Vec(
+                        blockAbove.position.x + Chest.SIZE / 2,
+                        blockAbove.position.y + Chest.SIZE
+                    );
+                    const item = itemTypes[i % itemTypes.length];
+                    let contents = [];
+                    const numCoins = Math.ceil(Math.random() * 20);
+                    for (let c = 0; c < numCoins; c++) {
+                        contents.push(
+                            new Coin(chestPosition, blockSprites["coin-gold"])
+                        );
+                    }
+                    if (item === "key") {
+                        contents.push(
+                            new Key(chestPosition, blockSprites["white-key"])
+                        );
+                    }
                     items.add(
                         new Chest(
                             chestPosition,
                             blockSprites["chest"],
-                            itemTypes[i % items.length]
+                            contents
                         )
                     );
                 }
