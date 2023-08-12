@@ -255,10 +255,10 @@ class LevelArchitect {
                     );
                 }
                 if (j !== chestIndex) {
-                    const coinPosition = {
-                        x: blockAbove.position.x + Item.SIZE / 2,
-                        y: blockAbove.position.y + Item.SIZE,
-                    };
+                    const coinPosition = new Vec(
+                        blockAbove.position.x + Item.SIZE / 2,
+                        blockAbove.position.y + Item.SIZE
+                    );
                     items.add(
                         new Coin(coinPosition, blockSprites["coin-gold"])
                     );
@@ -284,12 +284,12 @@ class LevelArchitect {
         let exitX = Math.floor(Math.random() * (blocksPerRow - 1));
         let exitY = blocksPerColumn - 2;
 
-        let blockPosition = new Vec(
+        let exitPosition = new Vec(
             exitX * LevelArchitect.BLOCK_SIZE,
             exitY * LevelArchitect.BLOCK_SIZE
         );
         blocks[exitX][exitY] = new Door(
-            blockPosition,
+            exitPosition,
             blockSprites["door-locked"]
         );
     }
