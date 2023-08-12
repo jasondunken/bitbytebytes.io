@@ -63,10 +63,6 @@ class Block extends GameObject {
                     this.width,
                     this.height
                 );
-            } else {
-                noStroke();
-                fill(LevelArchitect.getColor(this.blockType));
-                rect(this.position.x, this.position.y, this.width, this.height);
             }
         }
     }

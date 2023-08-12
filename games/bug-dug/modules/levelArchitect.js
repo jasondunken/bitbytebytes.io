@@ -294,30 +294,6 @@ class LevelArchitect {
         );
     }
 
-    static getColor(blockType) {
-        switch (blockType) {
-            case "grass":
-                return "green";
-            case "dirt":
-                return "brown";
-            case "clay":
-                return "orange";
-            case "sand":
-                return "beige";
-            case "stone":
-                return "gray";
-            case "bedrock":
-                return "black";
-            case "air":
-            case "none":
-            case "door":
-                return color("#00000000");
-            default:
-                console.log("unknown block type: ", blockType);
-                return "magenta";
-        }
-    }
-
     static loadSprites() {
         let sprites = {};
         sprites["grass_3"] = loadImage("./bug-dug/res/img/block_grass_3.png");
