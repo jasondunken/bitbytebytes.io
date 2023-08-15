@@ -31,12 +31,16 @@ class Player extends Entity {
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
             mining: new Animation(spriteSheets["mining"], 60, true),
         };
-        // this.particleEmitter = new ParticleEmitter(
-        //     new Vec(this.position.x, this.position.y),
-        //     10,
-        //     10,
-        //     ParticleEmitter.RadialBurst
-        // );
+        this.currentAnimation = this.animations["idle"];
+
+        console.log("ami: ", this.animations);
+
+        this.particleEmitter = new ParticleEmitter(
+            new Vec(this.position.x, this.position.y),
+            10,
+            10,
+            ParticleEmitter.RadialBurst
+        );
     }
 
     getInput() {
@@ -72,6 +76,7 @@ class Player extends Entity {
             this.grounded = false;
         }
     }
+
     climbDown() {
         const block = this.world.getBlockBelow(this.position);
         if (block.type === "ladder") {
@@ -80,14 +85,20 @@ class Player extends Entity {
             this.grounded = false;
         }
     }
+
     moveLeft() {
         this.position.x -= this.speed;
         this.state = Player.STATE.WALKING.LEFT;
+        this.currentAnimation = this.animations["walk-left"];
+        console.log("walking: ", this.currentAnimation);
     }
+
     moveRight() {
         this.position.x += this.speed;
         this.state = Player.STATE.WALKING.RIGHT;
+        this.currentAnimation = this.animations["walk-right"];
     }
+
     dig(direction) {
         const blocks = this.world.getBlocks(this.position);
         if (!this.mining) {
@@ -111,6 +122,25 @@ class Player extends Entity {
             if (block) {
                 block.takeDamage(this.pickaxeStrength);
             }
+        }
+    }
+
+    render() {
+        if (this.currentAnimation) {
+            const sprite = this.currentAnimation.currentFrame;
+            image(
+                sprite,
+                this.position.x - sprite.width / 2,
+                this.position.y - sprite.height / 2,
+                sprite.width,
+                sprite.height
+            );
+        } else {
+            fill("magenta");
+            rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
+        }
+        if (this.particleEmitter) {
+            this.particleEmitter.render();
         }
     }
 
