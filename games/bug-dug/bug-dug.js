@@ -347,6 +347,7 @@ class BugDug {
             keyIcon: this.blockSprites["white-key"],
             playerIcon: this.playerSprites["idle"],
             lives: this.lives,
+            score: this.score,
         });
     }
 

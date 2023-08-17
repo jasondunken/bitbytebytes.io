@@ -21,6 +21,7 @@ export class UI {
         noStroke();
         textSize(16);
         text("Level " + (currentData?.currentLevel + 1), 24, 40);
+        text("Score " + currentData?.score, 24, 70);
         if (currentData?.hasKey) {
             image(
                 currentData?.keyIcon,
