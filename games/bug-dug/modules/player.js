@@ -19,7 +19,7 @@ class Player extends Entity {
     mining = 0;
     pickaxeStrength = 33;
 
-    hasKey = true;
+    hasKey = false;
 
     constructor(world, spriteSheets) {
         super("player");

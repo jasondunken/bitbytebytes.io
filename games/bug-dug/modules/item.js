@@ -111,6 +111,20 @@ class Coin extends GameObject {
     }
 }
 
+const TOOL_TYPES = Object.freeze({
+    STONE_PICK: { name: "stone Pick", damage: 10, durability: 100 },
+    IRON_PICK: { name: "iron pick", damage: 25, durability: 200 },
+    STEEL_PICK: { name: "steel pick", damage: 50, durability: 500 },
+    DIAMOND_PICK: { name: "diamond pick", damage: 100, durability: 1000 },
+});
+
+class Tool extends GameObject {
+    constructor(toolType) {
+        super("tool");
+        this.properties = TOOL_TYPES[toolType];
+    }
+}
+
 class Key extends GameObject {
     constructor(position, sprite) {
         super("key", position);
@@ -118,4 +132,4 @@ class Key extends GameObject {
     }
 }
 
-export { Item, Chest, Coin, Key };
+export { Item, Chest, Coin, Tool, TOOL_TYPES, Key };
