@@ -6,7 +6,8 @@ import { Vec } from "../../modules/math/vec.js";
 class Player extends Entity {
     static STATE = Object.freeze({
         IDLE: "idle",
-        WALKING: "walk",
+        WALKING_LEFT: "walk_left",
+        WALKING_RIGHT: "walk-right",
         JUMPING: "jump",
         CLIMBING: "climb",
         ATTACKING: "attack",
@@ -33,6 +34,7 @@ class Player extends Entity {
         };
         this.currentAnimation = this.animations["idle"];
 
+        console.log("player: ", this);
         console.log("ami: ", this.animations);
 
         this.particleEmitter = new ParticleEmitter(
@@ -88,15 +90,12 @@ class Player extends Entity {
 
     moveLeft() {
         this.position.x -= this.speed;
-        this.state = Player.STATE.WALKING.LEFT;
-        this.currentAnimation = this.animations["walk-left"];
-        console.log("walking: ", this.currentAnimation);
+        this.state = Player.STATE.WALKING_LEFT;
     }
 
     moveRight() {
         this.position.x += this.speed;
-        this.state = Player.STATE.WALKING.RIGHT;
-        this.currentAnimation = this.animations["walk-right"];
+        this.state = Player.STATE.WALKING_RIGHT;
     }
 
     dig(direction) {
@@ -126,7 +125,14 @@ class Player extends Entity {
     }
 
     render() {
+        if (this.state == Player.STATE.WALKING_LEFT) {
+            this.currentAnimation = this.animations["walk-left"];
+        }
+        if (this.state == Player.STATE.WALKING_RIGHT) {
+            this.currentAnimation = this.animations["walk-right"];
+        }
         if (this.currentAnimation) {
+            this.currentAnimation.update();
             const sprite = this.currentAnimation.currentFrame;
             image(
                 sprite,
