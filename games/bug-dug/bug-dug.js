@@ -367,7 +367,5 @@ class BugDug {
             60,
             false
         );
-        // console.log("player: ", this.player);
-        console.log("level: ", this.level);
     }
 }

@@ -34,9 +34,6 @@ class Player extends Entity {
         };
         this.currentAnimation = this.animations["idle"];
 
-        console.log("player: ", this);
-        console.log("ami: ", this.animations);
-
         this.particleEmitter = new ParticleEmitter(
             new Vec(this.position.x, this.position.y),
             10,
