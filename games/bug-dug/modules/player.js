@@ -4,18 +4,6 @@ import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
 
 class Player extends Entity {
-    static STATE = Object.freeze({
-        IDLE: "idle",
-        WALKING_LEFT: "walk_left",
-        WALKING_RIGHT: "walk-right",
-        JUMPING: "jump",
-        CLIMBING: "climb",
-        ATTACKING: "attack",
-        MINING: "mining",
-        HURT: "hurt",
-        DEAD: "dead",
-    });
-
     MINING_TIME = 30;
     mining = 0;
     pickaxeStrength = 33;
@@ -34,12 +22,12 @@ class Player extends Entity {
         };
         this.currentAnimation = this.animations["idle"];
 
-        this.particleEmitter = new ParticleEmitter(
-            new Vec(this.position.x, this.position.y),
-            10,
-            10,
-            ParticleEmitter.RadialBurst
-        );
+        // this.particleEmitter = new ParticleEmitter(
+        //     this.position.copy(),
+        //     10,
+        //     10,
+        //     ParticleEmitter.RadialBurst
+        // );
     }
 
     getInput() {
@@ -58,7 +46,7 @@ class Player extends Entity {
             !keyIsDown(32) &&
             !this.mining
         ) {
-            this.state = Player.STATE.IDLE;
+            this.state = Entity.STATE.IDLE;
         }
 
         if (keyIsDown(38)) this.dig("up");
@@ -87,19 +75,19 @@ class Player extends Entity {
 
     moveLeft() {
         this.position.x -= this.speed;
-        this.state = Player.STATE.WALKING_LEFT;
+        this.state = Entity.STATE.WALKING_LEFT;
     }
 
     moveRight() {
         this.position.x += this.speed;
-        this.state = Player.STATE.WALKING_RIGHT;
+        this.state = Entity.STATE.WALKING_RIGHT;
     }
 
     dig(direction) {
         const blocks = this.world.getBlocks(this.position);
         if (!this.mining) {
             this.mining = this.MINING_TIME;
-            this.state = Player.STATE.MINING;
+            this.state = Entity.STATE.MINING;
             let block = null;
             switch (direction) {
                 case "up":
@@ -122,12 +110,6 @@ class Player extends Entity {
     }
 
     render() {
-        if (this.state == Player.STATE.WALKING_LEFT) {
-            this.currentAnimation = this.animations["walk-left"];
-        }
-        if (this.state == Player.STATE.WALKING_RIGHT) {
-            this.currentAnimation = this.animations["walk-right"];
-        }
         if (this.currentAnimation) {
             this.currentAnimation.update();
             const sprite = this.currentAnimation.currentFrame;
@@ -154,8 +136,8 @@ class Player extends Entity {
         );
         this.particleEmitter.setPosition(emitterPos);
         if (
-            this.state !== Player.STATE.WALKING.LEFT &&
-            this.state !== Player.STATE.WALKING.RIGHT
+            this.state !== Entity.STATE.WALKING_LEFT &&
+            this.state !== Entity.STATE.WALKING_RIGHT
         ) {
             this.particleEmitter.stop();
         } else {

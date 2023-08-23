@@ -3,21 +3,11 @@ import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 
 class Enemy extends Entity {
-    static STATE = {
-        IDLE: "idle",
-        WALKING: "walk",
-        JUMPING: "jump",
-        CLIMBING: "climb",
-        ATTACKING: "attack",
-        HURT: "hurt",
-        DEAD: "dead",
-    };
-
     attackStrength = 33;
 
     constructor(position, spriteSheets) {
         super("enemy", position);
-        this.state = Enemy.STATE.IDLE;
+        this.state = Entity.STATE.IDLE;
         this.animations = {
             idle: new Animation(spriteSheets["idle"], 240, true),
             "walk-left": new Animation(spriteSheets["walk-left"], 60, true),

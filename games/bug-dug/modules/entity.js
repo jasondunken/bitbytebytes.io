@@ -12,6 +12,18 @@ class Entity extends GameObject {
     currentAnimation = null;
     particleEmitter = null;
 
+    static STATE = Object.freeze({
+        IDLE: "idle",
+        WALKING_LEFT: "walk-left",
+        WALKING_RIGHT: "walk-right",
+        JUMPING: "jump",
+        CLIMBING: "climb",
+        ATTACKING: "attack",
+        MINING: "mining",
+        HURT: "hurt",
+        DEAD: "dead",
+    });
+
     constructor(type, position) {
         super(type, position);
         this.collider = new Collider(this.position, this.width, this.height);
@@ -19,6 +31,12 @@ class Entity extends GameObject {
 
     update(dt) {
         this.currentAnimation = this.animations[this.state];
+        if (this.state == Entity.STATE.WALKING_LEFT) {
+            this.currentAnimation = this.animations["walk-left"];
+        }
+        if (this.state == Entity.STATE.WALKING_RIGHT) {
+            this.currentAnimation = this.animations["walk-right"];
+        }
         if (this.currentAnimation) {
             this.currentAnimation.update();
         }
