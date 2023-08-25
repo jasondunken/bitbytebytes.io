@@ -13,7 +13,7 @@ import {
     getBlockBelowPosition,
 } from "./modules/utils.js";
 
-import { KEY_CODES } from "../modules/input/keys.js";
+import { KEY_CODES, KEY_NAMES } from "../modules/input/keys.js";
 
 import { UI } from "./modules/ui.js";
 import { Vec } from "../modules/math/vec.js";
@@ -34,6 +34,12 @@ function keyPressed(key) {
         key.preventDefault();
     }
 }
+
+document.onkeydown = (key) => {
+    if (KEY_NAMES.contains(key.code)) {
+        key.preventDefault();
+    }
+};
 
 // p5.js functions ------------------------>
 function preload() {
