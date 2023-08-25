@@ -22,12 +22,12 @@ class Player extends Entity {
         };
         this.currentAnimation = this.animations["idle"];
 
-        // this.particleEmitter = new ParticleEmitter(
-        //     this.position.copy(),
-        //     10,
-        //     10,
-        //     ParticleEmitter.RadialBurst
-        // );
+        this.particleEmitter = new ParticleEmitter(
+            new Vec(this.position.x, this.position.y + 16),
+            10,
+            10,
+            ParticleEmitter.RadialBurst
+        );
     }
 
     getInput() {

@@ -47,7 +47,17 @@ class Entity extends GameObject {
 
         this.collider.update(this.position);
         if (this.particleEmitter) {
-            this.particleEmitter.update(this.position);
+            if (
+                this.state == Entity.STATE.WALKING_LEFT ||
+                this.state == Entity.STATE.WALKING_RIGHT
+            ) {
+                this.particleEmitter.start();
+            } else {
+                this.particleEmitter.stop();
+            }
+
+            this.particleEmitter.update();
+            this.particleEmitter.setPosition(this.position);
         }
     }
 

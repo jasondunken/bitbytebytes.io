@@ -360,7 +360,9 @@ class BugDug {
             this.enemySprites
         );
 
-        this.player.setPosition(this.level.playerSpawn);
+        this.player.setPosition(
+            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
+        );
 
         this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
