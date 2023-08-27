@@ -31,8 +31,6 @@ class Player extends Entity {
     }
 
     getInput() {
-        if (this.mining) this.mining--;
-
         if (keyIsDown(87)) this.climbUp();
         if (keyIsDown(83)) this.climbDown();
         if (keyIsDown(65)) this.moveLeft();
@@ -43,8 +41,7 @@ class Player extends Entity {
             !keyIsDown(83) &&
             !keyIsDown(65) &&
             !keyIsDown(68) &&
-            !keyIsDown(32) &&
-            !this.mining
+            !keyIsDown(32)
         ) {
             this.state = Entity.STATE.IDLE;
         }
@@ -84,10 +81,13 @@ class Player extends Entity {
     }
 
     dig(direction) {
-        const blocks = this.world.getBlocks(this.position);
-        if (!this.mining) {
+        if (this.state != Entity.STATE.MINING) {
             this.mining = this.MINING_TIME;
             this.state = Entity.STATE.MINING;
+            this.currentAnimation = this.animations["mining"];
+        }
+        if (this.state === Entity.STATE.MINING) {
+            const blocks = this.world.getBlocks(this.position);
             let block = null;
             switch (direction) {
                 case "up":
@@ -103,13 +103,19 @@ class Player extends Entity {
                     block = blocks.right;
                     break;
             }
-            if (block) {
+            if (block && block.solid) {
+                this.mining--;
                 block.takeDamage(this.pickaxeStrength);
+            } else {
+                this.state = Entity.STATE.IDLE;
             }
         }
     }
 
     render() {
+        if (this.particleEmitter) {
+            this.particleEmitter.render();
+        }
         if (this.currentAnimation) {
             this.currentAnimation.update();
             const sprite = this.currentAnimation.currentFrame;
@@ -123,9 +129,6 @@ class Player extends Entity {
         } else {
             fill("magenta");
             rect(this.collider.a.x, this.collider.a.y, this.width, this.height);
-        }
-        if (this.particleEmitter) {
-            this.particleEmitter.render();
         }
     }
 
