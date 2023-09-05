@@ -24,6 +24,8 @@ class ParticleEmitter extends GameObject {
         this.loopTime = loopInterval;
         this.update = updateFunction;
 
+        this.particleColor = color(130, 80, 65);
+
         this.spawnParticles(numParticles);
     }
 
@@ -58,10 +60,10 @@ class ParticleEmitter extends GameObject {
 
     render() {
         this.particles.forEach((particle) => {
+            let alpha = map(particle.life, 0, 60, 0, 255);
+            this.particleColor.setAlpha(alpha);
             if (particle.life > 0) {
-                let alpha = map(particle.life, 0, 60, 0, 1);
-                let color = `rgba(255, 0, 0, ${alpha})`;
-                fill(color);
+                fill(this.particleColor);
                 noStroke();
                 ellipse(
                     particle.position.x,
