@@ -4,9 +4,13 @@ import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
 
 class Player extends Entity {
+    WALK_SPEED = 1.5;
+    CLIMB_SPEED = 2;
     MINING_TIME = 30;
     mining = 0;
     pickaxeStrength = 33;
+
+    particleEmitterOffset = new Vec(0, 16);
 
     hasKey = false;
 
@@ -23,7 +27,7 @@ class Player extends Entity {
         this.currentAnimation = this.animations["idle"];
 
         this.particleEmitter = new ParticleEmitter(
-            new Vec(this.position.x, this.position.y + 16),
+            Vec.add2(this.position, this.particleEmitterOffset),
             10,
             10,
             ParticleEmitter.RadialBurst
@@ -56,7 +60,7 @@ class Player extends Entity {
         const block = this.world.getBlock(this.position);
         if (block.type === "ladder") {
             this.onLadder = true;
-            this.position.y -= 4;
+            this.position.y -= this.CLIMB_SPEED;
             this.grounded = false;
         }
     }
@@ -65,18 +69,18 @@ class Player extends Entity {
         const block = this.world.getBlockBelow(this.position);
         if (block.type === "ladder") {
             this.onLadder = true;
-            this.position.y += 2;
+            this.position.y += this.CLIMB_SPEED;
             this.grounded = false;
         }
     }
 
     moveLeft() {
-        this.position.x -= this.speed;
+        this.position.x -= this.WALK_SPEED;
         this.state = Entity.STATE.WALKING_LEFT;
     }
 
     moveRight() {
-        this.position.x += this.speed;
+        this.position.x += this.WALK_SPEED;
         this.state = Entity.STATE.WALKING_RIGHT;
     }
 
