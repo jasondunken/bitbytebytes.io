@@ -40,10 +40,10 @@ class Block extends GameObject {
 
     takeDamage(dmg) {
         if (
-            this.blockType == "grass" &&
-            this.blockType == "sand" &&
-            this.blockType == "clay" &&
-            this.blockType == "dirt" &&
+            this.blockType == "grass" ||
+            this.blockType == "sand" ||
+            this.blockType == "clay" ||
+            this.blockType == "dirt" ||
             this.blockType == "stone"
         ) {
             this.health -= dmg;

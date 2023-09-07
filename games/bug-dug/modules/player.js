@@ -8,7 +8,7 @@ class Player extends Entity {
     CLIMB_SPEED = 2;
     MINING_TIME = 30;
     mining = 0;
-    pickaxeStrength = 33;
+    pickaxeStrength = 5;
 
     particleEmitterOffset = new Vec(0, 16);
 
@@ -40,20 +40,18 @@ class Player extends Entity {
         if (keyIsDown(65)) this.moveLeft();
         if (keyIsDown(68)) this.moveRight();
 
-        if (
-            !keyIsDown(87) &&
-            !keyIsDown(83) &&
-            !keyIsDown(65) &&
-            !keyIsDown(68) &&
-            !keyIsDown(32)
-        ) {
-            this.state = Entity.STATE.IDLE;
-        }
-
         if (keyIsDown(38)) this.dig("up");
         if (keyIsDown(40)) this.dig("down");
         if (keyIsDown(37)) this.dig("left");
         if (keyIsDown(39)) this.dig("right");
+
+        if (
+            this.state != Entity.STATE.WALKING_LEFT &&
+            this.state != Entity.STATE.WALKING_RIGHT &&
+            this.state != Entity.STATE.MINING
+        ) {
+            this.state = Entity.STATE.IDLE;
+        }
     }
 
     climbUp() {
@@ -110,7 +108,10 @@ class Player extends Entity {
             if (block && block.solid) {
                 this.mining--;
                 block.takeDamage(this.pickaxeStrength);
-            } else {
+                console.log("block.health: ", block.health);
+            }
+
+            if (this.mining <= 0) {
                 this.state = Entity.STATE.IDLE;
             }
         }
