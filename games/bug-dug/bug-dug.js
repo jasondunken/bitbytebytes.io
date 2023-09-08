@@ -193,7 +193,6 @@ class BugDug {
                             this.blockSprites["background-ladder"]
                         );
                     }
-                    console.log("blocks: ", this.level.blocks);
                 }
             }
         }

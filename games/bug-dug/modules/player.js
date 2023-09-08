@@ -35,51 +35,88 @@ class Player extends Entity {
     }
 
     getInput() {
-        if (keyIsDown(87)) this.climbUp();
-        if (keyIsDown(83)) this.climbDown();
-        if (keyIsDown(65)) this.moveLeft();
-        if (keyIsDown(68)) this.moveRight();
+        const inputList = [
+            keyIsDown(87),
+            keyIsDown(83),
+            keyIsDown(65),
+            keyIsDown(68),
+            keyIsDown(38),
+            keyIsDown(40),
+            keyIsDown(37),
+            keyIsDown(39),
+        ];
 
-        if (keyIsDown(38)) this.dig("up");
-        if (keyIsDown(40)) this.dig("down");
-        if (keyIsDown(37)) this.dig("left");
-        if (keyIsDown(39)) this.dig("right");
+        inputList[0] && this.inputFunctions[0](this);
+        inputList[1] && this.inputFunctions[1](this);
+        inputList[2] && this.inputFunctions[2](this);
+        inputList[3] && this.inputFunctions[3](this);
+        inputList[4] && this.inputFunctions[4](this);
+        inputList[5] && this.inputFunctions[5](this);
+        inputList[6] && this.inputFunctions[6](this);
+        inputList[7] && this.inputFunctions[7](this);
 
-        if (
-            this.state != Entity.STATE.WALKING_LEFT &&
-            this.state != Entity.STATE.WALKING_RIGHT &&
-            this.state != Entity.STATE.MINING
-        ) {
-            this.state = Entity.STATE.IDLE;
-        }
+        !inputList[0] &&
+            !inputList[1] &&
+            !inputList[2] &&
+            !inputList[3] &&
+            !inputList[4] &&
+            !inputList[5] &&
+            !inputList[6] &&
+            !inputList[7] &&
+            (this.state = Entity.STATE.IDLE);
     }
 
-    climbUp() {
-        const block = this.world.getBlock(this.position);
+    inputFunctions = [
+        this.climbUp,
+        this.climbDown,
+        this.moveLeft,
+        this.moveRight,
+
+        this.digUP,
+        this.digDown,
+        this.digLeft,
+        this.digRight,
+    ];
+
+    climbUp(player) {
+        const block = player.world.getBlock(player.position);
         if (block.type === "ladder") {
-            this.onLadder = true;
-            this.position.y -= this.CLIMB_SPEED;
-            this.grounded = false;
+            player.onLadder = true;
+            player.position.y -= player.CLIMB_SPEED;
+            player.grounded = false;
         }
     }
 
-    climbDown() {
-        const block = this.world.getBlockBelow(this.position);
+    climbDown(player) {
+        const block = player.world.getBlockBelow(player.position);
         if (block.type === "ladder") {
-            this.onLadder = true;
-            this.position.y += this.CLIMB_SPEED;
-            this.grounded = false;
+            player.onLadder = true;
+            player.position.y += player.CLIMB_SPEED;
+            player.grounded = false;
         }
     }
 
-    moveLeft() {
-        this.position.x -= this.WALK_SPEED;
-        this.state = Entity.STATE.WALKING_LEFT;
+    moveLeft(player) {
+        player.position.x -= player.WALK_SPEED;
+        player.state = Entity.STATE.WALKING_LEFT;
     }
 
-    moveRight() {
-        this.position.x += this.WALK_SPEED;
-        this.state = Entity.STATE.WALKING_RIGHT;
+    moveRight(player) {
+        player.position.x += player.WALK_SPEED;
+        player.state = Entity.STATE.WALKING_RIGHT;
+    }
+
+    digUp(player) {
+        player.dig("up");
+    }
+    digDown(player) {
+        player.dig("down");
+    }
+    digRight(player) {
+        player.dig("right");
+    }
+    gitLeft(player) {
+        player.dig("left");
     }
 
     dig(direction) {
@@ -108,7 +145,6 @@ class Player extends Entity {
             if (block && block.solid) {
                 this.mining--;
                 block.takeDamage(this.pickaxeStrength);
-                console.log("block.health: ", block.health);
             }
 
             if (this.mining <= 0) {
