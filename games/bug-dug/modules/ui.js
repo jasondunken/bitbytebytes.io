@@ -38,10 +38,10 @@ export class UI {
         for (let i = 0; i < currentData?.lives; i++) {
             image(
                 currentData?.playerIcon,
-                this.width - 44 - 32 * i,
-                20,
-                24,
-                24,
+                this.width - 48 - 48 * i,
+                0,
+                64,
+                64,
                 0,
                 0,
                 32,

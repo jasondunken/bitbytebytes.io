@@ -193,13 +193,13 @@ class Player extends Entity {
     static loadSpriteSheets() {
         let spriteSheets = {};
         spriteSheets["idle"] = loadImage(
-            "./bug-dug/res/img/animations/big_mushroom_idle.png"
+            "./bug-dug/res/img/animations/player_idle.png"
         );
         spriteSheets["walk-left"] = loadImage(
-            "./bug-dug/res/img/animations/big_mushroom_walk_left.png"
+            "./bug-dug/res/img/animations/player_walk_left.png"
         );
         spriteSheets["walk-right"] = loadImage(
-            "./bug-dug/res/img/animations/big_mushroom_walk_right.png"
+            "./bug-dug/res/img/animations/player_walk_right.png"
         );
         spriteSheets["mining"] = loadImage(
             "./bug-dug/res/img/animations/big_mushroom_idle.png"
