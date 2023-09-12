@@ -6,7 +6,7 @@ import { Vec } from "../../modules/math/vec.js";
 class Player extends Entity {
     WALK_SPEED = 1.5;
     CLIMB_SPEED = 2;
-    MINING_TIME = 30;
+    MINING_TIME = 60;
     mining = 0;
     pickaxeStrength = 5;
 
@@ -22,7 +22,11 @@ class Player extends Entity {
             idle: new Animation(spriteSheets["idle"], 240, true),
             "walk-left": new Animation(spriteSheets["walk-left"], 60, true),
             "walk-right": new Animation(spriteSheets["walk-right"], 60, true),
-            mining: new Animation(spriteSheets["mining"], 60, true),
+            climb: new Animation(spriteSheets["climb"], 60, true),
+            "mine-down": new Animation(spriteSheets["mine_down"], 60, true),
+            "mine-left": new Animation(spriteSheets["mine_left"], 60, true),
+            "mine-right": new Animation(spriteSheets["mine_right"], 60, true),
+            dead: new Animation(spriteSheets["dead"], 20, false),
         };
         this.currentAnimation = this.animations["idle"];
 
@@ -123,7 +127,6 @@ class Player extends Entity {
         if (this.state != Entity.STATE.MINING) {
             this.mining = this.MINING_TIME;
             this.state = Entity.STATE.MINING;
-            this.currentAnimation = this.animations["mining"];
         }
         if (this.state === Entity.STATE.MINING) {
             const blocks = this.world.getBlocks(this.position);
@@ -134,12 +137,15 @@ class Player extends Entity {
                     break;
                 case "down":
                     block = blocks.below;
+                    this.currentAnimation = this.animations["mine-down"];
                     break;
                 case "left":
                     block = blocks.left;
+                    this.currentAnimation = this.animations["mine-left"];
                     break;
                 case "right":
                     block = blocks.right;
+                    this.currentAnimation = this.animations["mine-right"];
                     break;
             }
             if (block && block.solid) {
@@ -201,8 +207,20 @@ class Player extends Entity {
         spriteSheets["walk-right"] = loadImage(
             "./bug-dug/res/img/animations/player_walk_right.png"
         );
-        spriteSheets["mining"] = loadImage(
-            "./bug-dug/res/img/animations/big_mushroom_idle.png"
+        spriteSheets["climb"] = loadImage(
+            "./bug-dug/res/img/animations/player_climb.png"
+        );
+        spriteSheets["mine_down"] = loadImage(
+            "./bug-dug/res/img/animations/player_pick_down.png"
+        );
+        spriteSheets["mine_left"] = loadImage(
+            "./bug-dug/res/img/animations/player_pick_left.png"
+        );
+        spriteSheets["mine_right"] = loadImage(
+            "./bug-dug/res/img/animations/player_pick_right.png"
+        );
+        spriteSheets["dead"] = loadImage(
+            "./bug-dug/res/img/animations/player_dead.png"
         );
         return spriteSheets;
     }
