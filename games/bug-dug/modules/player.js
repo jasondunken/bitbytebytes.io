@@ -14,6 +14,20 @@ class Player extends Entity {
 
     hasKey = false;
 
+    static STATE = Object.freeze({
+        IDLE: "idle",
+        WALKING_LEFT: "walk-left",
+        WALKING_RIGHT: "walk-right",
+        JUMPING: "jump",
+        CLIMBING: "climb",
+        ATTACKING: "attack",
+        MINING_LEFT: "mine-left",
+        MINING_RIGHT: "mine-right",
+        MINING_DOWN: "mine-down",
+        HURT: "hurt",
+        DEAD: "dead",
+    });
+
     constructor(world, spriteSheets) {
         super("player");
         this.world = world;
@@ -36,6 +50,35 @@ class Player extends Entity {
             10,
             ParticleEmitter.RadialBurst
         );
+    }
+
+    update(dt) {
+        this.getInput();
+
+        this.currentAnimation = this.animations[this.state];
+
+        if (this.currentAnimation) {
+            this.currentAnimation.update();
+        }
+
+        if (!this.grounded) {
+            this.position.y = this.position.y + 3; // terrain.gravity;
+        }
+
+        this.collider.update(this.position);
+        if (this.particleEmitter) {
+            if (
+                this.state == Entity.STATE.WALKING_LEFT ||
+                this.state == Entity.STATE.WALKING_RIGHT
+            ) {
+                this.particleEmitter.start();
+            } else {
+                this.particleEmitter.stop();
+            }
+
+            this.particleEmitter.update();
+            this.particleEmitter.setPosition(this.position);
+        }
     }
 
     getInput() {
@@ -76,7 +119,7 @@ class Player extends Entity {
         this.moveLeft,
         this.moveRight,
 
-        this.digUP,
+        this.digUp,
         this.digDown,
         this.digLeft,
         this.digRight,
@@ -119,33 +162,33 @@ class Player extends Entity {
     digRight(player) {
         player.dig("right");
     }
-    gitLeft(player) {
+    digLeft(player) {
         player.dig("left");
     }
 
     dig(direction) {
-        if (this.state != Entity.STATE.MINING) {
+        if (this.mining <= 0) {
             this.mining = this.MINING_TIME;
-            this.state = Entity.STATE.MINING;
-        }
-        if (this.state === Entity.STATE.MINING) {
+        } else {
             const blocks = this.world.getBlocks(this.position);
             let block = null;
             switch (direction) {
                 case "up":
                     block = blocks.above;
+                    // probably not going to alow mining up but this is here for now
+                    this.state = Player.STATE.MINING_DOWN;
                     break;
                 case "down":
                     block = blocks.below;
-                    this.currentAnimation = this.animations["mine-down"];
+                    this.state = Player.STATE.MINING_DOWN;
                     break;
                 case "left":
                     block = blocks.left;
-                    this.currentAnimation = this.animations["mine-left"];
+                    this.state = Player.STATE.MINING_LEFT;
                     break;
                 case "right":
                     block = blocks.right;
-                    this.currentAnimation = this.animations["mine-right"];
+                    this.state = Player.STATE.MINING_RIGHT;
                     break;
             }
             if (block && block.solid) {
@@ -154,7 +197,7 @@ class Player extends Entity {
             }
 
             if (this.mining <= 0) {
-                this.state = Entity.STATE.IDLE;
+                this.state = Player.STATE.IDLE;
             }
         }
     }

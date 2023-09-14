@@ -149,7 +149,6 @@ class BugDug {
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
 
-        this.player.getInput();
         this.player.update(this.dt);
         this.constrainPosition(this.player);
 
