@@ -85,6 +85,7 @@ class Block extends GameObject {
 class Ladder extends Block {
     constructor(position, sprite) {
         super(position, 32, 32, "ladder", sprite);
+        this.solid = false;
     }
 }
 

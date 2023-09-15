@@ -8,7 +8,8 @@ class Player extends Entity {
     CLIMB_SPEED = 2;
     MINING_TIME = 60;
     mining = 0;
-    pickaxeStrength = 5;
+    pickaxeStrength = 30;
+    canDamageBlock = false;
 
     particleEmitterOffset = new Vec(0, 16);
 
@@ -127,7 +128,7 @@ class Player extends Entity {
 
     climbUp(player) {
         const block = player.world.getBlock(player.position);
-        if (block.type === "ladder") {
+        if (block.blockType === "ladder") {
             player.onLadder = true;
             player.position.y -= player.CLIMB_SPEED;
             player.grounded = false;
@@ -136,7 +137,8 @@ class Player extends Entity {
 
     climbDown(player) {
         const block = player.world.getBlockBelow(player.position);
-        if (block.type === "ladder") {
+        console.log("block: ", block);
+        if (block.blockType === "ladder") {
             player.onLadder = true;
             player.position.y += player.CLIMB_SPEED;
             player.grounded = false;
@@ -169,7 +171,11 @@ class Player extends Entity {
     dig(direction) {
         if (this.mining <= 0) {
             this.mining = this.MINING_TIME;
-        } else {
+            this.canDamageBlock = true;
+        }
+
+        if (this.mining > 0) {
+            this.mining--;
             const blocks = this.world.getBlocks(this.position);
             let block = null;
             switch (direction) {
@@ -191,9 +197,9 @@ class Player extends Entity {
                     this.state = Player.STATE.MINING_RIGHT;
                     break;
             }
-            if (block && block.solid) {
-                this.mining--;
+            if (block && block.solid && this.canDamageBlock) {
                 block.takeDamage(this.pickaxeStrength);
+                this.canDamageBlock = false;
             }
 
             if (this.mining <= 0) {
