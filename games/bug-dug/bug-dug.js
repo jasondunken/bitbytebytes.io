@@ -206,27 +206,28 @@ class BugDug {
     }
 
     constrainPosition(obj) {
+        const collider = obj.collider;
         const { x, y } = obj.position;
         // constrain x
-        if (x < obj.width / 2) obj.position.x = obj.width / 2;
-        if (x > this.width - obj.width / 2)
-            obj.position.x = this.width - obj.width / 2;
+        if (x < collider.width / 2) x = collider.width / 2;
+        if (x > this.width - collider.width / 2)
+            obj.position.x = this.width - collider.width / 2;
         // constrain y
-        if (y < obj.height / 2) obj.position.y = obj.height / 2;
-        if (y > this.height - obj.height / 2)
-            obj.position.y = this.height - obj.height / 2;
+        if (y < collider.height / 2) y = collider.height / 2;
+        if (y > this.height - collider.height / 2)
+            obj.position.y = this.height - collider.height / 2;
 
         // check for block collisions
         const blocks = this.getBlocks(obj.position);
         let block = blocks.above;
         if (block && block.solid) {
-            if (y - obj.height / 2 <= block.collider.d.y) {
+            if (y - collider.height / 2 <= block.collider.d.y) {
                 obj.position.y = block.collider.d.y + obj.height / 2;
             }
         }
         block = blocks.below;
         if (block && block.solid) {
-            if (y + obj.height / 2 >= block.collider.a.y) {
+            if (y + collider.height / 2 >= block.collider.a.y) {
                 obj.position.y = block.collider.a.y - obj.height / 2;
                 obj.grounded = true;
             }
@@ -234,21 +235,21 @@ class BugDug {
         if (
             block &&
             !block.solid &&
-            x - obj.width / 2 >= block.collider.a.x &&
-            x + obj.width / 2 <= block.collider.b.x
+            x - collider.width / 2 >= block.collider.a.x &&
+            x + collider.width / 2 <= block.collider.b.x
         ) {
             obj.grounded = false;
         }
         block = blocks.left;
         if (block && block.solid) {
-            if (x - obj.width / 2 <= block.collider.b.x) {
-                obj.position.x = block.collider.b.x + obj.width / 2;
+            if (x - collider.width / 2 <= block.collider.b.x) {
+                obj.position.x = block.collider.b.x + collider.width / 2;
             }
         }
         block = blocks.right;
         if (block && block.solid) {
-            if (x + obj.width / 2 >= block.collider.a.x) {
-                obj.position.x = block.collider.a.x - obj.width / 2;
+            if (x + collider.width / 2 >= block.collider.a.x) {
+                obj.position.x = block.collider.a.x - collider.width / 2;
             }
         }
     }

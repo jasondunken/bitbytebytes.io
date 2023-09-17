@@ -1,4 +1,5 @@
 import { Entity } from "./entity.js";
+import { Collider } from "../../modules/collisions/collider.js";
 import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
@@ -11,7 +12,9 @@ class Player extends Entity {
     pickaxeStrength = 30;
     canDamageBlock = false;
 
+    // relative to player position
     particleEmitterOffset = new Vec(0, 16);
+    colliderPosition = new Vec(0, 8);
 
     hasKey = false;
 
@@ -51,6 +54,12 @@ class Player extends Entity {
             10,
             ParticleEmitter.RadialBurst
         );
+
+        this.collider = new Collider(
+            Vec.add2(this.position, this.colliderPosition),
+            16,
+            16
+        );
     }
 
     update(dt) {
@@ -66,7 +75,7 @@ class Player extends Entity {
             this.position.y = this.position.y + 3; // terrain.gravity;
         }
 
-        this.collider.update(this.position);
+        this.collider.update(Vec.add2(this.position, this.colliderPosition));
         if (this.particleEmitter) {
             if (
                 this.state == Entity.STATE.WALKING_LEFT ||
