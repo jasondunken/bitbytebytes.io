@@ -14,7 +14,11 @@ class Player extends Entity {
 
     // relative to player position
     particleEmitterOffset = new Vec(0, 16);
+    numParticles = 10;
+    particleLoopInterval = 10;
     colliderPosition = new Vec(0, 8);
+    colliderWith = 16;
+    colliderHeight = 16;
 
     hasKey = false;
 
@@ -50,15 +54,15 @@ class Player extends Entity {
 
         this.particleEmitter = new ParticleEmitter(
             Vec.add2(this.position, this.particleEmitterOffset),
-            10,
-            10,
+            this.numParticles,
+            this.particleLoopInterval,
             ParticleEmitter.RadialBurst
         );
 
         this.collider = new Collider(
             Vec.add2(this.position, this.colliderPosition),
-            16,
-            16
+            this.colliderWidth,
+            this.colliderHeight
         );
     }
 
