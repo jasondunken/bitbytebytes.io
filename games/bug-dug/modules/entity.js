@@ -1,5 +1,6 @@
 import { Collider } from "../../modules/collisions/collider.js";
 import { GameObject } from "../../modules/gameObject.js";
+import { LevelArchitect } from "./levelArchitect.js";
 
 class Entity extends GameObject {
     width = 32;
@@ -42,7 +43,7 @@ class Entity extends GameObject {
         }
 
         if (!this.grounded) {
-            this.position.y = this.position.y + 3; // terrain.gravity;
+            this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
 
         this.collider.update(this.position);

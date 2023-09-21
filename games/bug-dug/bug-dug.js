@@ -194,8 +194,8 @@ class BugDug {
                     } else {
                         this.level.blocks[i][j] = new Block(
                             block.position,
-                            32,
-                            32,
+                            LevelArchitect.BLOCK_SIZE,
+                            LevelArchitect.BLOCK_SIZE,
                             "air",
                             this.blockSprites["background-wall"]
                         );
@@ -289,8 +289,6 @@ class BugDug {
             this.level.blockSize
         );
     }
-
-    mineBlock(blockIndex) {}
 
     collectCoin() {
         this.score += 100;
