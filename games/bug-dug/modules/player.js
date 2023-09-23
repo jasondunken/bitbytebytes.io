@@ -1,3 +1,4 @@
+import { LevelArchitect } from "./levelArchitect.js";
 import { Entity } from "./entity.js";
 import { Collider } from "../../modules/collisions/collider.js";
 import { Animation } from "../../modules/graphics/animation.js";
@@ -76,7 +77,7 @@ class Player extends Entity {
         }
 
         if (!this.grounded) {
-            this.position.y = this.position.y + 3; // terrain.gravity;
+            this.position.y = this.position.y + LevelArchitect.GRAVITY; // terrain.gravity;
         }
 
         this.collider.update(Vec.add2(this.position, this.colliderPosition));
