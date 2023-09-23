@@ -3,7 +3,6 @@ import { Collider } from "../../modules/collisions/collider.js";
 import { Animation } from "../../modules/graphics/animation.js";
 import { ParticleEmitter } from "./particle.js";
 import { Vec } from "../../modules/math/vec.js";
-import { LevelArchitect } from "./levelArchitect.js";
 
 class Player extends Entity {
     WALK_SPEED = 1.5;
@@ -77,7 +76,7 @@ class Player extends Entity {
         }
 
         if (!this.grounded) {
-            this.position.y = this.position.y + LevelArchitect.GRAVITY;
+            this.position.y = this.position.y + 3; // terrain.gravity;
         }
 
         this.collider.update(Vec.add2(this.position, this.colliderPosition));

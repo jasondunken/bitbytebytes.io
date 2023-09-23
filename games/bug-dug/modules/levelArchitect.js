@@ -54,7 +54,6 @@ class Level {
 
 class LevelArchitect {
     static BLOCK_SIZE = 32;
-    static GRAVITY = 3;
 
     static createLevel(
         screenWidth,
