@@ -213,7 +213,7 @@ class BugDug {
         if (x > this.width - collider.width / 2)
             obj.position.x = this.width - collider.width / 2;
         // constrain y
-        if (y < collider.height / 2) y = collider.height / 2;
+        if (y < collider.height / 2) obj.position.y = collider.height / 2;
         if (y > this.height - collider.height / 2)
             obj.position.y = this.height - collider.height / 2;
 
