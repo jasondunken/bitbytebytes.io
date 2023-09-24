@@ -43,7 +43,7 @@ class Entity extends GameObject {
         }
 
         if (!this.grounded) {
-            this.position.y = this.position.y + LevelArchitect.GRAVITY; // terrain.gravity;
+            this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
 
         this.collider.update(this.position);

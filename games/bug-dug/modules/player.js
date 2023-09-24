@@ -77,7 +77,7 @@ class Player extends Entity {
         }
 
         if (!this.grounded) {
-            this.position.y = this.position.y + LevelArchitect.GRAVITY; // terrain.gravity;
+            this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
 
         this.collider.update(Vec.add2(this.position, this.colliderPosition));
