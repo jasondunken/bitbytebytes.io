@@ -22,15 +22,16 @@ class ParticleEmitter extends GameObject {
         this.numParticles = numParticles;
         this.loopInterval = loopInterval;
         this.loopTime = loopInterval;
-        this.update = updateFunction;
+        this.updateEmitter = updateFunction;
 
         this.particleColor = color(130, 80, 65);
 
         this.spawnParticles(numParticles);
     }
 
-    setPosition(position) {
-        this.position.set(position.x, position.y + 16);
+    update(position) {
+        this.position.set(position);
+        this.updateEmitter();
     }
 
     emit() {

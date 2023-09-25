@@ -14,7 +14,7 @@ class Player extends Entity {
     canDamageBlock = false;
 
     // relative to player position
-    particleEmitterOffset = new Vec(0, 16);
+    particleEmitterPosition = new Vec(0, 16);
     numParticles = 10;
     particleLoopInterval = 10;
     colliderPosition = new Vec(0, 8);
@@ -54,7 +54,7 @@ class Player extends Entity {
         this.currentAnimation = this.animations["idle"];
 
         this.particleEmitter = new ParticleEmitter(
-            Vec.add2(this.position, this.particleEmitterOffset),
+            Vec.add2(this.position, this.particleEmitterPosition),
             this.numParticles,
             this.particleLoopInterval,
             ParticleEmitter.RadialBurst
@@ -81,19 +81,18 @@ class Player extends Entity {
         }
 
         this.collider.update(Vec.add2(this.position, this.colliderPosition));
-        if (this.particleEmitter) {
-            if (
-                this.state == Entity.STATE.WALKING_LEFT ||
-                this.state == Entity.STATE.WALKING_RIGHT
-            ) {
-                this.particleEmitter.start();
-            } else {
-                this.particleEmitter.stop();
-            }
 
-            this.particleEmitter.update();
-            this.particleEmitter.setPosition(this.position);
+        if (
+            this.state == Entity.STATE.WALKING_LEFT ||
+            this.state == Entity.STATE.WALKING_RIGHT
+        ) {
+            this.particleEmitter.start();
+        } else {
+            this.particleEmitter.stop();
         }
+        this.particleEmitter.update(
+            Vec.add2(this.position, this.particleEmitterPosition)
+        );
     }
 
     getInput() {
