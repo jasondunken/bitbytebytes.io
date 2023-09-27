@@ -76,7 +76,7 @@ class Player extends Entity {
             this.currentAnimation.update();
         }
 
-        if (!this.grounded) {
+        if (!this.grounded && !this.onLadder) {
             this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
 
@@ -159,13 +159,19 @@ class Player extends Entity {
     }
 
     moveLeft(player) {
-        player.position.x -= player.WALK_SPEED;
-        player.state = Entity.STATE.WALKING_LEFT;
+        const block = player.world.getBlockLeft(player.position);
+        if (!block.solid || block.blockType === "ladder") {
+            player.position.x -= player.WALK_SPEED;
+            player.state = Entity.STATE.WALKING_LEFT;
+        }
     }
 
     moveRight(player) {
-        player.position.x += player.WALK_SPEED;
-        player.state = Entity.STATE.WALKING_RIGHT;
+        const block = player.world.getBlockRight(player.position);
+        if (!block.solid || block.blockType === "ladder") {
+            player.position.x += player.WALK_SPEED;
+            player.state = Entity.STATE.WALKING_RIGHT;
+        }
     }
 
     digUp(player) {

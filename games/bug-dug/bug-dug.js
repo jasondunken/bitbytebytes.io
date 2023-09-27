@@ -290,6 +290,22 @@ class BugDug {
         );
     }
 
+    getBlockLeft(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        ).left;
+    }
+
+    getBlockRight(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        ).right;
+    }
+
     mineBlock(blockIndex) {}
 
     collectCoin() {
