@@ -18,7 +18,7 @@ class Player extends Entity {
     numParticles = 10;
     particleLoopInterval = 10;
     colliderPosition = new Vec(0, 8);
-    colliderWith = 16;
+    colliderWidth = 16;
     colliderHeight = 16;
 
     hasKey = false;
@@ -160,7 +160,7 @@ class Player extends Entity {
 
     moveLeft(player) {
         const block = player.world.getBlockLeft(player.position);
-        if (!block.solid || block.blockType === "ladder") {
+        if (block && (!block.solid || block.blockType === "ladder")) {
             player.position.x -= player.WALK_SPEED;
             player.state = Entity.STATE.WALKING_LEFT;
         }
@@ -168,7 +168,7 @@ class Player extends Entity {
 
     moveRight(player) {
         const block = player.world.getBlockRight(player.position);
-        if (!block.solid || block.blockType === "ladder") {
+        if (block && (!block.solid || block.blockType === "ladder")) {
             player.position.x += player.WALK_SPEED;
             player.state = Entity.STATE.WALKING_RIGHT;
         }
