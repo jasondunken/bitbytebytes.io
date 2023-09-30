@@ -159,19 +159,13 @@ class Player extends Entity {
     }
 
     moveLeft(player) {
-        const block = player.world.getBlockLeft(player.position);
-        if (block && (!block.solid || block.blockType === "ladder")) {
-            player.position.x -= player.WALK_SPEED;
-            player.state = Entity.STATE.WALKING_LEFT;
-        }
+        player.position.x -= player.WALK_SPEED;
+        player.state = Entity.STATE.WALKING_LEFT;
     }
 
     moveRight(player) {
-        const block = player.world.getBlockRight(player.position);
-        if (block && (!block.solid || block.blockType === "ladder")) {
-            player.position.x += player.WALK_SPEED;
-            player.state = Entity.STATE.WALKING_RIGHT;
-        }
+        player.position.x += player.WALK_SPEED;
+        player.state = Entity.STATE.WALKING_RIGHT;
     }
 
     digUp(player) {
