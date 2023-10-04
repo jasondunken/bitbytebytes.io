@@ -113,12 +113,16 @@ class LevelArchitect {
                     backgroundLayer[i][j] = blockSprites["dirt_3_0"];
                     foregroundLayer[i][j] = blockSprites["dirt_3_0"];
                 } else {
-                    const blockType =
-                        levelConfig.BLOCK_TYPES[
-                            Math.floor(
-                                Math.random() * levelConfig.BLOCK_TYPES.length
-                            )
-                        ];
+                    let blockIndex = 0;
+                    let blockChance = Math.random();
+                    if (blockChance > 0.9) {
+                        blockIndex = levelConfig.BLOCK_TYPES.length - 1;
+                    } else {
+                        blockIndex = Math.floor(
+                            Math.random() * (levelConfig.BLOCK_TYPES.length - 1)
+                        );
+                    }
+                    const blockType = levelConfig.BLOCK_TYPES[blockIndex];
                     blocks[i][j] = new Block(
                         blockPosition,
                         LevelArchitect.BLOCK_SIZE,
