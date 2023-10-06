@@ -53,6 +53,7 @@ class Level {
 }
 
 class LevelArchitect {
+    static BLOCK_TYPES = ["dirt", "clay", "sand", "stone"];
     static BLOCK_SIZE = 32;
     static GRAVITY = 3;
 
@@ -116,13 +117,14 @@ class LevelArchitect {
                     let blockIndex = 0;
                     let blockChance = Math.random();
                     if (blockChance > 0.9) {
-                        blockIndex = levelConfig.BLOCK_TYPES.length - 1;
+                        blockIndex = LevelArchitect.BLOCK_TYPES.length - 1;
                     } else {
                         blockIndex = Math.floor(
-                            Math.random() * (levelConfig.BLOCK_TYPES.length - 1)
+                            Math.random() *
+                                (LevelArchitect.BLOCK_TYPES.length - 1)
                         );
                     }
-                    const blockType = levelConfig.BLOCK_TYPES[blockIndex];
+                    const blockType = LevelArchitect.BLOCK_TYPES[blockIndex];
                     blocks[i][j] = new Block(
                         blockPosition,
                         LevelArchitect.BLOCK_SIZE,
