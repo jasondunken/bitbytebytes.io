@@ -3,7 +3,6 @@ export const LEVELS = [
         playerSpawn: { x: 50, y: 100 },
         numEnemies: 3,
         surfaceHeight: 192,
-        gravity: 3,
         numItems: 6,
         numTraps: 3,
         SKY_COLOR: "#9EF6FF",
