@@ -171,6 +171,13 @@ class BugDug {
                     this.collectCoin();
                 }
             }
+            if (item.type === "chest") {
+                if (calculateAABBCollision(item, this.player)) {
+                    let contents = item.open();
+                    // console.log("contents: ", contents);
+                    this.level.items.delete(item);
+                }
+            }
         });
 
         for (let i = 0; i < this.level.blocks.length; i++) {
@@ -388,6 +395,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
+        // console.log("level: ", this.level);
 
         this.player.setPosition(
             new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
