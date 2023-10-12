@@ -9,11 +9,10 @@ class Item extends GameObject {
     collected = false;
     itemType = "";
     constructor(position, spriteSheet, itemType) {
-        super("item", position);
+        super(itemType, position);
         this.collider = new Collider(position, this.width, this.height);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
-        this.itemType = itemType;
     }
 
     render() {
@@ -72,7 +71,7 @@ class Chest extends GameObject {
     }
 }
 
-class Coin extends GameObject {
+class Coin extends Item {
     static SIZE = 16;
     collected = false;
 
@@ -83,7 +82,7 @@ class Coin extends GameObject {
         d: new Vec(),
     };
     constructor(position, spriteSheet) {
-        super("coin", position);
+        super(position, spriteSheet, "coin");
         const colliderPos = new Vec(
             position.x + Coin.SIZE / 2,
             position.y + Coin.SIZE / 2
@@ -125,9 +124,9 @@ class Tool extends GameObject {
     }
 }
 
-class Key extends GameObject {
+class Key extends Item {
     constructor(position, sprite) {
-        super("key", position);
+        super(position, sprite, "key");
         this.sprite = sprite;
     }
 }
