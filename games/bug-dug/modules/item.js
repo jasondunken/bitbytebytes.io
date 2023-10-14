@@ -3,16 +3,25 @@ import { Animation } from "../../modules/graphics/animation.js";
 import { Collider } from "../../modules/collisions/collider.js";
 
 import { Vec } from "../../modules/math/vec.js";
+import { LevelArchitect } from "./levelArchitect.js";
 
 class Item extends GameObject {
     static SIZE = 16;
     collected = false;
     itemType = "";
+    grounded = false;
     constructor(position, spriteSheet, itemType) {
         super(itemType, position);
         this.collider = new Collider(position, this.width, this.height);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
+    }
+
+    update(delta) {
+        if (!this.grounded) {
+            this.position.y += LevelArchitect.GRAVITY;
+        }
+        this.collider.update(this.position);
     }
 
     render() {
@@ -74,6 +83,7 @@ class Chest extends GameObject {
 class Coin extends Item {
     static SIZE = 16;
     collected = false;
+    grounded = false;
 
     collider = {
         a: new Vec(),
@@ -83,10 +93,9 @@ class Coin extends Item {
     };
     constructor(position, spriteSheet) {
         super(position, spriteSheet, "coin");
-        const colliderPos = new Vec(
-            position.x + Coin.SIZE / 2,
-            position.y + Coin.SIZE / 2
-        );
+        const colliderPos = new Vec(position.x, position.y);
+        this.width = Coin.SIZE;
+        this.height = Coin.SIZE;
         this.collider = new Collider(colliderPos, Coin.SIZE, Coin.SIZE);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
@@ -97,8 +106,8 @@ class Coin extends Item {
             this.animation.update();
             image(
                 this.animation.currentFrame,
-                this.position.x,
-                this.position.y,
+                this.position.x - Coin.SIZE / 2,
+                this.position.y - Coin.SIZE / 2,
                 Coin.SIZE,
                 Coin.SIZE
             );

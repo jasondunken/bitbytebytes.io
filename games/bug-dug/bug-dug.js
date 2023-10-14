@@ -165,7 +165,8 @@ class BugDug {
 
         this.level.items.forEach((item) => {
             item.update(this.dt);
-            if (item.type === "coin") {
+            this.constrainPosition(item);
+            if (item.type === "coin" && item.grounded) {
                 if (calculateAABBCollision(item, this.player)) {
                     this.level.items.delete(item);
                     this.collectCoin();
@@ -395,7 +396,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
-        // console.log("level: ", this.level);
+        console.log("level: ", this.level);
 
         this.player.setPosition(
             new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)

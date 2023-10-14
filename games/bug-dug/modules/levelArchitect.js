@@ -263,7 +263,7 @@ class LevelArchitect {
                 }
                 if (j !== chestIndex) {
                     const coinPosition = new Vec(
-                        blockAbove.position.x + Item.SIZE / 2,
+                        blockAbove.position.x + Item.SIZE,
                         blockAbove.position.y + Item.SIZE
                     );
                     items.add(
