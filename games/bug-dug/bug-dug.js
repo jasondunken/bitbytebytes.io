@@ -4,6 +4,7 @@ import { Block, Ladder } from "./modules/blocks.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
 import { Animation } from "../modules/graphics/animation.js";
+import { Coin, Key } from "./modules/item.js";
 import {
     clearForegroundAround,
     getGridIndex,
@@ -176,7 +177,33 @@ class BugDug {
                 if (calculateAABBCollision(item, this.player)) {
                     let contents = item.open();
                     // console.log("contents: ", contents);
+                    for (let item of contents) {
+                        let new_item = null;
+                        switch (item.type) {
+                            case "coin":
+                                new_item = new Coin(
+                                    item.position,
+                                    this.blockSprites["coin-gold"]
+                                );
+                                break;
+                            case "key":
+                                new_item = new Key(
+                                    item.position,
+                                    this.blockSprites["white-key"]
+                                );
+                                break;
+                        }
+                        if (new_item) {
+                            this.level.items.add(new_item);
+                        }
+                    }
                     this.level.items.delete(item);
+                }
+            }
+            if (item.type === "key" && item.grounded) {
+                if (calculateAABBCollision(item, this.player)) {
+                    this.level.items.delete(item);
+                    this.player.hasKey = true;
                 }
             }
         });
@@ -396,7 +423,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
-        console.log("level: ", this.level);
+        // console.log("level: ", this.level);
 
         this.player.setPosition(
             new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)

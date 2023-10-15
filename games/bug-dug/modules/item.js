@@ -10,6 +10,11 @@ class Item extends GameObject {
     collected = false;
     itemType = "";
     grounded = false;
+
+    launchVelocity = Vec.ZERO;
+    velocity = Vec.ZERO;
+    gravityVector = new Vec(0, LevelArchitect.GRAVITY);
+
     constructor(position, spriteSheet, itemType) {
         super(itemType, position);
         this.collider = new Collider(position, this.width, this.height);
@@ -17,9 +22,13 @@ class Item extends GameObject {
         this.animation.time = Math.random() * this.animation.duration;
     }
 
+    launch() {
+        this.launchVelocity = new Vec(Math.random() * 2 - 1, -1).normalize();
+    }
+
     update(delta) {
         if (!this.grounded) {
-            this.position.y += LevelArchitect.GRAVITY;
+            this.position.add(this.gravityVector);
         }
         this.collider.update(this.position);
     }
@@ -83,7 +92,6 @@ class Chest extends GameObject {
 class Coin extends Item {
     static SIZE = 16;
     collected = false;
-    grounded = false;
 
     collider = {
         a: new Vec(),
@@ -134,9 +142,30 @@ class Tool extends GameObject {
 }
 
 class Key extends Item {
-    constructor(position, sprite) {
-        super(position, sprite, "key");
-        this.sprite = sprite;
+    static SIZE = 16;
+    collected = false;
+
+    constructor(position, spriteSheet) {
+        super(position, spriteSheet, "key");
+        const colliderPos = new Vec(position.x, position.y);
+        this.width = Key.SIZE;
+        this.height = Key.SIZE;
+        this.collider = new Collider(colliderPos, Key.SIZE, Key.SIZE);
+        this.animation = new Animation(spriteSheet, 45, true);
+        this.animation.time = Math.random() * this.animation.duration;
+    }
+
+    render() {
+        if (this.animation) {
+            this.animation.update();
+            image(
+                this.animation.currentFrame,
+                this.position.x - Key.SIZE / 2,
+                this.position.y - Key.SIZE / 2,
+                Key.SIZE,
+                Key.SIZE
+            );
+        }
     }
 }
 

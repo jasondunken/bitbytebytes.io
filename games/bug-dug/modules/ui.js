@@ -26,7 +26,7 @@ export class UI {
             image(
                 currentData?.keyIcon,
                 this.width - 80,
-                54,
+                68,
                 32,
                 32,
                 0,
