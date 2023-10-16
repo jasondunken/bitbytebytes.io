@@ -13,6 +13,7 @@ class Item extends GameObject {
 
     launchVelocity = Vec.ZERO;
     velocity = Vec.ZERO;
+    mass = 0.5;
     gravityVector = new Vec(0, LevelArchitect.GRAVITY);
 
     constructor(position, spriteSheet, itemType) {
@@ -23,12 +24,20 @@ class Item extends GameObject {
     }
 
     launch() {
-        this.launchVelocity = new Vec(Math.random() * 2 - 1, -1).normalize();
+        this.grounded = false;
+        let rndX = Math.random() * 0.5 + 0.5;
+        rndX = Math.random() > 0.5 ? rndX : -rndX;
+        rndX *= 32;
+        this.velocity = new Vec(rndX, -1).mult(16);
     }
 
     update(delta) {
         if (!this.grounded) {
-            this.position.add(this.gravityVector);
+            this.velocity = Vec.add2(
+                this.velocity,
+                this.gravityVector.mult(this.mass)
+            ).mult(delta / 100);
+            this.position.add(this.velocity);
         }
         this.collider.update(this.position);
     }
@@ -93,12 +102,6 @@ class Coin extends Item {
     static SIZE = 16;
     collected = false;
 
-    collider = {
-        a: new Vec(),
-        b: new Vec(),
-        c: new Vec(),
-        d: new Vec(),
-    };
     constructor(position, spriteSheet) {
         super(position, spriteSheet, "coin");
         const colliderPos = new Vec(position.x, position.y);

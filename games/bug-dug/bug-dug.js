@@ -73,7 +73,27 @@ function initGame() {
     game.startDemo();
 }
 
+let times = 0;
 function draw() {
+    // if (times < 10) {
+    //     noFill();
+    //     stroke("blue");
+    //     rect(240, 368, 32, 32);
+    //     let pos = new Vec(256, 400);
+    //     point(pos.x, pos.y);
+    //     let rndX = Math.random() * 0.5 + 0.5;
+    //     rndX = Math.random() > 0.5 ? rndX : -rndX;
+    //     let velocity = new Vec(rndX, -1).normalize().mult(15);
+    //     for (let i = 0; i < 320; i++) {
+    //         velocity = Vec.add2(velocity, new Vec(0, 3));
+    //         const prev = new Vec(pos.x, pos.y);
+    //         pos.add(velocity);
+    //         stroke("red");
+    //         point(pos.x, pos.y);
+    //         line(prev.x, prev.y, pos.x, pos.y);
+    //     }
+    //     times++;
+    // }
     game.update();
     game.render();
 }
@@ -166,7 +186,9 @@ class BugDug {
 
         this.level.items.forEach((item) => {
             item.update(this.dt);
-            this.constrainPosition(item);
+            if (item.type != "chest") {
+                this.constrainPosition(item);
+            }
             if (item.type === "coin" && item.grounded) {
                 if (calculateAABBCollision(item, this.player)) {
                     this.level.items.delete(item);
@@ -182,18 +204,19 @@ class BugDug {
                         switch (item.type) {
                             case "coin":
                                 new_item = new Coin(
-                                    item.position,
+                                    item.position.copy(),
                                     this.blockSprites["coin-gold"]
                                 );
                                 break;
                             case "key":
                                 new_item = new Key(
-                                    item.position,
+                                    item.position.copy(),
                                     this.blockSprites["white-key"]
                                 );
                                 break;
                         }
                         if (new_item) {
+                            new_item.launch();
                             this.level.items.add(new_item);
                         }
                     }
