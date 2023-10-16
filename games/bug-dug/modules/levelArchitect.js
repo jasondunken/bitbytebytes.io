@@ -225,17 +225,11 @@ class LevelArchitect {
 
             // test chest
             const chestPosition = new Vec(256, 178);
-            const item = itemTypes[i % itemTypes.length];
             let contents = [];
             const numCoins = Math.ceil(Math.random() * 20);
             for (let c = 0; c < numCoins; c++) {
                 contents.push(
                     new Coin(chestPosition, blockSprites["coin-gold"])
-                );
-            }
-            if (item === "key") {
-                contents.push(
-                    new Key(chestPosition, blockSprites["white-key"])
                 );
             }
             items.add(

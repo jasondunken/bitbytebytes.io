@@ -27,16 +27,14 @@ class Item extends GameObject {
         this.grounded = false;
         let rndX = Math.random() * 0.5 + 0.5;
         rndX = Math.random() > 0.5 ? rndX : -rndX;
-        rndX *= 32;
-        this.velocity = new Vec(rndX, -1).mult(16);
+        this.velocity = new Vec(rndX, -1).mult(32);
     }
 
     update(delta) {
         if (!this.grounded) {
-            this.velocity = Vec.add2(
-                this.velocity,
-                this.gravityVector.mult(this.mass)
-            ).mult(delta / 100);
+            this.velocity = Vec.add2(this.velocity, this.gravityVector).mult(
+                delta / 200
+            );
             this.position.add(this.velocity);
         }
         this.collider.update(this.position);
