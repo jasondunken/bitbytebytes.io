@@ -310,7 +310,8 @@ class LevelArchitect {
         );
         blocks[exitX][exitY] = new Door(
             exitPosition,
-            blockSprites["door-locked"]
+            blockSprites["door-locked"],
+            blockSprites["door-unlocked"]
         );
     }
 
@@ -373,7 +374,7 @@ class LevelArchitect {
         );
         sprites["chest"] = loadImage("./bug-dug/res/img/chest.png");
         sprites["chest_sm"] = loadImage("./bug-dug/res/img/chest_sm.png");
-        sprites["door"] = loadImage("./bug-dug/res/img/door.png");
+        sprites["door-unlocked"] = loadImage("./bug-dug/res/img/door.png");
         sprites["door-locked"] = loadImage("./bug-dug/res/img/door_locked.png");
         sprites["white-key"] = loadImage(
             "./bug-dug/res/img/animations/White_Key.png"

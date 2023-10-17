@@ -235,6 +235,12 @@ class BugDug {
             for (let j = 0; j < this.level.blocks[i].length; j++) {
                 const block = this.level.blocks[i][j];
                 block.update(this.dt);
+                if (block.blockType === "door") {
+                    if (calculateAABBCollision(block, this.player)) {
+                        block.unlock();
+                        this.player.hasKey = false;
+                    }
+                }
                 if (block.destroyed) {
                     clearForegroundAround(
                         getGridIndex(block.position, this.level.BLOCK_SIZE),
@@ -310,6 +316,10 @@ class BugDug {
                 obj.position.x = block.collider.a.x - collider.width / 2;
             }
         }
+
+        if (obj.type === "player" && obj.grounded) {
+            obj.onLadder = false;
+        }
     }
 
     seeIfLadder(position) {
@@ -380,7 +390,10 @@ class BugDug {
             for (let j = 0; j < this.level.blocks[i].length; j++) {
                 const block = this.level.blocks[i][j];
                 block.render();
-                if (block.health < block.MAX_HEALTH) {
+                if (
+                    block.blockType != "door" &&
+                    block.health < block.MAX_HEALTH
+                ) {
                     let damageSpriteIndex = Math.floor(
                         map(
                             block.health,

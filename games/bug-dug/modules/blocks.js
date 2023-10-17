@@ -1,5 +1,4 @@
 import { GameObject } from "../../modules/gameObject.js";
-import { LevelArchitect } from "./levelArchitect.js";
 import { Collider } from "../../modules/collisions/collider.js";
 import { Vec } from "../../modules/math/vec.js";
 
@@ -95,8 +94,27 @@ class Door extends Block {
     open = false;
     locked = true;
 
-    constructor(position, sprite) {
-        super(position, 32, 32, "door", sprite);
+    constructor(position, locked_sprite, unlocked_sprite) {
+        super(position, 32, 32, "door", locked_sprite);
+        this.unlocked_sprite = unlocked_sprite;
+    }
+
+    unlock() {
+        this.solid = false;
+        this.locked = false;
+        this.sprite = this.unlocked_sprite;
+    }
+
+    render() {
+        if (this.sprite) {
+            image(
+                this.sprite,
+                this.position.x,
+                this.position.y,
+                this.width,
+                this.height
+            );
+        }
     }
 }
 

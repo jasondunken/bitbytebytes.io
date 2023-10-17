@@ -22,6 +22,7 @@ class Player extends Entity {
     colliderHeight = 16;
 
     hasKey = false;
+    onLadder = false;
 
     static STATE = Object.freeze({
         IDLE: "idle",
