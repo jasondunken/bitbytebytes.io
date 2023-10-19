@@ -392,13 +392,13 @@ class BugDug {
                 block.render();
                 if (
                     block.blockType != "door" &&
-                    block.health < block.MAX_HEALTH
+                    block.health < block.max_health
                 ) {
                     let damageSpriteIndex = Math.floor(
                         map(
                             block.health,
                             0,
-                            block.MAX_HEALTH,
+                            block.max_health,
                             this.blockDamageSprites.keyFrames.length - 1,
                             0
                         )

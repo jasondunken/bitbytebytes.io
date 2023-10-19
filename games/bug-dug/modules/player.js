@@ -152,8 +152,6 @@ class Player extends Entity {
     climbDown(player) {
         const blockAt = player.world.getBlock(player.position);
         const blockBelow = player.world.getBlockBelow(player.position);
-        console.log("blockA: ", blockAt);
-        console.log("blockB: ", blockBelow);
         if (
             blockAt.blockType === "ladder" ||
             blockBelow.blockType === "ladder"
