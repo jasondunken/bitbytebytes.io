@@ -267,6 +267,7 @@ class BugDug {
                 }
             }
         }
+        this.checkExitCollision(this.player);
     }
 
     constrainPosition(obj) {
@@ -374,10 +375,30 @@ class BugDug {
         ).right;
     }
 
-    mineBlock(blockIndex) {}
-
     collectCoin() {
         this.score += 100;
+    }
+
+    getExit() {
+        for (let column of this.level.blocks) {
+            for (let block of column) {
+                if (block.blockType === "door") {
+                    return block;
+                }
+            }
+        }
+    }
+
+    checkExitCollision(player) {
+        const exit = this.getExit();
+        const exitCenter = new Vec(
+            exit.position.x + exit.width / 2,
+            exit.position.y + exit.height / 2
+        );
+        const collisionBuffer = 4;
+        if (Vec.dist(player.position, exitCenter) <= collisionBuffer) {
+            this.loadLevel();
+        }
     }
 
     render() {
@@ -459,7 +480,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
-        // console.log("level: ", this.level);
+        console.log("level: ", this.level);
 
         this.player.setPosition(
             new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
