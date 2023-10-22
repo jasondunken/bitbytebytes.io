@@ -480,7 +480,7 @@ class BugDug {
             this.blockSprites,
             this.enemySprites
         );
-        console.log("level: ", this.level);
+        // console.log("level: ", this.level);
 
         this.player.setPosition(
             new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
