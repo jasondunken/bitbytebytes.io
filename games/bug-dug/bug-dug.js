@@ -181,6 +181,10 @@ class BugDug {
 
         this.level.enemies.forEach((enemy) => {
             enemy.update(this.dt);
+            this.lookForPlayer(enemy, this.player);
+            if (enemy.followingPlayer) {
+                enemy.followPlayer(this.player.position);
+            }
             this.constrainPosition(enemy);
         });
 
@@ -320,6 +324,18 @@ class BugDug {
 
         if (obj.type === "player" && obj.grounded) {
             obj.onLadder = false;
+        }
+    }
+
+    lookForPlayer(enemy, player) {
+        if (
+            Math.abs(enemy.position.y - player.position.y) <=
+                enemy.followRangeY &&
+            Math.abs(enemy.position.x - player.position.x) <= enemy.followRangeX
+        ) {
+            enemy.followingPlayer = true;
+        } else {
+            enemy.followingPlayer = false;
         }
     }
 

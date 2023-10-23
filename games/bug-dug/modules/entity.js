@@ -34,9 +34,11 @@ class Entity extends GameObject {
         this.currentAnimation = this.animations[this.state];
         if (this.state == Entity.STATE.WALKING_LEFT) {
             this.currentAnimation = this.animations["walk-left"];
+            this.position.x -= this.speed;
         }
         if (this.state == Entity.STATE.WALKING_RIGHT) {
             this.currentAnimation = this.animations["walk-right"];
+            this.position.x += this.speed;
         }
         if (this.currentAnimation) {
             this.currentAnimation.update();

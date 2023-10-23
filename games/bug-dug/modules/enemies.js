@@ -4,6 +4,11 @@ import { ParticleEmitter } from "./particle.js";
 
 class Enemy extends Entity {
     attackStrength = 33;
+    followRangeY = 16;
+    followRangeX = 128;
+    followingPlayer = false;
+
+    walkSpeed = 1.25;
 
     constructor(position, spriteSheets) {
         super("enemy", position);
@@ -16,6 +21,15 @@ class Enemy extends Entity {
         this.currentAnimation = this.animations["idle"];
         this.currentAnimation.time =
             Math.random() * this.currentAnimation.duration;
+    }
+
+    followPlayer(playerPosition) {
+        if (this.position.x > playerPosition.x) {
+            this.state = Entity.STATE.WALKING_LEFT;
+        }
+        if (this.position.x < playerPosition.x) {
+            this.state = Entity.STATE.WALKING_RIGHT;
+        }
     }
 
     static loadSpriteSheets() {
