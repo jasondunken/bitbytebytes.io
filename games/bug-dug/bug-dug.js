@@ -1,4 +1,5 @@
 import { Player, DemoPlayer } from "./modules/player.js";
+import { Entity } from "./modules/entity.js";
 import { Enemy } from "./modules/enemies.js";
 import { Block, Ladder } from "./modules/blocks.js";
 import { LEVELS } from "./modules/levels.js";
@@ -117,6 +118,9 @@ class BugDug {
 
     gameObjects = null;
 
+    playerRespawnTime = 3;
+    playerDeadTime = 0;
+
     DEBUG = false;
 
     constructor(
@@ -169,6 +173,14 @@ class BugDug {
         const nowTime = Date.now();
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
+        // console.log("dt: ", this.dt / 1000);
+
+        if (this.player.state === Player.STATE.DEAD) {
+            this.playerDeadTime += this.dt / 1000;
+            if (this.playerDeadTime >= this.playerRespawnTime) {
+                this.spawnPlayer();
+            }
+        }
 
         this.player.update(this.dt);
         this.constrainPosition(this.player);
@@ -182,8 +194,18 @@ class BugDug {
         this.level.enemies.forEach((enemy) => {
             enemy.update(this.dt);
             this.lookForPlayer(enemy, this.player);
+            if (this.player.state === Player.STATE.DEAD) {
+                enemy.state = Entity.STATE.IDLE;
+                enemy.followingPlayer = false;
+            }
             if (enemy.followingPlayer) {
                 enemy.followPlayer(this.player.position);
+            }
+            if (
+                this.player.state != Player.STATE.DEAD &&
+                this.checkEnemyCollision(enemy, this.player)
+            ) {
+                this.playerDead();
             }
             this.constrainPosition(enemy);
         });
@@ -405,6 +427,10 @@ class BugDug {
         }
     }
 
+    checkEnemyCollision(enemy, player) {
+        return this.colliderCollision(enemy.collider, player.collider);
+    }
+
     checkExitCollision(player) {
         const exit = this.getExit();
         const exitCenter = new Vec(
@@ -413,8 +439,32 @@ class BugDug {
         );
         const collisionBuffer = 4;
         if (Vec.dist(player.position, exitCenter) <= collisionBuffer) {
+            this.currentLevel++;
             this.loadLevel();
         }
+    }
+
+    playerDead() {
+        this.player.state = Player.STATE.DEAD;
+        this.lives -= 1;
+    }
+
+    colliderCollision(collider1, collider2) {
+        let collision = false;
+        if (
+            ((collider1.a.x >= collider2.a.x &&
+                collider1.a.x <= collider2.b.x) ||
+                (collider1.b.x <= collider2.b.x &&
+                    collider1.b.x >= collider2.a.x)) &&
+            ((collider1.a.y >= collider2.a.y &&
+                collider1.a.y <= collider2.d.y) ||
+                (collider1.d.y <= collider2.d.y &&
+                    collider1.d.y >= collider2.a.y))
+        ) {
+            collision = true;
+        }
+
+        return collision;
     }
 
     render() {
@@ -492,20 +542,27 @@ class BugDug {
         this.level = LevelArchitect.createLevel(
             this.width,
             this.height,
-            LEVELS[this.currentLevel],
+            //LEVELS[this.currentLevel],
+            LEVELS[0],
             this.blockSprites,
             this.enemySprites
         );
         // console.log("level: ", this.level);
 
-        this.player.setPosition(
-            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
-        );
+        this.spawnPlayer();
 
         this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
             60,
             false
+        );
+    }
+
+    spawnPlayer() {
+        this.player.state = Player.STATE.IDLE;
+        this.playerDeadTime = 0;
+        this.player.setPosition(
+            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
         );
     }
 }

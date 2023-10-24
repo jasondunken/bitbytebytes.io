@@ -69,7 +69,9 @@ class Player extends Entity {
     }
 
     update(dt) {
-        this.getInput();
+        if (this.state != Player.STATE.DEAD) {
+            this.getInput();
+        }
 
         this.currentAnimation = this.animations[this.state];
 
