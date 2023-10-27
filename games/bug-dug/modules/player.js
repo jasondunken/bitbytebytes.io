@@ -72,18 +72,20 @@ class Player extends Entity {
         if (this.state != Player.STATE.DEAD) {
             this.getInput();
         }
+        this.collider.update(Vec.add2(this.position, this.colliderPosition));
+
+        this.onLadder = this.isOnLadder();
+        console.log("onLadder: ", this.onLadder);
+
+        if (!this.grounded && !this.onLadder) {
+            this.position.y = this.position.y + LevelArchitect.GRAVITY;
+        }
 
         this.currentAnimation = this.animations[this.state];
 
         if (this.currentAnimation) {
             this.currentAnimation.update();
         }
-
-        if (!this.grounded && !this.onLadder) {
-            this.position.y = this.position.y + LevelArchitect.GRAVITY;
-        }
-
-        this.collider.update(Vec.add2(this.position, this.colliderPosition));
 
         if (
             this.state == Entity.STATE.WALKING_LEFT ||
@@ -142,23 +144,36 @@ class Player extends Entity {
         this.digRight,
     ];
 
+    isOnLadder() {
+        const rightHand = this.collider.b;
+        const leftHand = this.collider.a;
+        const rightFoot = this.collider.c;
+        const leftFoot = this.collider.d;
+        return (
+            this.world.getBlock(rightHand)?.blockType === "ladder" ||
+            this.world.getBlock(leftHand)?.blockType === "ladder" ||
+            //this.world.getBlock(this.position)?.blockType === "ladder" ||
+            this.world.getBlock(rightFoot)?.blockType === "ladder" ||
+            this.world.getBlock(leftFoot)?.blockType === "ladder"
+            // this.world.getBlockBelow(rightFoot)?.blockType === "ladder" ||
+            // this.world.getBlockBelow(leftFoot)?.blockType === "ladder"
+        );
+    }
+
     climbUp(player) {
-        const block = player.world.getBlock(player.position);
-        if (block.blockType === "ladder") {
-            player.onLadder = true;
+        console.log("onLadder: ", player.onLadder);
+        console.log(
+            "block: ",
+            player.world.getBlock(player.position)?.blockType
+        );
+        if (player.onLadder) {
             player.position.y -= player.CLIMB_SPEED;
             player.grounded = false;
         }
     }
 
     climbDown(player) {
-        const blockAt = player.world.getBlock(player.position);
-        const blockBelow = player.world.getBlockBelow(player.position);
-        if (
-            blockAt.blockType === "ladder" ||
-            blockBelow.blockType === "ladder"
-        ) {
-            player.onLadder = true;
+        if (player.onLadder && !player.grounded) {
             player.position.y += player.CLIMB_SPEED;
             player.grounded = false;
         }
