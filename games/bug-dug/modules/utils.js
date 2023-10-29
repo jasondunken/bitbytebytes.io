@@ -44,7 +44,7 @@ function getBlockRight(index, blocks) {
 }
 
 function getBlock(index, blocks) {
-    if (index.x < 0 || index.x >= blocks.length - 1) {
+    if (index.x < 0 || index.x >= blocks.length) {
         return null;
     }
     if (index.y < 0 || index.y >= blocks[index.x].length) {
