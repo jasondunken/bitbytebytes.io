@@ -75,7 +75,6 @@ class Player extends Entity {
         this.collider.update(Vec.add2(this.position, this.colliderPosition));
 
         this.onLadder = this.isOnLadder();
-        console.log("onLadder: ", this.onLadder);
 
         if (!this.grounded && !this.onLadder) {
             this.position.y = this.position.y + LevelArchitect.GRAVITY;
@@ -152,30 +151,21 @@ class Player extends Entity {
         return (
             this.world.getBlock(rightHand)?.blockType === "ladder" ||
             this.world.getBlock(leftHand)?.blockType === "ladder" ||
-            //this.world.getBlock(this.position)?.blockType === "ladder" ||
+            this.world.getBlock(this.position)?.blockType === "ladder" ||
             this.world.getBlock(rightFoot)?.blockType === "ladder" ||
             this.world.getBlock(leftFoot)?.blockType === "ladder"
-            // this.world.getBlockBelow(rightFoot)?.blockType === "ladder" ||
-            // this.world.getBlockBelow(leftFoot)?.blockType === "ladder"
         );
     }
 
     climbUp(player) {
-        console.log("onLadder: ", player.onLadder);
-        console.log(
-            "block: ",
-            player.world.getBlock(player.position)?.blockType
-        );
-        if (player.onLadder) {
+        if (player.isOnLadder()) {
             player.position.y -= player.CLIMB_SPEED;
-            player.grounded = false;
         }
     }
 
     climbDown(player) {
-        if (player.onLadder && !player.grounded) {
+        if (player.isOnLadder() && !player.grounded) {
             player.position.y += player.CLIMB_SPEED;
-            player.grounded = false;
         }
     }
 
