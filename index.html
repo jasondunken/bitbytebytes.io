@@ -3,7 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <title>BitByteBytes.io</title>
-        <meta name="bitbytebytes" content="The official site of BitByteBytes." />
+        <meta
+            name="bitbytebytes"
+            content="The official site of BitByteBytes."
+        />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href="./css/mainstyle.css" />
         <script src="./js/p5/p5.min.js"></script>
@@ -16,17 +19,26 @@
         </div>
 
         <div class="navigation">
-            <img src="./img/switch-bg.png" alt="switches" class="switches-background" />
+            <img
+                src="./img/switch-bg.png"
+                alt="switches"
+                class="switches-background"
+            />
             <div class="switches">
                 <div class="switch-container">
                     <div class="switch-label">POWER</div>
                     <div id="switch-4" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
+                        <img
+                            src="./img/toggle_frame.png"
+                            alt="switches"
+                            class="switch-frame"
+                        />
                         <div class="switch-label switch-options-text-label">
                             <div>ON</div>
                             <div>OFF</div>
                         </div>
                         <img
+                            title="Turn off retro interface"
                             src="./img/toggle_button.png"
                             alt="switches"
                             id="toggle-power"
@@ -37,12 +49,17 @@
                 <div class="switch-container">
                     <div class="switch-label">MODE</div>
                     <div id="switch-3" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
+                        <img
+                            src="./img/toggle_frame.png"
+                            alt="switches"
+                            class="switch-frame"
+                        />
                         <div class="switch-label switch-options-text-label">
                             <div>CLI</div>
                             <div>GUI</div>
                         </div>
                         <img
+                            title="Change interface mode"
                             src="./img/toggle_button.png"
                             alt="switches"
                             id="toggle-mode"
@@ -53,12 +70,17 @@
                 <div class="switch-container">
                     <div class="switch-label">CELLS</div>
                     <div id="switch-2" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
+                        <img
+                            src="./img/toggle_frame.png"
+                            alt="switches"
+                            class="switch-frame"
+                        />
                         <div class="switch-label switch-options-text-label">
                             <div>SMALL</div>
                             <div>LARGE</div>
                         </div>
                         <img
+                            title="Change Game of Life cell size"
                             src="./img/toggle_button.png"
                             alt="switches"
                             id="toggle-size"
@@ -69,9 +91,18 @@
                 <div class="switch-container">
                     <div class="switch-label">RESET</div>
                     <div id="switch-1" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
-                        <img src="./img/momentary.png" alt="momentary" class="switch-options-graphic-label" />
                         <img
+                            src="./img/toggle_frame.png"
+                            alt="switches"
+                            class="switch-frame"
+                        />
+                        <img
+                            src="./img/momentary.png"
+                            alt="momentary"
+                            class="switch-options-graphic-label"
+                        />
+                        <img
+                            title="Reset Game of Life cells"
                             src="./img/toggle_button.png"
                             alt="switches"
                             id="toggle-reset"
@@ -104,30 +135,58 @@
                 <div id="gui">
                     <div id="desktop">
                         <a class="gui-icon" href="./games/air-defense.html">
-                            <img class="gui-icon-image" src="./img/game_icons/defense.png" alt="air defense" />
+                            <img
+                                class="gui-icon-image"
+                                src="./img/game_icons/defense.png"
+                                alt="air defense"
+                            />
                             <div class="gui-icon-label">Air Defense.exe</div>
                         </a>
                         <a class="gui-icon" href="./games/planet-invaders.html">
-                            <img class="gui-icon-image" src="./img/game_icons/invaders.png" alt="planet invaders" />
-                            <div class="gui-icon-label">Planet Invaders.exe</div>
+                            <img
+                                class="gui-icon-image"
+                                src="./img/game_icons/invaders.png"
+                                alt="planet invaders"
+                            />
+                            <div class="gui-icon-label">
+                                Planet Invaders.exe
+                            </div>
                         </a>
                         <a class="gui-icon" href="./games/mine-squad.html">
-                            <img class="gui-icon-image" src="./img/game_icons/mine.png" alt="mine squad plus" />
-                            <div class="gui-icon-label">Mine Squad Plus.exe</div>
+                            <img
+                                class="gui-icon-image"
+                                src="./img/game_icons/mine.png"
+                                alt="mine squad plus"
+                            />
+                            <div class="gui-icon-label">
+                                Mine Squad Plus.exe
+                            </div>
                         </a>
                         <a class="gui-icon" href="./games/jump-to-orion.html">
-                            <img class="gui-icon-image" src="./img/game_icons/orion.png" alt="jump to orion" />
+                            <img
+                                class="gui-icon-image"
+                                src="./img/game_icons/orion.png"
+                                alt="jump to orion"
+                            />
                             <div class="gui-icon-label">Jump to Orion.exe</div>
                         </a>
                         <a class="gui-icon" href="./games/slider.html">
-                            <img class="gui-icon-image" src="./img/game_icons/slider.png" alt="slider" />
+                            <img
+                                class="gui-icon-image"
+                                src="./img/game_icons/slider.png"
+                                alt="slider"
+                            />
                             <div class="gui-icon-label">Slider.exe</div>
                         </a>
                     </div>
                 </div>
 
                 <div id="toob-overlay">
-                    <img src="./img/old_tv_overlay.png" alt="toobOverlay" id="toobOverlayImage" />
+                    <img
+                        src="./img/old_tv_overlay.png"
+                        alt="toobOverlay"
+                        id="toobOverlayImage"
+                    />
                 </div>
             </div>
         </div>
