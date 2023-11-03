@@ -23,6 +23,18 @@ class Enemy extends Entity {
             Math.random() * this.currentAnimation.duration;
     }
 
+    lookForPlayer(player) {
+        if (
+            Math.abs(this.position.y - player.position.y) <=
+                this.followRangeY &&
+            Math.abs(this.position.x - player.position.x) <= this.followRangeX
+        ) {
+            this.followingPlayer = true;
+        } else {
+            this.followingPlayer = false;
+        }
+    }
+
     followPlayer(playerPosition) {
         if (this.position.x > playerPosition.x) {
             this.state = Entity.STATE.WALKING_LEFT;

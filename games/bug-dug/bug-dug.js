@@ -114,6 +114,8 @@ class BugDug {
 
     player = null;
     currentLevel = 0;
+
+    COIN_VALUE = 100;
     score = 0;
 
     gameObjects = null;
@@ -193,7 +195,7 @@ class BugDug {
 
         this.level.enemies.forEach((enemy) => {
             enemy.update(this.dt);
-            this.lookForPlayer(enemy, this.player);
+            enemy.lookForPlayer(this.player);
             if (this.player.state === Player.STATE.DEAD) {
                 enemy.state = Entity.STATE.IDLE;
                 enemy.followingPlayer = false;
@@ -349,18 +351,6 @@ class BugDug {
         }
     }
 
-    lookForPlayer(enemy, player) {
-        if (
-            Math.abs(enemy.position.y - player.position.y) <=
-                enemy.followRangeY &&
-            Math.abs(enemy.position.x - player.position.x) <= enemy.followRangeX
-        ) {
-            enemy.followingPlayer = true;
-        } else {
-            enemy.followingPlayer = false;
-        }
-    }
-
     seeIfLadder(position) {
         const blocks = this.getBlocks(position);
         if (blocks.above.blockType === "air") {
@@ -414,7 +404,7 @@ class BugDug {
     }
 
     collectCoin() {
-        this.score += 100;
+        this.score += this.COIN_VALUE;
     }
 
     getExit() {
@@ -444,11 +434,6 @@ class BugDug {
         }
     }
 
-    playerDead() {
-        this.player.state = Player.STATE.DEAD;
-        this.lives -= 1;
-    }
-
     colliderCollision(collider1, collider2) {
         let collision = false;
         if (
@@ -463,8 +448,20 @@ class BugDug {
         ) {
             collision = true;
         }
-
         return collision;
+    }
+
+    playerDead() {
+        this.player.state = Player.STATE.DEAD;
+        this.lives -= 1;
+    }
+
+    spawnPlayer() {
+        this.player.state = Player.STATE.IDLE;
+        this.playerDeadTime = 0;
+        this.player.setPosition(
+            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
+        );
     }
 
     render() {
@@ -555,14 +552,6 @@ class BugDug {
             this.blockSprites["block-damage"],
             60,
             false
-        );
-    }
-
-    spawnPlayer() {
-        this.player.state = Player.STATE.IDLE;
-        this.playerDeadTime = 0;
-        this.player.setPosition(
-            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
         );
     }
 }
