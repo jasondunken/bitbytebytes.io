@@ -1,14 +1,23 @@
 import { pointOnLine } from "./modules/utils.js";
 import { Vec } from "../modules/math/vec.js";
 
+import { KEY_CODES } from "../modules/input/keys.js";
+
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
+window.keyPressed = keyPressed;
 
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 768;
 
 let game = null;
+
+function keyPressed(key) {
+    if (KEY_CODES.contains(key.keyCode)) {
+        key.preventDefault();
+    }
+}
 
 // p5.js functions ------------------------>
 function preload() {
