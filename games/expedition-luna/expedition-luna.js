@@ -120,10 +120,12 @@ class ExpeditionLuna {
     }
 
     update() {
-        this.player.consumeOxygen(this.OXYGEN_DEPLETION_RATE);
-        this.player.consumeFuel();
+        if (this.state != this.GAME_STATE.GAME_OVER) {
+            this.player.consumeOxygen(this.OXYGEN_DEPLETION_RATE);
+            this.player.consumeFuel();
 
-        this.handleInput();
+            this.handleInput();
+        }
 
         this.checkTerrain();
         this.applyPhysics(this.gravity);
@@ -260,6 +262,11 @@ class ExpeditionLuna {
             textAlign(CENTER);
             textSize(32);
             noStroke();
+            if (frameCount % 60 < 30) {
+                fill("gray");
+            } else {
+                fill("white");
+            }
             text("GAME OVER", this.width / 2, this.height / 2);
         }
     }
