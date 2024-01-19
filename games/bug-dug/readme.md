@@ -8,4 +8,4 @@
 -   Find the key to escape the level!
 -   How far can you get?
 
-![Bug Dug](bug-dug.png)
+![Bug Dug](res/img/bug-dug.png)

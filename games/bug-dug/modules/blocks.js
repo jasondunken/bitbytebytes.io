@@ -1,12 +1,13 @@
-import { GameObject } from "./gameObject.js";
-import { LevelArchitect } from "./levelArchitect.js";
+import { GameObject } from "../../modules/gameObject.js";
+import { Collider } from "../../modules/collisions/collider.js";
+import { Vec } from "../../modules/math/vec.js";
 
 class Block extends GameObject {
     solid = true;
     sprite;
     animation;
 
-    MAX_HEALTH = 120;
+    max_health = 120;
     health;
     destroyed = false;
     constructor(position, width, height, blockType, sprite) {
@@ -15,43 +16,43 @@ class Block extends GameObject {
         this.height = height;
         this.blockType = blockType;
         this.sprite = sprite;
-        this.updateCollider();
+        const colliderPos = new Vec(
+            position.x + width / 2,
+            position.y + height / 2
+        );
+        this.collider = new Collider(colliderPos, this.width, this.height);
+
         if (blockType === "air" || blockType === "water") {
             this.solid = false;
         }
-        if (blockType === "sand" || blockType === "grass") this.MAX_HEALTH = 50;
-        if (blockType === "dirt" || blockType === "clay") this.MAX_HEALTH = 75;
-        if (blockType === "stone") this.MAX_HEALTH = 120;
-        this.health = this.MAX_HEALTH;
+        if (blockType === "sand") this.max_health = 30;
+        if (
+            blockType === "dirt" ||
+            blockType === "clay" ||
+            blockType === "grass"
+        )
+            this.max_health = 60;
+        if (blockType === "stone") this.max_health = 120;
+        this.health = this.max_health;
     }
 
     update() {
         if (this.animation) {
             this.animation.update();
         }
-        this.updateCollider();
-    }
-
-    updateCollider() {
-        this.collider = {
-            a: { x: this.position.x, y: this.position.y },
-            b: { x: this.position.x + this.width, y: this.position.y },
-            c: { x: this.position.x + this.width, y: this.position.y + this.height },
-            d: { x: this.position.x, y: this.position.y + this.height },
-        };
     }
 
     takeDamage(dmg) {
         if (
-            this.blockType !== "bedrock" &&
-            this.blockType !== "air" &&
-            this.blockType !== "exit" &&
-            this.blockType !== "none"
+            this.blockType == "grass" ||
+            this.blockType == "sand" ||
+            this.blockType == "clay" ||
+            this.blockType == "dirt" ||
+            this.blockType == "stone"
         ) {
             this.health -= dmg;
             if (this.health <= 0) {
                 this.destroyed = true;
-                this.solid = false;
             }
         }
     }
@@ -59,13 +60,67 @@ class Block extends GameObject {
     render() {
         if (!this.destroyed) {
             if (this.sprite) {
-                image(this.sprite, this.position.x, this.position.y, this.width, this.height);
-            } else {
-                fill(LevelArchitect.getColor(this.blockType));
-                rect(this.position.x, this.position.y, this.width, this.height);
+                image(
+                    this.sprite,
+                    this.position.x,
+                    this.position.y,
+                    this.width,
+                    this.height
+                );
             }
+        }
+    }
+
+    renderDebug() {
+        if (this.sprite) {
+            if (this.blockType) {
+                this.collider.render("magenta", 3);
+            }
+            textSize(10);
+            noStroke();
+            fill("white");
+            text(`${this.blockType}`, this.position.x, this.position.y + 12);
+        } else {
+            this.collider.render("green", 1);
         }
     }
 }
 
-export { Block };
+class Ladder extends Block {
+    constructor(position, sprite) {
+        super(position, 32, 32, "ladder", sprite);
+        this.solid = false;
+    }
+}
+
+class Door extends Block {
+    health = 500;
+
+    open = false;
+    locked = true;
+
+    constructor(position, locked_sprite, unlocked_sprite) {
+        super(position, 32, 32, "door", locked_sprite);
+        this.unlocked_sprite = unlocked_sprite;
+    }
+
+    unlock() {
+        this.solid = false;
+        this.locked = false;
+        this.sprite = this.unlocked_sprite;
+    }
+
+    render() {
+        if (this.sprite) {
+            image(
+                this.sprite,
+                this.position.x,
+                this.position.y,
+                this.width,
+                this.height
+            );
+        }
+    }
+}
+
+export { Block, Door, Ladder };

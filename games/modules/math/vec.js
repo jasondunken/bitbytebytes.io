@@ -12,6 +12,7 @@ class Vec {
         return this;
     }
 
+    static ZERO = new Vec(0, 0);
     static UP = new Vec(0, -1);
     static DOWN = new Vec(0, 1);
     static LEFT = new Vec(-1, 0);

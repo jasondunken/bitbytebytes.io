@@ -3,8 +3,10 @@ import { Board } from "./modules/board.js";
 import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
 import { Vec } from "../modules/math/vec.js";
-import { Explosion, Firework } from "./modules/visual-effects.js";
+import { Explosion, Fireworks } from "./modules/visual-effects.js";
 import { setColor, getElapsedTimeString } from "./modules/utils.js";
+
+import { LayerManager } from "../modules/graphics/layer-manager.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -101,6 +103,19 @@ class MineSquad {
 
         this.board = new Board(this, MineSquad.sprites);
         this.ui = new UI(this);
+
+        // LayerManager.AddObject(
+        //     new Fireworks(
+        //         new Vec(
+        //             this.width / 4 + (Math.random() * this.width) / 2,
+        //             this.height / 4 + (Math.random() * this.height) / 2
+        //         ),
+        //         {
+        //             numStars: 20,
+        //             starSize: 8,
+        //         }
+        //     )
+        // );
     }
 
     startDemo() {
@@ -113,6 +128,7 @@ class MineSquad {
 
     startGame() {
         this.lastTime = Date.now();
+        this.dt = 0;
         this.gameTime = 0;
 
         this.level = 1;
@@ -130,21 +146,20 @@ class MineSquad {
 
     update() {
         const nowTime = Date.now();
-        if (this.currentState === GAME_STATE.PLAYING) {
-            this.gameTime += nowTime - this.lastTime;
-        }
+        this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
 
-        let layersComplete = true;
-        this.layers.forEach((layer) => {
-            layer.forEach((effect) => {
-                effect.update();
-                if (effect.done) layer.delete(effect);
-            });
-            if (layer.size) layersComplete = false;
-        });
+        if (this.currentState === GAME_STATE.PLAYING) {
+            this.gameTime += this.dt;
+            if (this.board.completed) this.endGame();
+        }
 
-        if (this.currentState === GAME_STATE.ENDING && layersComplete) {
+        LayerManager.Update(this.dt);
+
+        if (
+            this.currentState === GAME_STATE.ENDING &&
+            LayerManager.LayersComplete()
+        ) {
             this.gameOver();
         }
 
@@ -196,8 +211,6 @@ class MineSquad {
                     }
                 }
 
-                if (this.board.completed) this.endGame();
-
                 if (
                     this.score > this.FIRST_SQUAD_AWARD &&
                     this.squadAward === 0
@@ -241,23 +254,13 @@ class MineSquad {
         }
     }
 
-    addToLayers(effect) {
-        if (!this.layers[effect.layer]) this.layers[effect.layer] = new Set();
-        this.layers[effect.layer].add(effect);
-    }
-
     render() {
         setColor("darkgray");
         rect(0, 0, this.width, this.height);
 
-        this.ui.draw();
         this.board.draw(this.currentState);
 
-        this.layers.forEach((layer) => {
-            layer.forEach((effect) => {
-                effect.render();
-            });
-        });
+        LayerManager.Render();
 
         if (this.currentState === GAME_STATE.GAME_OVER) {
             this.board.drawMousePath(this.mouseClicks);
@@ -269,6 +272,8 @@ class MineSquad {
         if (this.currentState === GAME_STATE.HELP) {
             this.ui.showHelp();
         }
+
+        this.ui.draw();
         this.ui.drawCrosshair();
     }
 
@@ -305,18 +310,22 @@ class MineSquad {
     }
 
     detonateBomb(coords) {
-        this.addToLayers(new Explosion(coords));
+        LayerManager.AddObject(new Explosion(coords));
     }
 
     createFireworks() {
-        const numFireworks = Math.floor(this.score / 10000);
+        const numFireworks = Math.ceil(this.score / 10000);
         for (let i = 0; i < numFireworks; i++) {
-            this.addToLayers(
-                new Firework(
+            LayerManager.AddObject(
+                new Fireworks(
                     new Vec(
                         this.width / 4 + (Math.random() * this.width) / 2,
                         this.height / 4 + (Math.random() * this.height) / 2
-                    )
+                    ),
+                    {
+                        numStars: 20,
+                        starSize: 8,
+                    }
                 )
             );
         }

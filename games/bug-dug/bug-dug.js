@@ -1,13 +1,24 @@
 import { Player, DemoPlayer } from "./modules/player.js";
+import { Entity } from "./modules/entity.js";
 import { Enemy } from "./modules/enemies.js";
+import { Block, Ladder } from "./modules/blocks.js";
 import { LEVELS } from "./modules/levels.js";
 import { LevelArchitect } from "./modules/levelArchitect.js";
-import { Animation } from "./modules/animation.js";
+import { Animation } from "../modules/graphics/animation.js";
+import { Coin, Key } from "./modules/item.js";
 import {
     clearForegroundAround,
     getGridIndex,
-    getBlockAbove,
+    calculateAABBCollision,
+    getAdjacentBlocks,
+    getBlockAtPosition,
+    getBlockBelowPosition,
 } from "./modules/utils.js";
+
+import { KEY_CODES, KEY_NAMES } from "../modules/input/keys.js";
+
+import { UI } from "./modules/ui.js";
+import { Vec } from "../modules/math/vec.js";
 
 window.preload = preload;
 window.setup = setup;
@@ -21,8 +32,16 @@ const GAME_HEIGHT = 768;
 let game = null;
 
 function keyPressed(key) {
-    key.preventDefault();
+    if (KEY_CODES.contains(key.keyCode)) {
+        key.preventDefault();
+    }
 }
+
+document.onkeydown = (key) => {
+    if (KEY_NAMES.contains(key.code)) {
+        key.preventDefault();
+    }
+};
 
 // p5.js functions ------------------------>
 function preload() {
@@ -55,7 +74,27 @@ function initGame() {
     game.startDemo();
 }
 
+let times = 0;
 function draw() {
+    // if (times < 10) {
+    //     noFill();
+    //     stroke("blue");
+    //     rect(240, 368, 32, 32);
+    //     let pos = new Vec(256, 400);
+    //     point(pos.x, pos.y);
+    //     let rndX = Math.random() * 0.5 + 0.5;
+    //     rndX = Math.random() > 0.5 ? rndX : -rndX;
+    //     let velocity = new Vec(rndX, -1).normalize().mult(15);
+    //     for (let i = 0; i < 320; i++) {
+    //         velocity = Vec.add2(velocity, new Vec(0, 3));
+    //         const prev = new Vec(pos.x, pos.y);
+    //         pos.add(velocity);
+    //         stroke("red");
+    //         point(pos.x, pos.y);
+    //         line(prev.x, prev.y, pos.x, pos.y);
+    //     }
+    //     times++;
+    // }
     game.update();
     game.render();
 }
@@ -71,15 +110,20 @@ class BugDug {
     lives = 0;
 
     level = null;
-    backgroundLayer = null;
-    foregroundLayer = null;
-    mineBlockAnimation = null;
+    blockDamageSprites = null;
 
     player = null;
     currentLevel = 0;
+
+    COIN_VALUE = 100;
     score = 0;
 
     gameObjects = null;
+
+    playerRespawnTime = 3;
+    playerDeadTime = 0;
+
+    DEBUG = false;
 
     constructor(
         width,
@@ -96,21 +140,25 @@ class BugDug {
         this.enemySprites = enemySprites;
         this.font = font;
 
+        this.lastTime = Date.now();
+        this.dt = 0;
+
         this.demo = true;
         this.gameOver = true;
         this.score = 0;
-        this.gameObjects = new Set();
+
+        this.ui = new UI(new Vec(10, 10), this.width - 20, 96);
     }
 
     startDemo() {
         this.demo = true;
-        this.player = new DemoPlayer(this.playerSprites);
+        this.player = new DemoPlayer(this, this.playerSprites);
         this.startGame();
     }
 
     start1Player() {
         this.demo = false;
-        this.player = new Player(this.playerSprites);
+        this.player = new Player(this, this.playerSprites);
         this.startGame();
     }
 
@@ -124,172 +172,383 @@ class BugDug {
     }
 
     update() {
-        this.player.update(this.level);
-        this.gameObjects.forEach((gameObj) => {
-            if (gameObj.type === "block") {
-                gameObj.update();
-                if (gameObj.destroyed) {
-                    clearForegroundAround(
-                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
-                        this.foregroundLayer
-                    );
+        const nowTime = Date.now();
+        this.dt = nowTime - this.lastTime;
+        this.lastTime = nowTime;
+        // console.log("dt: ", this.dt / 1000);
+
+        if (this.player.state === Player.STATE.DEAD) {
+            this.playerDeadTime += this.dt / 1000;
+            if (this.playerDeadTime >= this.playerRespawnTime) {
+                this.spawnPlayer();
+            }
+        }
+
+        this.player.update(this.dt);
+        this.constrainPosition(this.player);
+
+        clearForegroundAround(
+            getGridIndex(this.player.position, this.level.BLOCK_SIZE),
+            this.level.foregroundLayer,
+            1.75
+        );
+
+        this.level.enemies.forEach((enemy) => {
+            enemy.update(this.dt);
+            enemy.lookForPlayer(this.player);
+            if (this.player.state === Player.STATE.DEAD) {
+                enemy.state = Entity.STATE.IDLE;
+                enemy.followingPlayer = false;
+            }
+            if (enemy.followingPlayer) {
+                enemy.followPlayer(this.player.position);
+            }
+            if (
+                this.player.state != Player.STATE.DEAD &&
+                this.checkEnemyCollision(enemy, this.player)
+            ) {
+                this.playerDead();
+            }
+            this.constrainPosition(enemy);
+        });
+
+        this.level.items.forEach((item) => {
+            item.update(this.dt);
+            if (item.type != "chest") {
+                this.constrainPosition(item);
+            }
+            if (item.type === "coin" && item.grounded) {
+                if (calculateAABBCollision(item, this.player)) {
+                    this.level.items.delete(item);
+                    this.collectCoin();
                 }
             }
-            if (gameObj.type === "enemy") gameObj.update(this.level);
+            if (item.type === "chest") {
+                if (calculateAABBCollision(item, this.player)) {
+                    let contents = item.open();
+                    // console.log("contents: ", contents);
+                    for (let item of contents) {
+                        let new_item = null;
+                        switch (item.type) {
+                            case "coin":
+                                new_item = new Coin(
+                                    item.position.copy(),
+                                    this.blockSprites["coin-gold"]
+                                );
+                                break;
+                            case "key":
+                                new_item = new Key(
+                                    item.position.copy(),
+                                    this.blockSprites["white-key"]
+                                );
+                                break;
+                        }
+                        if (new_item) {
+                            new_item.launch();
+                            this.level.items.add(new_item);
+                        }
+                    }
+                    this.level.items.delete(item);
+                }
+            }
+            if (item.type === "key" && item.grounded) {
+                if (calculateAABBCollision(item, this.player)) {
+                    this.level.items.delete(item);
+                    this.player.hasKey = true;
+                }
+            }
         });
+
+        for (let i = 0; i < this.level.blocks.length; i++) {
+            for (let j = 0; j < this.level.blocks[i].length; j++) {
+                const block = this.level.blocks[i][j];
+                block.update(this.dt);
+                if (block.blockType === "door") {
+                    if (calculateAABBCollision(block, this.player)) {
+                        block.unlock();
+                        this.player.hasKey = false;
+                    }
+                }
+                if (block.destroyed) {
+                    clearForegroundAround(
+                        getGridIndex(block.position, this.level.BLOCK_SIZE),
+                        this.level.foregroundLayer
+                    );
+                    const blocks = this.getBlocks(block.position);
+                    if (
+                        blocks.above.blockType === "air" ||
+                        blocks.above.blockType === "ladder"
+                    ) {
+                        this.level.blocks[i][j] = new Ladder(
+                            block.position,
+                            this.blockSprites["background-ladder"]
+                        );
+                    } else {
+                        this.level.blocks[i][j] = new Block(
+                            block.position,
+                            32,
+                            32,
+                            "air",
+                            this.blockSprites["background-wall"]
+                        );
+                    }
+                }
+            }
+        }
+        this.checkExitCollision(this.player);
+    }
+
+    constrainPosition(obj) {
+        const collider = obj.collider;
+        const { x, y } = obj.position;
+        // constrain x
+        if (x < collider.width / 2) obj.position.x = collider.width / 2;
+        if (x > this.width - collider.width / 2)
+            obj.position.x = this.width - collider.width / 2;
+        // constrain y
+        if (y < collider.height / 2) obj.position.y = collider.height / 2;
+        if (y > this.height - collider.height / 2)
+            obj.position.y = this.height - collider.height / 2;
+
+        // check for block collisions
+        const blocks = this.getBlocks(obj.position);
+        let block = blocks.above;
+        if (block && block.solid) {
+            if (y - collider.height / 2 <= block.collider.d.y) {
+                obj.position.y = block.collider.d.y + obj.height / 2;
+            }
+        }
+        block = blocks.below;
+        if (block && block.solid) {
+            if (y + collider.height / 2 >= block.collider.a.y) {
+                obj.position.y = block.collider.a.y - obj.height / 2;
+                obj.grounded = true;
+            }
+        }
+        if (
+            block &&
+            !block.solid &&
+            x - collider.width / 2 >= block.collider.a.x &&
+            x + collider.width / 2 <= block.collider.b.x
+        ) {
+            obj.grounded = false;
+        }
+        block = blocks.left;
+        if (block && block.solid) {
+            if (x - collider.width / 2 <= block.collider.b.x) {
+                obj.position.x = block.collider.b.x + collider.width / 2;
+            }
+        }
+        block = blocks.right;
+        if (block && block.solid) {
+            if (x + collider.width / 2 >= block.collider.a.x) {
+                obj.position.x = block.collider.a.x - collider.width / 2;
+            }
+        }
+
+        if (obj.type === "player" && obj.grounded) {
+            obj.onLadder = false;
+        }
+    }
+
+    seeIfLadder(position) {
+        const blocks = this.getBlocks(position);
+        if (blocks.above.blockType === "air") {
+            const ladder = new Ladder(
+                position,
+                this.blockSprites["background-ladder"]
+            );
+            const idx = getGridIndex(position, this.level.BLOCK_SIZE);
+            this.level.blocks[idx.x][idx.y] = ladder;
+        }
+    }
+
+    getBlocks(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        );
+    }
+
+    getBlock(position) {
+        return getBlockAtPosition(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        );
+    }
+
+    getBlockBelow(position) {
+        return getBlockBelowPosition(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        );
+    }
+
+    getBlockLeft(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        ).left;
+    }
+
+    getBlockRight(position) {
+        return getAdjacentBlocks(
+            position,
+            this.level.blocks,
+            this.level.blockSize
+        ).right;
+    }
+
+    collectCoin() {
+        this.score += this.COIN_VALUE;
+    }
+
+    getExit() {
+        for (let column of this.level.blocks) {
+            for (let block of column) {
+                if (block.blockType === "door") {
+                    return block;
+                }
+            }
+        }
+    }
+
+    checkEnemyCollision(enemy, player) {
+        return this.colliderCollision(enemy.collider, player.collider);
+    }
+
+    checkExitCollision(player) {
+        const exit = this.getExit();
+        const exitCenter = new Vec(
+            exit.position.x + exit.width / 2,
+            exit.position.y + exit.height / 2
+        );
+        const collisionBuffer = 4;
+        if (Vec.dist(player.position, exitCenter) <= collisionBuffer) {
+            this.currentLevel++;
+            this.loadLevel();
+        }
+    }
+
+    colliderCollision(collider1, collider2) {
+        let collision = false;
+        if (
+            ((collider1.a.x >= collider2.a.x &&
+                collider1.a.x <= collider2.b.x) ||
+                (collider1.b.x <= collider2.b.x &&
+                    collider1.b.x >= collider2.a.x)) &&
+            ((collider1.a.y >= collider2.a.y &&
+                collider1.a.y <= collider2.d.y) ||
+                (collider1.d.y <= collider2.d.y &&
+                    collider1.d.y >= collider2.a.y))
+        ) {
+            collision = true;
+        }
+        return collision;
+    }
+
+    playerDead() {
+        this.player.state = Player.STATE.DEAD;
+        this.lives -= 1;
+    }
+
+    spawnPlayer() {
+        this.player.state = Player.STATE.IDLE;
+        this.playerDeadTime = 0;
+        this.player.setPosition(
+            new Vec(this.level.playerSpawn.x, this.level.playerSpawn.y)
+        );
     }
 
     render() {
         background(color(this.level.skyColor));
         noStroke();
         // draw background
-        for (let i = 0; i < this.backgroundLayer.length; i++) {
-            for (let j = 0; j < this.backgroundLayer[i].length; j++) {
-                if (this.backgroundLayer[i][j] !== "none") {
-                    image(
-                        this.backgroundLayer[i][j],
-                        i * this.level.BLOCK_SIZE,
-                        j * this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE,
-                        this.level.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        this.level.renderBackground();
 
-        this.gameObjects.forEach((gameObj) => {
-            gameObj.render();
-            if (gameObj.type === "block") {
-                if (!gameObj.destroyed && gameObj.health < gameObj.MAX_HEALTH) {
+        for (let i = 0; i < this.level.blocks.length; i++) {
+            for (let j = 0; j < this.level.blocks[i].length; j++) {
+                const block = this.level.blocks[i][j];
+                block.render();
+                if (
+                    block.blockType != "door" &&
+                    block.health < block.max_health
+                ) {
                     let damageSpriteIndex = Math.floor(
                         map(
-                            gameObj.health,
+                            block.health,
                             0,
-                            gameObj.MAX_HEALTH,
-                            this.mineBlockAnimation.keyFrames.length - 1,
+                            block.max_health,
+                            this.blockDamageSprites.keyFrames.length - 1,
                             0
                         )
                     );
                     image(
-                        this.mineBlockAnimation.keyFrames[damageSpriteIndex],
-                        gameObj.position.x,
-                        gameObj.position.y,
-                        gameObj.width,
-                        gameObj.height
+                        this.blockDamageSprites.keyFrames[damageSpriteIndex],
+                        block.position.x,
+                        block.position.y,
+                        block.width,
+                        block.height
                     );
                 }
-                if (gameObj.destroyed) {
-                    const blockAbove = getBlockAbove(
-                        getGridIndex(gameObj.position, this.level.BLOCK_SIZE),
-                        this.level.blocks
-                    );
-                    if (
-                        blockAbove.destroyed ||
-                        blockAbove.blockType === "air"
-                    ) {
-                        image(
-                            this.blockSprites["background-ladder"],
-                            gameObj.position.x,
-                            gameObj.position.y,
-                            gameObj.width,
-                            gameObj.height
-                        );
-                    } else {
-                        image(
-                            this.blockSprites["background-wall"],
-                            gameObj.position.x,
-                            gameObj.position.y,
-                            gameObj.width,
-                            gameObj.height
-                        );
-                    }
+                if (this.DEBUG) {
+                    block.renderDebug();
                 }
+            }
+        }
+
+        this.level.enemies.forEach((enemy) => {
+            enemy.render();
+            if (this.DEBUG) {
+                enemy.renderDebug();
             }
         });
 
         this.player.render();
-        clearForegroundAround(
-            getGridIndex(this.player.position, this.level.BLOCK_SIZE),
-            this.level.foregroundLayer,
-            1.75
-        );
-        for (let enemy of this.level.enemies) {
-            enemy.render();
+        if (this.DEBUG) {
+            this.player.renderDebug();
         }
-        for (let item of this.level.items) {
+
+        this.level.items.forEach((item) => {
             item.render();
-        }
+            if (this.DEBUG) {
+                item.renderDebug();
+            }
+        });
 
         // draw foreground
-        // for (let i = 0; i < this.foregroundLayer.length; i++) {
-        //     for (let j = 0; j < this.foregroundLayer[i].length; j++) {
-        //         if (this.foregroundLayer[i][j] !== "none") {
-        //             image(
-        //                 this.foregroundLayer[i][j],
-        //                 i * this.level.BLOCK_SIZE,
-        //                 j * this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE,
-        //                 this.level.BLOCK_SIZE
-        //             );
-        //         }
-        //     }
-        // }
+        // this.level.renderForeground();
 
         //draw UI
-        stroke("brown");
-        strokeWeight(8);
-        fill("gray");
-        rect(10, 10, this.width - 20, 96);
-        // p5 text font
         textFont(this.font);
-        fill("blue");
-        noStroke();
-        textSize(16);
-        text("Level " + (this.currentLevel + 1), 24, 40);
-        if (this.player.hasKey) {
-            image(
-                this.blockSprites["white-key"],
-                this.width - 80,
-                54,
-                32,
-                32,
-                0,
-                0,
-                16,
-                16
-            );
-        }
-        for (let i = 0; i < this.lives; i++) {
-            image(
-                this.playerSprites["idle"],
-                this.width - 44 - 32 * i,
-                20,
-                24,
-                24,
-                0,
-                0,
-                32,
-                32
-            );
-        }
+        this.ui.render({
+            currentLevel: this.currentLevel,
+            hasKey: this.player.hasKey,
+            keyIcon: this.blockSprites["white-key"],
+            playerIcon: this.playerSprites["idle"],
+            lives: this.lives,
+            score: this.score,
+        });
     }
 
     loadLevel() {
-        this.level = new LevelArchitect(
+        this.level = LevelArchitect.createLevel(
             this.width,
             this.height,
-            LEVELS[this.currentLevel],
+            //LEVELS[this.currentLevel],
+            LEVELS[0],
             this.blockSprites,
             this.enemySprites
         );
-        this.gameObjects = this.level.getGameObjects();
+        // console.log("level: ", this.level);
 
-        this.backgroundLayer = this.level.backgroundLayer;
-        this.foregroundLayer = this.level.foregroundLayer;
+        this.spawnPlayer();
 
-        this.player.setPosition(this.level.playerSpawn);
-
-        this.mineBlockAnimation = new Animation(
+        this.blockDamageSprites = new Animation(
             this.blockSprites["block-damage"],
             60,
             false

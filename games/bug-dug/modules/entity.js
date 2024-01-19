@@ -1,6 +1,6 @@
-import { GameObject } from "./gameObject.js";
-import { getAdjacentBlocks } from "./utils.js";
-import { Vec } from "../../modules/math/vec.js";
+import { Collider } from "../../modules/collisions/collider.js";
+import { LevelArchitect } from "./levelArchitect.js";
+import { GameObject } from "../../modules/gameObject.js";
 
 class Entity extends GameObject {
     width = 32;
@@ -8,124 +8,61 @@ class Entity extends GameObject {
     grounded = false;
     speed = 1;
 
-    blocks = [];
-
     state;
     animations;
     currentAnimation = null;
-    walkDirection = "right";
-
     particleEmitter = null;
 
-    collider = {
-        a: new Vec(),
-        b: new Vec(),
-        c: new Vec(),
-        d: new Vec(),
-    };
+    static STATE = Object.freeze({
+        IDLE: "idle",
+        WALKING_LEFT: "walk-left",
+        WALKING_RIGHT: "walk-right",
+        JUMPING: "jump",
+        CLIMBING: "climb",
+        ATTACKING: "attack",
+        MINING: "mining",
+        HURT: "hurt",
+        DEAD: "dead",
+    });
 
     constructor(type, position) {
         super(type, position);
+        this.collider = new Collider(this.position, this.width, this.height);
     }
 
-    update(terrain) {
+    update(dt) {
         this.currentAnimation = this.animations[this.state];
-        this.currentAnimation.update();
+        if (this.state == Entity.STATE.WALKING_LEFT) {
+            this.currentAnimation = this.animations["walk-left"];
+            this.position.x -= this.speed;
+        }
+        if (this.state == Entity.STATE.WALKING_RIGHT) {
+            this.currentAnimation = this.animations["walk-right"];
+            this.position.x += this.speed;
+        }
+        if (this.currentAnimation) {
+            this.currentAnimation.update();
+        }
 
         if (!this.grounded) {
-            this.position.y += terrain.gravity;
-        }
-        this.getInput(terrain);
-
-        // constrain x
-        if (this.position.x < this.width / 2)
-            this.setPosition({ x: this.width / 2, y: this.position.y });
-        if (this.position.x > terrain.width - this.width / 2)
-            this.setPosition({
-                x: terrain.width - this.width / 2,
-                y: this.position.y,
-            });
-        // constrain y
-        if (this.position.y < this.height / 2)
-            this.setPosition({ x: this.position.x, y: this.height / 2 });
-        if (this.position.y > terrain.height - this.height / 2)
-            this.setPosition({
-                x: this.position.x,
-                y: terrain.height - this.height / 2,
-            });
-
-        // check blocks around enemy
-        this.blocks = getAdjacentBlocks(
-            this.position,
-            terrain.blocks,
-            terrain.BLOCK_SIZE
-        );
-        let block = this.blocks.above;
-        if (block && block.solid) {
-            if (this.position.y - this.height / 2 <= block.collider.d.y) {
-                this.position.y = block.collider.d.y + this.height / 2;
-            }
-        }
-        block = this.blocks.below;
-        if (block && block.solid) {
-            if (this.position.y + this.height / 2 >= block.collider.a.y) {
-                this.position.y = block.collider.a.y - this.height / 2;
-                this.grounded = true;
-            }
-        }
-        if (
-            block &&
-            !block.solid &&
-            this.position.x - (this.width / 2) * 0.8 > block.collider.a.x &&
-            this.position.x + (this.width / 2) * 0.8 < block.collider.b.x
-        ) {
-            this.grounded = false;
-        }
-        block = this.blocks.left;
-        if (block && block.solid) {
-            if (this.position.x - this.width / 2 <= block.collider.b.x) {
-                this.position.x = block.collider.b.x + this.width / 2;
-            }
-        }
-        block = this.blocks.right;
-        if (block && block.solid) {
-            if (this.position.x + this.width / 2 >= block.collider.a.x) {
-                this.position.x = block.collider.a.x - this.width / 2;
-            }
+            this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
 
-        this.updateCollider();
+        this.collider.update(this.position);
         if (this.particleEmitter) {
-            this.updateParticleEmitter();
+            if (
+                this.state == Entity.STATE.WALKING_LEFT ||
+                this.state == Entity.STATE.WALKING_RIGHT
+            ) {
+                this.particleEmitter.start();
+            } else {
+                this.particleEmitter.stop();
+            }
+
+            this.particleEmitter.update();
+            this.particleEmitter.setPosition(this.position);
         }
     }
-
-    getInput() {
-        // console.log("this: ", this);
-    }
-
-    updateCollider() {
-        this.collider = {
-            a: {
-                x: this.position.x - this.width / 2,
-                y: this.position.y - this.height / 2,
-            },
-            b: {
-                x: this.position.x + this.width / 2,
-                y: this.position.y - this.height / 2,
-            },
-            c: {
-                x: this.position.x + this.width / 2,
-                y: this.position.y + this.height / 2,
-            },
-            d: {
-                x: this.position.x - this.width / 2,
-                y: this.position.y + this.height / 2,
-            },
-        };
-    }
-
-    updateParticleEmitter() {}
 
     render() {
         if (this.currentAnimation) {
@@ -144,6 +81,10 @@ class Entity extends GameObject {
         if (this.particleEmitter) {
             this.particleEmitter.render();
         }
+    }
+
+    renderDebug() {
+        this.collider.render("blue", 5);
     }
 }
 

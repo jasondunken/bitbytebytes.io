@@ -1,22 +1,60 @@
-import { GameObject } from "./gameObject.js";
-import { Animation } from "./animation.js";
+import { GameObject } from "../../modules/gameObject.js";
+import { Animation } from "../../modules/graphics/animation.js";
+import { Collider } from "../../modules/collisions/collider.js";
+
+import { Vec } from "../../modules/math/vec.js";
+import { LevelArchitect } from "./levelArchitect.js";
 
 class Item extends GameObject {
     static SIZE = 16;
     collected = false;
     itemType = "";
+    grounded = false;
+
+    launchVelocity = Vec.ZERO;
+    velocity = Vec.ZERO;
+    mass = 0.5;
+    gravityVector = new Vec(0, LevelArchitect.GRAVITY);
+
     constructor(position, spriteSheet, itemType) {
-        super("item", position);
+        super(itemType, position);
+        this.collider = new Collider(position, this.width, this.height);
         this.animation = new Animation(spriteSheet, 45, true);
         this.animation.time = Math.random() * this.animation.duration;
-        this.itemType = itemType;
+    }
+
+    launch() {
+        this.grounded = false;
+        let rndX = Math.random() * 0.5 + 0.5;
+        rndX = Math.random() > 0.5 ? rndX : -rndX;
+        this.velocity = new Vec(rndX, -1).mult(32);
+    }
+
+    update(delta) {
+        if (!this.grounded) {
+            this.velocity = Vec.add2(this.velocity, this.gravityVector).mult(
+                delta / 200
+            );
+            this.position.add(this.velocity);
+        }
+        this.collider.update(this.position);
     }
 
     render() {
         if (this.animation) {
             this.animation.update();
-            image(this.animation.currentFrame, this.position.x, this.position.y, Item.SIZE, Item.SIZE);
+            image(
+                this.animation.currentFrame,
+                this.position.x,
+                this.position.y,
+                Item.SIZE,
+                Item.SIZE
+            );
         }
+    }
+
+    renderDebug() {
+        this.collider.render("orange");
     }
 }
 
@@ -25,6 +63,11 @@ class Chest extends GameObject {
     opened = false;
     constructor(position, sprite, contents) {
         super("chest", position);
+        const colliderPos = new Vec(
+            position.x + Coin.SIZE / 2,
+            position.y + Coin.SIZE / 2
+        );
+        this.collider = new Collider(colliderPos, Coin.SIZE, Coin.SIZE);
         this.sprite = sprite;
         this.contents = contents;
     }
@@ -38,30 +81,93 @@ class Chest extends GameObject {
 
     render() {
         if (!this.opened) {
-            image(this.sprite, this.position.x, this.position.y, Chest.SIZE, Chest.SIZE);
+            image(
+                this.sprite,
+                this.position.x,
+                this.position.y,
+                Chest.SIZE,
+                Chest.SIZE
+            );
+        }
+    }
+
+    renderDebug() {
+        this.collider.render("green", 2);
+    }
+}
+
+class Coin extends Item {
+    static SIZE = 16;
+    collected = false;
+
+    constructor(position, spriteSheet) {
+        super(position, spriteSheet, "coin");
+        const colliderPos = new Vec(position.x, position.y);
+        this.width = Coin.SIZE;
+        this.height = Coin.SIZE;
+        this.collider = new Collider(colliderPos, Coin.SIZE, Coin.SIZE);
+        this.animation = new Animation(spriteSheet, 45, true);
+        this.animation.time = Math.random() * this.animation.duration;
+    }
+
+    render() {
+        if (this.animation) {
+            this.animation.update();
+            image(
+                this.animation.currentFrame,
+                this.position.x - Coin.SIZE / 2,
+                this.position.y - Coin.SIZE / 2,
+                Coin.SIZE,
+                Coin.SIZE
+            );
+        }
+    }
+
+    renderDebug() {
+        this.collider.render("orange", 2);
+    }
+}
+
+const TOOL_TYPES = Object.freeze({
+    STONE_PICK: { name: "stone Pick", damage: 10, durability: 100 },
+    IRON_PICK: { name: "iron pick", damage: 25, durability: 200 },
+    STEEL_PICK: { name: "steel pick", damage: 50, durability: 500 },
+    DIAMOND_PICK: { name: "diamond pick", damage: 100, durability: 1000 },
+});
+
+class Tool extends GameObject {
+    constructor(toolType) {
+        super("tool");
+        this.properties = TOOL_TYPES[toolType];
+    }
+}
+
+class Key extends Item {
+    static SIZE = 16;
+    collected = false;
+
+    constructor(position, spriteSheet) {
+        super(position, spriteSheet, "key");
+        const colliderPos = new Vec(position.x, position.y);
+        this.width = Key.SIZE;
+        this.height = Key.SIZE;
+        this.collider = new Collider(colliderPos, Key.SIZE, Key.SIZE);
+        this.animation = new Animation(spriteSheet, 45, true);
+        this.animation.time = Math.random() * this.animation.duration;
+    }
+
+    render() {
+        if (this.animation) {
+            this.animation.update();
+            image(
+                this.animation.currentFrame,
+                this.position.x - Key.SIZE / 2,
+                this.position.y - Key.SIZE / 2,
+                Key.SIZE,
+                Key.SIZE
+            );
         }
     }
 }
 
-class Coin extends GameObject {
-    constructor(position, sprite) {
-        super("coin", position);
-        this.sprite = sprite;
-    }
-}
-
-class Key extends GameObject {
-    constructor(position, sprite) {
-        super("key", position);
-        this.sprite = sprite;
-    }
-}
-
-class Door extends GameObject {
-    constructor(position, sprite) {
-        super("door", position);
-        this.sprite = sprite;
-    }
-}
-
-export { Item, Chest, Coin, Key, Door };
+export { Item, Chest, Coin, Tool, TOOL_TYPES, Key };

@@ -1,8 +1,9 @@
 import { valueToColor } from "./utils.js";
 import { Vec } from "../../modules/math/vec.js";
+import { Particle } from "../../modules/graphics/particle.js";
 
 class VisualEffect {
-    done = false;
+    remove = false;
     layer = 0;
 
     constructor(position, layer) {
@@ -30,7 +31,7 @@ class ScoreEffect extends VisualEffect {
         this.opacity -= 5;
         this.color.setAlpha(this.opacity);
         this.outlineColor.setAlpha(this.opacity);
-        if (this.opacity <= 0) this.done = true;
+        if (this.opacity <= 0) this.remove = true;
     }
 
     render() {
@@ -54,7 +55,7 @@ class BonusEffect extends VisualEffect {
     update() {
         this.position.x += Math.random() * 4 - 2;
         this.position.y -= this.vSpeed;
-        if (this.position.y < -64) this.done = true;
+        if (this.position.y < -64) this.remove = true;
     }
 
     render() {
@@ -86,7 +87,7 @@ class BonusSquadEffect extends VisualEffect {
             if (this.repetitions > 0) {
                 this.size = 32;
             } else {
-                this.done = true;
+                this.remove = true;
             }
         }
     }
@@ -147,7 +148,7 @@ class Explosion extends VisualEffect {
                 );
             }
         }
-        if (this.explosion.size < 1) this.done = true;
+        if (this.explosion.size < 1) this.remove = true;
     }
 
     setBrightnessAlpha(b, a) {
@@ -169,7 +170,7 @@ class Explosion extends VisualEffect {
     }
 }
 
-class Firework extends VisualEffect {
+class Fireworks extends VisualEffect {
     fireworkColors = [
         "lightsalmon",
         "teal",
@@ -183,89 +184,116 @@ class Firework extends VisualEffect {
         "midnightblue",
         "chocolate",
         "coral",
+        "red",
+        "blue",
+        "green",
     ];
 
-    constructor(
-        position,
-        numParticles,
-        volleyTime,
-        expansionTime,
-        volleys,
-        volleyRate,
-        startDelay,
-        layer
-    ) {
-        super(position, layer);
-        numParticles
-            ? (this.numParticles = numParticles)
-            : (this.numParticles = 20);
-        volleyTime ? (this.volleyTime = volleyTime) : (this.volleyTime = 50);
-        expansionTime
-            ? (this.expansionTime = expansionTime)
-            : (this.expansionTime = 25);
-        volleys ? (this.volleys = volleys) : (this.volleys = 4);
-        volleyRate ? (this.volleyRate = volleyRate) : (this.volleyRate = 20);
-        startDelay ? (this.startDelay = startDelay) : (this.startDelay = 0);
-        this.particles = new Set();
-        this.expansionSpeed = 5;
+    constructor(position, config) {
+        super(position);
+        this.config = config;
+        this.startDelay = config?.startDelay || 0;
+        this.numVolleys = config?.numVolleys || 4;
+        this.volleyRate = config?.volleyRate || 20;
+        this.shells = new Set();
     }
 
-    update() {
+    update(delta) {
         if (this.startDelay > 0) this.startDelay--;
-        if (this.startDelay <= 0 && this.volleys > 0) {
-            this.fireVolley();
-            this.volleys--;
-            if (this.volleys > 0) this.startDelay = this.volleyRate;
+        if (this.startDelay <= 0 && this.numVolleys > 0) {
+            this.fireShell();
+            this.numVolleys--;
+            if (this.numVolleys > 0) this.startDelay = this.volleyRate;
         }
-        this.particles.forEach((particle) => {
-            if (particle.expansionTime > 0) {
-                particle.expansionTime--;
-                particle.position = particle.position.add(particle.direction);
-            } else {
-                particle.color.setAlpha(particle.alpha);
-                particle.alpha -= 10;
-                if (particle.alpha <= 0) particle.alpha = 0;
-                particle.position = particle.position.add(new Vec(0, 0.5));
-            }
-            particle.volleyTime--;
-            if (particle.volleyTime <= 0) {
-                this.particles.delete(particle);
+        this.shells.forEach((shell) => {
+            shell.update(delta);
+            if (shell.remove) {
+                this.shells.delete(shell);
             }
         });
-        if (this.particles.size <= 0 && this.volleys <= 0) this.done = true;
+        if (this.numVolleys === 0 && this.shells.size === 0) {
+            this.remove = true;
+        }
     }
 
-    fireVolley() {
-        const volleyPosition = new Vec2d(
+    fireShell() {
+        const volleyPosition = new Vec(
             this.position.x + Math.random() * 64 - 32,
             this.position.y + Math.random() * 64 - 32
         );
-        const pColor = color(
+        const starColor = color(
             this.fireworkColors[
                 Math.floor(Math.random() * this.fireworkColors.length)
             ]
         );
-        for (let i = 0; i < this.numParticles; i++) {
-            const angle = (i * 2 * PI) / this.numParticles;
-            this.particles.add({
-                position: volleyPosition,
-                direction: new Vec2d(
-                    Math.cos(angle) * this.expansionSpeed,
-                    Math.sin(angle) * this.expansionSpeed
-                ),
-                volleyTime: this.volleyTime,
-                expansionTime: this.expansionTime,
-                size: 8,
-                color: pColor,
-                alpha: 255,
-            });
+        this.shells.add(
+            new FireworkShell(volleyPosition, { ...this.config, starColor })
+        );
+    }
+
+    render() {
+        this.shells.forEach((volley) => {
+            volley.render();
+        });
+    }
+}
+
+class FireworkShell {
+    constructor(position, config) {
+        this.position = position || new Vec();
+        this.burstRadius = config?.burstRadius || 128;
+        this.numStars = config?.numStars || 20;
+        this.color = config?.starColor || "white";
+
+        this.remove = false;
+        this.life = 150;
+        this.burstSpeed = 25;
+        this.alpha = 255;
+
+        this.fallVec = Vec.DOWN.copy().mult(0.125);
+
+        this.particles = new Set();
+        for (let i = 0; i < this.numStars; i++) {
+            const angle = (i * 2 * PI) / this.numStars;
+            this.particles.add(
+                new Particle(
+                    position.copy(),
+                    new Vec(Math.cos(angle), Math.sin(angle)),
+                    this.life - Math.random() * 50,
+                    config.starSize
+                )
+            );
+        }
+    }
+
+    update(delta) {
+        this.particles.forEach((particle) => {
+            if (
+                Vec.dist(this.position, particle.position) >= this.burstRadius
+            ) {
+                this.alpha -= particle.alphaRate;
+                this.color.setAlpha(this.alpha);
+                particle.direction = this.fallVec;
+            }
+            const step = particle.direction
+                .copy()
+                .mult(delta * this.burstSpeed);
+            particle.position.add(step);
+
+            particle.life--;
+            if (particle.life <= 0) {
+                this.particles.delete(particle);
+            }
+        });
+        if (this.particles.size <= 0) {
+            this.remove = true;
         }
     }
 
     render() {
-        noStroke();
         this.particles.forEach((particle) => {
-            fill(particle.color);
+            noStroke();
+            fill(this.color);
             ellipse(
                 particle.position.x,
                 particle.position.y,
@@ -276,4 +304,4 @@ class Firework extends VisualEffect {
     }
 }
 
-export { BonusEffect, BonusSquadEffect, Explosion, Firework, ScoreEffect };
+export { BonusEffect, BonusSquadEffect, Explosion, Fireworks, ScoreEffect };

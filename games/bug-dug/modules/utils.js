@@ -9,7 +9,12 @@ function getGridIndex(position, blockSize) {
 
 function getBlockAtPosition(position, blocks, blockSize) {
     const index = getGridIndex(position, blockSize);
-    return blocks[index.x][index.y];
+    return getBlock(index, blocks);
+}
+
+function getBlockBelowPosition(position, blocks, blockSize) {
+    const index = getGridIndex(position, blockSize);
+    return getBlockBelow(index, blocks);
 }
 
 function getAdjacentBlocks(position, blocks, blockSize) {
@@ -23,31 +28,29 @@ function getAdjacentBlocks(position, blocks, blockSize) {
 }
 
 function getBlockBelow(index, blocks) {
-    if (index + 1 > blocks[index.x].length - 1) {
-        return null;
-    }
-    return blocks[index.x][index.y + 1];
+    return getBlock(new Vec(index.x, index.y + 1), blocks);
 }
 
 function getBlockAbove(index, blocks) {
-    if (index.y < 1) {
-        return null;
-    }
-    return blocks[index.x][index.y - 1];
+    return getBlock(new Vec(index.x, index.y - 1), blocks);
 }
 
 function getBlockLeft(index, blocks) {
-    if (index.x < 1) {
-        return null;
-    }
-    return blocks[index.x - 1][index.y];
+    return getBlock(new Vec(index.x - 1, index.y), blocks);
 }
 
 function getBlockRight(index, blocks) {
-    if (index.x + 1 > blocks.length - 1) {
+    return getBlock(new Vec(index.x + 1, index.y), blocks);
+}
+
+function getBlock(index, blocks) {
+    if (index.x < 0 || index.x >= blocks.length) {
         return null;
     }
-    return blocks[index.x + 1][index.y];
+    if (index.y < 0 || index.y >= blocks[index.x].length) {
+        return null;
+    }
+    return blocks[index.x][index.y];
 }
 
 function clearForegroundAround(index, foreground, radius = 2.5) {
@@ -110,6 +113,7 @@ function calculateAABBCollision(obj1, obj2) {
 export {
     getGridIndex,
     getBlockAtPosition,
+    getBlockBelowPosition,
     getAdjacentBlocks,
     getBlockAbove,
     clearForegroundAround,

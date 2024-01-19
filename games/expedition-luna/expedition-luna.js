@@ -1,14 +1,23 @@
 import { pointOnLine } from "./modules/utils.js";
 import { Vec } from "../modules/math/vec.js";
 
+import { KEY_CODES } from "../modules/input/keys.js";
+
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
+window.keyPressed = keyPressed;
 
 const GAME_WIDTH = 512;
 const GAME_HEIGHT = 768;
 
 let game = null;
+
+function keyPressed(key) {
+    if (KEY_CODES.contains(key.keyCode)) {
+        key.preventDefault();
+    }
+}
 
 // p5.js functions ------------------------>
 function preload() {
@@ -111,10 +120,12 @@ class ExpeditionLuna {
     }
 
     update() {
-        this.player.consumeOxygen(this.OXYGEN_DEPLETION_RATE);
-        this.player.consumeFuel();
+        if (this.state != this.GAME_STATE.GAME_OVER) {
+            this.player.consumeOxygen(this.OXYGEN_DEPLETION_RATE);
+            this.player.consumeFuel();
 
-        this.handleInput();
+            this.handleInput();
+        }
 
         this.checkTerrain();
         this.applyPhysics(this.gravity);
@@ -143,7 +154,7 @@ class ExpeditionLuna {
             if (touchL || touchR) {
                 this.player.velocity.y + Math.abs(this.player.velocity.x) >
                 this.player.MAX_LANDING_VELOCITY
-                    ? this.player.crash()
+                    ? this.playerCrashed()
                     : this.player.land();
             }
         }
@@ -155,6 +166,15 @@ class ExpeditionLuna {
 
     applyPhysics(gravity) {
         this.player.applyPhysics(gravity);
+    }
+
+    playerCrashed() {
+        this.player.crash();
+        this.gameOver();
+    }
+
+    gameOver() {
+        this.state = this.GAME_STATE.GAME_OVER;
     }
 
     render() {
@@ -185,6 +205,7 @@ class ExpeditionLuna {
         this.player.render();
 
         textFont(this.font);
+        textAlign(LEFT);
         textSize(10);
         noStroke();
         fill("white");
@@ -236,6 +257,18 @@ class ExpeditionLuna {
         const o2Bar =
             (this.player.oxygenLevel / this.player.STARTING_OXYGEN) * 100;
         rect(70, 37, o2Bar, 10);
+
+        if (this.state === this.GAME_STATE.GAME_OVER) {
+            textAlign(CENTER);
+            textSize(32);
+            noStroke();
+            if (frameCount % 60 < 30) {
+                fill("gray");
+            } else {
+                fill("white");
+            }
+            text("GAME OVER", this.width / 2, this.height / 2);
+        }
     }
 }
 
@@ -289,24 +322,6 @@ class Lander {
         this.fuelLevel = this.STARTING_FUEL;
         this.oxygenLevel = this.STARTING_OXYGEN;
         this.position.set(new Vec(planet.width / 2, 64));
-    }
-
-    render() {
-        strokeWeight(1);
-        stroke("white");
-        this.polygon.forEach((point, i) => {
-            line(
-                this.position.x + point[0],
-                this.position.y + point[1],
-                this.position.x +
-                    this.polygon[(i + 1) % this.polygon.length][0],
-                this.position.y + this.polygon[(i + 1) % this.polygon.length][1]
-            );
-        });
-        this.thrusterParticles.forEach((particle) => {
-            particle.render();
-            if (particle.life <= 0) this.thrusterParticles.delete(particle);
-        });
     }
 
     consumeOxygen(rate) {
@@ -366,7 +381,24 @@ class Lander {
 
     crash() {
         this.land();
-        console.log("CRASH!!!");
+    }
+
+    render() {
+        strokeWeight(1);
+        stroke("white");
+        this.polygon.forEach((point, i) => {
+            line(
+                this.position.x + point[0],
+                this.position.y + point[1],
+                this.position.x +
+                    this.polygon[(i + 1) % this.polygon.length][0],
+                this.position.y + this.polygon[(i + 1) % this.polygon.length][1]
+            );
+        });
+        this.thrusterParticles.forEach((particle) => {
+            particle.render();
+            if (particle.life <= 0) this.thrusterParticles.delete(particle);
+        });
     }
 
     addParticles(thruster) {

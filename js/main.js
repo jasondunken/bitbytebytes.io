@@ -197,9 +197,15 @@ class GOL {
     restart() {
         this.restartTime = this.RESTART_DELAY;
         clear();
+<<<<<<< HEAD
         this.pixelAge = new Array(this.bounds.width * this.bounds.height).fill(
             0
         );
+=======
+        this.pixelAge = new Uint8Array(
+            this.bounds.width * this.bounds.height
+        ).fill(0);
+>>>>>>> 4ae93e2307c7fc68a708f98cdaa1efc6220ecb11
         for (
             let i = 0;
             i <

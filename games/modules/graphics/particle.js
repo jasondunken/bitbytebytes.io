@@ -1,12 +1,12 @@
-import { GameObject } from "../../modules/gameObject.js";
-import { Vec } from "../../modules/math/vec.js";
+import { Vec } from "../math/vec.js";
+import { GameObject } from "../gameObject.js";
 
-class Particle {
-    constructor(position, velocity, size, life) {
-        this.position = position.copy();
-        this.velocity = velocity;
-        this.size = size;
-        this.life = life;
+export class Particle {
+    constructor(position, direction, life, size) {
+        this.position = position || new Vec();
+        this.direction = direction || new Vec();
+        this.life = life || 1;
+        this.size = size || 8;
     }
 
     update() {
@@ -15,23 +15,22 @@ class Particle {
     }
 }
 
-class ParticleEmitter extends GameObject {
+export class ParticleEmitter extends GameObject {
     particles = new Set();
     constructor(position, numParticles, loopInterval, updateFunction) {
         super("particle-emitter", position);
         this.numParticles = numParticles;
         this.loopInterval = loopInterval;
         this.loopTime = loopInterval;
-        this.updateEmitter = updateFunction;
-
-        this.particleColor = color(130, 80, 65);
+        this.update = updateFunction;
 
         this.spawnParticles(numParticles);
     }
 
-    update(position) {
+    update() {}
+
+    setPosition(position) {
         this.position.set(position);
-        this.updateEmitter();
     }
 
     emit() {
@@ -61,10 +60,10 @@ class ParticleEmitter extends GameObject {
 
     render() {
         this.particles.forEach((particle) => {
-            let alpha = map(particle.life, 0, 60, 0, 255);
-            this.particleColor.setAlpha(alpha);
             if (particle.life > 0) {
-                fill(this.particleColor);
+                let alpha = map(particle.life, 0, 60, 0, 1);
+                let color = `rgba(255, 0, 0, ${alpha})`;
+                fill(color);
                 noStroke();
                 ellipse(
                     particle.position.x,
@@ -75,24 +74,4 @@ class ParticleEmitter extends GameObject {
             }
         });
     }
-
-    static RadialBurst() {
-        if (!this.stopped && this.loopInterval) {
-            if (this.loopTime > 0) {
-                this.loopTime--;
-            }
-            if (this.loopTime <= 0) {
-                this.loopTime = this.loopInterval;
-                this.spawnParticles(this.numParticles);
-            }
-        }
-        this.particles.forEach((particle) => {
-            particle.update();
-            if (particle.life <= 0) {
-                this.particles.delete(particle);
-            }
-        });
-    }
 }
-
-export { ParticleEmitter };
