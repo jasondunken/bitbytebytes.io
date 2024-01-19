@@ -69,16 +69,15 @@ class Player extends Entity {
     }
 
     update(dt) {
+        let nextPos = null;
         if (this.state != Player.STATE.DEAD) {
-            this.getInput();
+            nextPos = this.getInput();
         }
-        this.collider.update(Vec.add2(this.position, this.colliderPosition));
-
-        this.onLadder = this.isOnLadder();
 
         if (!this.grounded && !this.onLadder) {
             this.position.y = this.position.y + LevelArchitect.GRAVITY;
         }
+        this.collider.update(Vec.add2(this.position, this.colliderPosition));
 
         this.currentAnimation = this.animations[this.state];
 
@@ -159,24 +158,24 @@ class Player extends Entity {
 
     climbUp(player) {
         if (player.isOnLadder()) {
-            player.position.y -= player.CLIMB_SPEED;
+            return Vec.sub2(player.position, new Vec(0, player.CLIMB_SPEED));
         }
     }
 
     climbDown(player) {
         if (player.isOnLadder() && !player.grounded) {
-            player.position.y += player.CLIMB_SPEED;
+            return Vec.add2(player.position, new Vec(0, player.CLIMB_SPEED));
         }
     }
 
     moveLeft(player) {
-        player.position.x -= player.WALK_SPEED;
         player.state = Entity.STATE.WALKING_LEFT;
+        return Vec.sub2(player.position, new Vec(player.WALK_SPEED, 0));
     }
 
     moveRight(player) {
-        player.position.x += player.WALK_SPEED;
         player.state = Entity.STATE.WALKING_RIGHT;
+        return Vec.add2(player.position, new Vec(player.WALK_SPEED, 0));
     }
 
     digUp(player) {
