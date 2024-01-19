@@ -2,135 +2,31 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>BitByteBytes.io</title>
-        <meta name="bitbytebytes" content="The official site of BitByteBytes." />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href="./css/mainstyle.css" />
-        <script src="./js/p5/p5.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Games</title>
+        <link rel="stylesheet" href="./games/games.css" />
     </head>
-
     <body>
-        <div class="gol-container" id="gol-container">
-            <div class="logo"></div>
-            <div class="game-of-life" id="p5-container"></div>
-        </div>
-
-        <div class="navigation">
-            <img src="./img/switch-bg.png" alt="switches" class="switches-background" />
-            <div class="switches">
-                <div class="switch-container">
-                    <div class="switch-label">POWER</div>
-                    <div id="switch-4" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
-                        <div class="switch-label switch-options-text-label">
-                            <div>ON</div>
-                            <div>OFF</div>
-                        </div>
-                        <img
-                            src="./img/toggle_button.png"
-                            alt="switches"
-                            id="toggle-power"
-                            class="switch-toggle switch-on"
-                        />
-                    </div>
+        <div id="content">
+            <div id="header">
+                <div id="header-name">
+                    <div id="header-name-text">BitByteBytes.io</div>
                 </div>
-                <div class="switch-container">
-                    <div class="switch-label">MODE</div>
-                    <div id="switch-3" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
-                        <div class="switch-label switch-options-text-label">
-                            <div>CLI</div>
-                            <div>GUI</div>
-                        </div>
-                        <img
-                            src="./img/toggle_button.png"
-                            alt="switches"
-                            id="toggle-mode"
-                            class="switch-toggle switch-on"
-                        />
-                    </div>
-                </div>
-                <div class="switch-container">
-                    <div class="switch-label">CELLS</div>
-                    <div id="switch-2" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
-                        <div class="switch-label switch-options-text-label">
-                            <div>SMALL</div>
-                            <div>LARGE</div>
-                        </div>
-                        <img
-                            src="./img/toggle_button.png"
-                            alt="switches"
-                            id="toggle-size"
-                            class="switch-toggle switch-on"
-                        />
-                    </div>
-                </div>
-                <div class="switch-container">
-                    <div class="switch-label">RESET</div>
-                    <div id="switch-1" class="switch">
-                        <img src="./img/toggle_frame.png" alt="switches" class="switch-frame" />
-                        <img src="./img/momentary.png" alt="momentary" class="switch-options-graphic-label" />
-                        <img
-                            src="./img/toggle_button.png"
-                            alt="switches"
-                            id="toggle-reset"
-                            class="switch-toggle switch-on"
-                        />
-                    </div>
+                <div id="header-controls">
+                    <a href="./ng-site/index.html"
+                        ><div class="button">journal</div></a
+                    >
+                    <a href="./retro.html"
+                        ><div class="button">go retro</div></a
+                    >
+                    <div class="button">login</div>
                 </div>
             </div>
-        </div>
-
-        <img src="./img/rosewood-3.png" alt="rosewood" id="divider" />
-
-        <div class="main">
-            <div id="retro-terminal">
-                <div id="toob">
-                    <img src="./img/old_tv.png" alt="toob" id="toobImage" />
-                </div>
-
-                <div id="console">
-                    <div id="console-output">
-                        <a id="output-bottom"></a>
-                    </div>
-                    <div id="command-line">
-                        <textarea id="hidden-input"></textarea>
-                        <span id="prompt"></span>
-                        <span id="dummy-input"></span><b id="cursor"></b>
-                    </div>
-                </div>
-
-                <div id="gui">
-                    <div id="desktop">
-                        <a class="gui-icon" href="./games/air-defense.html">
-                            <img class="gui-icon-image" src="./img/game_icons/defense.png" alt="air defense" />
-                            <div class="gui-icon-label">Air Defense.exe</div>
-                        </a>
-                        <a class="gui-icon" href="./games/planet-invaders.html">
-                            <img class="gui-icon-image" src="./img/game_icons/invaders.png" alt="planet invaders" />
-                            <div class="gui-icon-label">Planet Invaders.exe</div>
-                        </a>
-                        <a class="gui-icon" href="./games/mine-squad.html">
-                            <img class="gui-icon-image" src="./img/game_icons/mine.png" alt="mine squad plus" />
-                            <div class="gui-icon-label">Mine Squad Plus.exe</div>
-                        </a>
-                        <a class="gui-icon" href="./games/jump-to-orion.html">
-                            <img class="gui-icon-image" src="./img/game_icons/orion.png" alt="jump to orion" />
-                            <div class="gui-icon-label">Jump to Orion.exe</div>
-                        </a>
-                        <a class="gui-icon" href="./games/slider.html">
-                            <img class="gui-icon-image" src="./img/game_icons/slider.png" alt="slider" />
-                            <div class="gui-icon-label">Slider.exe</div>
-                        </a>
-                    </div>
-                </div>
-
-                <div id="toob-overlay">
-                    <img src="./img/old_tv_overlay.png" alt="toobOverlay" id="toobOverlayImage" />
-                </div>
+            <div id="games">
+                <div id="games-carousel"></div>
             </div>
+            <div id="footer">2024 BitByteBytes</div>
         </div>
+        <script src="./games/games.js"></script>
     </body>
-    <script src="js/main.js"></script>
 </html>

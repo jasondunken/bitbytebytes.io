@@ -44,7 +44,7 @@ for (let game of GAMES) {
                 <div>${game.description}</div>
             </div>
             <div class="play">
-                <a href="${game.file}.html"><button>Play</button></a>
+                <a href="./games/${game.file}.html"><button>Play</button></a>
             </div>
         </div>
     </div>`;
