@@ -705,7 +705,7 @@ class Terminal {
         this.mode = this.MODES.SHUTDOWN;
         this.prompt.innerHTML = "Shutting down...";
         setTimeout(() => {
-            window.location.href = "./games/games.html";
+            window.location.href = "./index.html";
         }, 3000);
     }
 

@@ -37,14 +37,14 @@ for (let game of GAMES) {
     gameBox.innerHTML = `<div class="container">
         <div class="card">
             <div class="icon">
-                <img src="${game.icon}" alt="${game.title}" />
+                <img src="./${game.icon}" alt="${game.title}" />
             </div>
             <div class="info">
                 <h1 class="title">${game.title}</h1>
                 <div>${game.description}</div>
             </div>
             <div class="play">
-                <a href="${game.file}.html"><button>Play</button></a>
+                <a href="./games/${game.file}.html"><button>Play</button></a>
             </div>
         </div>
     </div>`;
