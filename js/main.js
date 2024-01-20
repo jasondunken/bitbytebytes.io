@@ -149,8 +149,8 @@ class GOL {
     pixelAge;
 
     constructor(bounds) {
-        this.cellScale = GOL.CELL_SCALE.SMALL;
-        this.bounds = this.scaleBounds(bounds);
+        this.cellScale = GOL.CELL_SCALE.LARGE;
+        this.resize(bounds);
         const golCanvas = createCanvas(this.bounds.width, this.bounds.height);
         golCanvas.parent("p5-container");
         this.restart();
