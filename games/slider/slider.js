@@ -17,10 +17,20 @@ let playing = false;
 let level = 0;
 let turns = 0;
 
+let images = [];
+let currentImage = null;
+let emptyTile = null;
+
+const IMAGE_SPLASH_TIME = 300;
+let splashTimer = 0;
+
+const WIN_BREAK_TIME = 300;
 let breakTimer = 0;
 
-images = [];
-let emptyTile = null;
+const levelTextX = WIDTH / 2;
+const LEVEL_TEXT_Y_MAX = HEIGHT / 2;
+const LEVEL_TEXT_Y_START_POS = -32;
+let levelTextY = LEVEL_TEXT_Y_START_POS;
 
 function preload() {
     images.push(loadImage("./slider/img/image_1.png"));
@@ -42,13 +52,14 @@ function setup() {
 }
 
 function initGame() {
-    let currentImageIndex = level % images.length;
-    playing = true;
+    levelStarting = true;
+    levelTextY = LEVEL_TEXT_Y_START_POS;
     turns = 0;
+    let currentImageIndex = level % images.length;
+    currentImage = images[currentImageIndex];
     tilesPerSide = STARTING_TILES_PER_SIDE + level;
     tileSize = width / tilesPerSide;
     tiles = [];
-    const currentImage = images[currentImageIndex];
     for (let i = 0; i < tilesPerSide; i++) {
         tiles[i] = [];
         for (let j = 0; j < tilesPerSide; j++) {
@@ -73,9 +84,21 @@ function initGame() {
         }
     }
     shuffleTiles(999 * level + 1);
+    splashTimer = IMAGE_SPLASH_TIME;
 }
 
 function update() {
+    if (splashTimer > 0) {
+        levelTextY += 3;
+        if (levelTextY >= LEVEL_TEXT_Y_MAX) {
+            levelTextY = LEVEL_TEXT_Y_MAX;
+        }
+        splashTimer--;
+        if (splashTimer <= 0) {
+            levelStarting = false;
+            playing = true;
+        }
+    }
     if (breakTimer > 0) {
         breakTimer--;
         if (breakTimer <= 0 && !playing) {
@@ -85,19 +108,20 @@ function update() {
 }
 
 function mouseClicked(event) {
-    const clickX = Math.floor(mouseX / tileSize);
-    const clickY = Math.floor(mouseY / tileSize);
-    if (
-        playing &&
-        tiles &&
-        clickX >= 0 &&
-        clickY >= 0 &&
-        clickX < tilesPerSide &&
-        clickY < tilesPerSide
-    ) {
-        turns++;
-        checkTiles(clickX, clickY);
-        checkForWin();
+    if (playing) {
+        const clickX = Math.floor(mouseX / tileSize);
+        const clickY = Math.floor(mouseY / tileSize);
+        if (
+            tiles &&
+            clickX >= 0 &&
+            clickY >= 0 &&
+            clickX < tilesPerSide &&
+            clickY < tilesPerSide
+        ) {
+            turns++;
+            checkTiles(clickX, clickY);
+            checkForWin();
+        }
     }
 }
 
@@ -134,7 +158,7 @@ function checkForWin() {
         emptyTile.empty = false;
         playing = false;
         level++;
-        breakTimer = 300;
+        breakTimer = WIN_BREAK_TIME;
     }
 }
 
@@ -198,6 +222,8 @@ function draw() {
 
     background("gray");
     setColor("white");
+
+    // draw background
     for (let i = 0; i < width / 32; i++) {
         for (let j = 0; j < height / 32; j++) {
             if ((j + i) % 2 === 0) {
@@ -205,15 +231,25 @@ function draw() {
             }
         }
     }
-    for (let i = 0; i < tiles.length; i++) {
-        for (let j = 0; j < tiles[i].length; j++) {
-            setColor("white");
-            if (!tiles[i][j].empty) {
-                image(
-                    tiles[i][j].tileImage,
-                    (width / tilesPerSide) * i,
-                    (height / tilesPerSide) * j
-                );
+
+    if (levelStarting) {
+        image(currentImage, 0, 0, width, height);
+        textAlign(CENTER, CENTER);
+        textSize(48);
+        stroke("black");
+        strokeWeight(4);
+        text(`${level + 2} x ${level + 2}`, levelTextX, levelTextY);
+    } else {
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                setColor("white");
+                if (!tiles[i][j].empty) {
+                    image(
+                        tiles[i][j].tileImage,
+                        (width / tilesPerSide) * i,
+                        (height / tilesPerSide) * j
+                    );
+                }
             }
         }
     }
