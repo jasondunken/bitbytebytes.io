@@ -249,11 +249,27 @@ function draw() {
                         (width / tilesPerSide) * i,
                         (height / tilesPerSide) * j
                     );
+                    if (playing) {
+                        setColor("orange", true);
+                        strokeWeight(2);
+                        rect(
+                            (width / tilesPerSide) * i + 1,
+                            (height / tilesPerSide) * j + 1,
+                            tileSize - 2,
+                            tileSize - 2
+                        );
+                    }
                 }
             }
         }
     }
     if (playing) {
+        setColor("black", true);
+        strokeWeight(1);
+        for (let i = 1; i < tilesPerSide; i++) {
+            line(i * tileSize, 0, i * tileSize, height);
+            line(0, i * tileSize, width, i * tileSize);
+        }
         setColor("green", true);
         strokeWeight(4);
         rect(
