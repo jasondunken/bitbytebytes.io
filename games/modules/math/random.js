@@ -42,7 +42,11 @@ class Random {
     getGenerator(gen) {
         switch (gen) {
             case "sfc32":
-                return this.generators["sfc32"];
+            case "splitmix32":
+            case "mulberry32":
+            case "jsf32":
+                return this.generators[gen];
+
             default:
                 return this.generators["sfc32"];
         }
@@ -62,6 +66,39 @@ class Random {
                 c = (c << 21) | (c >>> 11);
                 c = (c + t) | 0;
                 return (t >>> 0) / 4294967296;
+            };
+        },
+        splitmix32: function (a, b, c, d) {
+            return function () {
+                a |= 0;
+                a = (a + 0x9e3779b9) | 0;
+                var t = a ^ (a >>> 16);
+                t = Math.imul(t, 0x21f0aaad);
+                t = t ^ (t >>> 15);
+                t = Math.imul(t, 0x735a2d97);
+                return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
+            };
+        },
+        mulberry32: function (a, b, c, d) {
+            return function () {
+                var t = (a += 0x6d2b79f5);
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        },
+        jsf32: function (a, b, c, d) {
+            return function () {
+                a |= 0;
+                b |= 0;
+                c |= 0;
+                d |= 0;
+                var t = (a - ((b << 27) | (b >>> 5))) | 0;
+                a = b ^ ((c << 17) | (c >>> 15));
+                b = (c + d) | 0;
+                c = (d + t) | 0;
+                d = (a + t) | 0;
+                return (d >>> 0) / 4294967296;
             };
         },
     };
