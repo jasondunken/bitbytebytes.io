@@ -10,4 +10,4 @@
 -   Not even a timer!
 -   Try to stay sane!
 
-![Slider](./img/slider.png)
+![Slider](./res/img/slider.png)

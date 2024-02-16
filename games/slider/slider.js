@@ -33,16 +33,16 @@ const LEVEL_TEXT_Y_START_POS = -32;
 let levelTextY = LEVEL_TEXT_Y_START_POS;
 
 function preload() {
-    images.push(loadImage("./slider/img/image_1.png"));
-    images.push(loadImage("./slider/img/image_2.png"));
-    images.push(loadImage("./slider/img/image_3.png"));
-    images.push(loadImage("./slider/img/image_4.png"));
-    images.push(loadImage("./slider/img/image_5.png"));
-    images.push(loadImage("./slider/img/image_6.png"));
-    images.push(loadImage("./slider/img/image_7.png"));
-    images.push(loadImage("./slider/img/image_8.png"));
-    images.push(loadImage("./slider/img/image_9.png"));
-    images.push(loadImage("./slider/img/image_10.png"));
+    images.push(loadImage("./slider/res/img/image_1.png"));
+    images.push(loadImage("./slider/res/img/image_2.png"));
+    images.push(loadImage("./slider/res/img/image_3.png"));
+    images.push(loadImage("./slider/res/img/image_4.png"));
+    images.push(loadImage("./slider/res/img/image_5.png"));
+    images.push(loadImage("./slider/res/img/image_6.png"));
+    images.push(loadImage("./slider/res/img/image_7.png"));
+    images.push(loadImage("./slider/res/img/image_8.png"));
+    images.push(loadImage("./slider/res/img/image_9.png"));
+    images.push(loadImage("./slider/res/img/image_10.png"));
 }
 
 function setup() {
@@ -127,6 +127,9 @@ function mouseClicked(event) {
 
 function checkTiles(indexX, indexY) {
     if (!tiles[indexX][indexY].empty) {
+        const tileSound = new Audio();
+        tileSound.src = "./slider/res/snd/click.wav";
+        tileSound.play();
         if (indexX !== 0 && tiles[indexX - 1][indexY].empty) {
             swapTiles(indexX, indexY, indexX - 1, indexY);
         } else if (
@@ -141,7 +144,15 @@ function checkTiles(indexX, indexY) {
             tiles[indexX][indexY + 1].empty
         ) {
             swapTiles(indexX, indexY, indexX, indexY + 1);
+        } else {
+            const tileSound = new Audio();
+            tileSound.src = "./slider/res/snd/dud.wav";
+            tileSound.play();
         }
+    } else {
+        const tileSound = new Audio();
+        tileSound.src = "./slider/res/snd/dud.wav";
+        tileSound.play();
     }
 }
 
@@ -155,6 +166,9 @@ function checkForWin() {
         }
     }
     if (gameOver) {
+        const winSound = new Audio();
+        winSound.src = "./slider/res/snd/win.wav";
+        winSound.play();
         emptyTile.empty = false;
         playing = false;
         level++;
