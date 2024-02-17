@@ -93,6 +93,9 @@ class Player extends GameObject {
                     Vec.UP
                 )
             );
+            const shotSound = new Audio();
+            shotSound.src = "./planet-invaders/res/snd/ship_shot.wav";
+            shotSound.play();
             this.coolDown = this.BASE_COOL_DOWN;
             this.weaponReady = false;
         }

@@ -147,6 +147,9 @@ class PlanetInvaders {
     }
 
     endGame() {
+        const loseSound = new Audio();
+        loseSound.src = "./planet-invaders/res/snd/lose.wav";
+        loseSound.play();
         this.gameEndTimer = this.END_GAME_TIMER;
         this.currentState = this.GAME_STATE.ENDING;
     }
@@ -235,6 +238,9 @@ class PlanetInvaders {
             for (let shot of this.world.gameObjects.shots) {
                 const collision = this.world.shotCollision(shot, this.player);
                 if (collision) {
+                    const boomSound = new Audio();
+                    boomSound.src = "./planet-invaders/res/snd/boom.wav";
+                    boomSound.play();
                     this.world.deleteGameObject(shot);
                     switch (collision.colliderId) {
                         case 0:

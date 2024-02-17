@@ -197,6 +197,10 @@ class World {
                 if (obj.type === "alien" || obj.type === "bonus") {
                     for (let shot of this.gameObjects.shots) {
                         if (this.shotCollision(shot, obj)) {
+                            const boomSound = new Audio();
+                            boomSound.src =
+                                "./planet-invaders/res/snd/boom.wav";
+                            boomSound.play();
                             obj.remove = true;
                             this.deleteGameObject(shot);
                             this.game.addScore(obj.type);
@@ -213,6 +217,10 @@ class World {
                 if (obj.type === "block") {
                     for (let shot of this.gameObjects.shots) {
                         if (this.shotCollision(shot, obj)) {
+                            const boomSound = new Audio();
+                            boomSound.src =
+                                "./planet-invaders/res/snd/boom.wav";
+                            boomSound.play();
                             obj.remove = true;
                             this.deleteGameObject(shot);
                             this.addGameObject(
@@ -222,6 +230,10 @@ class World {
                     }
                     for (let alien of this.gameObjects.aliens) {
                         if (this.shotCollision(alien, obj)) {
+                            const boomSound = new Audio();
+                            boomSound.src =
+                                "./planet-invaders/res/snd/boom.wav";
+                            boomSound.play();
                             obj.remove = true;
                             this.deleteGameObject(alien);
                             this.addGameObject(
@@ -238,6 +250,10 @@ class World {
                 if (obj.type === "shot" && obj.direction === Vec.UP) {
                     for (let shot of this.gameObjects.shots) {
                         if (obj !== shot && this.shotCollision(shot, obj)) {
+                            const boomSound = new Audio();
+                            boomSound.src =
+                                "./planet-invaders/res/snd/boom.wav";
+                            boomSound.play();
                             this.addGameObject(
                                 new PixelExplosionSmall(shot.position)
                             );
@@ -296,6 +312,9 @@ class World {
         let curIdx = 0;
         for (let alien of this.gameObjects.aliens) {
             if (curIdx === alienIdx) {
+                const shotSound = new Audio();
+                shotSound.src = "./planet-invaders/res/snd/alien_shot.wav";
+                shotSound.play();
                 this.addGameObject(new Shot(alien.position.copy(), Vec.DOWN));
                 return;
             }
