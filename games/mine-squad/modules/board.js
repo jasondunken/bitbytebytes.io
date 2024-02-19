@@ -103,6 +103,9 @@ class Board {
                 tileIndex,
                 this.boardConfig
             );
+            const explosionSound = new Audio();
+            explosionSound.src = "./mine-squad/res/snd/explosion.wav";
+            explosionSound.play();
             LayerManager.AddObject(new Explosion(position));
             this.completed = true;
             this.winner = false;

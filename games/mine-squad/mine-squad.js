@@ -207,6 +207,9 @@ class MineSquad {
                             this.board.defuseWithinRadius(tile, tileIndex);
                         }
                     } else {
+                        const selectSound = new Audio();
+                        selectSound.src = "./mine-squad/res/snd/select.wav";
+                        selectSound.play();
                         this.board.checkTile(tile, tileIndex);
                     }
                 }
@@ -279,6 +282,9 @@ class MineSquad {
 
     addSquad() {
         if (this.squadCount < this.MAX_SQUADS) {
+            const powerupSound = new Audio();
+            powerupSound.src = "./mine-squad/res/snd/powerup.wav";
+            powerupSound.play();
             this.squadCount++;
             this.ui.addSquad(this.squadCount);
         }
@@ -310,6 +316,9 @@ class MineSquad {
     }
 
     detonateBomb(coords) {
+        const explosionSound = new Audio();
+        explosionSound.src = "./mine-squad/res/snd/explosion.wav";
+        explosionSound.play();
         LayerManager.AddObject(new Explosion(coords));
     }
 
