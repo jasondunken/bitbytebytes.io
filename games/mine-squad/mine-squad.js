@@ -293,7 +293,12 @@ class MineSquad {
     endGame() {
         this.currentState = GAME_STATE.ENDING;
         this.calculateFinalScore();
-        if (this.board.winner) this.createFireworks();
+        if (this.board.winner) {
+            const winSound = new Audio();
+            winSound.src = "./mine-squad/res/snd/fanfare.wav";
+            winSound.play();
+            this.createFireworks();
+        }
     }
 
     gameOver() {
