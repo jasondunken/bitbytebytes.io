@@ -196,6 +196,7 @@ class Fireworks extends VisualEffect {
         this.numVolleys = config?.numVolleys || 4;
         this.volleyRate = config?.volleyRate || 20;
         this.shells = new Set();
+        console.log("firework: ", this);
     }
 
     update(delta) {
@@ -206,7 +207,7 @@ class Fireworks extends VisualEffect {
             if (this.numVolleys > 0) this.startDelay = this.volleyRate;
         }
         this.shells.forEach((shell) => {
-            shell.update(delta);
+            shell.update(delta / 100);
             if (shell.remove) {
                 this.shells.delete(shell);
             }

@@ -327,8 +327,8 @@ class MineSquad {
         LayerManager.AddObject(new Explosion(coords));
     }
 
-    createFireworks() {
-        const numFireworks = Math.ceil(this.score / 10000);
+    createFireworks(num) {
+        const numFireworks = num || Math.ceil(this.score / 10000);
         for (let i = 0; i < numFireworks; i++) {
             LayerManager.AddObject(
                 new Fireworks(
