@@ -169,6 +169,9 @@ class ExpeditionLuna {
     }
 
     playerCrashed() {
+        const explosionSound = new Audio();
+        explosionSound.src = "./expedition-luna/res/snd/boom.wav";
+        explosionSound.play();
         this.player.crash();
         this.gameOver();
     }
@@ -316,6 +319,13 @@ class Lander {
         this.position = new Vec();
         this.velocity = new Vec();
         console.log("this: ", this);
+
+        this.smThrusterSnd = new Audio();
+        this.smThrusterSnd.src = "./expedition-luna/res/snd/small_thruster.wav";
+        this.smThrusterSnd.loop = true;
+        this.lgThrusterSnd = new Audio();
+        this.lgThrusterSnd.src = "./expedition-luna/res/snd/big_thruster.wav";
+        this.lgThrusterSnd.loop = true;
     }
 
     spawn(planet) {
@@ -333,17 +343,25 @@ class Lander {
         if (this.mainThrusterOn) {
             this.fuelLevel -= 0.2;
             this.addParticles("main");
+            this.lgThrusterSnd.play();
+        } else {
+            this.lgThrusterSnd.pause();
         }
 
         if (this.rightRCSOn) {
             this.fuelLevel -= 0.1;
             this.addParticles("right");
         }
-
         if (this.leftRCSOn) {
             this.fuelLevel -= 0.1;
             this.addParticles("left");
         }
+        if (this.leftRCSOn || this.rightRCSOn) {
+            this.smThrusterSnd.play();
+        } else {
+            this.smThrusterSnd.pause();
+        }
+
         if (this.fuelLevel < 0) this.fuelLevel = 0;
     }
 

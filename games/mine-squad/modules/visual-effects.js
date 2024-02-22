@@ -196,7 +196,6 @@ class Fireworks extends VisualEffect {
         this.numVolleys = config?.numVolleys || 4;
         this.volleyRate = config?.volleyRate || 20;
         this.shells = new Set();
-        console.log("firework: ", this);
     }
 
     update(delta) {
@@ -230,6 +229,9 @@ class Fireworks extends VisualEffect {
         this.shells.add(
             new FireworkShell(volleyPosition, { ...this.config, starColor })
         );
+        const explosionSound = new Audio();
+        explosionSound.src = "./mine-squad/res/snd/explosion.wav";
+        explosionSound.play();
     }
 
     render() {
