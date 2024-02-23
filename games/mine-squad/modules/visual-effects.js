@@ -192,7 +192,7 @@ class Fireworks extends VisualEffect {
     constructor(position, config) {
         super(position);
         this.config = config;
-        this.startDelay = config?.startDelay || 0;
+        this.startDelay = config?.startDelay || Math.random() * 100;
         this.numVolleys = config?.numVolleys || 4;
         this.volleyRate = config?.volleyRate || 20;
         this.shells = new Set();
@@ -274,7 +274,7 @@ class FireworkShell {
             if (
                 Vec.dist(this.position, particle.position) >= this.burstRadius
             ) {
-                this.alpha -= particle.alphaRate;
+                this.alpha -= particle.life / 1000;
                 this.color.setAlpha(this.alpha);
                 particle.direction = this.fallVec;
             }
@@ -288,7 +288,7 @@ class FireworkShell {
                 this.particles.delete(particle);
             }
         });
-        if (this.particles.size <= 0) {
+        if (this.particles.size <= 0 || this.alpha <= 100) {
             this.remove = true;
         }
     }

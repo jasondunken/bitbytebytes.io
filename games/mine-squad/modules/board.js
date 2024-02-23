@@ -332,7 +332,7 @@ class Board {
                 coords,
                 this.boardConfig
             );
-            utils.setColor("yellow");
+            stroke("yellow");
             strokeWeight(4);
             noFill();
             rect(
