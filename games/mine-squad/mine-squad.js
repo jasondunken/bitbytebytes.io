@@ -21,6 +21,7 @@ let game = null;
 
 function preload() {
     let sprites = {};
+    sprites["flag"] = loadImage("./mine-squad/res/img/flag.png");
     sprites["bomb"] = loadImage("./mine-squad/res/img/bomb.png");
     sprites["bomb_defused"] = loadImage(
         "./mine-squad/res/img/bomb-defused.png"

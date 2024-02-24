@@ -285,14 +285,8 @@ class Board {
     }
 
     drawFlag(position) {
-        utils.setColor("yellow");
-        strokeWeight(1);
-        ellipse(
-            position.x + this.HALF_TILE,
-            position.y + this.HALF_TILE,
-            this.BOMB_HEIGHT,
-            this.BOMB_HEIGHT
-        );
+        const flag = this.sprites["flag"];
+        image(flag, position.x, position.y, 30, 30);
     }
 
     drawBomb(bomb, position) {
