@@ -105,8 +105,4 @@ class Bomb {
     }
 }
 
-class Flag {
-    constructor() {}
-}
-
 export { BoardBuilder };

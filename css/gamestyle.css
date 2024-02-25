@@ -1,3 +1,8 @@
+@font-face {
+    font-family: ElfBoy;
+    src: url("../../css/font/Elfboyclassic.ttf");
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -24,8 +29,8 @@ body {
 
 .logo {
     user-select: none;
-    font-size: 4em;
-    font-family: "Alfa Slab One", serif;
+    font-size: 8em;
+    font-family: ElfBoy, serif;
 }
 
 #game {
