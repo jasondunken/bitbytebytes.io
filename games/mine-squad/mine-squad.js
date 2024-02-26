@@ -276,7 +276,6 @@ class MineSquad {
         if (this.currentState === GAME_STATE.HELP) {
             this.ui.showHelp();
         }
-
         this.ui.draw();
         this.ui.drawCrosshair();
     }

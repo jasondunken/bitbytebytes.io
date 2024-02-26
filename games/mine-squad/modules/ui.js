@@ -1,4 +1,5 @@
 import { Vec } from "../../modules/math/vec.js";
+import * as utils from "./utils.js";
 import { BonusSquadEffect } from "./visual-effects.js";
 import { GAME_STATE } from "./game-state.js";
 import { getElapsedTimeString } from "./utils.js";
@@ -351,7 +352,7 @@ class UI {
         strokeWeight(1);
         noFill();
         let crosshairDiameter = 10;
-        if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
+        //if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
         ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
         stroke("black");
         line(mouseX - 10, mouseY, mouseX + 10, mouseY);

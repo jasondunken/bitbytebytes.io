@@ -168,15 +168,7 @@ class Board {
             );
         }
 
-        const defuseArea = this.boardBuilder.getNeighbors(tileIndex);
-        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex + 2)
-            ? defuseArea.push(tileIndex + 2)
-            : undefined;
-        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2)
-            ? defuseArea.push(tileIndex - 2)
-            : undefined;
-        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
-        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
+        const defuseArea = this.getDefuseAreaTiles(tileIndex);
 
         for (let i = 0; i < defuseArea.length; i++) {
             const tile = this.getTile(defuseArea[i]);
@@ -198,6 +190,19 @@ class Board {
             }
         }
         this.checkForWin();
+    }
+
+    getDefuseAreaTiles(tileIndex) {
+        let defuseArea = this.boardBuilder.getNeighbors(tileIndex);
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex + 2)
+            ? defuseArea.push(tileIndex + 2)
+            : undefined;
+        this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2)
+            ? defuseArea.push(tileIndex - 2)
+            : undefined;
+        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
+        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
+        return defuseArea;
     }
 
     checkForWin() {
@@ -225,6 +230,9 @@ class Board {
 
     draw() {
         this.drawBoard();
+        if (keyIsDown(SHIFT)) {
+            this.drawDefuseArea();
+        }
         this.drawCursor();
     }
 
@@ -335,6 +343,21 @@ class Board {
                 this.TILE_HEIGHT + 2,
                 this.TILE_HEIGHT + 2
             );
+        }
+    }
+
+    drawDefuseArea() {
+        const pos = new Vec(mouseX, mouseY);
+        const tileIndex = this.getIndex(pos);
+        const area = this.getDefuseAreaTiles(tileIndex);
+        stroke("blue");
+        strokeWeight(3);
+        noFill();
+        for (const tile of area) {
+            if (this.getTile(tile)?.hidden) {
+                const tl = utils.tileIndexToTileTopLeft(tile, this.boardConfig);
+                rect(tl.x, tl.y, 30, 30);
+            }
         }
     }
 
