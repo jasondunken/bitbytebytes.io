@@ -40,7 +40,6 @@ class BoardManager {
             coords.y > this.boardBounds.pos.y &&
             coords.y < this.boardBounds.pos.y + this.boardBounds.height
         ) {
-            console.log("is on board");
             return true;
         }
         return false;
@@ -88,7 +87,7 @@ class BoardManager {
 
     getFlagCount() {
         let count = 0;
-        this.board.forEach((tile) => {
+        this.board.tiles.forEach((tile) => {
             if (tile.flagged) count++;
         });
         return count;
@@ -101,7 +100,8 @@ class BoardManager {
             tile.hidden = false;
             const position = utils.tileIndexToTileCenter(
                 tileIndex,
-                this.currentBoard
+                this.TILE_HEIGHT,
+                this.boardBounds
             );
             const explosionSound = new Audio();
             explosionSound.src = "./mine-squad/res/snd/explosion.wav";
@@ -116,14 +116,17 @@ class BoardManager {
     }
 
     uncover(tileIndex, checkedTiles) {
-        const tile = this.getTile(tileIndex);
+        const tile = this.getTileByIndex(tileIndex);
+        if (!tile) return;
+
         tile.hidden = false;
         const tileScore = tile.value * this.mineSquad.TILE_MULTIPLIER;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
             const position = utils.tileIndexToTileCenter(
                 tileIndex,
-                this.currentBoard
+                this.TILE_HEIGHT,
+                this.boardBounds
             );
             LayerManager.AddObject(
                 new ScoreEffect(position, tileScore, tile.value)
@@ -143,7 +146,8 @@ class BoardManager {
         tile.hidden = false;
         const position = utils.tileIndexToTileCenter(
             tileIndex,
-            this.currentBoard
+            this.TILE_HEIGHT,
+            this.boardBounds
         );
         if (tile.bomb) {
             tile.bomb.live = false;
@@ -171,7 +175,7 @@ class BoardManager {
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
 
         for (let i = 0; i < defuseArea.length; i++) {
-            const tile = this.getTile(defuseArea[i]);
+            const tile = this.getTileByIndex(defuseArea[i]);
             if (tile && tile.hidden) {
                 tile.hidden = false;
                 this.mineSquad.score +=
@@ -181,7 +185,8 @@ class BoardManager {
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
                     const position = utils.tileIndexToTileCenter(
                         defuseArea[i],
-                        this.currentBoard
+                        this.TILE_HEIGHT,
+                        this.boardBounds
                     );
                     LayerManager.AddObject(
                         new BonusEffect(position, this.mineSquad.DEFUSE_BONUS)
@@ -200,14 +205,14 @@ class BoardManager {
         this.boardBuilder.isValidNeighbor(tileIndex, tileIndex - 2)
             ? defuseArea.push(tileIndex - 2)
             : undefined;
-        defuseArea.push(tileIndex + this.TILES_PER_ROW * 2);
-        defuseArea.push(tileIndex - this.TILES_PER_ROW * 2);
+        defuseArea.push(tileIndex + this.board.wTiles * 2);
+        defuseArea.push(tileIndex - this.board.wTiles * 2);
         return defuseArea;
     }
 
     checkForWin() {
         let isWinner = true;
-        this.board.forEach((tile) => {
+        this.board.tiles.forEach((tile) => {
             if (tile.hidden && !tile.bomb) isWinner = false;
         });
         this.completed = isWinner;
@@ -359,7 +364,7 @@ class BoardManager {
         strokeWeight(3);
         noFill();
         for (const tile of area) {
-            if (this.getTile(tile)?.hidden) {
+            if (this.getTileByIndex(tile)?.hidden) {
                 const tl = utils.tileIndexToTileTopLeft(
                     tile,
                     this.TILE_HEIGHT,

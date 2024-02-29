@@ -1,6 +1,7 @@
 class BoardBuilder {
     generateBoard(config) {
         const tiles = [];
+        this.wTiles = config.wTiles;
         for (let i = 0; i < config.wTiles * config.hTiles; i++) {
             tiles[i] = new Tile();
         }
@@ -13,10 +14,9 @@ class BoardBuilder {
     }
 
     placeMines(newBoard, numMines) {
-        let minesToPlace = numMines < this.maxMines ? numMines : this.maxMines;
         let placedMines = 0;
-        while (placedMines < minesToPlace) {
-            const tileIndex = Math.floor(Math.random() * this.totalTiles);
+        while (placedMines < numMines) {
+            const tileIndex = Math.floor(Math.random() * newBoard.length);
             if (!newBoard[tileIndex].bomb) {
                 newBoard[tileIndex].bomb = new Bomb();
                 placedMines++;
@@ -48,7 +48,7 @@ class BoardBuilder {
             for (let j = -1; j <= 1; j++) {
                 if (i === 0 && j === 0) continue;
                 if (i === -1) {
-                    const index = tileIndex - this.tilesPerRow + j;
+                    const index = tileIndex - this.wTiles + j;
                     if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
@@ -60,7 +60,7 @@ class BoardBuilder {
                     }
                 }
                 if (i === 1) {
-                    const index = tileIndex + this.tilesPerRow + j;
+                    const index = tileIndex + this.wTiles + j;
                     if (this.isValidNeighbor(tileIndex, index)) {
                         neighbors.push(index);
                     }
@@ -73,10 +73,10 @@ class BoardBuilder {
     // checks that the neighbor isn't across an edge
     isValidNeighbor(tile1, tile2) {
         if (tile2 < 0 || tile2 >= this.totalTiles) return false;
-        const tile1X = Math.floor(tile1 % this.tilesPerRow);
-        const tile2X = Math.floor(tile2 % this.tilesPerRow);
+        const tile1X = Math.floor(tile1 % this.wTiles);
+        const tile2X = Math.floor(tile2 % this.wTiles);
         const distanceApart = Math.abs(tile1X - tile2X);
-        if (distanceApart < this.tilesPerRow - 2) {
+        if (distanceApart < this.wTiles - 2) {
             return true;
         }
         return false;

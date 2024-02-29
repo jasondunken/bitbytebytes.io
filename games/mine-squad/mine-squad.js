@@ -1,5 +1,5 @@
 import { GAME_STATE } from "./modules/game-state.js";
-import { Board } from "./modules/board.js";
+import { BoardManager } from "./modules/board-manager.js";
 import { UI } from "./modules/ui.js";
 import { HighScorePanel } from "./modules/highscore-panel.js";
 import { Vec } from "../modules/math/vec.js";
@@ -93,6 +93,8 @@ class MineSquad {
 
     currentState = GAME_STATE.STARTING;
 
+    BOARD_MARGIN = 4;
+
     constructor(screenWidth, screenHeight, sprites) {
         this.width = screenWidth;
         this.height = screenHeight;
@@ -102,21 +104,20 @@ class MineSquad {
         textAlign(CENTER, CENTER);
         textSize(28);
 
-        this.board = new Board(this, MineSquad.sprites);
-        this.ui = new UI(this);
+        this.boardConfig = {
+            wTiles: 10,
+            hTiles: 8,
+            mines: 20,
+        };
 
-        // LayerManager.AddObject(
-        //     new Fireworks(
-        //         new Vec(
-        //             this.width / 4 + (Math.random() * this.width) / 2,
-        //             this.height / 4 + (Math.random() * this.height) / 2
-        //         ),
-        //         {
-        //             numStars: 20,
-        //             starSize: 8,
-        //         }
-        //     )
-        // );
+        this.boardBounds = {
+            pos: new Vec(this.BOARD_MARGIN, this.BOARD_MARGIN, 0),
+            width: this.width - this.BOARD_MARGIN * 2,
+            height: this.height - this.BOARD_MARGIN * 2,
+        };
+
+        this.boardManager = new BoardManager(this, MineSquad.sprites);
+        this.ui = new UI(this);
     }
 
     startDemo() {
@@ -137,7 +138,7 @@ class MineSquad {
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
 
-        this.board.generateBoard(this.MAX_MINES);
+        this.boardManager.generateBoard(this.boardConfig);
 
         this.mouseClicks = [];
         this.layers = [];
@@ -152,7 +153,7 @@ class MineSquad {
 
         if (this.currentState === GAME_STATE.PLAYING) {
             this.gameTime += this.dt;
-            if (this.board.completed) this.endGame();
+            if (this.boardManager.completed) this.endGame();
         }
 
         LayerManager.Update(this.dt);
@@ -169,29 +170,32 @@ class MineSquad {
             score: this.score,
             squads: this.squadCount,
             time: this.gameTime,
-            ...this.board.getUiData(),
+            ...this.boardManager.getUiData(),
         });
     }
 
     handleMouseClick(mouseX, mouseY) {
         const coords = new Vec(mouseX, mouseY);
 
-        if (this.board.isOnBoard(coords)) {
+        if (this.boardManager.isOnBoard(coords)) {
             this.mouseClicks.push(coords);
 
-            const tileIndex = this.board.getIndex(coords);
-            let tile = this.board.getTile(tileIndex);
+            const tileIndex = this.boardManager.getIndex(coords);
+            let tile = this.boardManager.getTileByIndex(tileIndex);
 
             if (this.currentState === GAME_STATE.STARTING) {
                 while (tile.value != 0 || tile.bomb) {
-                    this.board.generateBoard(this.MAX_MINES);
-                    tile = this.board.getTile(tileIndex);
+                    this.boardManager.generateBoard(this.boardConfig);
+                    tile = this.boardManager.getTileByIndex(tileIndex);
                 }
                 this.currentState = GAME_STATE.PLAYING;
             }
             if (this.currentState === GAME_STATE.PLAYING) {
                 if (keyIsDown(CONTROL)) {
-                    if (this.board.getFlagCount() < this.MAX_MINES) {
+                    if (
+                        this.boardManager.getFlagCount() <
+                        this.boardConfig.mines
+                    ) {
                         tile.flagged = true;
                     }
                     return;
@@ -205,13 +209,16 @@ class MineSquad {
                     if (keyIsDown(SHIFT)) {
                         if (this.squadCount > 0) {
                             this.squadCount--;
-                            this.board.defuseWithinRadius(tile, tileIndex);
+                            this.boardManager.defuseWithinRadius(
+                                tile,
+                                tileIndex
+                            );
                         }
                     } else {
                         const selectSound = new Audio();
                         selectSound.src = "./mine-squad/res/snd/select.wav";
                         selectSound.play();
-                        this.board.checkTile(tile, tileIndex);
+                        this.boardManager.checkTile(tile, tileIndex);
                     }
                 }
 
@@ -262,12 +269,12 @@ class MineSquad {
         setColor("darkgray");
         rect(0, 0, this.width, this.height);
 
-        this.board.draw(this.currentState);
+        this.boardManager.draw(this.currentState);
 
         LayerManager.Render();
 
         if (this.currentState === GAME_STATE.GAME_OVER) {
-            this.board.drawMousePath(this.mouseClicks);
+            this.boardManager.drawMousePath(this.mouseClicks);
             if (this.highScorePanel && this.highScorePanel.isShowing()) {
                 this.highScorePanel.draw();
             }
@@ -293,7 +300,7 @@ class MineSquad {
     endGame() {
         this.currentState = GAME_STATE.ENDING;
         this.calculateFinalScore();
-        if (this.board.winner) {
+        if (this.boardManager.winner) {
             const winSound = new Audio();
             winSound.src = "./mine-squad/res/snd/fanfare.wav";
             winSound.play();
@@ -307,14 +314,14 @@ class MineSquad {
             this.width,
             this.height - 54,
             this.score,
-            this.board.winner,
+            this.boardManager.winner,
             getElapsedTimeString(this.gameTime)
         );
         this.highScorePanel.showPanel();
     }
 
     calculateFinalScore() {
-        this.score += this.board.calculateFinalScore();
+        this.score += this.boardManager.calculateFinalScore();
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
         }

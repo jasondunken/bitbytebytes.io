@@ -27,44 +27,44 @@ function valueToColor(value) {
     }
 }
 
-// returns the array index of tile under coords
-function screenPositionToTileIndex(coords, config) {
-    const xIndex = Math.floor((coords.x - config.xOffset) / config.tileSize);
-    const yIndex = Math.floor((coords.y - config.yOffset) / config.tileSize);
-    return xIndex + yIndex * config.tilesPerRow;
+// returns the array index of tile containing coords
+function screenPositionToTileIndex(coords, tileWidth, config) {
+    const xIndex = Math.floor((coords.x - config.pos.x) / tileWidth);
+    const yIndex = Math.floor((coords.y - config.pos.y) / tileWidth);
+    return xIndex + yIndex * (config.width / tileWidth);
 }
 
 // returns the screen position of the center of the tile at the given array index
-function tileIndexToTileCenter(tileIndex, config) {
+function tileIndexToTileCenter(tileIndex, tileWidth, config) {
     return new Vec(
-        (tileIndex % config.tilesPerRow) * config.tileSize +
-            config.xOffset +
-            config.tileSize / 2,
-        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize +
-            config.yOffset +
-            config.tileSize / 2
+        (tileIndex % (config.width / tileWidth)) * tileWidth +
+            config.pos.x +
+            tileWidth / 2,
+        Math.floor(tileIndex / (config.width / tileWidth)) * tileWidth +
+            config.pos.y +
+            tileWidth / 2
     );
 }
 
 // returns the screen position of the top-left of the tile at the given array index
-function tileIndexToTileTopLeft(tileIndex, config) {
+function tileIndexToTileTopLeft(tileIndex, tileWidth, config) {
     return new Vec(
-        (tileIndex % config.tilesPerRow) * config.tileSize + config.xOffset,
-        Math.floor(tileIndex / config.tilesPerRow) * config.tileSize +
-            config.yOffset
+        (tileIndex % (config.width / tileWidth)) * tileWidth + config.pos.x,
+        Math.floor(tileIndex / (config.width / tileWidth)) * tileWidth +
+            config.pos.y
     );
 }
 
-// returns the screen position of the center of the tile under coords
-function screenPositionToTileCenter(coords, config) {
-    const tileIndex = this.screenPositionToTileIndex(coords, config);
-    return this.tileIndexToTileCenter(tileIndex, config);
+// returns the screen position of the center of the tile containing coords
+function screenPositionToTileCenter(coords, tileWidth, config) {
+    const tileIndex = this.screenPositionToTileIndex(coords, tileWidth, config);
+    return this.tileIndexToTileCenter(tileIndex, tileWidth, config);
 }
 
-// returns the screen position of the top-left of the tile under coords
-function screenPositionToTileTopLeft(coords, config) {
-    const tileIndex = this.screenPositionToTileIndex(coords, config);
-    return this.tileIndexToTileTopLeft(tileIndex, config);
+// returns the screen position of the top-left of the tile containing coords
+function screenPositionToTileTopLeft(coords, tileWidth, config) {
+    const tileIndex = this.screenPositionToTileIndex(coords, tileWidth, config);
+    return this.tileIndexToTileTopLeft(tileIndex, tileWidth, config);
 }
 
 function getElapsedTimeString(gameTime) {
