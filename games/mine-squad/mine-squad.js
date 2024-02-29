@@ -26,6 +26,7 @@ function preload() {
     sprites["bomb_defused"] = loadImage(
         "./mine-squad/res/img/bomb-defused.png"
     );
+    sprites["background"] = loadImage("./mine-squad/res/img/grass.png");
     MineSquad.sprites = sprites;
 }
 
@@ -94,6 +95,7 @@ class MineSquad {
     currentState = GAME_STATE.STARTING;
 
     BOARD_MARGIN = 4;
+    UI_HEIGHT = 52;
 
     constructor(screenWidth, screenHeight, sprites) {
         this.width = screenWidth;
@@ -106,14 +108,14 @@ class MineSquad {
 
         this.boardConfig = {
             wTiles: 10,
-            hTiles: 8,
+            hTiles: 10,
             mines: 20,
         };
 
         this.boardBounds = {
             pos: new Vec(this.BOARD_MARGIN, this.BOARD_MARGIN, 0),
             width: this.width - this.BOARD_MARGIN * 2,
-            height: this.height - this.BOARD_MARGIN * 2,
+            height: this.height - (this.BOARD_MARGIN * 2 + this.UI_HEIGHT),
         };
 
         this.boardManager = new BoardManager(this, MineSquad.sprites);
@@ -268,6 +270,8 @@ class MineSquad {
     render() {
         setColor("darkgray");
         rect(0, 0, this.width, this.height);
+
+        image(MineSquad.sprites["background"], 0, 0, this.width, this.height);
 
         this.boardManager.draw(this.currentState);
 
