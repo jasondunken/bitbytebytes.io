@@ -5,68 +5,68 @@ import { GAME_STATE } from "./game-state.js";
 import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
 import { LayerManager } from "../../modules/graphics/layer-manager.js";
 
-class Board {
-    TILES_PER_COLUMN = 16;
-    TILES_PER_ROW = 30;
+class BoardManager {
     TILE_HEIGHT = 30;
     HALF_TILE = Math.floor(this.TILE_HEIGHT / 2);
-
-    BOARD_X_OFFSET = 30;
-    BOARD_Y_OFFSET = 4;
     BOMB_HEIGHT = this.TILE_HEIGHT * 0.7;
-    TOTAL_TILES = this.TILES_PER_COLUMN * this.TILES_PER_ROW;
-
-    MAX_MINES = 99;
-
-    config = {
-        totalTiles: this.TOTAL_TILES,
-        tilesPerRow: this.TILES_PER_ROW,
-        maxMines: this.MAX_MINES,
-    };
 
     constructor(mineSquad, sprites) {
         this.mineSquad = mineSquad;
+        this.bounds = mineSquad.boardBounds;
         this.sprites = sprites;
-        this.boardBuilder = new BoardBuilder(this.config);
-        this.bounds = {
-            top: this.BOARD_Y_OFFSET,
-            right: this.BOARD_X_OFFSET + this.TILES_PER_ROW * this.TILE_HEIGHT,
-            bottom:
-                this.BOARD_Y_OFFSET + this.TILES_PER_COLUMN * this.TILE_HEIGHT,
-            left: this.BOARD_X_OFFSET,
-        };
-        this.boardConfig = {
-            tileSize: this.TILE_HEIGHT,
-            tilesPerRow: this.TILES_PER_ROW,
-            xOffset: this.BOARD_X_OFFSET,
-            yOffset: this.BOARD_Y_OFFSET,
-        };
+        this.boardBuilder = new BoardBuilder(this.bounds);
     }
 
-    generateBoard(numMines) {
+    generateBoard(config) {
         this.completed = false;
         this.winner = false;
-        this.board = this.boardBuilder.generateBoard(numMines);
+        this.board = this.boardBuilder.generateBoard(config);
+        const width = config.wTiles * this.TILE_HEIGHT;
+        const height = config.hTiles * this.TILE_HEIGHT;
+        this.boardBounds = {
+            pos: new Vec(
+                this.bounds.pos.x + (this.bounds.width / 2 - width / 2),
+                this.bounds.pos.y + (this.bounds.height / 2 - height / 2)
+            ),
+            width,
+            height,
+        };
     }
 
     isOnBoard(coords) {
         if (
-            coords.x > this.bounds.left &&
-            coords.x < this.bounds.right &&
-            coords.y > this.bounds.top &&
-            coords.y < this.bounds.bottom
+            coords.x > this.boardBounds.pos.x &&
+            coords.x < this.boardBounds.pos.x + this.boardBounds.width &&
+            coords.y > this.boardBounds.pos.y &&
+            coords.y < this.boardBounds.pos.y + this.boardBounds.height
         ) {
+            console.log("is on board");
             return true;
         }
         return false;
     }
 
-    getIndex(coords) {
-        return utils.screenPositionToTileIndex(coords, this.boardConfig);
+    getTile(coords) {
+        const index = this.getIndex(coords);
+        return this.getTileByIndex(index);
     }
 
-    getTile(index) {
-        return this.board[index];
+    getIndex(coords) {
+        if (this.isOnBoard(coords)) {
+            return utils.screenPositionToTileIndex(
+                coords,
+                this.TILE_HEIGHT,
+                this.boardBounds
+            );
+        }
+        return null;
+    }
+
+    getTileByIndex(index) {
+        if (index >= 0 && index < this.board.tiles.length) {
+            return this.board.tiles[index];
+        }
+        return null;
     }
 
     getUiData() {
@@ -75,7 +75,7 @@ class Board {
         let mines = 0;
         let flags = 0;
         let totalTileValue = 0;
-        this.board.forEach((tile) => {
+        this.board.tiles.forEach((tile) => {
             totalTiles++;
             if (tile.hidden) hidden++;
             if (tile.bomb && tile.bomb.live === false) hidden++;
@@ -101,7 +101,7 @@ class Board {
             tile.hidden = false;
             const position = utils.tileIndexToTileCenter(
                 tileIndex,
-                this.boardConfig
+                this.currentBoard
             );
             const explosionSound = new Audio();
             explosionSound.src = "./mine-squad/res/snd/explosion.wav";
@@ -123,7 +123,7 @@ class Board {
         if (tile.value > 0) {
             const position = utils.tileIndexToTileCenter(
                 tileIndex,
-                this.boardConfig
+                this.currentBoard
             );
             LayerManager.AddObject(
                 new ScoreEffect(position, tileScore, tile.value)
@@ -143,7 +143,7 @@ class Board {
         tile.hidden = false;
         const position = utils.tileIndexToTileCenter(
             tileIndex,
-            this.boardConfig
+            this.currentBoard
         );
         if (tile.bomb) {
             tile.bomb.live = false;
@@ -181,7 +181,7 @@ class Board {
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
                     const position = utils.tileIndexToTileCenter(
                         defuseArea[i],
-                        this.boardConfig
+                        this.currentBoard
                     );
                     LayerManager.AddObject(
                         new BonusEffect(position, this.mineSquad.DEFUSE_BONUS)
@@ -237,9 +237,13 @@ class Board {
     }
 
     drawBoard(gameState) {
-        for (let i = 0; i < this.TOTAL_TILES; i++) {
-            const tile = this.board[i];
-            const position = utils.tileIndexToTileTopLeft(i, this.boardConfig);
+        for (let i = 0; i < this.board.tiles.length; i++) {
+            const tile = this.board.tiles[i];
+            const position = utils.tileIndexToTileTopLeft(
+                i,
+                this.TILE_HEIGHT,
+                this.boardBounds
+            );
 
             if (tile.hidden === false) {
                 utils.setColor("gray");
@@ -332,7 +336,8 @@ class Board {
         if (this.isOnBoard(coords)) {
             const tileCenter = utils.screenPositionToTileCenter(
                 coords,
-                this.boardConfig
+                this.TILE_HEIGHT,
+                this.boardBounds
             );
             stroke("yellow");
             strokeWeight(4);
@@ -355,7 +360,11 @@ class Board {
         noFill();
         for (const tile of area) {
             if (this.getTile(tile)?.hidden) {
-                const tl = utils.tileIndexToTileTopLeft(tile, this.boardConfig);
+                const tl = utils.tileIndexToTileTopLeft(
+                    tile,
+                    this.TILE_HEIGHT,
+                    this.boardBounds
+                );
                 rect(tl.x, tl.y, 30, 30);
             }
         }
@@ -379,7 +388,8 @@ class Board {
         let firstClick = mouseClickCoords[0];
         const firstClickCenter = utils.screenPositionToTileTopLeft(
             firstClick,
-            this.boardConfig
+            this.TILE_HEIGHT,
+            this.boardBounds
         );
         rect(
             firstClickCenter.x,
@@ -394,7 +404,8 @@ class Board {
         let lastClick = mouseClickCoords[mouseClickCoords.length - 1];
         const lastClickCenter = utils.screenPositionToTileTopLeft(
             lastClick,
-            this.boardConfig
+            this.TILE_HEIGHT,
+            this.boardBounds
         );
         rect(
             lastClickCenter.x,
@@ -405,4 +416,4 @@ class Board {
     }
 }
 
-export { Board };
+export { BoardManager };
