@@ -1,18 +1,15 @@
 class BoardBuilder {
-    constructor(config) {
-        this.totalTiles = config.totalTiles;
-        this.tilesPerRow = config.tilesPerRow;
-        this.maxMines = config.maxMines;
-    }
-
-    generateBoard(numMines) {
-        const newBoard = [];
-        for (let i = 0; i < this.totalTiles; i++) {
-            newBoard[i] = new Tile();
+    generateBoard(config) {
+        const tiles = [];
+        for (let i = 0; i < config.wTiles * config.hTiles; i++) {
+            tiles[i] = new Tile();
         }
-        this.placeMines(newBoard, numMines);
-        this.calculateValues(newBoard);
-        return newBoard;
+        this.placeMines(tiles, config.mines);
+        this.calculateValues(tiles);
+        return {
+            wTiles: config.wTiles,
+            tiles,
+        };
     }
 
     placeMines(newBoard, numMines) {
