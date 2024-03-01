@@ -68,6 +68,8 @@ class MineSquad {
 
     static sprites;
 
+    MAX_TILES_WIDTH = 31;
+    MAX_TILES_HEIGHT = 16;
     MAX_MINES = 99;
     STARTING_SQUADS = 1;
     FIRST_SQUAD_AWARD = 20000;
@@ -78,6 +80,12 @@ class MineSquad {
     SQUAD_BONUS = 10000;
     DEFUSE_BONUS = 4000;
     FLAG_PENALTY = 25;
+
+    DEFAULT_BOARD_CONFIG = {
+        wTiles: 10,
+        hTiles: 10,
+        mines: 10,
+    };
 
     showHighScores = false;
 
@@ -105,12 +113,6 @@ class MineSquad {
         textSize(this.TILE_HEIGHT);
         textAlign(CENTER, CENTER);
         textSize(28);
-
-        this.boardConfig = {
-            wTiles: 10,
-            hTiles: 10,
-            mines: 20,
-        };
 
         this.boardBounds = {
             pos: new Vec(this.BOARD_MARGIN, this.BOARD_MARGIN, 0),
@@ -140,11 +142,42 @@ class MineSquad {
         this.squadCount = this.STARTING_SQUADS;
         this.squadAward = 0;
 
+        this.boardConfig = {
+            wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
+            hTiles: this.DEFAULT_BOARD_CONFIG.hTiles,
+            mines: this.DEFAULT_BOARD_CONFIG.mines,
+        };
+
         this.boardManager.generateBoard(this.boardConfig);
 
         this.mouseClicks = [];
         this.layers = [];
 
+        this.currentState = GAME_STATE.STARTING;
+    }
+
+    nextLevel() {
+        this.level++;
+        if (
+            this.level % 2 == 1 &&
+            this.boardConfig.hTiles < this.MAX_TILES_HEIGHT
+        ) {
+            this.boardConfig.hTiles++;
+            if (this.boardConfig.hTiles > this.MAX_TILES_HEIGHT) {
+                this.boardConfig.hTiles = this.MAX_TILES_HEIGHT;
+            }
+        } else {
+            this.boardConfig.wTiles++;
+            if (this.boardConfig.wTiles > this.MAX_TILES_WIDTH) {
+                this.boardConfig.wTiles = this.MAX_TILES_WIDTH;
+            }
+        }
+        this.boardConfig.mines = Math.floor(
+            this.boardConfig.wTiles * this.boardConfig.hTiles * 0.25
+        );
+        if (this.boardConfig.mines > this.MAX_MINES)
+            this.boardConfig.mines = this.MAX_MINES;
+        this.boardManager.generateBoard(this.boardConfig);
         this.currentState = GAME_STATE.STARTING;
     }
 
@@ -155,7 +188,13 @@ class MineSquad {
 
         if (this.currentState === GAME_STATE.PLAYING) {
             this.gameTime += this.dt;
-            if (this.boardManager.completed) this.endGame();
+            if (this.boardManager.completed) {
+                if (this.boardManager.winner) {
+                    this.nextLevel();
+                } else {
+                    this.gameOver();
+                }
+            }
         }
 
         LayerManager.Update(this.dt);
@@ -322,6 +361,13 @@ class MineSquad {
             getElapsedTimeString(this.gameTime)
         );
         this.highScorePanel.showPanel();
+        this.level = 1;
+
+        this.boardConfig = {
+            wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
+            hTiles: this.DEFAULT_BOARD_CONFIG.hTiles,
+            mines: this.DEFAULT_BOARD_CONFIG.mines,
+        };
     }
 
     calculateFinalScore() {
