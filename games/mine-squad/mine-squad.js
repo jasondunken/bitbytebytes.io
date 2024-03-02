@@ -179,6 +179,7 @@ class MineSquad {
             this.boardConfig.mines = this.MAX_MINES;
         this.boardManager.generateBoard(this.boardConfig);
         this.currentState = GAME_STATE.STARTING;
+        this.mouseClicks = [];
     }
 
     update() {
@@ -189,11 +190,7 @@ class MineSquad {
         if (this.currentState === GAME_STATE.PLAYING) {
             this.gameTime += this.dt;
             if (this.boardManager.completed) {
-                if (this.boardManager.winner) {
-                    this.nextLevel();
-                } else {
-                    this.gameOver();
-                }
+                this.currentState = GAME_STATE.ENDING;
             }
         }
 
@@ -203,7 +200,11 @@ class MineSquad {
             this.currentState === GAME_STATE.ENDING &&
             LayerManager.LayersComplete()
         ) {
-            this.gameOver();
+            if (this.boardManager.winner) {
+                this.nextLevel();
+            } else {
+                this.gameOver();
+            }
         }
 
         this.ui.update({
