@@ -71,9 +71,8 @@ class MineSquad {
     MAX_TILES_WIDTH = 31;
     MAX_TILES_HEIGHT = 16;
     MAX_MINES = 99;
-    STARTING_SQUADS = 1;
+    STARTING_SQUADS = 0;
     FIRST_SQUAD_AWARD = 20000;
-    SECOND_SQUAD_AWARD = 40000;
     MAX_SQUADS = 3;
     TILE_MULTIPLIER = 100;
     TILE_BONUS = 100;
@@ -94,7 +93,7 @@ class MineSquad {
     score = 0;
     time = 0;
     squadCount = 0;
-    squadAward = 0;
+    squad_bonus_threshold;
 
     mouseClicks = [];
 
@@ -140,7 +139,7 @@ class MineSquad {
         this.level = 1;
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
-        this.squadAward = 0;
+        this.squad_bonus_threshold = this.FIRST_SQUAD_AWARD;
 
         this.boardConfig = {
             wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
@@ -201,6 +200,10 @@ class MineSquad {
             LayerManager.LayersComplete()
         ) {
             if (this.boardManager.winner) {
+                const winSound = new Audio();
+                winSound.src = "./mine-squad/res/snd/fanfare.wav";
+                winSound.play();
+                this.createFireworks();
                 this.nextLevel();
             } else {
                 this.gameOver();
@@ -264,18 +267,8 @@ class MineSquad {
                     }
                 }
 
-                if (
-                    this.score > this.FIRST_SQUAD_AWARD &&
-                    this.squadAward === 0
-                ) {
-                    this.squadAward = this.FIRST_SQUAD_AWARD;
-                    this.addSquad();
-                }
-                if (
-                    this.score > this.SECOND_SQUAD_AWARD &&
-                    this.squadAward === this.FIRST_SQUAD_AWARD
-                ) {
-                    this.squadAward = this.SECOND_SQUAD_AWARD;
+                if (this.score > this.squad_bonus_threshold) {
+                    this.squad_bonus_threshold = this.squad_bonus_threshold * 2;
                     this.addSquad();
                 }
             }
@@ -338,18 +331,16 @@ class MineSquad {
             powerupSound.play();
             this.squadCount++;
             this.ui.addSquad(this.squadCount);
+        } else {
+            const deniedSound = new Audio();
+            deniedSound.src = "./mine-squad/res/snd/denied.wav";
+            deniedSound.play();
         }
     }
 
     endGame() {
         this.currentState = GAME_STATE.ENDING;
         this.calculateFinalScore();
-        if (this.boardManager.winner) {
-            const winSound = new Audio();
-            winSound.src = "./mine-squad/res/snd/fanfare.wav";
-            winSound.play();
-            this.createFireworks();
-        }
     }
 
     gameOver() {
