@@ -189,23 +189,25 @@ class MineSquad {
         if (this.currentState === GAME_STATE.PLAYING) {
             this.gameTime += this.dt;
             if (this.boardManager.completed) {
-                this.currentState = GAME_STATE.ENDING;
+                this.currentState = GAME_STATE.LEVEL_ENDING;
+                const winSound = new Audio();
+                winSound.src = "./mine-squad/res/snd/fanfare.wav";
+                winSound.play();
+                this.createFireworks();
             }
         }
 
         LayerManager.Update(this.dt);
 
         if (
-            this.currentState === GAME_STATE.ENDING &&
+            this.currentState === GAME_STATE.LEVEL_ENDING &&
             LayerManager.LayersComplete()
         ) {
             if (this.boardManager.winner) {
-                const winSound = new Audio();
-                winSound.src = "./mine-squad/res/snd/fanfare.wav";
-                winSound.play();
-                this.createFireworks();
                 this.nextLevel();
+                this.currentState = GAME_STATE.STARTING;
             } else {
+                this.calculateFinalScore();
                 this.gameOver();
             }
         }
@@ -336,11 +338,6 @@ class MineSquad {
             deniedSound.src = "./mine-squad/res/snd/denied.wav";
             deniedSound.play();
         }
-    }
-
-    endGame() {
-        this.currentState = GAME_STATE.ENDING;
-        this.calculateFinalScore();
     }
 
     gameOver() {
