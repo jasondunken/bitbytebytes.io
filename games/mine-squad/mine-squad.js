@@ -190,9 +190,6 @@ class MineSquad {
             this.gameTime += this.dt;
             if (this.boardManager.completed) {
                 this.currentState = GAME_STATE.LEVEL_ENDING;
-                const winSound = new Audio();
-                winSound.src = "./mine-squad/res/snd/fanfare.wav";
-                winSound.play();
                 this.createFireworks();
             }
         }
@@ -204,6 +201,9 @@ class MineSquad {
             LayerManager.LayersComplete()
         ) {
             if (this.boardManager.winner) {
+                const winSound = new Audio();
+                winSound.src = "./mine-squad/res/snd/fanfare.wav";
+                winSound.play();
                 this.nextLevel();
                 this.currentState = GAME_STATE.STARTING;
             } else {
