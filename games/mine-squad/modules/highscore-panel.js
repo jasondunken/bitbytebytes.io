@@ -116,14 +116,8 @@ class HighScorePanel {
         }
 
         fill("black");
-        // textSize(16);
-        // text(
-        //     `wins ${this.stats.wins} - losses ${
-        //         this.stats.losses
-        //     } - win rate ${this.getWinRate()}%`,
-        //     this.position.x + this.WIDTH / 2,
-        //     100
-        // );
+        textSize(16);
+        text("High Scores", this.position.x + this.WIDTH / 2, 100);
 
         textSize(18);
         this.highScores.forEach((score, i) => {

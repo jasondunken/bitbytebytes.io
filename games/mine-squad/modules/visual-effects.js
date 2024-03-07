@@ -245,6 +245,7 @@ class FireworkShell {
     constructor(position, config) {
         this.position = position || new Vec();
         this.burstRadius = config?.burstRadius || 128;
+        const burstRadiusVariation = 16;
         this.numStars = config?.numStars || 20;
         this.color = config?.starColor || "white";
 
@@ -258,21 +259,25 @@ class FireworkShell {
         this.particles = new Set();
         for (let i = 0; i < this.numStars; i++) {
             const angle = (i * 2 * PI) / this.numStars;
-            this.particles.add(
-                new Particle(
-                    position.copy(),
-                    new Vec(Math.cos(angle), Math.sin(angle)),
-                    this.life - Math.random() * 50,
-                    config.starSize
-                )
+            const particle = new Particle(
+                position.copy(),
+                new Vec(Math.cos(angle), Math.sin(angle)),
+                this.life - Math.random() * 50,
+                config.starSize
             );
+            particle.burstRadius =
+                Math.random() * burstRadiusVariation +
+                this.burstRadius -
+                burstRadiusVariation;
+            this.particles.add(particle);
         }
     }
 
     update(delta) {
         this.particles.forEach((particle) => {
             if (
-                Vec.dist(this.position, particle.position) >= this.burstRadius
+                Vec.dist(this.position, particle.position) >=
+                particle.burstRadius
             ) {
                 this.alpha -= particle.life / 1000;
                 this.color.setAlpha(this.alpha);
@@ -295,15 +300,16 @@ class FireworkShell {
 
     render() {
         this.particles.forEach((particle) => {
-            noStroke();
-            fill(this.color);
-            ellipse(
-                particle.position.x,
-                particle.position.y,
-                particle.size,
-                particle.size
-            );
+            this.renderParticle(particle.position, particle.size);
         });
+    }
+
+    renderParticle(position, size) {
+        noStroke();
+        fill("gray");
+        ellipse(position.x, position.y, size + 2, size + 2);
+        fill(this.color);
+        ellipse(position.x, position.y, size, size);
     }
 }
 
