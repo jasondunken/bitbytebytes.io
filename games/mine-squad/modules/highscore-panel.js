@@ -9,17 +9,14 @@ class HighScorePanel {
     highScores = [];
     show = false;
 
-    constructor(width, height, score, winner, time) {
+    constructor(width, height, score, level, time) {
         this.position.x = width / 2 - this.WIDTH / 2;
         this.position.y = height / 2 - this.HEIGHT / 2;
         this.score = score;
-        this.winner = winner;
-
-        this.stats = this.getGameStats(winner);
-        this.highScores = this.getHighScores(score, time);
+        this.highScores = this.getHighScores(score, level, time);
     }
 
-    getHighScores(score, winner, time) {
+    getHighScores(score, level, time) {
         let gameScores = this.getLocalStorageItemAsObj("minesquad");
         if (!gameScores) {
             gameScores = [];
@@ -28,9 +25,9 @@ class HighScorePanel {
         const scoreDate = Date.now();
         gameScores.push({
             scoreDate,
-            score: score,
-            winner: winner,
-            time: time,
+            score,
+            level,
+            time,
         });
 
         if (gameScores.length > this.MAX_SCORES) {
@@ -60,21 +57,6 @@ class HighScorePanel {
         }
         localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
         return gameStats;
-    }
-
-    getWinRate() {
-        if (this.stats) {
-            if (this.stats.wins <= 0) {
-                return 0;
-            } else if (this.stats.losses <= 0) {
-                return 100;
-            } else {
-                return (
-                    (this.stats.wins / (this.stats.wins + this.stats.losses)) *
-                    100
-                ).toFixed(2);
-            }
-        } else return 0;
     }
 
     getLocalStorageItemAsObj(item) {
@@ -107,13 +89,9 @@ class HighScorePanel {
         noStroke();
         textSize(32);
         textAlign(CENTER);
-        if (this.winner) {
-            fill("green");
-            text("You Win!", this.position.x + this.WIDTH / 2, 60);
-        } else {
-            fill("red");
-            text("Game Over!", this.position.x + this.WIDTH / 2, 60);
-        }
+
+        fill("red");
+        text("Game Over!", this.position.x + this.WIDTH / 2, 60);
 
         fill("black");
         textSize(16);
@@ -129,6 +107,12 @@ class HighScorePanel {
                 text(
                     new Date(+score.scoreDate).toLocaleDateString(),
                     this.position.x + 32,
+                    135 + i * 24
+                );
+                textAlign(CENTER);
+                text(
+                    `Level ${score.level}`,
+                    this.position.x + this.WIDTH / 2,
                     135 + i * 24
                 );
                 textAlign(RIGHT);

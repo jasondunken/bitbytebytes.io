@@ -346,7 +346,7 @@ class MineSquad {
             this.width,
             this.height - 54,
             this.score,
-            this.boardManager.winner,
+            this.level,
             getElapsedTimeString(this.gameTime)
         );
         this.highScorePanel.showPanel();
