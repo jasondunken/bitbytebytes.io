@@ -23,6 +23,7 @@ class UI {
     LEVEL_BOX_WIDTH = 64;
     SCORE_BOX_WIDTH = 128;
     SQUADS_BOX_WIDTH = 128;
+    NEXT_BONUS_BOX_WIDTH = 96;
     TIME_BOX_WIDTH = 96;
     MINES_BOX_WIDTH = 96;
     HIDDEN_BOX_WIDTH = 96;
@@ -32,6 +33,7 @@ class UI {
     SCORE_BOX_X = 72;
     TIME_BOX_X = 204;
     SQUADS_BOX_X = 412;
+    NEXT_BONUS_BOX_X = 544;
     MINES_BOX_X = 652;
     HIDDEN_BOX_X = 752;
     FLAGS_BOX_X = 852;
@@ -68,6 +70,7 @@ class UI {
         this.drawLevelBox();
         this.drawScoreBox();
         this.drawSquadsBox();
+        this.drawNextBonus();
         this.drawTimerBox();
         this.drawMinesBox();
         this.drawHiddenBox();
@@ -186,6 +189,35 @@ class UI {
                 );
             }
         }
+    }
+
+    drawNextBonus() {
+        noStroke();
+        fill("white");
+        textSize(14);
+        textAlign(LEFT, BOTTOM);
+        text(
+            "NEXT SQUAD",
+            this.position.x + this.NEXT_BONUS_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.NEXT_BONUS_BOX_X,
+            this.position.y + this.UI_BOX_Y,
+            this.NEXT_BONUS_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        fill("white");
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        text(
+            "" + this.gameData.nextBonus,
+            this.NEXT_BONUS_BOX_X +
+                this.NEXT_BONUS_BOX_WIDTH / 2 +
+                this.P5_TEXT_ISNT_REALLY_CENTERED,
+            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+        );
     }
 
     drawTimerBox() {

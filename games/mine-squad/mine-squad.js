@@ -217,6 +217,7 @@ class MineSquad {
         this.ui.update({
             level: this.level,
             score: this.score,
+            nextBonus: this.squad_bonus_threshold,
             squads: this.squadCount,
             time: this.gameTime,
             ...this.boardManager.getUiData(),
