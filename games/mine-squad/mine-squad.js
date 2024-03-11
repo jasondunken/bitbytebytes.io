@@ -263,6 +263,9 @@ class MineSquad {
                                 tile,
                                 tileIndex
                             );
+                            const defuseSound = new Audio();
+                            defuseSound.src = "./mine-squad/res/snd/defuse.wav";
+                            defuseSound.play();
                         }
                     } else {
                         const selectSound = new Audio();
