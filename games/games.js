@@ -51,7 +51,7 @@ for (let game of GAMES) {
     body.appendChild(createGameBoxElement(gameBox));
 }
 
-for (let game of GAMES) {
+for (let i = 0; i < 2; i++) {
     let gameBox = document.createElement("div");
     gameBox.innerHTML = `<div class="container">
         <div class="card">
