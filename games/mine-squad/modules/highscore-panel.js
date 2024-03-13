@@ -4,15 +4,17 @@ class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
     position = new Vec();
-    MAX_SCORES = 10;
+    MAX_SCORES = 200;
+    MAX_DISPLAY_SCORES = 10;
     stats = {};
     highScores = [];
     show = false;
 
+    score = null;
+
     constructor(width, height, score, level, time) {
         this.position.x = width / 2 - this.WIDTH / 2;
         this.position.y = height / 2 - this.HEIGHT / 2;
-        this.score = score;
         this.highScores = this.getHighScores(score, level, time);
     }
 
@@ -23,12 +25,13 @@ class HighScorePanel {
         }
 
         const scoreDate = Date.now();
-        gameScores.push({
+        this.score = {
             scoreDate,
             score,
             level,
             time,
-        });
+        };
+        gameScores.push(this.score);
 
         if (gameScores.length > this.MAX_SCORES) {
             let lowestScore = gameScores[0];
@@ -40,23 +43,11 @@ class HighScorePanel {
             gameScores.splice(gameScores.indexOf(lowestScore), 1);
         }
         gameScores = gameScores.sort((a, b) => b.score - a.score);
+
+        this.score.num = gameScores.indexOf(this.score) + 1;
+
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
         return gameScores;
-    }
-
-    getGameStats(winner) {
-        let gameStats = this.getLocalStorageItemAsObj("minesquad.stats");
-        if (!gameStats) {
-            gameStats = { wins: 0, losses: 0 };
-        }
-
-        if (winner) {
-            gameStats.wins++;
-        } else {
-            gameStats.losses++;
-        }
-        localStorage.setItem("minesquad.stats", JSON.stringify(gameStats));
-        return gameStats;
     }
 
     getLocalStorageItemAsObj(item) {
@@ -99,9 +90,9 @@ class HighScorePanel {
 
         textSize(18);
         this.highScores.forEach((score, i) => {
-            if (i < this.MAX_SCORES) {
-                if (score.score == this.score && frameCount % 60 > 30) {
-                    fill("red");
+            if (i < this.MAX_DISPLAY_SCORES) {
+                if (score.score == this.score.score && frameCount % 40 < 30) {
+                    fill("green");
                 } else fill("black");
                 textAlign(LEFT);
                 text(
@@ -124,7 +115,24 @@ class HighScorePanel {
             }
         });
 
+        if (frameCount % 40 < 30) {
+            fill("green");
+            textSize(18);
+            textAlign(LEFT);
+            text(this.score.num, this.position.x + 32, 380);
+            textAlign(CENTER);
+            text(
+                `Level ${this.score.level}`,
+                this.position.x + this.WIDTH / 2,
+                380
+            );
+            textAlign(RIGHT);
+            text(this.score.score, this.position.x + this.WIDTH - 32, 380);
+        }
+
         fill("black");
+        noStroke();
+        textSize(18);
         textAlign(CENTER);
         if (frameCount % 120 > 60) {
             text("Click to restart", this.position.x + this.WIDTH / 2, 430);
