@@ -191,6 +191,7 @@ class MineSquad {
             if (this.boardManager.completed) {
                 this.currentState = GAME_STATE.LEVEL_ENDING;
                 if (this.boardManager.winner) {
+                    this.calculateLevelScore();
                     const winSound = new Audio();
                     winSound.src = "./mine-squad/res/snd/fanfare.wav";
                     winSound.play();
@@ -365,8 +366,20 @@ class MineSquad {
         };
     }
 
+    calculateLevelScore() {
+        this.score += this.boardManager.calculateLevelScore(
+            this.level,
+            this.TILE_BONUS,
+            this.FLAG_PENALTY
+        );
+    }
+
     calculateFinalScore() {
-        this.score += this.boardManager.calculateFinalScore();
+        this.score += this.boardManager.calculateFinalScore(
+            this.level,
+            this.TILE_BONUS,
+            this.FLAG_PENALTY
+        );
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
         }

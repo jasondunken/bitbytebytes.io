@@ -219,17 +219,32 @@ class BoardManager {
         this.winner = isWinner;
     }
 
-    calculateFinalScore(tileBonus, flagPenalty) {
+    calculateLevelScore(level, tileBonus, flagPenalty) {
         let score = 0;
-        for (let i = 0; i < this.totalTiles; i++) {
-            const tile = this.board[i];
-            if (tile.hidden === false && this.winner) {
-                score += tileBonus;
+        for (let i = 0; i < this.board.tiles.length; i++) {
+            const tile = this.board.tiles[i];
+            if (tile.hidden === true && tile.bomb) {
+                score += tileBonus * tile.value * level;
+            }
+            if (tile.flagged) {
+                score -= flagPenalty * level;
+            }
+        }
+        return score;
+    }
+
+    calculateFinalScore(level, tileBonus, flagPenalty) {
+        let score = 0;
+        for (let i = 0; i < this.board.tiles.length; i++) {
+            const tile = this.board.tiles[i];
+            if (tile.hidden === false) {
+                score += tileBonus * tile.value * level;
             }
             if (tile.flagged) {
                 score -= flagPenalty;
             }
         }
+        console.log("final score bonus: ", score);
         return score;
     }
 
