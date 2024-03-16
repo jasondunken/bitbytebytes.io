@@ -192,6 +192,7 @@ class MineSquad {
                 this.currentState = GAME_STATE.LEVEL_ENDING;
                 if (this.boardManager.winner) {
                     this.calculateLevelScore();
+                    this.checkSquadBonus();
                     const winSound = new Audio();
                     winSound.src = "./mine-squad/res/snd/fanfare.wav";
                     winSound.play();
@@ -275,11 +276,7 @@ class MineSquad {
                         this.boardManager.checkTile(tile, tileIndex);
                     }
                 }
-
-                if (this.score > this.squad_bonus_threshold) {
-                    this.squad_bonus_threshold = this.squad_bonus_threshold * 2;
-                    this.addSquad();
-                }
+                this.checkSquadBonus();
             }
         }
         if (this.currentState === GAME_STATE.GAME_OVER) {
@@ -331,6 +328,13 @@ class MineSquad {
         }
         this.ui.draw();
         this.ui.drawCrosshair();
+    }
+
+    checkSquadBonus() {
+        if (this.score > this.squad_bonus_threshold) {
+            this.squad_bonus_threshold = this.squad_bonus_threshold * 2;
+            this.addSquad();
+        }
     }
 
     addSquad() {

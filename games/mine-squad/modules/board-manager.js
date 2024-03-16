@@ -244,7 +244,6 @@ class BoardManager {
                 score -= flagPenalty;
             }
         }
-        console.log("final score bonus: ", score);
         return score;
     }
 
