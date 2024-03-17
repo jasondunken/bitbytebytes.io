@@ -44,7 +44,8 @@ class HighScorePanel {
         }
         gameScores = gameScores.sort((a, b) => b.score - a.score);
 
-        this.score.num = gameScores.indexOf(this.score) + 1;
+        const rank = gameScores.indexOf(this.score) + 1;
+        this.score.num = rank ? rank : `>${this.MAX_SCORES}`;
 
         localStorage.setItem("minesquad", JSON.stringify(gameScores));
         return gameScores;
