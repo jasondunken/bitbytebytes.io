@@ -95,6 +95,8 @@ class MineSquad {
     squadCount = 0;
     squad_bonus_threshold;
 
+    flagsUsed = 0;
+
     mouseClicks = [];
 
     visualEffects = new Set();
@@ -140,6 +142,7 @@ class MineSquad {
         this.score = 0;
         this.squadCount = this.STARTING_SQUADS;
         this.squad_bonus_threshold = this.FIRST_SQUAD_AWARD;
+        this.flagsUsed = 0;
 
         this.boardConfig = {
             wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
@@ -249,6 +252,7 @@ class MineSquad {
                         this.boardConfig.mines
                     ) {
                         tile.flagged = true;
+                        this.flagsUsed++;
                     }
                     return;
                 }
