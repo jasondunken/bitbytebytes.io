@@ -117,7 +117,7 @@ class HighScorePanel {
         });
 
         if (frameCount % 40 < 30) {
-            fill("green");
+            fill("red");
             textSize(18);
             textAlign(LEFT);
             text(this.score.num, this.position.x + 32, 380);

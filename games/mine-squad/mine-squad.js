@@ -391,6 +391,8 @@ class MineSquad {
         );
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
+        } else {
+            this.score -= this.flagsUsed * this.FLAG_PENALTY;
         }
     }
 
