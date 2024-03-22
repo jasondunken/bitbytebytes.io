@@ -295,7 +295,7 @@ class UI {
         textSize(14);
         textAlign(LEFT, BOTTOM);
         text(
-            "MINES?",
+            "HIDDEN",
             this.position.x + this.HIDDEN_BOX_X,
             this.position.y + this.UI_BOX_Y
         );
