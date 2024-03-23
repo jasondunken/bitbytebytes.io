@@ -79,6 +79,7 @@ class MineSquad {
     TILE_BONUS = 100;
     SQUAD_BONUS = 10000;
     DEFUSE_BONUS = 4000;
+    BASE_CLICK_BONUS = 10000;
     FLAG_PENALTY = 25;
 
     DEFAULT_BOARD_CONFIG = {
@@ -99,6 +100,7 @@ class MineSquad {
     flagsUsed = 0;
 
     mouseClicks = [];
+    clicksThisLevel = 0;
 
     visualEffects = new Set();
 
@@ -145,6 +147,9 @@ class MineSquad {
         this.squad_bonus_threshold = this.FIRST_SQUAD_AWARD;
         this.flagsUsed = 0;
 
+        this.mouseClicks = [];
+        this.clicksThisLevel = 0;
+
         this.boardConfig = {
             wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
             hTiles: this.DEFAULT_BOARD_CONFIG.hTiles,
@@ -152,8 +157,6 @@ class MineSquad {
         };
 
         this.boardManager.generateBoard(this.boardConfig);
-
-        this.mouseClicks = [];
         this.layers = [];
 
         this.currentState = GAME_STATE.STARTING;
@@ -235,6 +238,7 @@ class MineSquad {
 
         if (this.boardManager.isOnBoard(coords)) {
             this.mouseClicks.push(coords);
+            this.clicksThisLevel++;
 
             const tileIndex = this.boardManager.getIndex(coords);
             let tile = this.boardManager.getTileByIndex(tileIndex);
@@ -381,6 +385,7 @@ class MineSquad {
             this.TILE_BONUS,
             this.FLAG_PENALTY
         );
+        this.score += this.getClickBonus();
     }
 
     calculateFinalScore() {
@@ -394,6 +399,13 @@ class MineSquad {
         } else {
             this.score -= this.flagsUsed * this.FLAG_PENALTY;
         }
+        this.score += this.getClickBonus();
+    }
+
+    getClickBonus() {
+        return Math.floor(
+            this.level * this.BASE_CLICK_BONUS * (1 / this.clicksThisLevel)
+        );
     }
 
     detonateBomb(coords) {
