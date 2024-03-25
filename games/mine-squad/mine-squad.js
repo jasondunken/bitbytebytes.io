@@ -80,7 +80,7 @@ class MineSquad {
     SQUAD_BONUS = 10000;
     DEFUSE_BONUS = 4000;
     BASE_CLICK_BONUS = 10000;
-    FLAG_PENALTY = 25;
+    FLAG_COST = 100;
 
     DEFAULT_BOARD_CONFIG = {
         wTiles: 10,
@@ -252,13 +252,7 @@ class MineSquad {
             }
             if (this.currentState === GAME_STATE.PLAYING) {
                 if (keyIsDown(CONTROL)) {
-                    if (
-                        this.boardManager.getFlagCount() <
-                        this.boardConfig.mines
-                    ) {
-                        tile.flagged = true;
-                        this.flagsUsed++;
-                    }
+                    this.addFlag(tile);
                     return;
                 }
                 if (tile.flagged) {
@@ -346,6 +340,18 @@ class MineSquad {
         }
     }
 
+    addFlag(tile) {
+        if (
+            this.score >= this.FLAG_COST &&
+            this.boardManager.getFlagCount() < this.boardConfig.mines
+        ) {
+            tile.flagged = true;
+            this.flagsUsed++;
+            this.score -= this.FLAG_COST;
+            this.boardManager.addScoreEffect(tile, -this.FLAG_COST);
+        }
+    }
+
     addSquad() {
         if (this.squadCount < this.MAX_SQUADS) {
             const powerupSound = new Audio();
@@ -382,8 +388,7 @@ class MineSquad {
     calculateLevelScore() {
         this.score += this.boardManager.calculateLevelScore(
             this.level,
-            this.TILE_BONUS,
-            this.FLAG_PENALTY
+            this.TILE_BONUS
         );
         this.score += this.getClickBonus();
     }
@@ -391,13 +396,10 @@ class MineSquad {
     calculateFinalScore() {
         this.score += this.boardManager.calculateFinalScore(
             this.level,
-            this.TILE_BONUS,
-            this.FLAG_PENALTY
+            this.TILE_BONUS
         );
         if (this.winner) {
             this.score += this.squadCount * this.SQUAD_BONUS;
-        } else {
-            this.score -= this.flagsUsed * this.FLAG_PENALTY;
         }
         this.score += this.getClickBonus();
     }

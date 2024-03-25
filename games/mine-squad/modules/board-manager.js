@@ -123,14 +123,7 @@ class BoardManager {
         const tileScore = tile.value * this.mineSquad.TILE_MULTIPLIER;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
-            const position = utils.tileIndexToTileCenter(
-                tileIndex,
-                this.TILE_HEIGHT,
-                this.boardBounds
-            );
-            LayerManager.AddObject(
-                new ScoreEffect(position, tileScore, tile.value)
-            );
+            this.addScoreEffect(tile, tileScore);
         }
         // if tile.value is zero and not already checked, uncover all the tiles around it
         if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
@@ -144,32 +137,13 @@ class BoardManager {
 
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        const position = utils.tileIndexToTileCenter(
-            tileIndex,
-            this.TILE_HEIGHT,
-            this.boardBounds
-        );
         if (tile.bomb) {
             tile.bomb.live = false;
             this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            LayerManager.AddObject(
-                new BonusEffect(
-                    position,
-                    this.mineSquad.DEFUSE_BONUS,
-                    "green",
-                    2
-                )
-            );
+            this.addBonusEffect(tile, "green");
         } else if (tile.value > 0) {
             this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
-            LayerManager.AddObject(
-                new BonusEffect(
-                    position,
-                    tile.value * this.mineSquad.DEFUSE_BONUS,
-                    "blue",
-                    2
-                )
-            );
+            this.addBonusEffect(tile, "blue");
         }
 
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
@@ -183,18 +157,33 @@ class BoardManager {
                 if (tile.bomb) {
                     tile.bomb.live = false;
                     this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-                    const position = utils.tileIndexToTileCenter(
-                        defuseArea[i],
-                        this.TILE_HEIGHT,
-                        this.boardBounds
-                    );
-                    LayerManager.AddObject(
-                        new BonusEffect(position, this.mineSquad.DEFUSE_BONUS)
-                    );
+                    this.addBonusEffect(tile, "blue");
                 }
             }
         }
         this.checkForWin();
+    }
+
+    addScoreEffect(tile, score) {
+        const tileIndex = this.board.tiles.indexOf(tile);
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.TILE_HEIGHT,
+            this.boardBounds
+        );
+        LayerManager.AddObject(new ScoreEffect(position, score, tile.value));
+    }
+
+    addBonusEffect(tile, color) {
+        const tileIndex = this.board.tiles.indexOf(tile);
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.TILE_HEIGHT,
+            this.boardBounds
+        );
+        LayerManager.AddObject(
+            new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, color)
+        );
     }
 
     getDefuseAreaTiles(tileIndex) {
@@ -219,29 +208,23 @@ class BoardManager {
         this.winner = isWinner;
     }
 
-    calculateLevelScore(level, tileBonus, flagPenalty) {
+    calculateLevelScore(level, tileBonus) {
         let score = 0;
         for (let i = 0; i < this.board.tiles.length; i++) {
             const tile = this.board.tiles[i];
             if (tile.hidden === true && tile.bomb) {
                 score += tileBonus * tile.value * level;
             }
-            if (tile.flagged) {
-                score -= flagPenalty * level;
-            }
         }
         return score;
     }
 
-    calculateFinalScore(level, tileBonus, flagPenalty) {
+    calculateFinalScore(level, tileBonus) {
         let score = 0;
         for (let i = 0; i < this.board.tiles.length; i++) {
             const tile = this.board.tiles[i];
             if (tile.hidden === false) {
                 score += tileBonus * tile.value * level;
-            }
-            if (tile.flagged) {
-                score -= flagPenalty;
             }
         }
         return score;
