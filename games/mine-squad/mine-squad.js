@@ -56,7 +56,7 @@ function keyPressed(event) {
 
 function mousePressed(event) {
     if (game && event.button === 0) {
-        game.handleMouseClick(mouseX, mouseY);
+        game.handleMouseClick();
     }
 }
 
@@ -101,6 +101,8 @@ class MineSquad {
 
     mouseClicks = [];
     clicksThisLevel = 0;
+
+    cursorScreenPos = new Vec();
 
     visualEffects = new Set();
 
@@ -189,6 +191,7 @@ class MineSquad {
     }
 
     update() {
+        this.cursorScreenPos.set(mouseX, mouseY);
         const nowTime = Date.now();
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
@@ -233,14 +236,12 @@ class MineSquad {
         });
     }
 
-    handleMouseClick(mouseX, mouseY) {
-        const coords = new Vec(mouseX, mouseY);
-
-        if (this.boardManager.isOnBoard(coords)) {
-            this.mouseClicks.push(coords);
+    handleMouseClick() {
+        if (this.boardManager.isOnBoard(this.cursorScreenPos)) {
+            this.mouseClicks.push(this.cursorScreenPos);
             this.clicksThisLevel++;
 
-            const tileIndex = this.boardManager.getIndex(coords);
+            const tileIndex = this.boardManager.getIndex(this.cursorScreenPos);
             let tile = this.boardManager.getTileByIndex(tileIndex);
 
             if (this.currentState === GAME_STATE.STARTING) {
@@ -315,7 +316,7 @@ class MineSquad {
 
         image(MineSquad.sprites["background"], 0, 0, this.width, this.height);
 
-        this.boardManager.draw(this.currentState);
+        this.boardManager.draw(this.cursorScreenPos);
 
         LayerManager.Render();
 

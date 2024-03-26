@@ -230,9 +230,9 @@ class BoardManager {
         return score;
     }
 
-    draw() {
+    draw(cursorPos) {
         this.drawBoard();
-        if (keyIsDown(SHIFT)) {
+        if (this.isOnBoard(cursorPos) && keyIsDown(SHIFT)) {
             this.drawDefuseArea();
         }
         this.drawCursor();
