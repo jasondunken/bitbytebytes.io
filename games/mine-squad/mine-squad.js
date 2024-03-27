@@ -258,6 +258,10 @@ class MineSquad {
                 }
                 if (tile.flagged) {
                     tile.flagged = false;
+                    const removeFlagSound = new Audio();
+                    removeFlagSound.src =
+                        "./mine-squad/res/snd/remove-flag.wav";
+                    removeFlagSound.play();
                     return;
                 }
 
@@ -350,6 +354,13 @@ class MineSquad {
             this.flagsUsed++;
             this.score -= this.FLAG_COST;
             this.boardManager.addScoreEffect(tile, -this.FLAG_COST);
+            const placeFlagSound = new Audio();
+            placeFlagSound.src = "./mine-squad/res/snd/place-flag.wav";
+            placeFlagSound.play();
+        } else {
+            const flagDeniedSound = new Audio();
+            flagDeniedSound.src = "./mine-squad/res/snd/denied.wav";
+            flagDeniedSound.play();
         }
     }
 
