@@ -196,35 +196,43 @@ class MineSquad {
         this.dt = nowTime - this.lastTime;
         this.lastTime = nowTime;
 
-        if (this.currentState === GAME_STATE.PLAYING) {
-            this.gameTime += this.dt;
-            if (this.boardManager.completed) {
-                this.currentState = GAME_STATE.LEVEL_ENDING;
-                if (this.boardManager.winner) {
-                    this.calculateLevelScore();
-                    this.checkSquadBonus();
-                    const winSound = new Audio();
-                    winSound.src = "./mine-squad/res/snd/fanfare.wav";
-                    winSound.play();
+        switch (this.currentState) {
+            case GAME_STATE.STARTING:
+                break;
+            case GAME_STATE.PLAYING:
+                this.gameTime += this.dt;
+                if (this.boardManager.completed) {
+                    this.currentState = GAME_STATE.LEVEL_ENDING;
+                    if (this.boardManager.winner) {
+                        this.calculateLevelScore();
+                        this.checkSquadBonus();
+                        const winSound = new Audio();
+                        winSound.src = "./mine-squad/res/snd/fanfare.wav";
+                        winSound.play();
+                    }
+                    this.createFireworks();
                 }
-                this.createFireworks();
-            }
+                break;
+            case GAME_STATE.LEVEL_SCORING:
+                break;
+            case GAME_STATE.LEVEL_ENDING:
+                if (LayerManager.LayersComplete()) {
+                    if (this.boardManager.winner) {
+                        this.nextLevel();
+                        this.currentState = GAME_STATE.STARTING;
+                    } else {
+                        this.calculateFinalScore();
+                        this.gameOver();
+                    }
+                }
+                break;
+            case GAME_STATE.GAME_OVER:
+                break;
+            default:
+                console.error(`invalid game state: ${this.currentState}`);
         }
 
         LayerManager.Update(this.dt);
-
-        if (
-            this.currentState === GAME_STATE.LEVEL_ENDING &&
-            LayerManager.LayersComplete()
-        ) {
-            if (this.boardManager.winner) {
-                this.nextLevel();
-                this.currentState = GAME_STATE.STARTING;
-            } else {
-                this.calculateFinalScore();
-                this.gameOver();
-            }
-        }
 
         this.ui.update({
             level: this.level,
