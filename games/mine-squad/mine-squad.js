@@ -441,7 +441,7 @@ class MineSquad {
     }
 
     createFireworks(num) {
-        const numFireworks = num || Math.ceil(this.score / 10000);
+        const numFireworks = num || this.level;
         for (let i = 0; i < numFireworks; i++) {
             LayerManager.AddObject(
                 new Fireworks(
