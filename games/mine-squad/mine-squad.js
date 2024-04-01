@@ -202,22 +202,25 @@ class MineSquad {
             case GAME_STATE.PLAYING:
                 this.gameTime += this.dt;
                 if (this.boardManager.completed) {
-                    this.currentState = GAME_STATE.LEVEL_ENDING;
-                    if (this.boardManager.winner) {
-                        this.calculateLevelScore();
-                        this.checkSquadBonus();
-                        const winSound = new Audio();
-                        winSound.src = "./mine-squad/res/snd/fanfare.wav";
-                        winSound.play();
-                    }
-                    this.createFireworks();
+                    this.currentState = GAME_STATE.LEVEL_SCORING;
                 }
                 break;
             case GAME_STATE.LEVEL_SCORING:
+                if (this.boardManager.winner) {
+                    this.calculateLevelScore();
+                    this.checkSquadBonus();
+                }
+                if (LayerManager.LayersComplete()) {
+                    this.createFireworks();
+                    this.currentState = GAME_STATE.LEVEL_ENDING;
+                }
                 break;
             case GAME_STATE.LEVEL_ENDING:
                 if (LayerManager.LayersComplete()) {
                     if (this.boardManager.winner) {
+                        const winSound = new Audio();
+                        winSound.src = "./mine-squad/res/snd/fanfare.wav";
+                        winSound.play();
                         this.nextLevel();
                         this.currentState = GAME_STATE.STARTING;
                     } else {
