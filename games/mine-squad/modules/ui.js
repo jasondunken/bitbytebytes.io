@@ -1,8 +1,9 @@
 import { Vec } from "../../modules/math/vec.js";
-import * as utils from "./utils.js";
-import { BonusSquadEffect } from "./visual-effects.js";
+import { TextEffect } from "./visual-effects.js";
 import { GAME_STATE } from "./game-state.js";
 import { getElapsedTimeString } from "./utils.js";
+
+import { LayerManager } from "../../modules/graphics/layer-manager.js";
 
 class UI {
     P5_TEXT_ISNT_REALLY_CENTERED = 5;
@@ -54,7 +55,7 @@ class UI {
                 (squadCount - 1) * this.SQUADS_SPACING,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
-        this.mineSquad.visualEffects.add(new BonusSquadEffect(position));
+        LayerManager.AddObject(new TextEffect(position, "Squad Up!"));
     }
 
     update(gameData) {

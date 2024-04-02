@@ -68,6 +68,30 @@ class BonusEffect extends VisualEffect {
     }
 }
 
+class TextEffect extends VisualEffect {
+    vSpeed = Math.floor(Math.random() * 3 + 2);
+    constructor(position, text, color, layer) {
+        super(position, layer);
+        this.text = text;
+        this.color = color || "green";
+    }
+
+    update() {
+        this.position.x += Math.random() * 4 - 2;
+        this.position.y -= this.vSpeed;
+        if (this.position.y < -64) this.remove = true;
+    }
+
+    render() {
+        strokeWeight(2);
+        stroke("white");
+        fill(this.color);
+        textStyle(BOLD);
+        text(this.text, this.position.x, this.position.y);
+        textStyle(NORMAL);
+    }
+}
+
 class BonusSquadEffect extends VisualEffect {
     size = 32;
     MAX_SIZE = 64;
@@ -313,4 +337,11 @@ class FireworkShell {
     }
 }
 
-export { BonusEffect, BonusSquadEffect, Explosion, Fireworks, ScoreEffect };
+export {
+    BonusEffect,
+    TextEffect,
+    BonusSquadEffect,
+    Explosion,
+    Fireworks,
+    ScoreEffect,
+};
