@@ -232,7 +232,11 @@ class BoardManager {
 
     draw(cursorPos) {
         this.drawBoard();
-        if (this.isOnBoard(cursorPos) && keyIsDown(SHIFT)) {
+        if (
+            this.mineSquad.currentState === GAME_STATE.PLAYING &&
+            this.isOnBoard(cursorPos) &&
+            keyIsDown(SHIFT)
+        ) {
             this.drawDefuseArea();
         }
         this.drawCursor();
@@ -358,6 +362,9 @@ class BoardManager {
         const tileIndex = this.getIndex(pos);
         const area = this.getDefuseAreaTiles(tileIndex);
         stroke("blue");
+        if (this.mineSquad.squadCount <= 0) {
+            stroke("red");
+        }
         strokeWeight(3);
         noFill();
         for (const tile of area) {

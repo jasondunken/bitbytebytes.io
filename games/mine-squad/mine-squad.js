@@ -278,16 +278,7 @@ class MineSquad {
 
                 if (tile.hidden) {
                     if (keyIsDown(SHIFT)) {
-                        if (this.squadCount > 0) {
-                            this.squadCount--;
-                            this.boardManager.defuseWithinRadius(
-                                tile,
-                                tileIndex
-                            );
-                            const defuseSound = new Audio();
-                            defuseSound.src = "./mine-squad/res/snd/defuse.wav";
-                            defuseSound.play();
-                        }
+                        this.useSquad(tile, tileIndex);
                     } else {
                         const selectSound = new Audio();
                         selectSound.src = "./mine-squad/res/snd/select.wav";
@@ -356,6 +347,20 @@ class MineSquad {
         }
     }
 
+    useSquad(tile, tileIndex) {
+        if (this.squadCount > 0) {
+            this.squadCount--;
+            this.boardManager.defuseWithinRadius(tile, tileIndex);
+            const defuseSound = new Audio();
+            defuseSound.src = "./mine-squad/res/snd/defuse.wav";
+            defuseSound.play();
+        } else {
+            const deniedSound = new Audio();
+            deniedSound.src = "./mine-squad/res/snd/denied.wav";
+            deniedSound.play();
+        }
+    }
+
     addFlag(tile) {
         if (
             this.score >= this.FLAG_COST &&
@@ -409,6 +414,15 @@ class MineSquad {
     }
 
     calculateLevelScore() {
+        const pointsSounds = [
+            "./mine-squad/res/snd/points_low.wav",
+            "./mine-squad/res/snd/points.wav",
+            "./mine-squad/res/snd/points_high.wav",
+        ];
+        const pointsSound = new Audio();
+        pointsSound.src =
+            pointsSounds[Math.floor(Math.random() * pointsSounds.length)];
+        pointsSound.play();
         this.score += this.boardManager.calculateLevelScore(
             this.level,
             this.TILE_BONUS
