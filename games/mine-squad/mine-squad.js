@@ -128,6 +128,15 @@ class MineSquad {
 
         this.boardManager = new BoardManager(this, MineSquad.sprites);
         this.ui = new UI(this);
+
+        const snd1 = new Audio();
+        snd1.src = "./mine-squad/res/snd/points_low.wav";
+        const snd2 = new Audio();
+        snd2.src = "./mine-squad/res/snd/points.wav";
+        const snd3 = new Audio();
+        snd3.src = "./mine-squad/res/snd/points_high.wav";
+
+        this.pointsSounds = [snd1, snd2, snd3];
     }
 
     startDemo() {
@@ -391,6 +400,7 @@ class MineSquad {
             const deniedSound = new Audio();
             deniedSound.src = "./mine-squad/res/snd/denied.wav";
             deniedSound.play();
+            this.ui.addSquad(this.squadCount, true);
         }
     }
 
@@ -414,14 +424,10 @@ class MineSquad {
     }
 
     calculateLevelScore() {
-        const pointsSounds = [
-            "./mine-squad/res/snd/points_low.wav",
-            "./mine-squad/res/snd/points.wav",
-            "./mine-squad/res/snd/points_high.wav",
-        ];
-        const pointsSound = new Audio();
-        pointsSound.src =
-            pointsSounds[Math.floor(Math.random() * pointsSounds.length)];
+        const pointsSound =
+            this.pointsSounds[
+                Math.floor(Math.random() * this.pointsSounds.length)
+            ];
         pointsSound.play();
         this.score += this.boardManager.calculateLevelScore(
             this.level,

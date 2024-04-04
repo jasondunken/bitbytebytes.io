@@ -46,7 +46,9 @@ class UI {
         this.position = position || new Vec(4, 487);
     }
 
-    addSquad(squadCount) {
+    addSquad(squadCount, denied) {
+        let message = "Squad Up!";
+        if (denied) message = "Squad Limit Reached!";
         const position = new Vec(
             this.position.x +
                 this.SQUADS_BOX_X +
@@ -55,7 +57,7 @@ class UI {
                 (squadCount - 1) * this.SQUADS_SPACING,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
-        LayerManager.AddObject(new TextEffect(position, "Squad Up!"));
+        LayerManager.AddObject(new TextEffect(position, message));
     }
 
     update(gameData) {
