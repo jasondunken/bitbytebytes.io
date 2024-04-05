@@ -48,7 +48,11 @@ class UI {
 
     addSquad(squadCount, denied) {
         let message = "Squad Up!";
-        if (denied) message = "Squad Limit Reached!";
+        let messageColor = "blue";
+        if (denied) {
+            message = "Squad Limit Reached!";
+            messageColor = "red";
+        }
         const position = new Vec(
             this.position.x +
                 this.SQUADS_BOX_X +
@@ -57,7 +61,7 @@ class UI {
                 (squadCount - 1) * this.SQUADS_SPACING,
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
-        LayerManager.AddObject(new TextEffect(position, message));
+        LayerManager.AddObject(new TextEffect(position, message, messageColor));
     }
 
     update(gameData) {
