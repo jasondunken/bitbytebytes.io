@@ -137,14 +137,7 @@ class BoardManager {
 
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        if (tile.bomb) {
-            tile.bomb.live = false;
-            this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-            this.addBonusEffect(tile, "green");
-        } else if (tile.value > 0) {
-            this.mineSquad.score += tile.value * this.mineSquad.DEFUSE_BONUS;
-            this.addBonusEffect(tile, "blue");
-        }
+        this.addTileScore(tile);
 
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
 
@@ -152,16 +145,24 @@ class BoardManager {
             const tile = this.getTileByIndex(defuseArea[i]);
             if (tile && tile.hidden) {
                 tile.hidden = false;
-                this.mineSquad.score +=
-                    tile.value * this.mineSquad.DEFUSE_BONUS;
-                if (tile.bomb) {
-                    tile.bomb.live = false;
-                    this.mineSquad.score += this.mineSquad.DEFUSE_BONUS;
-                    this.addBonusEffect(tile, "blue");
-                }
+                this.addTileScore(tile);
             }
         }
         this.checkForWin();
+    }
+
+    addTileScore(tile) {
+        let color = "blue";
+        let score = 0;
+        if (tile.bomb) {
+            tile.bomb.live = false;
+            score += this.mineSquad.DEFUSE_BONUS;
+            color = "green";
+        } else if (tile.value > 0) {
+            score += tile.value * this.mineSquad.DEFUSE_BONUS;
+        }
+        this.score += score;
+        this.addBonusEffect(tile, score, color);
     }
 
     addScoreEffect(tile, score) {
@@ -174,16 +175,14 @@ class BoardManager {
         LayerManager.AddObject(new ScoreEffect(position, score, tile.value));
     }
 
-    addBonusEffect(tile, color) {
+    addBonusEffect(tile, score, color) {
         const tileIndex = this.board.tiles.indexOf(tile);
         const position = utils.tileIndexToTileCenter(
             tileIndex,
             this.TILE_HEIGHT,
             this.boardBounds
         );
-        LayerManager.AddObject(
-            new BonusEffect(position, this.mineSquad.DEFUSE_BONUS, color)
-        );
+        LayerManager.AddObject(new BonusEffect(position, score, color));
     }
 
     getDefuseAreaTiles(tileIndex) {
