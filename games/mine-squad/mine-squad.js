@@ -423,11 +423,11 @@ class MineSquad {
         };
     }
 
+    pointSoundIndex = 0;
     calculateLevelScore() {
-        const pointsSound =
-            this.pointsSounds[
-                Math.floor(Math.random() * this.pointsSounds.length)
-            ];
+        this.pointSoundIndex =
+            (this.pointSoundIndex + 1) % this.pointsSounds.length;
+        const pointsSound = this.pointsSounds[this.pointSoundIndex];
         pointsSound.play();
         this.score += this.boardManager.calculateLevelScore(
             this.level,
