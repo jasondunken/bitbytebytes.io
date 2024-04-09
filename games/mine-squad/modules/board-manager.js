@@ -162,7 +162,9 @@ class BoardManager {
             score += tile.value * this.mineSquad.DEFUSE_BONUS;
         }
         this.score += score;
-        this.addBonusEffect(tile, score, color);
+        if (score > 0) {
+            this.addBonusEffect(tile, score, color);
+        }
     }
 
     addScoreEffect(tile, score) {
