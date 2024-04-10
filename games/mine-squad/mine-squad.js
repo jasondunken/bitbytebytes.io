@@ -203,6 +203,7 @@ class MineSquad {
     }
 
     pointSoundIndex = 0;
+    scoringTime = 0;
     update() {
         this.cursorScreenPos.set(mouseX, mouseY);
         const nowTime = Date.now();
@@ -221,15 +222,21 @@ class MineSquad {
                 break;
             case GAME_STATE.LEVEL_SCORING:
                 if (this.boardManager.winner && this.tilesToScore.length) {
-                    const tile = this.tilesToScore.pop();
-                    this.pointSoundIndex =
-                        (this.pointSoundIndex + 1) % this.pointsSounds.length;
-                    const pointsSound = this.pointsSounds[this.pointSoundIndex];
-                    pointsSound.play();
-                    const score = this.TILE_BONUS * tile.value * this.level;
-                    this.score += score;
-                    this.boardManager.addScoreEffect(tile, score);
-                    this.checkSquadBonus();
+                    this.scoringTime += this.dt;
+                    if (this.scoringTime > 250) {
+                        this.scoringTime = 0;
+                        const tile = this.tilesToScore.pop();
+                        this.pointSoundIndex =
+                            (this.pointSoundIndex + 1) %
+                            this.pointsSounds.length;
+                        const pointsSound =
+                            this.pointsSounds[this.pointSoundIndex];
+                        pointsSound.play();
+                        const score = this.TILE_BONUS * tile.value * this.level;
+                        this.score += score;
+                        this.boardManager.addScoreEffect(tile, score);
+                        this.checkSquadBonus();
+                    }
                 } else if (LayerManager.LayersComplete()) {
                     this.calculateLevelScore();
                     this.createFireworks();
