@@ -161,7 +161,7 @@ class BoardManager {
         } else if (tile.value > 0) {
             score += tile.value * this.mineSquad.DEFUSE_BONUS;
         }
-        this.score += score;
+        this.mineSquad.score += score;
         if (score > 0) {
             this.addBonusEffect(tile, score, color);
         }
@@ -207,6 +207,12 @@ class BoardManager {
         });
         this.completed = isWinner;
         this.winner = isWinner;
+    }
+
+    getScoreableTiles() {
+        return this.board.tiles.filter((tile) => {
+            return tile.hidden === false && tile.value > 0;
+        });
     }
 
     calculateLevelScore(level, tileBonus) {

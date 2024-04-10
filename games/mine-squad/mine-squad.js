@@ -105,6 +105,7 @@ class MineSquad {
     cursorScreenPos = new Vec();
 
     visualEffects = new Set();
+    tilesToScore = [];
 
     currentState = GAME_STATE.STARTING;
 
@@ -170,6 +171,8 @@ class MineSquad {
         this.boardManager.generateBoard(this.boardConfig);
         this.layers = [];
 
+        this.tilesToScore = [];
+
         this.currentState = GAME_STATE.STARTING;
     }
 
@@ -199,6 +202,7 @@ class MineSquad {
         this.mouseClicks = [];
     }
 
+    pointSoundIndex = 0;
     update() {
         this.cursorScreenPos.set(mouseX, mouseY);
         const nowTime = Date.now();
@@ -211,15 +215,23 @@ class MineSquad {
             case GAME_STATE.PLAYING:
                 this.gameTime += this.dt;
                 if (this.boardManager.completed) {
+                    this.tilesToScore = this.boardManager.getScoreableTiles();
                     this.currentState = GAME_STATE.LEVEL_SCORING;
                 }
                 break;
             case GAME_STATE.LEVEL_SCORING:
-                if (this.boardManager.winner) {
-                    this.calculateLevelScore();
+                if (this.boardManager.winner && this.tilesToScore.length) {
+                    const tile = this.tilesToScore.pop();
+                    this.pointSoundIndex =
+                        (this.pointSoundIndex + 1) % this.pointsSounds.length;
+                    const pointsSound = this.pointsSounds[this.pointSoundIndex];
+                    pointsSound.play();
+                    const score = this.TILE_BONUS * tile.value * this.level;
+                    this.score += score;
+                    this.boardManager.addScoreEffect(tile, score);
                     this.checkSquadBonus();
-                }
-                if (LayerManager.LayersComplete()) {
+                } else if (LayerManager.LayersComplete()) {
+                    this.calculateLevelScore();
                     this.createFireworks();
                     this.currentState = GAME_STATE.LEVEL_ENDING;
                 }
@@ -423,16 +435,7 @@ class MineSquad {
         };
     }
 
-    pointSoundIndex = 0;
     calculateLevelScore() {
-        this.pointSoundIndex =
-            (this.pointSoundIndex + 1) % this.pointsSounds.length;
-        const pointsSound = this.pointsSounds[this.pointSoundIndex];
-        pointsSound.play();
-        this.score += this.boardManager.calculateLevelScore(
-            this.level,
-            this.TILE_BONUS
-        );
         this.score += this.getClickBonus();
     }
 
