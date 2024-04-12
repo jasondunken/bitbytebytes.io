@@ -156,10 +156,11 @@ class BoardManager {
         let score = 0;
         if (tile.bomb) {
             tile.bomb.live = false;
-            score += this.mineSquad.DEFUSE_BONUS;
+            score += this.mineSquad.DEFUSE_BONUS * this.mineSquad.level;
             color = "green";
         } else if (tile.value > 0) {
-            score += tile.value * this.mineSquad.DEFUSE_BONUS;
+            score +=
+                tile.value * this.mineSquad.DEFUSE_BONUS * this.mineSquad.level;
         }
         this.mineSquad.score += score;
         if (score > 0) {

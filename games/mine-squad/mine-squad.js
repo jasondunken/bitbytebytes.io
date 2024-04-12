@@ -223,7 +223,7 @@ class MineSquad {
             case GAME_STATE.LEVEL_SCORING:
                 if (this.boardManager.winner && this.tilesToScore.length) {
                     this.scoringTime += this.dt;
-                    if (this.scoringTime > 250) {
+                    if (this.scoringTime > 125) {
                         this.scoringTime = 0;
                         const tile = this.tilesToScore.pop();
                         this.pointSoundIndex =
