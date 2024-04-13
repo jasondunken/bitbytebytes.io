@@ -23,7 +23,7 @@ class UI {
 
     LEVEL_BOX_WIDTH = 64;
     TIME_BOX_WIDTH = 96;
-    SCORE_BOX_WIDTH = 128;
+    SCORE_BOX_WIDTH = 96;
     SQUADS_BOX_WIDTH = 128;
     NEXT_BONUS_BOX_WIDTH = 96;
     MINES_BOX_WIDTH = 64;
@@ -32,7 +32,7 @@ class UI {
 
     LEVEL_BOX_X = 4;
     TIME_BOX_X = 72;
-    SCORE_BOX_X = 280;
+    SCORE_BOX_X = 312;
     SQUADS_BOX_X = 412;
     NEXT_BONUS_BOX_X = 544;
     MINES_BOX_X = 748;
