@@ -217,6 +217,7 @@ class MineSquad {
                 this.gameTime += this.dt;
                 if (this.boardManager.completed) {
                     this.tilesToScore = this.boardManager.getScoreableTiles();
+                    console.log("tiles: ", this.tilesToScore);
                     this.currentState = GAME_STATE.LEVEL_SCORING;
                 }
                 break;
@@ -237,9 +238,22 @@ class MineSquad {
                         this.boardManager.addScoreEffect(tile, score);
                         this.checkSquadBonus();
                     }
+                } else if (
+                    !this.boardManager.winner &&
+                    this.tilesToScore.length
+                ) {
+                    this.scoringTime += this.dt;
+                    if (this.scoringTime > 375) {
+                        this.scoringTime = 0;
+                        const tile = this.tilesToScore.pop();
+                        tile.hidden = false;
+                        this.boardManager.addExplosion(tile);
+                    }
                 } else if (LayerManager.LayersComplete()) {
                     this.calculateLevelScore();
-                    this.createFireworks();
+                    if (this.boardManager.winner) {
+                        this.createFireworks();
+                    }
                     this.currentState = GAME_STATE.LEVEL_ENDING;
                 }
                 break;
@@ -372,6 +386,7 @@ class MineSquad {
         if (this.score > this.squad_bonus_threshold) {
             this.squad_bonus_threshold = this.squad_bonus_threshold * 2;
             this.addSquad();
+            this.checkSquadBonus();
         }
     }
 

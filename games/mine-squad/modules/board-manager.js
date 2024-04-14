@@ -98,15 +98,7 @@ class BoardManager {
     checkTile(tile, tileIndex) {
         if (tile.bomb?.live) {
             tile.hidden = false;
-            const position = utils.tileIndexToTileCenter(
-                tileIndex,
-                this.TILE_HEIGHT,
-                this.boardBounds
-            );
-            const explosionSound = new Audio();
-            explosionSound.src = "./mine-squad/res/snd/explosion.wav";
-            explosionSound.play();
-            LayerManager.AddObject(new Explosion(position));
+            this.addExplosion(tile);
             this.completed = true;
             this.winner = false;
         } else {
@@ -149,6 +141,19 @@ class BoardManager {
             }
         }
         this.checkForWin();
+    }
+
+    addExplosion(tile) {
+        const tileIndex = this.board.tiles.indexOf(tile);
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.TILE_HEIGHT,
+            this.boardBounds
+        );
+        const explosionSound = new Audio();
+        explosionSound.src = "./mine-squad/res/snd/explosion.wav";
+        explosionSound.play();
+        LayerManager.AddObject(new Explosion(position));
     }
 
     addTileScore(tile) {
@@ -211,9 +216,15 @@ class BoardManager {
     }
 
     getScoreableTiles() {
-        return this.board.tiles.filter((tile) => {
-            return tile.hidden === false && tile.value > 0;
-        });
+        if (this.winner) {
+            return this.board.tiles.filter((tile) => {
+                return tile.hidden === false && tile.value > 0;
+            });
+        } else {
+            return this.board.tiles.filter((tile) => {
+                return tile.bomb && tile.hidden;
+            });
+        }
     }
 
     calculateLevelScore(level, tileBonus) {
