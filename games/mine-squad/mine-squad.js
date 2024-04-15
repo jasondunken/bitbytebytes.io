@@ -217,7 +217,6 @@ class MineSquad {
                 this.gameTime += this.dt;
                 if (this.boardManager.completed) {
                     this.tilesToScore = this.boardManager.getScoreableTiles();
-                    console.log("tiles: ", this.tilesToScore);
                     this.currentState = GAME_STATE.LEVEL_SCORING;
                 }
                 break;
@@ -243,7 +242,7 @@ class MineSquad {
                     this.tilesToScore.length
                 ) {
                     this.scoringTime += this.dt;
-                    if (this.scoringTime > 375) {
+                    if (this.scoringTime > 250) {
                         this.scoringTime = 0;
                         const tile = this.tilesToScore.pop();
                         tile.hidden = false;

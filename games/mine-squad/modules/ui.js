@@ -176,7 +176,7 @@ class UI {
                 ellipse(
                     this.position.x +
                         this.SQUADS_BOX_X +
-                        this.SCORE_BOX_WIDTH / 2 +
+                        this.SQUADS_BOX_WIDTH / 2 +
                         xOff,
                     this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y,
                     12,
@@ -190,7 +190,7 @@ class UI {
                     "X",
                     this.position.x +
                         this.SQUADS_BOX_X +
-                        this.SCORE_BOX_WIDTH / 2 +
+                        this.SQUADS_BOX_WIDTH / 2 +
                         xOff,
                     this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
                 );
