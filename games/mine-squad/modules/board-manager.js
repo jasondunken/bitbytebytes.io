@@ -253,12 +253,13 @@ class BoardManager {
         this.drawBoard();
         if (
             this.mineSquad.currentState === GAME_STATE.PLAYING &&
-            this.isOnBoard(cursorPos) &&
-            keyIsDown(SHIFT)
+            this.isOnBoard(cursorPos)
         ) {
-            this.drawDefuseArea();
+            if (keyIsDown(SHIFT)) {
+                this.drawDefuseArea();
+            }
+            this.drawCursor();
         }
-        this.drawCursor();
     }
 
     drawBoard(gameState) {
@@ -357,7 +358,7 @@ class BoardManager {
     }
 
     drawCursor() {
-        const coords = new Vec(mouseX, mouseY);
+        const coords = this.mineSquad.cursorScreenPos;
         if (this.isOnBoard(coords)) {
             const tileCenter = utils.screenPositionToTileCenter(
                 coords,
@@ -426,7 +427,7 @@ class BoardManager {
             this.TILE_HEIGHT
         );
 
-        stroke("magenta");
+        stroke("blue");
         noFill();
         strokeWeight(3);
         let lastClick = mouseClickCoords[mouseClickCoords.length - 1];

@@ -290,7 +290,7 @@ class MineSquad {
 
     handleMouseClick() {
         if (this.boardManager.isOnBoard(this.cursorScreenPos)) {
-            this.mouseClicks.push(this.cursorScreenPos);
+            this.mouseClicks.push(this.cursorScreenPos.copy());
             this.clicksThisLevel++;
 
             const tileIndex = this.boardManager.getIndex(this.cursorScreenPos);
