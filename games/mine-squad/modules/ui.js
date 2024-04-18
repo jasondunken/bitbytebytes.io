@@ -267,7 +267,7 @@ class UI {
         textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
-            "HIDDEN N",
+            "HIDDEN V",
             this.position.x + this.HIDDEN_NEIGHBORS_BOX_X,
             this.position.y + this.UI_BOX_Y
         );
@@ -347,7 +347,7 @@ class UI {
         textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
-            "HIDDEN M",
+            "HIDDEN T",
             this.position.x + this.HIDDEN_BOX_X,
             this.position.y + this.UI_BOX_Y
         );
