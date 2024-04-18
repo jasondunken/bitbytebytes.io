@@ -7,6 +7,9 @@ import { LayerManager } from "../../modules/graphics/layer-manager.js";
 
 class UI {
     P5_TEXT_ISNT_REALLY_CENTERED = 5;
+    LABEL_SIZE = 12;
+    VALUE_SIZE = 18;
+
     UI_HEIGHT = 50;
     UI_WIDTH = 952;
 
@@ -35,6 +38,7 @@ class UI {
     SCORE_BOX_X = 312;
     SQUADS_BOX_X = 412;
     NEXT_BONUS_BOX_X = 544;
+    HIDDEN_NEIGHBORS_BOX_X = 680;
     MINES_BOX_X = 748;
     HIDDEN_BOX_X = 816;
     FLAGS_BOX_X = 884;
@@ -79,6 +83,7 @@ class UI {
         this.drawSquadsBox();
         this.drawNextBonus();
         this.drawTimerBox();
+        this.drawHiddenNeighborsBox();
         this.drawMinesBox();
         this.drawHiddenBox();
         this.drawFlagsBox();
@@ -87,7 +92,7 @@ class UI {
     drawLevelBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "LEVEL",
@@ -102,7 +107,7 @@ class UI {
             this.UI_BOX_HEIGHT
         );
         fill("white");
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         text(
             "" + this.gameData.level,
@@ -116,7 +121,7 @@ class UI {
     drawScoreBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "SCORE",
@@ -145,7 +150,7 @@ class UI {
     drawSquadsBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "SQUADS",
@@ -201,7 +206,7 @@ class UI {
     drawNextBonus() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "NEXT SQUAD",
@@ -216,7 +221,7 @@ class UI {
             this.UI_BOX_HEIGHT
         );
         fill("white");
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         text(
             "" + this.gameData.nextBonus,
@@ -230,7 +235,7 @@ class UI {
     drawTimerBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "TIME",
@@ -245,7 +250,7 @@ class UI {
             this.UI_BOX_HEIGHT
         );
         fill("white");
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         text(
             "" + getElapsedTimeString(this.gameData.time),
@@ -256,10 +261,50 @@ class UI {
         );
     }
 
+    drawHiddenNeighborsBox() {
+        noStroke();
+        fill("white");
+        textSize(this.LABEL_SIZE);
+        textAlign(LEFT, BOTTOM);
+        text(
+            "HIDDEN N",
+            this.position.x + this.HIDDEN_NEIGHBORS_BOX_X,
+            this.position.y + this.UI_BOX_Y
+        );
+        fill(color(44, 44, 44));
+        rect(
+            this.position.x + this.HIDDEN_NEIGHBORS_BOX_X,
+            this.position.y + this.UI_BOX_Y,
+            this.MINES_BOX_WIDTH,
+            this.UI_BOX_HEIGHT
+        );
+        textSize(this.VALUE_SIZE);
+        textAlign(CENTER, CENTER);
+        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+            fill("white");
+            text(
+                "" + this.gameData.totalHiddenNeighborCount,
+                this.HIDDEN_NEIGHBORS_BOX_X +
+                    this.MINES_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        } else {
+            fill("black");
+            text(
+                "X",
+                this.HIDDEN_NEIGHBORS_BOX_X +
+                    this.MINES_BOX_WIDTH / 2 +
+                    this.P5_TEXT_ISNT_REALLY_CENTERED,
+                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            );
+        }
+    }
+
     drawMinesBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "MINES",
@@ -273,7 +318,7 @@ class UI {
             this.MINES_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
             fill("white");
@@ -299,10 +344,10 @@ class UI {
     drawHiddenBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
-            "HIDDEN",
+            "HIDDEN M",
             this.position.x + this.HIDDEN_BOX_X,
             this.position.y + this.UI_BOX_Y
         );
@@ -313,7 +358,7 @@ class UI {
             this.HIDDEN_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
             fill("red");
@@ -339,7 +384,7 @@ class UI {
     drawFlagsBox() {
         noStroke();
         fill("white");
-        textSize(14);
+        textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
         text(
             "FLAGS",
@@ -353,7 +398,7 @@ class UI {
             this.MINES_BOX_WIDTH,
             this.UI_BOX_HEIGHT
         );
-        textSize(18);
+        textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
             fill("yellow");

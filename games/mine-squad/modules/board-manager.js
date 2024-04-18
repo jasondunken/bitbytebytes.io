@@ -74,15 +74,28 @@ class BoardManager {
         let mines = 0;
         let flags = 0;
         let totalTileValue = 0;
+        let totalHiddenNeighborCount = 0;
         this.board.tiles.forEach((tile) => {
             totalTiles++;
-            if (tile.hidden) hidden++;
+            if (tile.hidden) {
+                if (!tile.bomb && tile.value > 0) {
+                    totalHiddenNeighborCount += tile.value;
+                }
+                hidden++;
+            }
             if (tile.bomb && tile.bomb.live === false) hidden++;
             if (tile.bomb) mines++;
             if (tile.flagged) flags++;
             totalTileValue += tile.value;
         });
-        return { totalTiles, hidden, mines, flags, totalTileValue };
+        return {
+            totalTiles,
+            hidden,
+            mines,
+            flags,
+            totalTileValue,
+            totalHiddenNeighborCount,
+        };
     }
 
     getFlagCount() {
