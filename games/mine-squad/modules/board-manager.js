@@ -125,7 +125,8 @@ class BoardManager {
         if (!tile) return;
 
         tile.hidden = false;
-        const tileScore = tile.value * this.mineSquad.TILE_MULTIPLIER;
+        const tileScore =
+            tile.value * this.mineSquad.TILE_MULTIPLIER * this.mineSquad.level;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
             this.addScoreEffect(tile, tileScore);
