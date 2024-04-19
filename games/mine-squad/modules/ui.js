@@ -45,6 +45,8 @@ class UI {
 
     SQUADS_SPACING = 36;
 
+    CROSSHAIR_DIAMETER = 10;
+
     constructor(mineSquad, position) {
         this.mineSquad = mineSquad;
         this.position = position || new Vec(4, 487);
@@ -90,60 +92,32 @@ class UI {
     }
 
     drawLevelBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "LEVEL",
-            this.position.x + this.LEVEL_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.LEVEL_BOX_X,
-            this.position.y + this.UI_BOX_Y,
+        this.drawBox(
+            this.LEVEL_BOX_X,
             this.LEVEL_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
+            "LEVEL",
+            this.gameData.level,
+            "white"
         );
-        fill("white");
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        text(
-            "" + this.gameData.level,
-            this.LEVEL_BOX_X +
-                this.LEVEL_BOX_WIDTH / 2 +
-                this.P5_TEXT_ISNT_REALLY_CENTERED,
-            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+    }
+
+    drawTimerBox() {
+        this.drawBox(
+            this.TIME_BOX_X,
+            this.TIME_BOX_WIDTH,
+            "TIME",
+            getElapsedTimeString(this.gameData.time),
+            "white"
         );
     }
 
     drawScoreBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "SCORE",
-            this.position.x + this.SCORE_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.SCORE_BOX_X,
-            this.position.y + this.UI_BOX_Y,
+        this.drawBox(
+            this.SCORE_BOX_X,
             this.SCORE_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
-        );
-        fill("white");
-        textSize(18);
-        textAlign(CENTER, CENTER);
-        text(
-            "" + this.gameData.score,
-            this.SCORE_BOX_X +
-                this.SCORE_BOX_WIDTH / 2 +
-                this.P5_TEXT_ISNT_REALLY_CENTERED,
-            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            "SCORE",
+            this.gameData.score,
+            "white"
         );
     }
 
@@ -204,218 +178,82 @@ class UI {
     }
 
     drawNextBonus() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "NEXT SQUAD",
-            this.position.x + this.NEXT_BONUS_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.NEXT_BONUS_BOX_X,
-            this.position.y + this.UI_BOX_Y,
+        this.drawBox(
+            this.NEXT_BONUS_BOX_X,
             this.NEXT_BONUS_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
-        );
-        fill("white");
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        text(
-            "" + this.gameData.nextBonus,
-            this.NEXT_BONUS_BOX_X +
-                this.NEXT_BONUS_BOX_WIDTH / 2 +
-                this.P5_TEXT_ISNT_REALLY_CENTERED,
-            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-        );
-    }
-
-    drawTimerBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "TIME",
-            this.position.x + this.TIME_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.TIME_BOX_X,
-            this.position.y + this.UI_BOX_Y,
-            this.TIME_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
-        );
-        fill("white");
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        text(
-            "" + getElapsedTimeString(this.gameData.time),
-            this.TIME_BOX_X +
-                this.TIME_BOX_WIDTH / 2 +
-                this.P5_TEXT_ISNT_REALLY_CENTERED,
-            this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
+            "NEXT SQUAD",
+            this.gameData.nextBonus,
+            "white"
         );
     }
 
     drawHiddenNeighborsBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
+        this.drawBox(
+            this.HIDDEN_NEIGHBORS_BOX_X,
+            this.HIDDEN_BOX_WIDTH,
             "HIDDEN V",
-            this.position.x + this.HIDDEN_NEIGHBORS_BOX_X,
-            this.position.y + this.UI_BOX_Y
+            this.gameData.totalHiddenNeighborCount,
+            "white"
         );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.HIDDEN_NEIGHBORS_BOX_X,
-            this.position.y + this.UI_BOX_Y,
-            this.MINES_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
-        );
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
-            fill("white");
-            text(
-                "" + this.gameData.totalHiddenNeighborCount,
-                this.HIDDEN_NEIGHBORS_BOX_X +
-                    this.MINES_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        } else {
-            fill("black");
-            text(
-                "X",
-                this.HIDDEN_NEIGHBORS_BOX_X +
-                    this.MINES_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        }
     }
 
     drawMinesBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "MINES",
-            this.position.x + this.MINES_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.MINES_BOX_X,
-            this.position.y + this.UI_BOX_Y,
+        this.drawBox(
+            this.MINES_BOX_X,
             this.MINES_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
+            "MINES",
+            this.gameData.mines,
+            "white"
         );
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
-            fill("white");
-            text(
-                "" + this.gameData.mines,
-                this.MINES_BOX_X +
-                    this.MINES_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        } else {
-            fill("black");
-            text(
-                "X",
-                this.MINES_BOX_X +
-                    this.MINES_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        }
     }
 
     drawHiddenBox() {
-        noStroke();
-        fill("white");
-        textSize(this.LABEL_SIZE);
-        textAlign(LEFT, BOTTOM);
-        text(
-            "HIDDEN T",
-            this.position.x + this.HIDDEN_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
-        fill(color(44, 44, 44));
-        rect(
-            this.position.x + this.HIDDEN_BOX_X,
-            this.position.y + this.UI_BOX_Y,
+        this.drawBox(
+            this.HIDDEN_BOX_X,
             this.HIDDEN_BOX_WIDTH,
-            this.UI_BOX_HEIGHT
+            "HIDDEN T",
+            this.gameData.hidden,
+            "red"
         );
-        textSize(this.VALUE_SIZE);
-        textAlign(CENTER, CENTER);
-        if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
-            fill("red");
-            text(
-                "" + this.gameData.hidden,
-                this.HIDDEN_BOX_X +
-                    this.HIDDEN_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        } else {
-            fill("black");
-            text(
-                "X",
-                this.HIDDEN_BOX_X +
-                    this.HIDDEN_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
-                this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
-            );
-        }
     }
 
     drawFlagsBox() {
+        this.drawBox(
+            this.FLAGS_BOX_X,
+            this.FLAGS_BOX_WIDTH,
+            "FLAGS",
+            this.gameData.flags,
+            "yellow"
+        );
+    }
+
+    drawBox(offsetX, width, label, value, valueColor) {
         noStroke();
         fill("white");
         textSize(this.LABEL_SIZE);
         textAlign(LEFT, BOTTOM);
-        text(
-            "FLAGS",
-            this.position.x + this.FLAGS_BOX_X,
-            this.position.y + this.UI_BOX_Y
-        );
+        text(label, this.position.x + offsetX, this.position.y + this.UI_BOX_Y);
         fill(color(44, 44, 44));
         rect(
-            this.position.x + this.FLAGS_BOX_X,
+            this.position.x + offsetX,
             this.position.y + this.UI_BOX_Y,
-            this.MINES_BOX_WIDTH,
+            width,
             this.UI_BOX_HEIGHT
         );
         textSize(this.VALUE_SIZE);
         textAlign(CENTER, CENTER);
         if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
-            fill("yellow");
+            fill(valueColor);
             text(
-                "" + this.gameData.flags,
-                this.FLAGS_BOX_X +
-                    this.FLAGS_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
+                "" + value,
+                offsetX + width / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         } else {
             fill("black");
             text(
                 "X",
-                this.FLAGS_BOX_X +
-                    this.FLAGS_BOX_WIDTH / 2 +
-                    this.P5_TEXT_ISNT_REALLY_CENTERED,
+                offsetX + width / 2 + this.P5_TEXT_ISNT_REALLY_CENTERED,
                 this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
             );
         }
@@ -435,9 +273,12 @@ class UI {
         stroke("red");
         strokeWeight(1);
         noFill();
-        let crosshairDiameter = 10;
-        //if (keyIsDown(SHIFT)) crosshairDiameter *= 10;
-        ellipse(mouseX, mouseY, crosshairDiameter, crosshairDiameter);
+        ellipse(
+            mouseX,
+            mouseY,
+            this.CROSSHAIR_DIAMETER,
+            this.CROSSHAIR_DIAMETER
+        );
         stroke("black");
         line(mouseX - 10, mouseY, mouseX + 10, mouseY);
         line(mouseX, mouseY - 10, mouseX, mouseY + 10);
