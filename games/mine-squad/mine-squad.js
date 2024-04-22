@@ -105,7 +105,12 @@ class MineSquad {
     cursorScreenPos = new Vec();
 
     visualEffects = new Set();
+
+    pointSoundIndex = 0;
+    scoringTime = 0;
     tilesToScore = [];
+    BOMB_SCORE_INTERVAL = 175;
+    TILE_SCORE_INTERVAL = 125;
 
     currentState = GAME_STATE.STARTING;
 
@@ -202,8 +207,6 @@ class MineSquad {
         this.mouseClicks = [];
     }
 
-    pointSoundIndex = 0;
-    scoringTime = 0;
     update() {
         this.cursorScreenPos.set(mouseX, mouseY);
         const nowTime = Date.now();
@@ -223,7 +226,7 @@ class MineSquad {
             case GAME_STATE.LEVEL_SCORING:
                 if (this.boardManager.winner && this.tilesToScore.length) {
                     this.scoringTime += this.dt;
-                    if (this.scoringTime > 125) {
+                    if (this.scoringTime > this.TILE_SCORE_INTERVAL) {
                         this.scoringTime = 0;
                         const tile = this.tilesToScore.pop();
                         this.pointSoundIndex =
@@ -242,7 +245,7 @@ class MineSquad {
                     this.tilesToScore.length
                 ) {
                     this.scoringTime += this.dt;
-                    if (this.scoringTime > 250) {
+                    if (this.scoringTime > this.BOMB_SCORE_INTERVAL) {
                         this.scoringTime = 0;
                         const tile = this.tilesToScore.pop();
                         tile.hidden = false;
