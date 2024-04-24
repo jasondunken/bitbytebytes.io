@@ -29,6 +29,7 @@ class UI {
     SCORE_BOX_WIDTH = 96;
     SQUADS_BOX_WIDTH = 128;
     NEXT_BONUS_BOX_WIDTH = 96;
+    HIDDEN_NEIGHBORS_BOX_WIDTH = 80;
     MINES_BOX_WIDTH = 64;
     HIDDEN_BOX_WIDTH = 64;
     FLAGS_BOX_WIDTH = 64;
@@ -38,7 +39,7 @@ class UI {
     SCORE_BOX_X = 312;
     SQUADS_BOX_X = 412;
     NEXT_BONUS_BOX_X = 544;
-    HIDDEN_NEIGHBORS_BOX_X = 680;
+    HIDDEN_NEIGHBORS_BOX_X = 664;
     MINES_BOX_X = 748;
     HIDDEN_BOX_X = 816;
     FLAGS_BOX_X = 884;
@@ -190,8 +191,8 @@ class UI {
     drawHiddenNeighborsBox() {
         this.drawBox(
             this.HIDDEN_NEIGHBORS_BOX_X,
-            this.HIDDEN_BOX_WIDTH,
-            "HIDDEN V",
+            this.HIDDEN_NEIGHBORS_BOX_WIDTH,
+            "NEIGHBORS",
             this.gameData.totalHiddenNeighborCount,
             "white"
         );
