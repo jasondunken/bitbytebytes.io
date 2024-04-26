@@ -461,6 +461,7 @@ class MineSquad {
 
     calculateLevelScore() {
         this.score += this.getClickBonus();
+        this.checkSquadBonus();
     }
 
     calculateFinalScore() {
