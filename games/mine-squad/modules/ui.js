@@ -141,18 +141,33 @@ class UI {
         );
         fill("gray");
         for (let i = 0; i < this.mineSquad.MAX_SQUADS; i++) {
-            if (i + 1 > this.mineSquad.MAX_SQUADS - this.gameData.squads) {
-                fill("SpringGreen");
-            }
-            if (i === this.mineSquad.MAX_SQUADS - this.gameData.squads) {
-                if (keyIsDown(SHIFT) && frameCount % 30 > 15) {
-                    fill("Green");
-                } else if (!keyIsDown(SHIFT) && frameCount % 60 > 30) {
-                    fill("Green");
-                }
-            }
             const xOff = this.SQUADS_SPACING * (i - 1);
             if (this.mineSquad.currentState != GAME_STATE.GAME_OVER) {
+                if (i + 1 > this.mineSquad.MAX_SQUADS - this.gameData.squads) {
+                    fill("SpringGreen");
+                }
+                if (i === this.mineSquad.MAX_SQUADS - this.gameData.squads) {
+                    let fillColor = "green";
+                    if (this.gameData.squads === this.mineSquad.MAX_SQUADS) {
+                        if (
+                            this.gameData.score >
+                            this.gameData.nextBonus * 0.8
+                        ) {
+                            fillColor = "orange";
+                        }
+                        if (
+                            this.gameData.score >
+                            this.gameData.nextBonus * 0.9
+                        ) {
+                            fillColor = "red";
+                        }
+                    }
+                    if (keyIsDown(SHIFT) && frameCount % 30 > 15) {
+                        fill(fillColor);
+                    } else if (!keyIsDown(SHIFT) && frameCount % 60 > 30) {
+                        fill(fillColor);
+                    }
+                }
                 ellipse(
                     this.position.x +
                         this.SQUADS_BOX_X +
