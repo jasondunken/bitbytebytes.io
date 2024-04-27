@@ -194,12 +194,24 @@ class UI {
     }
 
     drawNextBonus() {
+        let fillColor = "white";
+        if (
+            this.gameData.squads === this.mineSquad.MAX_SQUADS &&
+            frameCount % 60 > 30
+        ) {
+            if (this.gameData.score > this.gameData.nextBonus * 0.8) {
+                fillColor = "orange";
+            }
+            if (this.gameData.score > this.gameData.nextBonus * 0.9) {
+                fillColor = "red";
+            }
+        }
         this.drawBox(
             this.NEXT_BONUS_BOX_X,
             this.NEXT_BONUS_BOX_WIDTH,
             "NEXT SQUAD",
             this.gameData.nextBonus,
-            "white"
+            fillColor
         );
     }
 
