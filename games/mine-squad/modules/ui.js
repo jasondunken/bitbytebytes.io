@@ -113,7 +113,7 @@ class UI {
     }
 
     drawScoreBox() {
-        this.drawBox(
+        this.drawIndicatorBox(
             this.SCORE_BOX_X,
             this.SCORE_BOX_WIDTH,
             "SCORE",
@@ -194,24 +194,12 @@ class UI {
     }
 
     drawNextBonus() {
-        let fillColor = "white";
-        if (
-            this.gameData.squads === this.mineSquad.MAX_SQUADS &&
-            frameCount % 60 > 30
-        ) {
-            if (this.gameData.score > this.gameData.nextBonus * 0.8) {
-                fillColor = "orange";
-            }
-            if (this.gameData.score > this.gameData.nextBonus * 0.9) {
-                fillColor = "red";
-            }
-        }
-        this.drawBox(
+        this.drawIndicatorBox(
             this.NEXT_BONUS_BOX_X,
             this.NEXT_BONUS_BOX_WIDTH,
             "NEXT SQUAD",
             this.gameData.nextBonus,
-            fillColor
+            "white"
         );
     }
 
@@ -253,6 +241,22 @@ class UI {
             this.gameData.flags,
             "yellow"
         );
+    }
+
+    drawIndicatorBox(offsetX, width, label, value, valueColor) {
+        let fillColor = valueColor;
+        if (
+            this.gameData.squads === this.mineSquad.MAX_SQUADS &&
+            frameCount % 60 > 30
+        ) {
+            if (this.gameData.score > this.gameData.nextBonus * 0.8) {
+                fillColor = "orange";
+            }
+            if (this.gameData.score > this.gameData.nextBonus * 0.9) {
+                fillColor = "red";
+            }
+        }
+        this.drawBox(offsetX, width, label, value, fillColor);
     }
 
     drawBox(offsetX, width, label, value, valueColor) {
