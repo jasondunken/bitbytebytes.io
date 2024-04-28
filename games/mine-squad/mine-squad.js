@@ -247,7 +247,11 @@ class MineSquad {
                     this.scoringTime += this.dt;
                     if (this.scoringTime > this.BOMB_SCORE_INTERVAL) {
                         this.scoringTime = 0;
-                        const tile = this.tilesToScore.pop();
+                        let bombIndex = Math.floor(
+                            Math.random() * this.tilesToScore.length
+                        );
+                        const tile = this.tilesToScore[bombIndex];
+                        this.tilesToScore.splice(bombIndex, 1);
                         tile.hidden = false;
                         this.boardManager.addExplosion(tile);
                     }
