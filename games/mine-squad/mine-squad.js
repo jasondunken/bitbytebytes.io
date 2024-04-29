@@ -310,7 +310,10 @@ class MineSquad {
                 }
                 this.currentState = GAME_STATE.PLAYING;
             }
-            if (this.currentState === GAME_STATE.PLAYING) {
+            if (
+                this.currentState === GAME_STATE.PLAYING ||
+                this.currentState === GAME_STATE.STARTING
+            ) {
                 if (keyIsDown(CONTROL)) {
                     this.addFlag(tile);
                     return;
