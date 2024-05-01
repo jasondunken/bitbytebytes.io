@@ -266,7 +266,8 @@ class BoardManager {
     draw(cursorPos) {
         this.drawBoard();
         if (
-            this.mineSquad.currentState === GAME_STATE.PLAYING &&
+            (this.mineSquad.currentState === GAME_STATE.PLAYING ||
+                this.mineSquad.currentState === GAME_STATE.STARTING) &&
             this.isOnBoard(cursorPos)
         ) {
             if (keyIsDown(SHIFT)) {
