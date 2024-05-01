@@ -3,7 +3,7 @@ import * as utils from "./utils.js";
 import { Vec } from "../../modules/math/vec.js";
 import { GAME_STATE } from "./game-state.js";
 import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
-import { LayerManager } from "../../modules/graphics/layer-manager.js";
+import { LayerManager, LAYERS } from "../../modules/graphics/layer-manager.js";
 
 class BoardManager {
     TILE_HEIGHT = 30;
@@ -143,7 +143,7 @@ class BoardManager {
 
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        this.addTileScore(tile);
+        this.addTileScore(tile, LAYERS.SPRITES_2);
 
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
 
@@ -170,7 +170,7 @@ class BoardManager {
         LayerManager.AddObject(new Explosion(position));
     }
 
-    addTileScore(tile) {
+    addTileScore(tile, layer) {
         let color = "blue";
         let score = 0;
         if (tile.bomb) {
@@ -183,7 +183,7 @@ class BoardManager {
         }
         this.mineSquad.score += score;
         if (score > 0) {
-            this.addBonusEffect(tile, score, color);
+            this.addBonusEffect(tile, score, color, layer);
         }
     }
 
@@ -197,14 +197,14 @@ class BoardManager {
         LayerManager.AddObject(new ScoreEffect(position, score, tile.value));
     }
 
-    addBonusEffect(tile, score, color) {
+    addBonusEffect(tile, score, color, layer) {
         const tileIndex = this.board.tiles.indexOf(tile);
         const position = utils.tileIndexToTileCenter(
             tileIndex,
             this.TILE_HEIGHT,
             this.boardBounds
         );
-        LayerManager.AddObject(new BonusEffect(position, score, color));
+        LayerManager.AddObject(new BonusEffect(position, score, color), layer);
     }
 
     getDefuseAreaTiles(tileIndex) {

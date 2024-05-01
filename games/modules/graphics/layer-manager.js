@@ -36,8 +36,6 @@ export class LayerManager {
         }
         const layer = LayerManager.layers.get(layerId);
         layer.add(obj);
-
-        // console.log("layerM: ", LayerManager.layers);
     }
 
     static Update(delta) {
