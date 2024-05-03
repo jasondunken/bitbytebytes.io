@@ -109,7 +109,7 @@ class UI {
         this.drawBox(
             this.TIME_BOX_X,
             this.TIME_BOX_WIDTH,
-            "TIME",
+            "LEVEL TIME",
             getElapsedTimeString(this.gameData.time),
             "white"
         );

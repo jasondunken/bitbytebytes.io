@@ -183,6 +183,7 @@ class MineSquad {
 
     nextLevel() {
         this.level++;
+        this.gameTime = 0;
         if (
             this.level % 2 == 1 &&
             this.boardConfig.hTiles < this.MAX_TILES_HEIGHT
