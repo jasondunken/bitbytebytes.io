@@ -308,6 +308,17 @@ class BoardManager {
                     utils.setColor("black");
                 }
 
+                if (tile.bonus) {
+                    noStroke();
+                    fill(tile.bonus.type);
+                    rect(
+                        position.x,
+                        position.y,
+                        this.TILE_HEIGHT,
+                        this.TILE_HEIGHT
+                    );
+                }
+
                 if (tile.bomb) {
                     this.drawBomb(tile.bomb, position);
                 }

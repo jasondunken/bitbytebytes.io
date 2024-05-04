@@ -82,6 +82,12 @@ class MineSquad {
     BASE_CLICK_BONUS = 10000;
     FLAG_COST = 100;
 
+    BONUS_TILES = [
+        { type: "RED", score: 1000 },
+        { type: "BLUE", score: 500 },
+        { type: "YELLOW", score: 250 },
+    ];
+
     DEFAULT_BOARD_CONFIG = {
         wTiles: 10,
         hTiles: 10,
@@ -167,10 +173,20 @@ class MineSquad {
         this.mouseClicks = [];
         this.clicksThisLevel = 0;
 
+        const bonusTiles = [];
+        for (let i = 0; i < 10; i++) {
+            bonusTiles.push(
+                this.BONUS_TILES[
+                    Math.floor(Math.random() * this.BONUS_TILES.length)
+                ]
+            );
+        }
+
         this.boardConfig = {
             wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
             hTiles: this.DEFAULT_BOARD_CONFIG.hTiles,
             mines: this.DEFAULT_BOARD_CONFIG.mines,
+            bonusTiles,
         };
 
         this.boardManager.generateBoard(this.boardConfig);
@@ -464,6 +480,7 @@ class MineSquad {
             wTiles: this.DEFAULT_BOARD_CONFIG.wTiles,
             hTiles: this.DEFAULT_BOARD_CONFIG.hTiles,
             mines: this.DEFAULT_BOARD_CONFIG.mines,
+            bonusTiles: [],
         };
     }
 

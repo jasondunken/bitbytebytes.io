@@ -7,6 +7,7 @@ class BoardBuilder {
         }
         this.placeMines(tiles, config.mines);
         this.calculateValues(tiles);
+        this.placeBonusTiles(tiles, config.bonusTiles);
         return {
             wTiles: config.wTiles,
             tiles,
@@ -27,6 +28,16 @@ class BoardBuilder {
     calculateValues(newBoard) {
         for (let i = 0; i < newBoard.length; i++) {
             newBoard[i].value = this.countNeighbors(newBoard, i);
+        }
+    }
+
+    placeBonusTiles(newBoard, bonusTiles) {
+        for (let bonus of bonusTiles) {
+            const rndIndex = Math.floor(Math.random() * newBoard.length);
+            const tile = newBoard[rndIndex];
+            if (!tile.bomb && tile.value === 0) {
+                tile.bonus = new BonusTile(bonus.type, bonus.score);
+            }
         }
     }
 
@@ -93,6 +104,14 @@ class Tile {
         this.bomb = false;
         this.flagged = false;
         this.value = 0;
+    }
+}
+
+class BonusTile extends Tile {
+    constructor(type, score) {
+        super();
+        this.type = type;
+        this.score = score;
     }
 }
 
