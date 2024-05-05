@@ -27,6 +27,16 @@ function preload() {
     sprites["bomb_defused"] = loadImage(
         "./mine-squad/res/img/bomb-defused.png"
     );
+    sprites["diamond_green"] = loadImage(
+        "./mine-squad/res/img/diamond-green.png"
+    );
+    sprites["diamond_purple"] = loadImage(
+        "./mine-squad/res/img/diamond-purple.png"
+    );
+    sprites["diamond_red"] = loadImage("./mine-squad/res/img/diamond-red.png");
+    sprites["diamond_yellow"] = loadImage(
+        "./mine-squad/res/img/diamond-yellow.png"
+    );
     sprites["background"] = loadImage("./mine-squad/res/img/grass.png");
     MineSquad.sprites = sprites;
 }
@@ -83,9 +93,10 @@ class MineSquad {
     FLAG_COST = 100;
 
     BONUS_TILES = [
-        { type: "RED", score: 1000 },
-        { type: "BLUE", score: 500 },
-        { type: "YELLOW", score: 250 },
+        { type: "red", score: 1000 },
+        { type: "purple", score: 750 },
+        { type: "green", score: 500 },
+        { type: "yellow", score: 250 },
     ];
 
     DEFAULT_BOARD_CONFIG = {

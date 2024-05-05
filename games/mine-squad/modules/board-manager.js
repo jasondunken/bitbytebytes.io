@@ -309,14 +309,7 @@ class BoardManager {
                 }
 
                 if (tile.bonus) {
-                    noStroke();
-                    fill(tile.bonus.type);
-                    rect(
-                        position.x,
-                        position.y,
-                        this.TILE_HEIGHT,
-                        this.TILE_HEIGHT
-                    );
+                    this.drawBonus(tile.bonus, position);
                 }
 
                 if (tile.bomb) {
@@ -357,6 +350,17 @@ class BoardManager {
         const sprite = bomb.live
             ? this.sprites["bomb"]
             : this.sprites["bomb_defused"];
+        image(
+            sprite,
+            position.x + 2,
+            position.y + 2,
+            this.TILE_HEIGHT - 4,
+            this.TILE_HEIGHT - 4
+        );
+    }
+
+    drawBonus(bonus, position) {
+        const sprite = this.sprites["diamond_" + bonus.type];
         image(
             sprite,
             position.x + 2,
