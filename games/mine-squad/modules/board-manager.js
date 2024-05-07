@@ -180,6 +180,11 @@ class BoardManager {
         } else if (tile.value > 0) {
             score +=
                 tile.value * this.mineSquad.DEFUSE_BONUS * this.mineSquad.level;
+        } else if (tile.bonus) {
+            score +=
+                tile.bonus.score *
+                this.mineSquad.DEFUSE_BONUS *
+                this.mineSquad.level;
         }
         this.mineSquad.score += score;
         if (score > 0) {
