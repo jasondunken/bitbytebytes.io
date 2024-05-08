@@ -332,7 +332,7 @@ class MineSquad {
             let tile = this.boardManager.getTileByIndex(tileIndex);
 
             if (this.currentState === GAME_STATE.STARTING) {
-                while (tile.value != 0 || tile.bomb) {
+                while (tile.bomb) {
                     this.boardManager.generateBoard(this.boardConfig);
                     tile = this.boardManager.getTileByIndex(tileIndex);
                 }
@@ -364,6 +364,9 @@ class MineSquad {
                         selectSound.play();
                         this.boardManager.checkTile(tile, tileIndex);
                     }
+                }
+                if (tile.bonus) {
+                    this.boardManager.addBonusScore(tile);
                 }
                 this.checkSquadBonus();
             }

@@ -2,7 +2,12 @@ import { BoardBuilder } from "./board-builder.js";
 import * as utils from "./utils.js";
 import { Vec } from "../../modules/math/vec.js";
 import { GAME_STATE } from "./game-state.js";
-import { ScoreEffect, BonusEffect, Explosion } from "./visual-effects.js";
+import {
+    ScoreEffect,
+    BonusEffect,
+    Explosion,
+    Fireworks,
+} from "./visual-effects.js";
 import { LayerManager, LAYERS } from "../../modules/graphics/layer-manager.js";
 
 class BoardManager {
@@ -192,12 +197,14 @@ class BoardManager {
     }
 
     addBonusScore(tile, layer) {
-        score +=
+        let score =
             tile.bonus.score *
             this.mineSquad.DEFUSE_BONUS *
             this.mineSquad.level;
 
-        this.addBonusEffect(tile, score, color, layer);
+        this.mineSquad.score += score;
+        this.addBonusEffect(tile, score, tile.bonus.type, layer);
+        this.addFireworks(tile);
     }
 
     addScoreEffect(tile, score) {
@@ -218,6 +225,16 @@ class BoardManager {
             this.boardBounds
         );
         LayerManager.AddObject(new BonusEffect(position, score, color), layer);
+    }
+
+    addFireworks(tile) {
+        const tileIndex = this.board.tiles.indexOf(tile);
+        const position = utils.tileIndexToTileCenter(
+            tileIndex,
+            this.TILE_HEIGHT,
+            this.boardBounds
+        );
+        LayerManager.AddObject(new Fireworks(position));
     }
 
     getDefuseAreaTiles(tileIndex) {
