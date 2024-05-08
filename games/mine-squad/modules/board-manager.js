@@ -143,7 +143,11 @@ class BoardManager {
 
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
-        this.addTileScore(tile, LAYERS.SPRITES_2);
+        if (tile.bonus) {
+            this.addBonusScore(tile.LAYERS.SPRITES_2);
+        } else {
+            this.addTileScore(tile, LAYERS.SPRITES_2);
+        }
 
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
 
@@ -180,16 +184,20 @@ class BoardManager {
         } else if (tile.value > 0) {
             score +=
                 tile.value * this.mineSquad.DEFUSE_BONUS * this.mineSquad.level;
-        } else if (tile.bonus) {
-            score +=
-                tile.bonus.score *
-                this.mineSquad.DEFUSE_BONUS *
-                this.mineSquad.level;
         }
         this.mineSquad.score += score;
         if (score > 0) {
             this.addBonusEffect(tile, score, color, layer);
         }
+    }
+
+    addBonusScore(tile, layer) {
+        score +=
+            tile.bonus.score *
+            this.mineSquad.DEFUSE_BONUS *
+            this.mineSquad.level;
+
+        this.addBonusEffect(tile, score, color, layer);
     }
 
     addScoreEffect(tile, score) {
