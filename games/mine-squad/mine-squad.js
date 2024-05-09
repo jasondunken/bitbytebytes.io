@@ -325,11 +325,15 @@ class MineSquad {
 
     handleMouseClick() {
         if (this.boardManager.isOnBoard(this.cursorScreenPos)) {
-            this.mouseClicks.push(this.cursorScreenPos.copy());
-            this.clicksThisLevel++;
+            if (this.currentState === GAME_STATE.GAME_OVER) {
+                this.startGame();
+                return;
+            }
 
             const tileIndex = this.boardManager.getIndex(this.cursorScreenPos);
             let tile = this.boardManager.getTileByIndex(tileIndex);
+
+            if (!tile.hidden) return;
 
             if (this.currentState === GAME_STATE.STARTING) {
                 while (tile.bomb) {
@@ -338,10 +342,11 @@ class MineSquad {
                 }
                 this.currentState = GAME_STATE.PLAYING;
             }
-            if (
-                this.currentState === GAME_STATE.PLAYING ||
-                this.currentState === GAME_STATE.STARTING
-            ) {
+
+            if (this.currentState === GAME_STATE.PLAYING) {
+                this.mouseClicks.push(this.cursorScreenPos.copy());
+                this.clicksThisLevel++;
+
                 if (keyIsDown(CONTROL)) {
                     this.addFlag(tile);
                     return;
@@ -370,9 +375,6 @@ class MineSquad {
                 }
                 this.checkSquadBonus();
             }
-        }
-        if (this.currentState === GAME_STATE.GAME_OVER) {
-            this.startGame();
         }
     }
 
@@ -424,7 +426,10 @@ class MineSquad {
 
     checkSquadBonus() {
         if (this.score > this.squad_bonus_threshold) {
-            this.squad_bonus_threshold = this.squad_bonus_threshold * 2;
+            this.squad_bonus_threshold =
+                this.score + this.squad_bonus_threshold * 2;
+            this.squad_bonus_threshold =
+                Math.floor(this.squad_bonus_threshold / 1000) * 1000;
             this.addSquad();
             this.checkSquadBonus();
         }
