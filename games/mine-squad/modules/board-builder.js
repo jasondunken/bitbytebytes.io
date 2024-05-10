@@ -32,12 +32,19 @@ class BoardBuilder {
     }
 
     placeBonusTiles(newBoard, bonusTiles) {
-        for (let bonus of bonusTiles) {
+        let placedTiles = 0;
+        let maxAttempts = 100;
+        let bonus = bonusTiles[placedTiles];
+        while (placedTiles < bonusTiles.length) {
             const rndIndex = Math.floor(Math.random() * newBoard.length);
             const tile = newBoard[rndIndex];
-            if (!tile.bomb && tile.value === 0) {
+            if (!tile.bomb && tile.value === 0 && !tile?.bonus) {
                 tile.bonus = new BonusTile(bonus.type, bonus.score);
+                placedTiles++;
+                bonus = bonusTiles[placedTiles];
             }
+            maxAttempts--;
+            if (maxAttempts <= 0) break;
         }
     }
 
