@@ -234,7 +234,13 @@ class BoardManager {
             this.TILE_HEIGHT,
             this.boardBounds
         );
-        LayerManager.AddObject(new Fireworks(position));
+        LayerManager.AddObject(
+            new Fireworks(position, {
+                startDelay: 0,
+                numVolleys: 1,
+                volleyRate: 0,
+            })
+        );
     }
 
     getDefuseAreaTiles(tileIndex) {
