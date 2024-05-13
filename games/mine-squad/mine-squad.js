@@ -336,7 +336,7 @@ class MineSquad {
             if (!tile.hidden) return;
 
             if (this.currentState === GAME_STATE.STARTING) {
-                while (tile.bomb) {
+                while (tile.bomb || tile.value > 0) {
                     this.boardManager.generateBoard(this.boardConfig);
                     tile = this.boardManager.getTileByIndex(tileIndex);
                 }
