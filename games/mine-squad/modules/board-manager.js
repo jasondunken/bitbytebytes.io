@@ -299,6 +299,12 @@ class BoardManager {
         return score;
     }
 
+    uncoverAllTiles() {
+        for (let tile of this.board.tiles) {
+            tile.hidden = false;
+        }
+    }
+
     draw(cursorPos) {
         this.drawBoard();
         if (

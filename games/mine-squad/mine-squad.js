@@ -484,6 +484,8 @@ class MineSquad {
     }
 
     gameOver() {
+        this.boardManager.uncoverAllTiles();
+
         this.currentState = GAME_STATE.GAME_OVER;
         this.highScorePanel = new HighScorePanel(
             this.width,
