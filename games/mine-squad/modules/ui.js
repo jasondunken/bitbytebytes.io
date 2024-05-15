@@ -69,7 +69,7 @@ class UI {
             this.position.y + this.UI_BOX_Y + this.UI_VALUE_CENTER_Y
         );
         LayerManager.AddObject(
-            new TextEffect(position, message, messageColor),
+            new TextEffect(position, message, 32, messageColor),
             LAYERS.UI
         );
     }

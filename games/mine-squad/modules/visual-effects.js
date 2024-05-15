@@ -3,6 +3,7 @@ import { Vec } from "../../modules/math/vec.js";
 import { Particle } from "../../modules/graphics/particle.js";
 
 class VisualEffect {
+    TEXT_DEFAULT_SIZE = 24;
     remove = false;
     layer = 0;
 
@@ -39,6 +40,7 @@ class ScoreEffect extends VisualEffect {
         stroke(this.outlineColor);
         fill(this.color);
         textStyle(BOLD);
+        textSize(this.TEXT_DEFAULT_SIZE);
         text(this.score, this.position.x, this.position.y);
         textStyle(NORMAL);
     }
@@ -63,6 +65,7 @@ class BonusEffect extends VisualEffect {
         stroke("white");
         fill(this.color);
         textStyle(BOLD);
+        textSize(this.TEXT_DEFAULT_SIZE);
         text(this.score, this.position.x, this.position.y);
         textStyle(NORMAL);
     }
@@ -70,9 +73,10 @@ class BonusEffect extends VisualEffect {
 
 class TextEffect extends VisualEffect {
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, text, color, layer) {
+    constructor(position, text, size, color, layer) {
         super(position, layer);
         this.text = text;
+        this.size = size || this.TEXT_DEFAULT_SIZE;
         this.color = color || "green";
     }
 
@@ -87,6 +91,7 @@ class TextEffect extends VisualEffect {
         stroke("white");
         fill(this.color);
         textStyle(BOLD);
+        textSize(this.size);
         text(this.text, this.position.x, this.position.y);
         textStyle(NORMAL);
     }
