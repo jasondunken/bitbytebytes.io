@@ -59,6 +59,13 @@ export class LayerManager {
         return true;
     }
 
+    static ClearLayers() {
+        for (let layerId of RENDER_ORDER) {
+            const layer = LayerManager.layers.get(layerId);
+            layer.clear();
+        }
+    }
+
     static Render() {
         for (let layerId of RENDER_ORDER) {
             const layer = LayerManager.layers.get(layerId);

@@ -265,6 +265,10 @@ class BoardManager {
         this.winner = isWinner;
     }
 
+    isGameOver() {
+        return this.completed && !this.winner;
+    }
+
     getScoreableTiles() {
         if (this.winner) {
             return this.board.tiles.filter((tile) => {
