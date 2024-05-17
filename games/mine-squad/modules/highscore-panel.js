@@ -3,6 +3,11 @@ import { Vec } from "../../modules/math/vec.js";
 class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
+
+    DEFAULT_TEXT_SIZE = 16;
+    TITLE_SIZE = 32;
+    SCORE_SIZE = 18;
+
     position = new Vec();
     MAX_SCORES = 200;
     MAX_DISPLAY_SCORES = 10;
@@ -79,17 +84,17 @@ class HighScorePanel {
         rect(this.position.x, this.position.y, this.WIDTH, this.HEIGHT);
 
         noStroke();
-        textSize(32);
+        textSize(this.TITLE_SIZE);
         textAlign(CENTER);
 
         fill("red");
         text("Game Over!", this.position.x + this.WIDTH / 2, 60);
 
         fill("black");
-        textSize(16);
+        textSize(this.DEFAULT_TEXT_SIZE);
         text("High Scores", this.position.x + this.WIDTH / 2, 100);
 
-        textSize(18);
+        textSize(this.SCORE_SIZE);
         this.highScores.forEach((score, i) => {
             if (i < this.MAX_DISPLAY_SCORES) {
                 if (score.score == this.score.score && frameCount % 40 < 30) {
@@ -118,7 +123,7 @@ class HighScorePanel {
 
         if (frameCount % 40 < 30) {
             fill("red");
-            textSize(18);
+            textSize(this.SCORE_SIZE);
             textAlign(LEFT);
             text(this.score.num, this.position.x + 32, 380);
             textAlign(CENTER);
@@ -133,7 +138,7 @@ class HighScorePanel {
 
         fill("black");
         noStroke();
-        textSize(18);
+        textSize(this.DEFAULT_TEXT_SIZE);
         textAlign(CENTER);
         if (frameCount % 120 > 60) {
             text("Click to restart", this.position.x + this.WIDTH / 2, 430);
