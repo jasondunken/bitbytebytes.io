@@ -62,7 +62,9 @@ export class LayerManager {
     static ClearLayers() {
         for (let layerId of RENDER_ORDER) {
             const layer = LayerManager.layers.get(layerId);
-            layer.clear();
+            if (layer) {
+                layer.clear();
+            }
         }
     }
 
