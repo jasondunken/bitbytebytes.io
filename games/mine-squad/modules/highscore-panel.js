@@ -78,18 +78,29 @@ class HighScorePanel {
     }
 
     draw() {
+        this.drawContainer();
+        this.drawHeading();
+        this.drawHighscores();
+        this.drawAction();
+    }
+
+    drawContainer() {
         stroke("black");
         strokeWeight(3);
         fill("gray");
         rect(this.position.x, this.position.y, this.WIDTH, this.HEIGHT);
+    }
 
+    drawHeading() {
         noStroke();
         textSize(this.TITLE_SIZE);
         textAlign(CENTER);
 
         fill("red");
         text("Game Over!", this.position.x + this.WIDTH / 2, 60);
+    }
 
+    drawHighscores() {
         fill("black");
         textSize(this.DEFAULT_TEXT_SIZE);
         text("High Scores", this.position.x + this.WIDTH / 2, 100);
@@ -135,7 +146,9 @@ class HighScorePanel {
             textAlign(RIGHT);
             text(this.score.score, this.position.x + this.WIDTH - 32, 380);
         }
+    }
 
+    drawAction() {
         fill("black");
         noStroke();
         textSize(this.DEFAULT_TEXT_SIZE);
