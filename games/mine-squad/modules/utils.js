@@ -75,6 +75,27 @@ function getElapsedTimeString(gameTime) {
     return minutes + ":" + secondsStr;
 }
 
+function formatNumber(number) {
+    let fNumber = "";
+    while (number > 0) {
+        if (Math.floor(number / 1000) > 0) {
+            fNumber = padPartialNumber("" + (number % 1000)) + fNumber;
+            fNumber = "," + fNumber;
+        } else {
+            fNumber = number + fNumber;
+        }
+        number = Math.floor(number / 1000);
+    }
+    return fNumber;
+}
+
+function padPartialNumber(numberString) {
+    while (numberString.length < 3) {
+        numberString = "0" + numberString;
+    }
+    return numberString;
+}
+
 export {
     setColor,
     valueToColor,
@@ -84,4 +105,5 @@ export {
     screenPositionToTileCenter,
     screenPositionToTileTopLeft,
     getElapsedTimeString,
+    formatNumber,
 };
