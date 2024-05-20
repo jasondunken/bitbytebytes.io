@@ -2,6 +2,8 @@ import { valueToColor } from "./utils.js";
 import { Vec } from "../../modules/math/vec.js";
 import { Particle } from "../../modules/graphics/particle.js";
 
+import { formatNumber } from "../modules/utils.js";
+
 class VisualEffect {
     TEXT_DEFAULT_SIZE = 24;
     remove = false;
@@ -41,7 +43,7 @@ class ScoreEffect extends VisualEffect {
         fill(this.color);
         textStyle(BOLD);
         textSize(this.TEXT_DEFAULT_SIZE);
-        text(this.score, this.position.x, this.position.y);
+        text(formatNumber(this.score), this.position.x, this.position.y);
         textStyle(NORMAL);
     }
 }
@@ -66,7 +68,7 @@ class BonusEffect extends VisualEffect {
         fill(this.color);
         textStyle(BOLD);
         textSize(this.TEXT_DEFAULT_SIZE);
-        text(this.score, this.position.x, this.position.y);
+        text(formatNumber(this.score), this.position.x, this.position.y);
         textStyle(NORMAL);
     }
 }
