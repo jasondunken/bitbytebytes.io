@@ -76,6 +76,7 @@ function getElapsedTimeString(gameTime) {
 }
 
 function formatNumber(number) {
+    if (number === 0) return "0";
     let fNumber = "";
     while (number > 0) {
         if (Math.floor(number / 1000) > 0) {
