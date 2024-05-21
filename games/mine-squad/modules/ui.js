@@ -5,6 +5,8 @@ import { getElapsedTimeString } from "./utils.js";
 
 import { LayerManager, LAYERS } from "../../modules/graphics/layer-manager.js";
 
+import { formatNumber } from "./utils.js";
+
 class UI {
     P5_TEXT_ISNT_REALLY_CENTERED = 5;
     LABEL_SIZE = 12;
@@ -120,7 +122,7 @@ class UI {
             this.SCORE_BOX_X,
             this.SCORE_BOX_WIDTH,
             "SCORE",
-            this.gameData.score,
+            formatNumber(this.gameData.score),
             "white"
         );
     }
@@ -201,7 +203,7 @@ class UI {
             this.NEXT_BONUS_BOX_X,
             this.NEXT_BONUS_BOX_WIDTH,
             "NEXT SQUAD",
-            this.gameData.nextBonus,
+            formatNumber(this.gameData.nextBonus),
             "white"
         );
     }
