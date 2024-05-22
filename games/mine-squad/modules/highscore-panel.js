@@ -1,5 +1,7 @@
 import { Vec } from "../../modules/math/vec.js";
 
+import { formatNumber } from "./utils.js";
+
 class HighScorePanel {
     WIDTH = 400;
     HEIGHT = 425;
@@ -125,7 +127,7 @@ class HighScorePanel {
                 );
                 textAlign(RIGHT);
                 text(
-                    score.score,
+                    formatNumber(score.score),
                     this.position.x + this.WIDTH - 32,
                     135 + i * 24
                 );
@@ -144,7 +146,11 @@ class HighScorePanel {
                 380
             );
             textAlign(RIGHT);
-            text(this.score.score, this.position.x + this.WIDTH - 32, 380);
+            text(
+                formatNumber(this.score.score),
+                this.position.x + this.WIDTH - 32,
+                380
+            );
         }
     }
 
