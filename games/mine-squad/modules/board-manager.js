@@ -149,7 +149,7 @@ class BoardManager {
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
         if (tile.bonus) {
-            this.addBonusScore(tile.LAYERS.SPRITES_2);
+            this.addBonusScore(tile, LAYERS.SPRITES_2);
         } else {
             this.addTileScore(tile, LAYERS.SPRITES_2);
         }
