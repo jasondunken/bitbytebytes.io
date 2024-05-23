@@ -265,7 +265,11 @@ class MineSquad {
                         pointsSound.play();
                         const score = this.TILE_BONUS * tile.value * this.level;
                         this.score += score;
-                        this.boardManager.addScoreEffect(tile, score);
+                        this.boardManager.addScoreEffect(
+                            tile,
+                            undefined,
+                            score
+                        );
                         this.checkSquadBonus();
                     }
                 } else if (
@@ -457,7 +461,7 @@ class MineSquad {
             tile.flagged = true;
             this.flagsUsed++;
             this.score -= this.FLAG_COST;
-            this.boardManager.addScoreEffect(tile, -this.FLAG_COST);
+            this.boardManager.addScoreEffect(tile, undefined, -this.FLAG_COST);
             const placeFlagSound = new Audio();
             placeFlagSound.src = "./mine-squad/res/snd/place-flag.wav";
             placeFlagSound.play();

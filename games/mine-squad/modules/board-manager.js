@@ -134,7 +134,7 @@ class BoardManager {
             tile.value * this.mineSquad.TILE_MULTIPLIER * this.mineSquad.level;
         this.mineSquad.score += tileScore;
         if (tile.value > 0) {
-            this.addScoreEffect(tile, tileScore);
+            this.addScoreEffect(tile, undefined, tileScore);
         }
         // if tile.value is zero and not already checked, uncover all the tiles around it
         if (tile.value === 0 && !checkedTiles.includes(tileIndex)) {
@@ -149,9 +149,9 @@ class BoardManager {
     defuseWithinRadius(tile, tileIndex) {
         tile.hidden = false;
         if (tile.bonus) {
-            this.addBonusScore(tile, LAYERS.SPRITES_2);
+            this.addBonusScore(tile, 32, LAYERS.SPRITES_2);
         } else {
-            this.addTileScore(tile, LAYERS.SPRITES_2);
+            this.addTileScore(tile, 32, LAYERS.SPRITES_2);
         }
 
         const defuseArea = this.getDefuseAreaTiles(tileIndex);
@@ -179,7 +179,7 @@ class BoardManager {
         LayerManager.AddObject(new Explosion(position));
     }
 
-    addTileScore(tile, layer) {
+    addTileScore(tile, size, layer) {
         let color = "blue";
         let score = 0;
         if (tile.bomb) {
@@ -192,39 +192,44 @@ class BoardManager {
         }
         this.mineSquad.score += score;
         if (score > 0) {
-            this.addBonusEffect(tile, score, color, layer);
+            this.addBonusEffect(tile, score, size, color, layer);
         }
     }
 
-    addBonusScore(tile, layer) {
+    addBonusScore(tile, size, layer) {
         let score =
             tile.bonus.score *
             this.mineSquad.DEFUSE_BONUS *
             this.mineSquad.level;
 
         this.mineSquad.score += score;
-        this.addBonusEffect(tile, score, tile.bonus.type, layer);
+        this.addBonusEffect(tile, score, size, tile.bonus.type, layer);
         this.addFireworks(tile);
     }
 
-    addScoreEffect(tile, score) {
+    addScoreEffect(tile, size, score) {
         const tileIndex = this.board.tiles.indexOf(tile);
         const position = utils.tileIndexToTileCenter(
             tileIndex,
             this.TILE_HEIGHT,
             this.boardBounds
         );
-        LayerManager.AddObject(new ScoreEffect(position, score, tile.value));
+        LayerManager.AddObject(
+            new ScoreEffect(position, score, size, tile.value)
+        );
     }
 
-    addBonusEffect(tile, score, color, layer) {
+    addBonusEffect(tile, score, size, color, layer) {
         const tileIndex = this.board.tiles.indexOf(tile);
         const position = utils.tileIndexToTileCenter(
             tileIndex,
             this.TILE_HEIGHT,
             this.boardBounds
         );
-        LayerManager.AddObject(new BonusEffect(position, score, color), layer);
+        LayerManager.AddObject(
+            new BonusEffect(position, score, size, color),
+            layer
+        );
     }
 
     addFireworks(tile) {

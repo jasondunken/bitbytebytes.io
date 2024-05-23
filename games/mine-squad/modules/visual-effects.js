@@ -21,9 +21,10 @@ class VisualEffect {
 class ScoreEffect extends VisualEffect {
     opacity = 255;
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score, value, layer) {
+    constructor(position, score, size, value, layer) {
         super(position, layer);
         this.score = score;
+        this.size = size || this.TEXT_DEFAULT_SIZE;
         this.color = color(valueToColor(value));
         this.outlineColor = color("white");
     }
@@ -42,7 +43,7 @@ class ScoreEffect extends VisualEffect {
         stroke(this.outlineColor);
         fill(this.color);
         textStyle(BOLD);
-        textSize(this.TEXT_DEFAULT_SIZE);
+        textSize(this.size);
         text(formatNumber(this.score), this.position.x, this.position.y);
         textStyle(NORMAL);
     }
@@ -50,9 +51,10 @@ class ScoreEffect extends VisualEffect {
 
 class BonusEffect extends VisualEffect {
     vSpeed = Math.floor(Math.random() * 3 + 2);
-    constructor(position, score, color, layer) {
+    constructor(position, score, size, color, layer) {
         super(position, layer);
         this.score = score;
+        this.size = size || this.TEXT_DEFAULT_SIZE;
         this.color = color || "red";
     }
 
@@ -67,7 +69,7 @@ class BonusEffect extends VisualEffect {
         stroke("white");
         fill(this.color);
         textStyle(BOLD);
-        textSize(this.TEXT_DEFAULT_SIZE);
+        textSize(this.size);
         text(formatNumber(this.score), this.position.x, this.position.y);
         textStyle(NORMAL);
     }
@@ -100,7 +102,7 @@ class TextEffect extends VisualEffect {
 }
 
 class BonusSquadEffect extends VisualEffect {
-    size = 32;
+    DEFAULT_SIZE = 32;
     MAX_SIZE = 64;
 
     color = "red";
@@ -109,6 +111,7 @@ class BonusSquadEffect extends VisualEffect {
 
     constructor(position, layer) {
         super(position, layer);
+        this.size = this.DEFAULT_SIZE;
     }
 
     update() {
@@ -116,7 +119,7 @@ class BonusSquadEffect extends VisualEffect {
         if (this.size >= this.MAX_SIZE) {
             this.repetitions--;
             if (this.repetitions > 0) {
-                this.size = 32;
+                this.size = this.DEFAULT_SIZE;
             } else {
                 this.remove = true;
             }
