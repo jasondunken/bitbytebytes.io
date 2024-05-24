@@ -203,7 +203,7 @@ class BoardManager {
             this.mineSquad.level;
 
         this.mineSquad.score += score;
-        this.addBonusEffect(tile, score, size, tile.bonus.type, layer);
+        this.addBonusEffect(tile, score, 32, tile.bonus.type, layer);
         this.addFireworks(tile);
     }
 
